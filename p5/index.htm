@@ -1,0 +1,44 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="zh-tw">
+<meta http-equiv="Content-Type" content="text/html; charset=big5">
+<title>CBETA XML TEI P4 =</title>
+<style>
+<!--
+body         { font-family: Verdana }
+h1           { font-family: Times New Roman }
+h2           { font-family: Times New Roman }
+-->
+</style>
+</head>
+
+<body>
+
+<h1>CBETA XML TEI P4 =&gt; P5 Steps</h1>
+<p align="right">Ray Chou 2007.1.8</p>
+<h2>X2R TXT =&gt; XML</h2>
+<ul>
+	<li>CVS update \cbwork\common\X2R</li>
+	<li>cd \cbwork\bin\p5</li>
+	<li>執行 x2r-xml.py</li>
+</ul>
+<h2>gaiji-m.mdb =&gt; cbgaiji.xml</h2>
+<p>MS Access 開啟 gaiji-m.mdb 匯出 XML 到 /cbwork/bin/p5/cbgaiji.xml</p>
+<h2>p4=&gt;p5</h2>
+<ul>
+	<li>修改 p5.py 裏的路徑參數</li>
+	<li>執行 p5.py 一次產生一冊, 或執行 p5.bat 一次多冊.</li>
+	<li>使用 7z.py 壓縮, 上傳給標記組</li>
+</ul>
+
+<h2>比對以下兩個版本</h2>
+<ul>
+	<li>p5 xml =&gt; txt: 執行 cbwork/bin/p5/p5totxt-dir.py</li>
+	<li>p4 xml =&gt; txt: xml2txt -h -z -x 1 (-h: 不要檔頭資訊, -z: 不使用通用字, -x 1: 悉曇字使用 
+	entity &amp;SD-xxxx;)</li>
+</ul>
+
+</body>
+
+</html>

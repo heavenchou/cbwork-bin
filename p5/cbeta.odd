@@ -1,0 +1,647 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?oxygen RNGSchema="p5odds.rnc" type="compact"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xmlns:rng="http://relaxng.org/ns/structure/1.0">
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Customization for CBETA</title>
+            </titleStmt>
+            <publicationStmt>
+                <p>not published</p>
+            </publicationStmt>
+            <sourceDesc>
+                <p>created from scratch</p>
+            </sourceDesc>
+        </fileDesc>
+    </teiHeader>
+    <text>
+        <body>
+            <div>
+                <schemaSpec ident="cbeta-p5" start="TEI">
+                    <moduleRef key="header"/>
+                    <moduleRef key="core"/>
+                    <moduleRef key="tei"/>
+                    <moduleRef key="textstructure"/>
+                    <moduleRef key="linking"/>
+                    <moduleRef key="textcrit"/>
+                    <moduleRef key="transcr"/>
+                    <moduleRef key="figures"/>
+                    <moduleRef key="gaiji"/>
+                    <moduleRef key="dictionaries"/>
+                    <moduleRef key="namesdates"/>
+                    <classSpec ident="att.global" mode="change" type="atts">
+                        <attList>
+                            <attDef ident="rend" mode="change">
+                                <datatype>
+                                    <rng:text/>
+                                </datatype>
+                            </attDef>
+                        </attList>
+                    </classSpec>
+                    <elementSpec ident="div" mode="change" ns="http://www.cbeta.org/ns/1.0">
+                        <!-- this redefines the content model quite radically to allow for the rather lose encoding practice encountered in the texts
+                        it would be a major task to bring this up to notch to a standard tei:div, but I can't really see the benefits-->
+                        <content>
+                            <rng:zeroOrMore>
+                                <rng:choice>
+                                    <rng:ref name="mulu"/>
+                                    <rng:ref name="head"/>
+                                    <rng:ref name="byline"/>
+                                    <rng:ref name="lb"/>
+                                    <rng:ref name="lg"/>
+                                    <rng:ref name="pb"/>
+                                    <rng:ref name="p"/>
+                                    <rng:ref name="div"/>
+                                    <rng:ref name="juan"/>
+                                    <rng:ref name="list"/>
+                                    <rng:ref name="listBibl"/>
+                                    <rng:ref name="event"/>
+                                    <rng:ref name="entry"/>
+                                    <rng:ref name="g"/>
+                                    <rng:ref name="trailer"/>
+                                    <rng:ref name="app"/>
+                                    <rng:ref name="anchor"/>
+                                    <rng:ref name="choice"/>
+                                    <rng:ref name="milestone"/>
+                                    <rng:ref name="note"/>
+                                    <rng:ref name="table"/>
+                                    <rng:ref name="tt"/>
+                                    <rng:ref name="docNumber"/>
+                                    <rng:ref name="dialog"/>
+                                    <rng:ref name="macro.xtext"/>
+                                </rng:choice>
+                            </rng:zeroOrMore>
+                        </content>
+                    </elementSpec>
+                    <!-- where only attributes are added the ns is not changed  -->
+                    <elementSpec ident="lg" mode="change">
+                        <attList>
+                            <attDef ident="place" mode="add" ns="http://www.cbeta.org/ns/1.0">
+                                <datatype>
+                                    <rng:text/>
+                                </datatype>
+                            </attDef>
+                        </attList>
+                    </elementSpec>
+                    <elementSpec ident="entry" mode="change">
+                        <attList>
+                            <attDef ident="place" mode="add" ns="http://www.cbeta.org/ns/1.0">
+                                <datatype>
+                                    <rng:text/>
+                                </datatype>
+                            </attDef>
+                        </attList>
+                    </elementSpec>
+                    <elementSpec ident="app" mode="change">
+                        <attList>
+                            <attDef ident="word-count" mode="add" ns="http://www.cbeta.org/ns/1.0">
+                                <datatype>
+                                    <rng:text/>
+                                </datatype>
+                            </attDef>
+                        </attList>
+                    </elementSpec>
+                    <elementSpec ident="mapping" mode="change">
+                        <attList>
+                            <attDef ident="dec" mode="add" ns="http://www.cbeta.org/ns/1.0">
+                                <desc>the Unicode codepoint integer value in decimal notation, this
+                                    makes processing with XSLT easier</desc>
+                                <datatype>
+                                    <rng:data type="integer"/>
+                                </datatype>
+                            </attDef>
+                        </attList>
+                    </elementSpec>
+                    <!--  the attributes might not be used anymore,
+                    need to check, then remove here cw 2009-06-24  -->
+<!--
+                    <elementSpec ident="lem" mode="change">
+                        <attList>
+                            <attDef ident="cf1" mode="add" ns="http://www.cbeta.org/ns/1.0">
+                                <desc>cf1 provides reference to a witness in another canonical
+                                    collection</desc>
+                                <datatype>
+                                    <rng:text/>
+                                </datatype>
+                            </attDef>
+                            <attDef ident="cf2" mode="add" ns="http://www.cbeta.org/ns/1.0">
+                                <desc>cf2 provides reference to a witness in another canonical
+                                    collection</desc>
+                                <datatype>
+                                    <rng:text/>
+                                </datatype>
+                            </attDef>
+                        </attList>
+                    </elementSpec>
+                    <elementSpec ident="rdg" mode="change">
+                        <attList>
+                            <attDef ident="cf1" mode="add" ns="http://www.cbeta.org/ns/1.0">
+                                <desc>cf1 provides reference to a witness in another canonical
+                                    collection</desc>
+                                <datatype>
+                                    <rng:text/>
+                                </datatype>
+                            </attDef>
+                            <attDef ident="cf2" mode="add" ns="http://www.cbeta.org/ns/1.0">
+                                <desc>cf2 provides reference to a witness in another canonical
+                                    collection</desc>
+                                <datatype>
+                                    <rng:text/>
+                                </datatype>
+                            </attDef>
+                        </attList>
+                    </elementSpec>
+-->
+    <!-- added type to the following four -->
+                    <elementSpec ident="byline" mode="change">
+                        <classes>
+                            <memberOf key="model.global"/>
+                        </classes>
+                        <attList>
+                            <attDef ident="type" mode="add" ns="http://www.cbeta.org/ns/1.0">
+                                <desc>The type attribute has been added to distinguish different
+                                    types of persons in the byline, for example those authors,
+                                    translators etc.</desc>
+                                <datatype>
+                                    <rng:text/>
+                                </datatype>
+                            </attDef>
+                        </attList>
+                    </elementSpec>
+                    <elementSpec ident="p" mode="change">
+                        <attList>
+                            <attDef ident="type" mode="add" ns="http://www.cbeta.org/ns/1.0">
+                                <desc>The type attribute has been added to distinguish different
+                                    types of paragraphs, for example those containing a dharani, a
+                                    dedication, etc.</desc>
+                                <datatype>
+                                    <rng:text/>
+                                </datatype>
+                            </attDef>
+                        </attList>
+                    </elementSpec>
+                    <elementSpec ident="sp" mode="change">
+                        <desc>The sp element is used here to record utterances in a dialog.</desc>
+                        <attList>
+                            <attDef ident="type" mode="add" ns="http://www.cbeta.org/ns/1.0">
+                                <desc>The type attribute is used here to.</desc>
+                                <datatype>
+                                    <valList type="closed">
+                                        <valItem ident="question">
+                                            <gloss>a question in a dialog</gloss>
+                                        </valItem>
+                                        <valItem ident="answer">
+                                            <gloss>an answer in a dialog</gloss>
+                                        </valItem>
+                                    </valList>
+                                </datatype>
+                            </attDef>
+                        </attList>
+                    </elementSpec>
+                    <!-- these atts make it quite similar to app -->
+                    <elementSpec ident="choice" mode="change">
+                        <attList>
+                            <attDef ident="type" mode="add" ns="http://www.cbeta.org/ns/1.0">
+                                <datatype>
+                                    <rng:text/>
+                                </datatype>
+                            </attDef>
+                            <attDef ident="cert" mode="add" ns="http://www.cbeta.org/ns/1.0">
+                                <desc>certainty of the assertion</desc>
+                                <datatype>
+                                    <rng:text/>
+                                </datatype>
+                            </attDef>
+                            <attDef ident="shift" mode="add" ns="http://www.cbeta.org/ns/1.0">
+                                <desc>indicates that this emendment is caused by a "shift"</desc>
+                                <datatype>
+                                    <rng:text/>
+                                </datatype>
+                            </attDef>
+                            <attDef ident="resp" mode="add" ns="http://www.cbeta.org/ns/1.0">
+                                <desc>indicates the responsibility</desc>
+                                <datatype>
+                                    <rng:ref name="data.pointer"/>
+                                </datatype>
+                            </attDef>
+                            <attDef ident="from" mode="add" ns="http://www.cbeta.org/ns/1.0">
+                                <desc>identifies the beginning of the choice in the base text, if
+                                    necessary.</desc>
+                                <datatype>
+                                    <rng:ref name="data.pointer"/>
+                                </datatype>
+                            </attDef>
+                            <attDef ident="to" mode="add" ns="http://www.cbeta.org/ns/1.0">
+                                <desc>identifies the end of the choice in the base text, if
+                                    necessary.</desc>
+                                <datatype>
+                                    <rng:ref name="data.pointer"/>
+                                </datatype>
+                            </attDef>
+                        </attList>
+                    </elementSpec>
+                    <elementSpec ident="foreign" mode="change">
+                        <attList>
+                            <attDef ident="resp" mode="add" ns="http://www.cbeta.org/ns/1.0">
+                                <datatype>
+                                    <rng:ref name="data.pointer"/>
+                                </datatype>
+                            </attDef>
+                            <attDef ident="place" mode="add" ns="http://www.cbeta.org/ns/1.0">
+                                <datatype>
+                                    <rng:text/>
+                                </datatype>
+                            </attDef>
+                            <attDef ident="cert" mode="add" ns="http://www.cbeta.org/ns/1.0">
+                                <datatype>
+                                    <rng:text/>
+                                </datatype>
+                            </attDef>
+                        </attList>
+                    </elementSpec>
+                    <!-- needed to change this to allow for multiple <p>; some <def> in the wild contain more than 100 -->
+                    <elementSpec ident="def" mode="change" ns="http://www.cbeta.org/ns/1.0">
+                        <classes>
+                            <memberOf key="model.entryPart.top"/>
+                            <memberOf key="model.entryPart"/>
+                        </classes>
+                        <content>
+                            <rng:zeroOrMore>
+                                <rng:choice>
+                                    <rng:ref name="model.common"/>
+                                    <rng:ref name="model.global"/>
+                                </rng:choice>
+                            </rng:zeroOrMore>
+                        </content>
+                    </elementSpec>
+                    <!-- needed to add an explicit <date>; <tei:event> has only dating attributes  -->
+                    <elementSpec ident="event" mode="change" ns="http://www.cbeta.org/ns/1.0">
+                        <classes>
+                            <memberOf key="att.datable"/>
+                            <memberOf key="att.editLike"/>
+                            <memberOf key="att.typed"/>
+                            <memberOf key="att.naming"/>
+                            <memberOf key="model.persEventLike"/>
+                            <memberOf key="model.placeEventLike"/>
+                        </classes>
+                        <content>
+                            <rng:group>
+                                <rng:zeroOrMore>
+                                    <rng:ref name="model.headLike"/>
+                                </rng:zeroOrMore>
+                                <rng:choice>
+                                    <rng:group>
+                                        <rng:oneOrMore>
+                                            <rng:ref name="model.dateLike"/>
+                                        </rng:oneOrMore>
+                                    </rng:group>
+                                    <rng:group>
+                                        <rng:oneOrMore>
+                                            <rng:ref name="model.labelLike"/>
+                                        </rng:oneOrMore>
+                                    </rng:group>
+                                </rng:choice>
+                                <rng:zeroOrMore>
+                                    <rng:choice>
+                                        <rng:ref name="model.global"/>
+                                        <rng:ref name="model.pLike"/>
+                                        <rng:ref name="model.noteLike"/>
+                                        <rng:ref name="model.biblLike"/>
+                                    </rng:choice>
+                                </rng:zeroOrMore>
+                                <rng:zeroOrMore>
+                                    <rng:ref name="event"/>
+                                </rng:zeroOrMore>
+                            </rng:group>
+
+                            <rng:group>
+                                <rng:zeroOrMore>
+                                    <rng:ref name="model.headLike"/>
+                                </rng:zeroOrMore>
+                                <rng:zeroOrMore>
+                                    <rng:choice>
+                                        <rng:ref name="model.pLike"/>
+                                        <rng:ref name="model.labelLike"/>
+                                        <rng:ref name="model.noteLike"/>
+                                        <rng:ref name="model.biblLike"/>
+                                    </rng:choice>
+                                </rng:zeroOrMore>
+                                <rng:zeroOrMore>
+                                    <rng:ref name="event"/>
+                                </rng:zeroOrMore>
+                            </rng:group>
+                        </content>
+                    </elementSpec>
+                    <!-- new elements -->
+                    <elementSpec ident="dTitle" mode="add" ns="http://www.cbeta.org/ns/1.0">
+                        <desc>A specialization of the docTitle element. This should be used only
+                            once per document, usually as direct child of the body element</desc>
+                        <classes>
+                            <memberOf key="model.global"/>
+                        </classes>
+                        <content>
+                            <rng:ref name="macro.phraseSeq"/>
+                        </content>
+                    </elementSpec>
+                    <elementSpec ident="docNumber" mode="add" ns="http://www.cbeta.org/ns/1.0">
+                        <desc>The number of the document</desc>
+                        <classes>
+                            <memberOf key="model.global"/>
+                        </classes>
+                        <content>
+                            <rng:ref name="macro.phraseSeq"/>
+                        </content>
+                    </elementSpec>
+                    <elementSpec ident="dialog" mode="add" ns="http://www.cbeta.org/ns/1.0">
+                        <classes>
+                            <memberOf key="model.divLike"/>
+                            <memberOf key="model.pLike"/>
+                        </classes>
+                        <content>
+                            <rng:zeroOrMore>
+                                <rng:choice>
+                                    <rng:ref name="model.divPart"/>
+                                    <rng:ref name="model.milestoneLike"/>
+                                </rng:choice>
+                            </rng:zeroOrMore>
+                        </content>
+                        <attList>
+                            <attDef ident="type" mode="add">
+                                <datatype>
+                                    <rng:text/>
+                                </datatype>
+                            </attDef>
+                        </attList>
+                    </elementSpec>
+
+                    <elementSpec ident="mulu" mode="add" ns="http://www.cbeta.org/ns/1.0">
+                        <gloss>mulu for table of contents</gloss>
+                        <desc>This element gives the items as they should appear in the table of contents.  All content of this element has been added to the text and is not found in the copy text.  It usually appears shortly after the start of a division.</desc>
+                        <classes>
+                            <memberOf key="model.divWrapper"/>
+                            <memberOf key="model.milestoneLike"/>
+                        </classes>
+                        <content>
+                            <rng:ref name="macro.phraseSeq"/>
+                        </content>
+                        <attList>
+                            <attDef ident="type" mode="add">
+                                <datatype>
+                                    <rng:text/>
+                                </datatype>
+                            </attDef>
+                            <attDef ident="level" mode="add">
+                                <desc>Indicates the nesting level of the division in question.</desc>
+                                <datatype>
+                                    <rng:text/>
+                                </datatype>
+                            </attDef>
+                            <attDef ident="n" mode="add">
+                                <desc>Number or some other label.</desc>
+                                <datatype>
+                                    <rng:text/>
+                                </datatype>
+                            </attDef>
+                        </attList>
+                    </elementSpec>
+                    <elementSpec ident="juan" mode="add" ns="http://www.cbeta.org/ns/1.0">
+
+                        <classes>
+                            <memberOf key="model.global"/>
+                            <memberOf key="att.global"/>
+                        </classes>
+                        <content>
+                            <rng:zeroOrMore>
+                                <rng:choice>
+                                    <rng:ref name="mulu"/>
+                                    <rng:ref name="note"/>
+                                    <rng:ref name="jhead"/>
+                                    <rng:ref name="macro.phraseSeq"/>
+                                </rng:choice>
+                            </rng:zeroOrMore>
+                        </content>
+                        <attList>
+                            <attDef ident="fun" mode="add">
+                                <gloss>(function) of the element here, that is at the beginning or the end of the juan</gloss>
+                                <desc></desc>
+                                <datatype>
+                                    <rng:ref name="datatype.Choice"/>
+                                </datatype>
+                                <valList type="closed">
+                                    <valItem ident="open">
+                                        <gloss>opener</gloss>
+                                    </valItem>
+                                    <valItem ident="close">
+                                        <gloss>closer</gloss>
+                                    </valItem>
+                                </valList>
+                            </attDef>
+                            <attDef ident="place" mode="add">
+                                <datatype>
+                                    <rng:text/>
+                                </datatype>
+                            </attDef>
+                        </attList>
+                    </elementSpec>
+                    <elementSpec ident="jhead" mode="add" ns="http://www.cbeta.org/ns/1.0">
+                        <desc>Specialized head element used at the start of a scroll.</desc>
+                        <classes>
+                            <memberOf key="model.inter"/>
+                            <memberOf key="macro.phraseSeq"/>
+                        </classes>
+                        <content>
+                            <rng:zeroOrMore>
+                                <rng:choice>
+                                    <rng:ref name="macro.phraseSeq"/>
+                                    <rng:ref name="tt"/>
+                                    <rng:ref name="label"/>
+                                    <rng:ref name="note"/>
+                                </rng:choice>
+                            </rng:zeroOrMore>
+                        </content>
+                        <attList>
+                            <attDef ident="type" mode="add">
+                                <datatype>
+                                    <rng:text/>
+                                </datatype>
+                            </attDef>
+                        </attList>
+                    </elementSpec>
+                    <elementSpec ident="tt" mode="add" ns="http://www.cbeta.org/ns/1.0">
+                        <desc>Container element for parallel &lt;t&gt; elements</desc>
+                        <classes>
+                            <memberOf key="model.inter"/>
+                        </classes>
+                        <content>
+                            <rng:ref name="macro.phraseSeq"/>
+                            <rng:zeroOrMore>
+                                <rng:ref name="t"/>
+                            </rng:zeroOrMore>
+                        </content>
+                        <attList>
+                            <attDef ident="type" mode="add">
+                                <datatype>
+                                    <rng:text/>
+                                </datatype>
+                            </attDef>
+                            <attDef ident="word-count" mode="add">
+                                <datatype>
+                                    <rng:text/>
+                                </datatype>
+                            </attDef>
+                            <attDef ident="from" mode="add">
+                                <datatype>
+                                    <rng:text/>
+                                </datatype>
+                            </attDef>
+                            <attDef ident="to" mode="add">
+                                <datatype>
+                                    <rng:text/>
+                                </datatype>
+                            </attDef>
+                            <attDef ident="rend" mode="add">
+                                <datatype>
+                                    <rng:text/>
+                                </datatype>
+                            </attDef>
+                            <attDef ident="place" mode="add">
+                                <datatype>
+                                    <rng:text/>
+                                </datatype>
+                            </attDef>
+                        </attList>
+                    </elementSpec>
+                    <elementSpec ident="t" mode="add" ns="http://www.cbeta.org/ns/1.0">
+                        <desc>Element for parallel t elements (used to mark parallel Chinese and
+                            Sanskrit passages)</desc>
+                        <classes>
+                            <memberOf key="model.phrase"/>
+                        </classes>
+                        <content>
+                            <rng:ref name="macro.paraContent"/>
+                            <rng:ref name="att.global.attributes"/>
+                            <rng:zeroOrMore>
+                                <rng:ref name="yin"/>
+                            </rng:zeroOrMore>
+                        </content>
+                        <attList>
+                            <attDef ident="resp" mode="add">
+                                <datatype>
+                                    <rng:ref name="data.pointer"/>
+                                </datatype>
+                            </attDef>
+                            <attDef ident="place" mode="add">
+                                <datatype>
+                                    <rng:text/>
+                                </datatype>
+                            </attDef>
+                            <attDef ident="cert" mode="add">
+                                <desc>describes the certainty of the assignment</desc>
+                                <datatype>
+                                    <rng:text/>
+                                </datatype>
+                            </attDef>
+                        </attList>
+                    </elementSpec>
+                    <elementSpec ident="fan" mode="add" ns="http://www.cbeta.org/ns/1.0">
+                        <desc>A container element for a sound gloss in fanqie notation. The
+                            character to be annotated is <gi>zi</gi>, the sound gloss is
+                            <gi>yin</gi>. </desc>
+                        <desc xml:lang="zh-tw">反切</desc>
+                        <classes>
+                            <memberOf key="model.inter"/>
+                        </classes>
+                        <content>
+                            <rng:zeroOrMore>
+                                <rng:ref name="zi"/>
+                                <rng:ref name="yin"/>
+                            </rng:zeroOrMore>
+                        </content>
+                    </elementSpec>
+                    <elementSpec ident="zi" mode="add" ns="http://www.cbeta.org/ns/1.0">
+                        <content>
+                            <rng:ref name="macro.phraseSeq"/>
+                        </content>
+                    </elementSpec>
+                    <elementSpec ident="yin" mode="add" ns="http://www.cbeta.org/ns/1.0">
+                        <desc>Content of a soundgloss, either of the fanqie type, or a description,
+                            how a Sanskrit transkription is supposed to be rendered.</desc>
+                        <classes>
+                            <memberOf key="model.phrase"/>
+                        </classes>
+                        <content>
+                            <rng:zeroOrMore>
+                                <rng:choice>
+                                    <rng:ref name="macro.phraseSeq"/>
+                                    <rng:ref name="model.noteLike"/>
+                                    <rng:ref name="zi"/>
+                                    <rng:ref name="sg"/>
+                                </rng:choice>
+                            </rng:zeroOrMore>
+                        </content>
+                    </elementSpec>
+                    <elementSpec ident="sg" mode="add" ns="http://www.cbeta.org/ns/1.0">
+                        <desc>Describes how the sound is modified on the preceding <gi>zi</gi>
+                            element.</desc>
+                        <content>
+                            <rng:ref name="macro.phraseSeq"/>
+                        </content>
+                        <attList>
+                            <attDef ident="type" mode="add">
+                                <datatype>
+                                    <rng:text/>
+                                </datatype>
+                            </attDef>
+                        </attList>
+                    </elementSpec>
+                    <elementSpec ident="jl_title" mode="add" ns="http://www.cbeta.org/ns/1.0">
+                        <classes>
+                            <memberOf key="model.phrase"/>
+                        </classes>
+                        <content>
+                            <rng:ref name="macro.phraseSeq"/>
+                        </content>
+                        <attList>
+                            <attDef ident="type" mode="add">
+                                <datatype>
+                                    <rng:text/>
+                                </datatype>
+                            </attDef>
+                        </attList>
+                    </elementSpec>
+                    <elementSpec ident="jl_juan" mode="add" ns="http://www.cbeta.org/ns/1.0">
+                        <classes>
+                            <memberOf key="model.phrase"/>
+                        </classes>
+                        <content>
+                            <rng:ref name="macro.phraseSeq"/>
+                        </content>
+                        <attList>
+                            <attDef ident="n" mode="add">
+                                <datatype>
+                                    <rng:text/>
+                                </datatype>
+                            </attDef>
+                        </attList>
+                    </elementSpec>
+                    <elementSpec ident="jl_byline" mode="add" ns="http://www.cbeta.org/ns/1.0">
+                        <classes>
+                            <memberOf key="model.phrase"/>
+                        </classes>
+                        <content>
+                            <rng:ref name="macro.phraseSeq"/>
+                        </content>
+                        <attList>
+                            <attDef ident="type" mode="add">
+                                <datatype>
+                                    <rng:text/>
+                                </datatype>
+                            </attDef>
+                        </attList>
+                    </elementSpec>
+                </schemaSpec>
+
+            </div>
+        </body>
+    </text>
+</TEI>

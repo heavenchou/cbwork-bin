@@ -1,0 +1,1 @@
+python gen-gaijixml.py -c ACFGKLMPSU

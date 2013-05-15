@@ -1,0 +1,1 @@
+comp.py /cbwork/xml/T10 /release/add-id/T10
