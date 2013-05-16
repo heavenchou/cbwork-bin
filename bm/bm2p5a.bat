@@ -1,1 +1,0 @@
-bm2p5a.py -v N01 -o c:\temp\cbetap5a-ok\
