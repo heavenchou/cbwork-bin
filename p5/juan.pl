@@ -13,7 +13,7 @@ use XML::Parser;
 
 my $vol = shift;				# $vol = T01 , 冊數
 my $ed = substr($vol,0,1);		# $ed = T
-my $xml_path = "c:/cbwork/xml-p5a/$ed/$vol/";
+my $xml_path = "/cbwork/xml-p5a/$ed/$vol/";
 
 #require "head.pl";
 #open (CFG, "../../work/bin/CBETA.CFG") || die "can't open cbeta.cfg\n";
