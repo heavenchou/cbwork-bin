@@ -14,7 +14,7 @@ use XML::Parser;
 my $vol = shift;				# $vol = T01 , 冊數
 exit if($vol eq "");			# 沒參數就結束
 my $ed = substr($vol,0,1);		# $ed = T
-my $xml_path = "c:/cbwork/xml-p5a/$ed/$vol/";
+my $xml_path = "/cbwork/xml-p5a/$ed/$vol/";
 
 my $tree = "";			# 目錄樹全文
 my $inTitleStmt = 0;
