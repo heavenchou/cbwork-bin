@@ -193,7 +193,7 @@ use Encode;
 #my $ver_date = "..\\bin\\ver_date.txt";	#日期與版本的記錄檔 (V1.2 之後取消)
 #my $sourlog = "sourlog.txt";				#讀 source.txt 之後所產生的 log 檔, 用來檢查讀取正確與否.
 my $outdir = "c:/release/bm/";				# 輸出的目錄
-my $xml_root_path = "c:/cbwork/xml/";		# xml 經文的位置
+my $xml_root_path = "/cbwork/xml/";			# xml 經文的位置
 my $Xfile=0;								# 1 : 表示序要單獨一個檔, 0: 表示不用了 -- V2.0
 
 #######################################
@@ -2836,7 +2836,7 @@ sub prenormal
 	my @key;
 	readGaiji();	# 先讀取缺字資料
 	
-	open (IN, "<:utf8", "c:/cbwork/bm/$vol_head/$T_vol/new.txt");
+	open (IN, "<:utf8", "/cbwork/bm/$vol_head/$T_vol/new.txt");
 	#open (OUT, ">$out") || die "Open $out error : $!";
 	#open (TABLE,"$table") || die "Open $table error : $!";
 	
@@ -2999,7 +2999,7 @@ sub prenormal
 	# 處理 source.txt 來源檔
 	###############################################################
 	
-	open (IN, "<:utf8", "c:/cbwork/bm/$vol_head/$T_vol/source.txt");
+	open (IN, "<:utf8", "/cbwork/bm/$vol_head/$T_vol/source.txt");
 	#open (OUT,">source4.txt") || die "Open source4.txt error : $!";
 	
 	while(<IN>)
