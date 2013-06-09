@@ -10,6 +10,7 @@ rem 　　nohead 表示沒有卷首資訊
 rem 　　no_normal 是不要換通用字
 rem 　　jk_num 是要呈現校勘數字及星號
 rem 　　normal 一卷一檔(預設值) / normal1 一經一檔 / app 一卷一檔 App 格式 / app1 一經一檔 app 格式
+rem 設定檔：相關設定由 ../cbwork_bin.ini 取得
 rem 範例：perl bm2nor.pl N01
 rem ===============================================================================================
 

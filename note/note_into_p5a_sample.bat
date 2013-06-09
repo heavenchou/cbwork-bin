@@ -8,6 +8,7 @@ rem 　　以 N01 為例, 目錄下要有 out_N01.txt , 這是 N01 的校勘 XML 格式 , 由 note
 rem 　　原始的 N01 P5a xml 檔在 c:\cbwork\xml-p5a\N\N01 目錄中
 rem 　　執行後會產生 out_N01 目錄, 已插入校勘的 XML 檔就在此目錄中
 rem 　　若有錯誤, 會產生 err_out_N01.txt , 可檢查其內容
+rem 設定檔：相關設定由 ../cbwork_bin.ini 取得
 rem 範例：perl note_into_p5a.pl N01
 rem =======================================================================================
 

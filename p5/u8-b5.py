@@ -1,5 +1,5 @@
 # -*- coding: utf-8 *-*
-"""
+'''
 u8-b5.py
 功能: 
 	將目錄下(含子目錄)所有 utf-8 檔案轉為 CP950, 
@@ -10,14 +10,15 @@ u8-b5.py
 	執行 u8-b5.py -h 可以查看參數說明.
 需求: PythonWin
 作者: ray
-2013.03.05 Heaven: 增加 -n 使用通用字的參數
 2011.06.14 Ray: 改用 Python 3.2, 不過 64bit 版好像不能用
 2009.12.02 Ray: 從 Unicode 網站取得 Unihan.txt, 取出裏面的異寫字資訊 kCompatibilityVariant, 放在 variant
-"""
 
-gaiji = '/cbwork/work/bin/gaiji-m.mdb' # 缺字資料庫路徑
+Heaven 修改:
+2013/06/09 變數改用設定檔 ../cbwork_bin.ini
+2013/03/05 增加 -n 使用通用字的參數
+'''
 
-import os, codecs, sys
+import configparser, os, codecs, sys
 from optparse import OptionParser
 import win32com.client # 要安裝 PythonWin
 import re
@@ -1215,6 +1216,11 @@ parser.add_option("-o", dest="output", help="輸出資料夾")
 parser.add_option("-v", action="store_true", dest="convertVariant", default=False, help="異寫轉換")
 parser.add_option("-n", action="store_true", dest="gaijiNormalize", default=False, help="使用通用字")
 (options, args) = parser.parse_args()
+
+# 讀取設定檔 cbwork_bin.ini
+config = configparser.SafeConfigParser()
+config.read('../cbwork_bin.ini')
+gaiji = config.get('default', 'gaiji-m.mdb_file')
 
 high_word = 0
 codecs.register_error('cbeta', my_err_handler) # 先登記遇到缺字時的 error handler

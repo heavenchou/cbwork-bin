@@ -1,13 +1,15 @@
 ﻿# -*- coding: utf-8 *-*
 '''
 功能: CBETA BM-UTF8 (簡單標記版) 轉為 XML-P5-UTF8
-設定檔: bm2p5a.ini
+設定檔: ../cbwork_bin.ini
 命令列參數:
 	bm2p5a.py -h 可以看參數說明
 需求: Python 3, PythonWin
 作者: 周邦信 2009.06.02-2011.8.4
 $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
+
+2013/06/09 將設定檔改為 ../cbwork_bin.ini
 '''
 
 import collections, configparser, datetime, os, re, struct, sys
@@ -720,12 +722,13 @@ parser.add_option("-o", action='store', dest="output", help="輸出資料夾")
 vol = options.vol.upper()
 ed = vol[0:1]
 
-# 讀取 設定檔 bm2p5a.ini
+# 讀取 設定檔 cbwork_bin.ini
 config = configparser.SafeConfigParser()
-config.read('bm2p5a.ini')
-gaijiMdb=config.get('default', 'gaijiMdb')
-BMLaiYuan=config.get('default', 'BMLaiYuan').format(vol=vol, ed=ed)
-BMJingWen=config.get('default', 'BMJingWen').format(vol=vol, ed=ed)
+config.read('../cbwork_bin.ini')
+gaijiMdb = config.get('default', 'gaiji-m.mdb_file')
+cbwork_dir = config.get('default', 'cbwork')
+BMLaiYuan = cbwork_dir + '/bm/{ed}/{vol}/source.txt'.format(vol=vol, ed=ed)
+BMJingWen = cbwork_dir + '/bm/{ed}/{vol}/new.txt'.format(vol=vol, ed=ed)
 
 log=open('bm2p5a.log', 'w', encoding='utf8')
 

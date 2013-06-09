@@ -1,20 +1,27 @@
 #######################################################
 # 程式名稱：get_mulu.pl
 # 程式位置：c:\cbwork\bin\p5
-# 程式用途：由 <mulu> 標記產生目錄樹
+# 程式用途：由 由 XML 經文的 <mulu> 標記產生目錄樹
 # 程式步驟：c:\cbwork\bin\p5\perl get_mulu.pl T01
-# 結果會在 tree 目錄下產生 T01_tree.txt
+# 設定檔：相關設定由 ../cbwork_bin.ini 取得
+# 結果會在輸出目錄下產生 T01_tree.txt
 #######################################################
 
 use utf8;
 use autodie;
 use Encode;
 use XML::Parser;
+use Config::IniFiles;
 
 my $vol = shift;				# $vol = T01 , 冊數
 exit if($vol eq "");			# 沒參數就結束
 my $ed = substr($vol,0,1);		# $ed = T
-my $xml_path = "/cbwork/xml-p5a/$ed/$vol/";
+
+my $cfg = Config::IniFiles->new( -file => "../cbwork_bin.ini" );
+
+my $cbwork_dir = $cfg->val('default', 'cbwork', '/cbwork');	# 讀取 cbwork 目錄
+my $output_dir = $cfg->val('get_mulu', 'tree_dir', '/cbwork/bin/p5/tree');	# 讀取 cbwork 目錄
+my $xml_path = $cbwork_dir . "/xml-p5a/$ed/$vol/";
 
 my $tree = "";			# 目錄樹全文
 my $inTitleStmt = 0;
@@ -53,9 +60,9 @@ for $file (sort(@files))
 	$parser->parsefile($filename);
 }
 
-mkdir("tree") if(not -d "tree");
+mkdir($output_dir) if(not -d $output_dir);
 
-open (OUT, ">:encoding(big5)", "tree/${vol}_tree.txt");
+open (OUT, ">:encoding(big5)", "${output_dir}/${vol}_tree.txt");
 print OUT $tree;	# 印出樹狀目錄
 close OUT;
 

@@ -5,7 +5,11 @@
 	轉某一冊: p5totxt.py -v T01
 	轉某一冊且含校勘符號: p5totxt.py -v T01 -k
 Ray CHOU 周邦信 2011.6.11
+
+Heaven 修改:
+2013/06/09 將設定檔改為 ../cbwork_bin.ini
 '''
+
 import configparser, datetime, os, re, sys
 from optparse import OptionParser
 from string import Template
@@ -302,13 +306,15 @@ def handle1vol(vol):
 		x=os.path.join(p, s)
 		handle1sutra(x, folder_out)
 
-# main
+####################################################################
+# 主程式
+####################################################################
 
-# 讀取 設定檔 p5tonor.ini
+# 讀取 設定檔 cbwork_bin.ini
 config = configparser.SafeConfigParser()
-config.read('p5totxt.ini')
-xmlP5Base=config.get('default', 'xmlP5Base')
-outBase=config.get('default', 'outBase')
+config.read('../cbwork_bin.ini')
+xmlP5Base = config.get('default', 'cbwork') + '/xml-p5'
+outBase = config.get('p5totxt', 'output_dir')
 print('Input XML P5 Folder:', xmlP5Base)
 print('Output Normal Folder:', outBase)
 

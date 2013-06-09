@@ -1,8 +1,8 @@
 # -*- coding: utf-8 *-*
 '''
 功能: 驗證某個目錄下的 XML 檔
-設定檔: valid_vol.ini
-	設定檔中放置 jing.jar 的位置
+設定檔: ../cbwork_bin.ini
+	讀取設定檔中放置 jing.jar 的位置
 命令列參數:
 	valid_vol.py -r 驗證用的 rnc 檔的位置 -d 要驗證的目錄 
 	valid_vol.py -h 可以看參數說明
@@ -11,6 +11,9 @@
 作者: Heaven Chou (2013/03/11)
 $Revision: 1.2 $
 $Date: 2013/03/11 09:47:33 $
+
+Heaven 修改:
+2013/06/09 變數改用設定檔 ../cbwork_bin.ini
 '''
 
 import os, sys, configparser
@@ -55,10 +58,10 @@ parser.add_option("-r", dest="RNC", help="XML驗證檔")
 source_dir = options.source_dir
 RNC = options.RNC
 
-# 讀取設定檔 valid_vol.ini
+# 讀取設定檔 cbwork_bin.ini
 config = configparser.SafeConfigParser()
-config.read('valid_vol.ini')
-JING=config.get('default', 'JING_FILE')
+config.read('../cbwork_bin.ini')
+JING = config.get('default', 'jing.jar_file')
 
 # 設定 log 檔
 LOG=open('valid_vol.log', 'a', encoding='utf8')

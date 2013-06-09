@@ -7,21 +7,15 @@
 	全部, 但從 T02 開始: p4top5a.py -s t02
 	執行全部: p4top5a.py
 2013.1.3 周邦信 改寫自 cbp4top5.py
+
+Heaven 修改:
+2013/06/09 變數改用設定檔 ../cbwork_bin.ini
 '''
-import collections, csv, datetime, glob, os, re, shutil, sys, time
+
+import configparser, collections, csv, datetime, glob, os, re, shutil, sys, time
 from optparse import OptionParser
 from lxml import etree
 import zbxxml
-
-CBTEMP = 'c:/temp'
-XML_P4 = '/cbwork/xml' 					# 從這裡讀 P4 XML
-PHASE1DIR = CBTEMP + '/cbetap5a-tmp1'	# 暫存資料夾
-PHASE2DIR = CBTEMP + '/cbetap5a-tmp2'	# 暫存資料夾
-OUT_P5a = CBTEMP + '/cbetap5a-ok' # 最後結果
-BINDIR = 'D:/1Projects/1998-CBETA/bin-p4'
-JING = '/bin/jing/bin/jing.jar'
-RNC = '/cbwork/xml-p5a/schema/cbeta-p5a.rnc'
-GAIJI = '/cbwork/bin/gaiji-m_u8.txt'
 
 # 使用 lxml 3.0.2 的 RelaxNG 在 validate T18n0850 時有問題
 #relaxng_doc = etree.parse('D:/git-repos/ddbc-cbeta/schema/cbeta-p5.rng')
@@ -952,7 +946,11 @@ def createTongYongCiTable():
 				r[ent] = '<choice><orig>{}</orig><reg type="通用詞">{}</reg></choice>'.format(s, row['nor'])
 	return r
 
-# main
+####################################################################
+# 主程式
+####################################################################
+
+# 讀取 命令列參數
 parser = OptionParser()
 parser.add_option('-c', dest='collection', help='collections (e.g. TXJ...)')
 parser.add_option('-s', dest='vol_start', help='start volumn (e.g. x55)')
@@ -963,6 +961,20 @@ if options.collection is not None:
 	options.collection = options.collection.upper()
 if options.vol_start is not None:
 	options.vol_start = options.vol_start.upper()
+	
+# 讀取設定檔 cbwork_bin.ini
+config = configparser.SafeConfigParser()
+config.read('../cbwork_bin.ini')
+CBTEMP = config.get('default', 'temp')
+cbwork_dir = config.get('default', 'cbwork')
+JING = config.get('default', 'jing.jar_file')
+
+XML_P4 = cbwork_dir + '/xml' 			# 從這裡讀 P4 XML
+PHASE1DIR = CBTEMP + '/cbetap5a-tmp1'	# 暫存資料夾
+PHASE2DIR = CBTEMP + '/cbetap5a-tmp2'	# 暫存資料夾
+OUT_P5a = CBTEMP + '/cbetap5a-ok' 		# 最後結果
+RNC = cbwork_dir + '/xml-p5a/schema/cbeta-p5a.rnc'
+GAIJI = cbwork_dir + '/bin/gaiji-m_u8.txt'
 
 globals={}
 cb2uni = {}

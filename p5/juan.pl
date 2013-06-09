@@ -3,17 +3,22 @@
 # 程式位置：c:\cbwork\bin\p5
 # 程式用途：檢查XML檔中的卷首資訊。
 # 程式步驟：c:\cbwork\bin\p5\perl juan.pl T01
-# 結果會在 DOS 視窗上呈現
+# 設定檔：相關設定由 ../cbwork_bin.ini 取得
+# 其他：結果會在 DOS 視窗上呈現
 #######################################################
 
 use utf8;
 use autodie;
 use Encode;
 use XML::Parser;
+use Config::IniFiles;
 
 my $vol = shift;				# $vol = T01 , 冊數
 my $ed = substr($vol,0,1);		# $ed = T
-my $xml_path = "/cbwork/xml-p5a/$ed/$vol/";
+
+my $cfg = Config::IniFiles->new( -file => "../cbwork_bin.ini" );
+my $cbwork_dir = $cfg->val('default', 'cbwork', '/cbwork');	# 讀取 cbwork 目錄
+my $xml_path = $cbwork_dir . "/xml-p5a/$ed/$vol/";
 
 #require "head.pl";
 #open (CFG, "../../work/bin/CBETA.CFG") || die "can't open cbeta.cfg\n";

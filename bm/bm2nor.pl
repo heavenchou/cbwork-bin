@@ -10,9 +10,12 @@
 # no_normal 是不要換通用字
 # jk_num 是要呈現校勘數字及星號
 #
+# 設定檔：相關設定由 ../cbwork_bin.ini 取得
+#
 # Copyright (C) 1998-2013 CBETA
 # Copyright (C) 1999-2013 Heaven Chou
 ########################################################################
+# 2013/06/09 V8.1  設定由 ../cbwork_bin.ini 來獲得
 # 2013/03/26 V8.0  正式改為 utf8 版, 由 perl 5.16 開始執行
 ##########################################################
 # 2011/06/20 V7.4  修正將行中<n>誤判為行首<n>.
@@ -183,18 +186,20 @@
 use utf8;
 use autodie;
 use Encode;
+use Config::IniFiles;
 
 #######################################
-#可修改參數
+# 讀取來自 ../cbwork_bin.ini 的設定
 #######################################
 
-#my $infile = "new4.txt";   				#來源檔
-#my $sourcefile = "source4.txt";			#經文來源記錄檔
-#my $ver_date = "..\\bin\\ver_date.txt";	#日期與版本的記錄檔 (V1.2 之後取消)
-#my $sourlog = "sourlog.txt";				#讀 source.txt 之後所產生的 log 檔, 用來檢查讀取正確與否.
-my $outdir = "c:/release/bm/";				# 輸出的目錄
-my $xml_root_path = "/cbwork/xml/";			# xml 經文的位置
-my $Xfile=0;								# 1 : 表示序要單獨一個檔, 0: 表示不用了 -- V2.0
+my $cfg = Config::IniFiles->new( -file => "../cbwork_bin.ini" );
+
+my $release_dir = $cfg->val('default', 'release', '/release');	# 讀取 release 目錄
+my $cbwork_dir = $cfg->val('default', 'cbwork', '/cbwork');	# 讀取 cbwork 目錄
+my $Xfile = $cfg->val('bm2nor', 'Xfile', 0);		# 1 : 表示序要單獨一個檔, 0: 表示不用了 -- V2.0
+
+my $outdir = $release_dir . "/bm/";				# 輸出的目錄
+my $xml_root_path = $cbwork_dir . "/xml/";		# xml 經文的位置
 
 #######################################
 #不要改的參數
@@ -2836,7 +2841,7 @@ sub prenormal
 	my @key;
 	readGaiji();	# 先讀取缺字資料
 	
-	open (IN, "<:utf8", "/cbwork/bm/$vol_head/$T_vol/new.txt");
+	open (IN, "<:utf8", "${cbwork_dir}/bm/$vol_head/$T_vol/new.txt");
 	#open (OUT, ">$out") || die "Open $out error : $!";
 	#open (TABLE,"$table") || die "Open $table error : $!";
 	
@@ -2999,7 +3004,7 @@ sub prenormal
 	# 處理 source.txt 來源檔
 	###############################################################
 	
-	open (IN, "<:utf8", "/cbwork/bm/$vol_head/$T_vol/source.txt");
+	open (IN, "<:utf8", "${cbwork_dir}/bm/$vol_head/$T_vol/source.txt");
 	#open (OUT,">source4.txt") || die "Open source4.txt error : $!";
 	
 	while(<IN>)

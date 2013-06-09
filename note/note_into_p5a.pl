@@ -6,6 +6,7 @@
 use utf8;
 use autodie;
 use Encode;
+use Config::IniFiles;
 
 ######################################################################################
 # 參數
@@ -15,7 +16,11 @@ my $vol = shift;						# 傳入冊數 N01
 
 my $ed = substr($vol,0,1);						# 取出 $vol 第一個英文字
 my $infile = "out_" . $vol . ".txt";			# 校注來源檔, 若改成 shift , 則表示由參數傳入
-my $source = "c:/cbwork/xml-p5a/${ed}/${vol}";	# 經文來源檔, 最後不要加斜線, 注意目錄之間斜線的方向必須為 /
+
+my $cfg = Config::IniFiles->new( -file => "../cbwork_bin.ini" );
+my $cbwork_dir = $cfg->val('default', 'cbwork', '/cbwork');	# 讀取 cbwork 目錄
+
+my $source = $cbwork_dir . "/xml-p5a/${ed}/${vol}";	# 經文來源檔, 最後不要加斜線, 注意目錄之間斜線的方向必須為 /
 my $outdir = $vol . "_out";						# 輸出目錄 , 也就是在輸入檔名後加上 _out 
 my $errfile = "err_" . $infile;					# 錯誤檔名 , 也就是在輸入檔名前加上 err_ 
 

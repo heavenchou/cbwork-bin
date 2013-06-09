@@ -1,7 +1,6 @@
 *.log
 /bm/bm2p5a.bat
 /bm/bm2nor.bat
-/bm/bm2p5a.ini
 /note/note2xml.bat
 /note/note_into_p5a.bat
 /p5/b5-u8.bat
@@ -10,10 +9,9 @@
 /p5/p4top5a.bat
 /p5/p5a2p5.bat
 /p5/p5totxt.bat
-/p5/p5totxt.ini
 /p5/u8-b5.bat
 /p5/valid_vol.bat
-/p5/valid_vol.ini
 /p5/__pycache__
 /p5/tree/*.txt
 /note/*.txt
+/note/*/*.xml

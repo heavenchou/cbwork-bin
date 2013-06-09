@@ -1,20 +1,15 @@
 # -*- coding: utf8 -*-
 ''' CBETA XML P5a 轉 P5
 2013.1.4 周邦信 改寫自 cbp4top5.py
+
+Heaven 修改:
+2013/06/09 變數改用設定檔 ../cbwork_bin.ini
 '''
-import collections, csv, datetime, glob, os, re, shutil, sys, time
+
+import configparser, collections, csv, datetime, glob, os, re, shutil, sys, time
 from optparse import OptionParser
 from lxml import etree
 import zbxxml, siddam, ranjana
-
-CBTEMP = 'c:/temp'
-IN_P5a = CBTEMP + '/cbetap5a-ok' # XML P5a 來源資料夾
-PHASE1DIR = CBTEMP + '/cbetap5-tmp1' # 暫存資料夾
-OUT_P5 = CBTEMP + '/cbetap5-ok' # 最後結果
-BINDIR = 'D:/1Projects/1998-CBETA/bin-p4'
-GAIJI = '/cbwork/bin/gaiji-m_u8.txt'
-JING = '/bin/jing/bin/jing.jar'
-RNC = '/cbwork/xml-p5/schema/cbeta-p5.rnc'
 
 # 使用 lxml 3.0.2 的 RelaxNG 在 validate T18n0850 時有問題
 #relaxng_doc = etree.parse('D:/git-repos/ddbc-cbeta/schema/cbeta-p5.rng')
@@ -1219,7 +1214,11 @@ def read_all_gaijis():
 				unicode2cb[uni] = cb
 	return r
 
-# main
+####################################################################
+# 主程式
+####################################################################
+
+# 讀取 命令列參數
 parser = OptionParser()
 parser.add_option('-c', dest='collection', help='collections (e.g. TXJ...)')
 parser.add_option('-s', dest='vol_start', help='start volumn (e.g. x55)')
@@ -1230,6 +1229,19 @@ if options.collection is not None:
 	options.collection = options.collection.upper()
 if options.vol_start is not None:
 	options.vol_start = options.vol_start.upper()
+
+# 讀取設定檔 cbwork_bin.ini
+config = configparser.SafeConfigParser()
+config.read('../cbwork_bin.ini')
+CBTEMP = config.get('default', 'temp')
+cbwork_dir = config.get('default', 'cbwork')
+JING = config.get('default', 'jing.jar_file')
+
+IN_P5a = CBTEMP + '/cbetap5a-ok' 		# XML P5a 來源資料夾
+PHASE1DIR = CBTEMP + '/cbetap5-tmp1'	# 暫存資料夾
+OUT_P5 = CBTEMP + '/cbetap5-ok'			# 最後結果
+GAIJI = cbwork_dir + '/bin/gaiji-m_u8.txt'
+RNC = cbwork_dir + '/xml-p5/schema/cbeta-p5.rnc'
 
 globals={}
 unicode2cb = {}

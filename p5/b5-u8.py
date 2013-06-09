@@ -16,13 +16,14 @@ b5-u8.py
 需求: Python 3.2, PythonWin
 2011.6.18 改寫使用 python 3
 作者: 周邦信 2009.05.26
+
+Heaven 修改:
+2013/06/09 變數改用設定檔 ../cbwork_bin.ini
 '''
 
 #################################################
 
-gaiji = '/cbwork/work/bin/gaiji-m.mdb' # 缺字資料庫路徑
-
-import os, codecs, re, sys
+import configparser, os, codecs, re, sys
 from optparse import OptionParser
 import win32com.client		# 要安裝 PythonWin
 
@@ -105,6 +106,11 @@ parser = OptionParser()
 parser.add_option("-s", dest="source", help="來源資料夾")
 parser.add_option("-o", dest="output", help="輸出資料夾")
 (options, args) = parser.parse_args()
+
+# 讀取設定檔 cbwork_bin.ini
+config = configparser.SafeConfigParser()
+config.read('../cbwork_bin.ini')
+gaiji = config.get('default', 'gaiji-m.mdb_file')
 
 # 準備存取 gaiji-m.mdb
 conn = win32com.client.Dispatch(r'ADODB.Connection')
