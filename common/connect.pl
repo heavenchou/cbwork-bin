@@ -52,7 +52,7 @@ print "輸出檔案 : $opt_o\n";
 # 主程式
 ############################################################
 
-my @file = <${opt_s}>;
+my @file = <{$opt_s}>;
 open OUT, ">$opt_o";
 foreach my $filename (sort (@file))
 {
