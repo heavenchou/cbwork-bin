@@ -17,3 +17,5 @@
 /note/*/*.xml
 /cbwork_bin.ini
 /common/connect.bat
+/common/b5-u8.bat
+/common/u8-b5.bat
