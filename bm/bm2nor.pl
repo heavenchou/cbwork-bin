@@ -15,6 +15,7 @@
 # Copyright (C) 1998-2013 CBETA
 # Copyright (C) 1999-2013 Heaven Chou
 ########################################################################
+# 2013/06/19 V8.2  <trans-mark,...> 前後的空格移除.
 # 2013/06/09 V8.1  設定由 ../cbwork_bin.ini 來獲得
 # 2013/03/26 V8.0  正式改為 utf8 版, 由 perl 5.16 開始執行
 ##########################################################
@@ -1227,8 +1228,8 @@ sub print_jun_head()
 	{
 		#$sutraver_c = "永樂南藏";
 		#$sutraver_e = "Southern Yongle Edition of the Canon";
-		$sutraver_c = "南傳大藏經";
-		$sutraver_e = "Pali Tripitaka";
+		$sutraver_c = "漢譯南傳大藏經";
+		$sutraver_e = "Chinese Translation of the Pali Tipiṭaka";
 	}
 	elsif($vol_head eq "P")
 	{
@@ -2613,7 +2614,7 @@ s之後的第一個Ｐ：變成二個空格。（是否是不管之前的繼承�
 		}
 		if($thistag =~ /<trans-mark,(.*?)>/)
 		{
-			s/<trans-mark,(.*?)>/ $1 /;
+			s/<trans-mark,(.*?)>/$1/;
 			next;
 		}
 		

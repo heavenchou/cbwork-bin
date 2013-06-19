@@ -34,7 +34,7 @@ collectionName={
 	"K":"高麗大藏經",
 	"L":"乾隆大藏經",
 	"M":"卍正藏經",
-	"N":"永樂南藏",
+	"N":"漢譯南傳大藏經",
 	"P":"永樂北藏",
 	"Q":"磧砂大藏經",
 	"S":"宋藏遺珍",
@@ -176,6 +176,12 @@ def handleNode(e):
 				globals['nextLineBuf']+=traverse(e)
 	elif e.tag=='unclear':
 		r='▆'
+	elif e.tag=='ref':
+		# <ref target="#PTS.Vin.3.2"></ref>
+		target = e.get('target')
+		mo=re.match('#PTS\..*\.(\d+)', target)
+		if mo is not None:
+			r = ' ' + mo.group(1) + ' '
 	else: r+=traverse(e)
 	return r
 

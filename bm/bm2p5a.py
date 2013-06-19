@@ -9,6 +9,8 @@
 $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
+Heaven 修改:
+2013/06/19 修改漢譯南傳大藏經的中英文
 2013/06/09 將設定檔改為 ../cbwork_bin.ini
 '''
 
@@ -28,7 +30,7 @@ wits={
 'K': '【麗】',
 'L': '【龍】',
 'M': '【卍正】',
-'N': '【南藏】',
+'N': '【南傳】',
 'P': '【北藏】',
 'Q': '【磧砂】',
 'S': '【宋遺】',
@@ -51,7 +53,7 @@ collectionEng={
 'K': 'Tripiṭaka Koreana - Xinwenfeng Edition',
 'L': 'Qianlong Edition of the Canon - Xinwenfeng Edition',
 'M': 'Manji Daizōkyō - Xinwenfeng Edition',
-'N': 'Southern Yongle Edition of the Canon',
+'N': 'Chinese Translation of the Pali Tipiṭaka',
 'P': 'Northern Yongle Edition of the Canon',
 'Q': 'Qisha Edition of the Canon - Xinwenfeng Edition',
 'R': 'Manji Zokuzōkyō - Xinwenfeng Edition',
