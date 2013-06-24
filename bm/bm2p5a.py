@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2013/06/24 BM 版經文最後的空白行也要轉出 XML 來
 2013/06/19 修改漢譯南傳大藏經的中英文
 2013/06/09 將設定檔改為 ../cbwork_bin.ini
 '''
@@ -593,6 +594,7 @@ $Log:'''.format(today=today)
 	fo.write(s)
 	closeTags('p')
 	close_div(1)
+	out('')		# 處理最後的 <lb> , 因為 BM 版經文最後可能會有空白行, 也要轉出 XML 來
 	
 	#最後的要處理一些特例
 	#移除 <head></head> 及將 <ref target="PTS.Vin.3.110"/></head> 換成 <ref target="PTS.Vin.3.110"/>
