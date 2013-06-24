@@ -7,6 +7,7 @@
 Ray CHOU 周邦信 2011.6.11
 
 Heaven 修改:
+2013/06/24 修改校勘數字呈現, [a01] 改成 [01]
 2013/06/09 將設定檔改為 ../cbwork_bin.ini
 '''
 
@@ -90,6 +91,7 @@ def getJKMark(e):
 	if id.startswith('end'): return ''
 	jk = id[-3:]
 	jk = re.sub("0(\d\d)", r"\g<1>", jk)		# 如果有三個數字且<100 , 第一個 0 移除
+	jk = re.sub("\D(\d\d)", r"\g<1>", jk)		# 如果前面不是數字則移除
 	
 	# 處理 kbj => 【科】 【標】 【解】
 	if jk[0] == 'k': jk = '【科' + jk[1:] + '】'
