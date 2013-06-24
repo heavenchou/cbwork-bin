@@ -3,6 +3,7 @@
 2013.1.4 周邦信 改寫自 cbp4top5.py
 
 Heaven 修改:
+2013/06/24 增加漢譯南傳大藏經的校勘支援
 2013/06/09 變數改用設定檔 ../cbwork_bin.ini
 '''
 
@@ -1024,6 +1025,9 @@ def handle_back(t):
 		elif k=='ihp':
 			r += '<cb:div type="ihp-notes">\n'
 			r += '<head>中央研究院歷史語言研究所 校勘記</head>\n'
+		elif k=='NanChuan':
+			r += '<cb:div type="nanchuan-notes">\n'
+			r += '<head>漢譯南傳大藏經 註解</head>\n'
 		elif k=='NCLRareBook':
 			r += '<cb:div type="ncl-notes">\n'
 			r += '<head>國家圖書館善本佛典 校勘記</head>\n'
