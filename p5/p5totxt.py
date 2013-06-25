@@ -7,6 +7,7 @@
 Ray CHOU 周邦信 2011.6.11
 
 Heaven 修改:
+2013/06/25 取消版本與日期的呈現, 非正式版不使用日期與版本
 2013/06/24 修改校勘數字呈現, [a01] 改成 [01]
 2013/06/09 將設定檔改為 ../cbwork_bin.ini
 '''
@@ -260,11 +261,13 @@ def fileHeader(tree):
 	globals['vol_c']=chineseNumber(int(globals['vol'][1:]))
 	title=tree.findtext('.//title')
 	globals['title']=title[title.rfind(' ')+1:]
-	globals['ver']=tree.findtext("//editionStmt/edition")
-	globals['ver']=globals['ver'][11:-2]	# $Revision: 1.29 $ ==> 1.72
+	#globals['ver']=tree.findtext("//editionStmt/edition")
+	#globals['ver']=globals['ver'][11:-2]	# $Revision: 1.29 $ ==> 1.72
+	globals['ver']='v.v'	# 非正式版不使用日期與版本
 	globals['encoding']='UTF-8'
 	globals['cFormat']='普及版'
-	globals['date']=datetime.date.today().strftime('%Y/%m/%d')
+	#globals['date']=datetime.date.today().strftime('%Y/%m/%d')
+	globals['date']= 'yyyy/mm/dd (非正式版不使用日期與版本)'	#非正式版不使用日期與版本
 	p=tree.xpath("//projectDesc/p[@lang='zh']")
 	globals['ly_zh']=p[0].text
 	p=tree.xpath("//projectDesc/p[@lang='en']")
