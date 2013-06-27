@@ -10,6 +10,8 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2013/06/27 1.<T,y> 格式改成 <T,x,y> , 與 <p,x,y> 同步. 
+           2.若遇到 <p>, <Q> P, Q 自動結束偈頌, 不一定要用 </T>
 2013/06/24 BM 版經文最後的空白行也要轉出 XML 來
 2013/06/19 修改漢譯南傳大藏經的中英文
 2013/06/09 將設定檔改為 ../cbwork_bin.ini
@@ -160,6 +162,7 @@ def start_trans_mark(tag):
 
 def start_p(tag):
 	closeTags('p', 'byline', 'head')
+	closeTags('l', 'lg')
 	r = get_number(tag)
 	out('<p xml:id="p%sp%s%s01"' % (vol, old_pb, line_num))
 	if 'r' in head_tag:
@@ -172,6 +175,7 @@ def start_p(tag):
 def start_inline_p(tag):
 	closeTags('p')
 	close_head()
+	closeTags('l', 'lg')
 	s = '<p xml:id="p%sp%s%s%02d"' % (vol, old_pb, line_num, char_count)
 	if char_count>1: s += ' cb:type="inline"'
 	mo = re.search(r'<p,(\d+),(\d+)>', tag)
@@ -188,6 +192,7 @@ def start_inline_p(tag):
 def start_div(level, type):
 	closeTags('p', 'cb:jhead', 'cb:juan')
 	close_div(level)
+	closeTags('l', 'lg')
 	opens['div'] = level
 	if type=='other' and 'W' in head_tag:
 		out('<cb:div type="w">')
@@ -197,6 +202,7 @@ def start_div(level, type):
 def start_inline_q(tag):
 	global buf, div_head, head_tag, globals
 	close_head()
+	closeTags('l', 'lg')
 	i=tag.find('m=')
 	div_head = ''
 	level = 0
@@ -289,13 +295,23 @@ def start_inline_T(tag):
 	if opens['lg']==0:
 		closeTags('p')
 		close_head()
-		out('<lg xml:id="lg%sp%s%s01" type="abnormal">' % (vol, old_pb, line_num))
+		out('<lg xml:id="lg%sp%s%s01" type="abnormal">' % (vol, old_pb, line_num))	#??? lg 一定是在行首的第一個字嗎?
 		opens['lg'] = 1
 	closeTags('l')
-	r=get_number(tag)
-	out('<l rend="text-indent:%sem">' % r)
+	mo = re.search(r'<T,(\d+),(\d+)>', tag)
+	if mo!=None:
+		if(mo.group(1) == '0'):
+			out('<l rend="text-indent:%sem">' % mo.group(2))
+		elif(mo.group(2) == '0'):
+			out('<l rend="margin-left:%sem">' % mo.group(1))
+		else:
+			out('<l rend="margin-left:%sem;text-indent:%sem">' % mo.groups())
+	else:
+		mo = re.search(r'\d+', tag)
+		if mo!=None:
+			out('<l rend="margin-left:%sem">' % mo.group())
 	record_open('l')
-	
+
 def start_inline_o(tag):
 	closeTags('p')
 	if 'commentary' in opens and opens['commentary']>0:
