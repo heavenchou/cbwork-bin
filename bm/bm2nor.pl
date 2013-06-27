@@ -15,6 +15,7 @@
 # Copyright (C) 1998-2013 CBETA
 # Copyright (C) 1999-2013 Heaven Chou
 ########################################################################
+# 2013/06/27 V8.3  <T,y> 改成 <T,x,y>, 比照 <p,x,y> 的規則處理
 # 2013/06/19 V8.2  <trans-mark,...> 前後的空格移除.
 # 2013/06/09 V8.1  設定由 ../cbwork_bin.ini 來獲得
 # 2013/03/26 V8.0  正式改為 utf8 版, 由 perl 5.16 開始執行
@@ -183,7 +184,6 @@
 #  1. 原來沒有, 並發現序, 所以可以訂 xxxx_000.txt
 #  2. 原來沒有, 並發現卷, 所以可以訂 xxxx_yyy.txt
 #  4. 原來有序(卷), 並發現卷(序or卷),  換檔了.
-#
 
 use utf8;
 use autodie;
@@ -293,9 +293,9 @@ sub check_format()
 
 sub print_help()
 {
-	print STDERR "\nError: Argument Error!\n";
-	print STDERR "Perl bm2nor.pl Vol [NoHead] [No_Normal] [JK_Num] [ Normal | Normal1 | App | App1 ]\n";
-	print STDERR "ex : Perl bm2nor.pl T01\n";
+	print STDERR togig5("\n參數錯誤！\n");
+	print STDERR "使用方法 : Perl bm2nor.pl Vol [NoHead] [No_Normal] [JK_Num] [ Normal | Normal1 | App | App1 ]\n";
+	print STDERR "例 : Perl bm2nor.pl T01\n";
 	exit;	
 }
 
@@ -2201,6 +2201,8 @@ s之後的第一個Ｐ：變成二個空格。（是否是不管之前的繼承�
 	# 因為 <z,x,y> 和 <p,x,y> 處理方法相同, 所以先置換
 	s/<z,/<p,/g;
 	s/<z>/<p>/g;
+	# 因為 <T,x,y> 和 <p,x,y> 處理方法相同, 所以先置換 2013/06/27
+	s/<T,/<p,/g;
 	#<e..> 和 <n..>  處理方法相同, 所以先置換
 	s/<e>/<n>/g;
 	s/<e(,.*?>)/<n$1/;
@@ -2554,13 +2556,16 @@ s之後的第一個Ｐ：變成二個空格。（是否是不管之前的繼承�
 			$has_d = 0;		# 解除 <d>
 			next;
 		}
-		if($thistag =~ /<T,(\d+)>/)	# <T,n> 依 n 空格
-		{
-			my $space_num = $1;
-			my $space = "　" x $space_num;
-			s/<T,(\d+)>/$space/;
-			next;
-		}
+		
+		# 20130627 <T,y> 改成 <T,x,y>, 所以比照 p 來空格
+		#if($thistag =~ /<T,(\d+)>/)	# <T,n> 依 n 空格
+		#{
+		#	my $space_num = $1;
+		#	my $space = "　" x $space_num;
+		#	s/<T,(\d+)>/$space/;
+		#	next;
+		#}
+		
 		if($thistag eq "<j>")
 		{
 			s/<j>/$fullspace/;
@@ -2760,9 +2765,9 @@ s之後的第一個Ｐ：變成二個空格。（是否是不管之前的繼承�
 			next;
 		}
 		
-		print STDERR "Error : 遇到無法處理的標記  $thistag\n";
-		print STDERR "$_\n";
-		print STDERR "...任意鍵結束...";
+		print STDERR togig5("錯誤 : 遇到無法處理的標記 => $thistag\n");
+		print STDERR togig5("內容 : $_\n");
+		print STDERR togig5("...任意鍵結束...");
 		<STDIN>;
 		exit;
 	}
@@ -3086,5 +3091,14 @@ sub readGaiji
 	#print STDERR "ok\n";
 }
 
+####################################################
+# 將文字轉成 big5 , 以便在 DOS 視窗輸出
+####################################################
+
+sub togig5
+{
+	my $str = shift;
+	return encode("big5",$str);
+}
 ###  END  ####################################################
 
