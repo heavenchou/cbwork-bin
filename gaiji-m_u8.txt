@@ -15,8 +15,8 @@ cb	mojikyo	entity	uni_flag	unicode	nor_unicode	des	nor	cx
 		Sacute	1	015A		[′/S]	`S	
 		sacute	1	015B		[′/s]	`s	
 	M062962		1	0160		[ˇ/S]		
-		umacron	1	016B		[-/u]	uu	
-	M062986		1	017D		[ˇ/Z]		
+		Umacron	1	016A		[-/U]	UU	
+			1	016D		[ˇ/u]		
 			1	0119		ę		
 	M063014		1	00E7		ç		
 	M062914		1	00C7		Ç		
@@ -36,11 +36,11 @@ cb	mojikyo	entity	uni_flag	unicode	nor_unicode	des	nor	cx
 		iacute	1	00ED		[′/i]	`I	
 		ntilde	1	00F1		[~/n]	~n	
 		oacute	1	00F3		[′/o]	`o	
-			1	016D		[ˇ/u]		
+	M062986		1	017D		[ˇ/Z]		
 		atilde	1	00E3		[~/a]	~a	
 		adotblw	1	1EA1		[a/.]	.a	
 		cdotblw				[c/.]	.c	
-		Umacron	1	016A		[-/U]	UU	
+		umacron	1	016B		[-/u]	uu	
 		udotblw	1	1EE5		[u/.]	.u	
 		Bdotblw	1	1E04		[B/.]	.B	
 		tdotblw	1	1E6D		[t/.]	.t	
@@ -51,18 +51,18 @@ cb	mojikyo	entity	uni_flag	unicode	nor_unicode	des	nor	cx
 		Rdotblw	1	1E5A		[R/.]	.R	
 		ndotblw	1	1E47		[n/.]	.n	
 		Ndotblw	1	1E46		[N/.]	.N	
+		Ddotblw	1	1E0C		[D/.]	.D	
+		Ndotabv	1	1E44		[./N]	^N	
+		mdotblw	1	1E43		[m/.]	.m	
+		mdotabv	1	1E41		[./m]	^m	
+		ldotblw	1	1E37		[l/.]	.l	
+		Ldotblw	1	1E36		[L/.]	.L	
+		kdotblw	1	1E33		[k/.]	.k	
+		hdotblw	1	1E25		[h/.]	.h	
+		Hdotblw	1	1E24		[H/.]	.H	
 		ddotblw	1	1E0D		[d/.]	.d	
 		Cdotblw				[C/.]	.C	
 		ndotabv	1	1E45		[./n]	^n	
-		Ddotblw	1	1E0C		[D/.]	.D	
-		Hdotblw	1	1E24		[H/.]	.H	
-		hdotblw	1	1E25		[h/.]	.h	
-		mdotblw	1	1E43		[m/.]	.m	
-		Ldotblw	1	1E36		[L/.]	.L	
-		ldotblw	1	1E37		[l/.]	.l	
-		Ndotabv	1	1E44		[./N]	^N	
-		mdotabv	1	1E41		[./m]	^m	
-		kdotblw	1	1E33		[k/.]	.k	
 00001	M016085	M016085	1	6B35		[肄-聿+欠]	款	
 00002	M024824	M024824	1	9834		[(匕/示)*頁]	穎	
 00003	M067838	M067838				[(工*刀)/言]	辯	
@@ -29768,6 +29768,8 @@ cb	mojikyo	entity	uni_flag	unicode	nor_unicode	des	nor	cx
 32757						[日*兆]		
 32758						[夭*ㄗ]		
 32759						[這-言+瞿]		
+32760						[鹿/非]		
+32761			0	280B0		[跳-兆+契]	跇	
 x0001	M024583	CI0001	1	&#x7914;&#x7930;		礔[石*歷]	霹靂	礔&CB00269;
 x0002	M025746	CI0002	1	&#x7ADB;&#x7AEE;		[立*令]竮	伶俜	&CB00277;竮
 x0003	M045414	CI0003	1	&#x9AE3;&#x9AF4;		髣[髟/弗]	彷彿	髣&CB00662;
