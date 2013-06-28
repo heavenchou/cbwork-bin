@@ -7,6 +7,7 @@
 Ray CHOU 周邦信 2011.6.11
 
 Heaven 修改:
+2013/06/28 第二卷之後卷首加上版本資訊
 2013/06/25 取消版本與日期的呈現, 非正式版不使用日期與版本
 2013/06/24 修改校勘數字呈現, [a01] 改成 [01]
 2013/06/09 將設定檔改為 ../cbwork_bin.ini
@@ -237,8 +238,8 @@ def splitByJuan(source, folder_out):
 	os.remove(source)
 
 def shortFileHeader():
-	template = Template('''【經文資訊】$edition_c 第${vol_c}冊 No. ${sutra_no_0}《${title}》CBETA 電子佛典 $cFormat
-# $ebib $title, CBETA Chinese Electronic Tripitaka, $eFormat
+	template = Template('''【經文資訊】$edition_c 第${vol_c}冊 No. ${sutra_no_0}《${title}》CBETA 電子佛典 V${ver} $cFormat
+# $ebib $title, CBETA Chinese Electronic Tripitaka V${ver}, $eFormat
 =========================================================================
 ''')
 	return template.substitute(globals)
