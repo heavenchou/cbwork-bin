@@ -8,10 +8,13 @@
 # 參數說明：
 #     -h 列出說明
 #     -v 要比對的冊數
+#     -type 輸出的格式, 計有 normal, html, pda , 預設是 normal
+#     -jingfile 採用一經一檔, 預設則是一卷一檔
+#
 #     * 以下僅供參考 *
 #     -c 內碼轉換表路徑
 #     -e output encoding
-#     -g 去除行首(或段首)資訊的選項(edith modify 2005/1/13, 目前僅用於app版)
+#     -g 去除行首(或段首)資訊的選項
 #     -h 不要檔頭資訊
 #     -i input directory
 #     -j normalize for Japanese
@@ -46,7 +49,7 @@ use Config::IniFiles;
 use Getopt::Long;
 
 # 如果有使用 use strict; , 本行就要加上去
-use vars qw($opt_h $opt_v );		
+use vars qw($opt_h $opt_v $opt_type $opt_jingfile);		
 
 ##############################################################################
 # 變數
@@ -55,19 +58,26 @@ use vars qw($opt_h $opt_v );
 my $vol;			# $vol = T01 , 主要在執行的冊數
 my $vol_ed;			# $vol_ed = T
 my $vol_num;		# $vol_num = 01
+my $sutra_num;		# 經號, 例如 T01n0001 , 則 $sutra_num = 0001
+my $file_type;		# 經文格式, 計有 normal, html, pda, 預設是 normal
+my $cut_type;		# 切檔的方法 , 有 "jing" 一經一檔 及 "juan" 一卷一檔, 預設是一卷一檔.
 
 my @files = ();		# $vol 底下所有的 xml 檔案檔名
 
 my $cbwork_dir;		# cbwork 目錄, 預設會讀取 ../cbwork_bin.ini 的內容, 也可以由 -release 來指定
 my $release_dir;	# release 目錄, 預設會讀取 ../cbwork_bin.ini 的內容, 也可以由 -release 來指定
 my $xml_dir;		# xml 目錄 = $cbwork_dir . "/xml-p5/$vol_ed/$vol/";
+my $out_dir;		# 輸出結果的目錄 $out_dir = $release_dir . "/${file_type}-utf8/$vol/";
+
+my $text;			# 儲存產生的經文
+my $juan_num;		# 處理中的卷數
 
 ##############################################################################
 # 主程式
 ##############################################################################
 
-check_opt();			# 檢查參數
 read_ini_file();		# 讀取主要的 ini 檔內容
+check_opt();			# 檢查參數
 initial_para();			# 參數設定
 show_main_message();	# 在 DOS 視窗秀出主要的訊息
 
@@ -81,7 +91,7 @@ if(not @files)
 	exit;
 }
 
-# 逐檔 parse
+# 宣告 parse 程式
 
 my $ent;
 my $val;
@@ -95,18 +105,43 @@ $parser->setHandlers (
 	Entity => \&entity,
 	Default => \&default);
 
+# 逐檔處理
+
 for my $file (sort(@files))
 {
+	if($file =~ /^(\D+\d+)n(.*?)\.xml/)
+	{
+		my $v = $1;
+		$sutra_num = $2;
+		if($vol ne $v)
+		{
+			# 冊數與 $vol 不同
+			print tobig5("錯誤：發現奇怪檔名 $file！\n");
+			exit;
+		}
+	}
+	else
+	{
+		# 檔名不符合標準格式
+		print tobig5("錯誤：發現奇怪檔名 $file！\n");
+		exit;
+	}
 	my $filename = $xml_dir . $file;
 	print "\n" . $file . "..." ;
-	#$parser->parsefile($filename);
+	$parser->parsefile($filename);
 }
 
-#mkdir($output_dir) if(not -d $output_dir);
+##############################################################################
+# 讀取主要的 ini 檔內容
+##############################################################################
 
-#open (OUT, ">:encoding(big5)", "${output_dir}/${vol}_tree.txt");
-#print OUT $tree;	# 印出樹狀目錄
-#close OUT;
+sub read_ini_file
+{
+	my $cfg = Config::IniFiles->new( -file => "../cbwork_bin.ini" );
+	
+	$cbwork_dir = $cfg->val('default', 'cbwork', '/cbwork');	# 讀取 cbwork 目錄
+	$release_dir = $cfg->val('default', 'release', '/release');	# 讀取 release 目錄
+}
 
 ##############################################################################
 # 檢查參數
@@ -116,7 +151,7 @@ sub check_opt
 {
 	# -h 不用引數, 所以用 !
 	# -v 需要引數, 所以用 v=s, 並放入 $opt_v (s : 字串 , i : 整數 , f : 浮點)
-	GetOptions("h!", "v=s");
+	GetOptions("h!", "v=s", "type=s", "jingfile!");
 
 	if($opt_h == 1)
 	{
@@ -130,18 +165,17 @@ sub check_opt
 		print_help();
 		exit;
 	}
-}
-
-##############################################################################
-# 讀取主要的 ini 檔內容
-##############################################################################
-
-sub read_ini_file
-{
-	my $cfg = Config::IniFiles->new( -file => "../cbwork_bin.ini" );
 	
-	$cbwork_dir = $cfg->val('default', 'cbwork', '/cbwork');	# 讀取 cbwork 目錄
-	$release_dir = $cfg->val('default', 'release', '/release');	# 讀取 release 目錄
+	# 經文格式, 預設是 normal , 也有 html 及 pda
+	$file_type = "normal";	# 預設值
+	if(($opt_type eq "html") or ($opt_type eq "pda"))
+	{
+		$file_type = $opt_type;
+	}
+	
+	# 切檔方式, 預設是一卷一檔, 若使用 -jingfile 參數, 則是一經一檔
+	$cut_type = "juan";
+	if($opt_jingfile) { $cut_type = "jing";}
 }
 
 ##############################################################################
@@ -162,7 +196,23 @@ sub initial_para
 		exit;
 	}
 	
+	# xml 來源目錄
 	$xml_dir = $cbwork_dir . "/xml-p5/$vol_ed/$vol/";
+	
+	# 輸出目錄
+	mkdir($release_dir) if(not -d $release_dir);
+	if($cut_type eq "juan")
+	{
+		$out_dir = $release_dir . "/${file_type}-utf8/";
+	}
+	else
+	{
+		# 一經一檔的目錄不同, 例如 normal 一經一檔目錄是 normal1
+		$out_dir = $release_dir . "/${file_type}1-utf8/";
+	}
+	mkdir($out_dir) if(not -d $out_dir);
+	$out_dir .= "$vol/";
+	mkdir($out_dir) if(not -d $out_dir);
 }
 
 ##############################################################################
@@ -172,6 +222,13 @@ sub initial_para
 sub show_main_message
 {
 	print tobig5("\n【 XML P5 轉檔程式 】\n");
+	print tobig5("處理冊數：$vol\n");
+	print tobig5("資料來源：$xml_dir\n");
+	print tobig5("輸出目錄：$out_dir\n");
+	print tobig5("輸出格式：$file_type\n");
+	print tobig5("切檔方式：");
+	print tobig5("一卷一檔\n") if ($cut_type eq "juan");
+	print tobig5("一經一檔\n") if ($cut_type eq "jing");
 }
 
 ##############################################################################
@@ -199,6 +256,19 @@ sub print_help
 	}
 }
 
+##############################################################################
+# 將結果印出來
+##############################################################################
+
+sub print_file
+{
+	my $txt_ref = shift;
+	
+	open OUT, ">utf8:", "$out_dir" . $vol . "n" . $sutra_num . ".txt";
+	print OUT $$txt_ref;
+	close OUT;
+}
+
 
 ##############################################################################
 # XML Parser
@@ -207,12 +277,14 @@ sub print_help
 # 初值化的工作
 sub init_handler
 {
+	$text = "";			# 儲存產生的經文
 }
 
 #-----------------------------------------------------------------------------
 
 sub final_handler 
 {
+	print_file(\$text);
 }
 
 #-----------------------------------------------------------------------------
@@ -256,6 +328,7 @@ sub char_handler
 	my $p = shift;
 	my $char = shift;
 
+	$text .= $char;
 }
 
 #-----------------------------------------------------------------------------
