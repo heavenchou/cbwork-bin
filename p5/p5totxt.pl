@@ -58,7 +58,11 @@ use vars qw($opt_h $opt_v $opt_type $opt_jingfile);
 my $vol;			# $vol = T01 , 主要在執行的冊數
 my $vol_ed;			# $vol_ed = T
 my $vol_num;		# $vol_num = 01
-my $sutra_num;		# 經號, 例如 T01n0001 , 則 $sutra_num = 0001
+my $sutra_id;		# 經文 id, T01n0001 , T02n0128a
+my $sutra_id_;		# 經文 id, T01n0001_ , T02n0128a
+my $sutra_num;		# 經號, 0001 , 0128a
+my $sutra_num_;		# 經號, 0001_ , 0128a
+
 my $file_type;		# 經文格式, 計有 normal, html, pda, 預設是 normal
 my $cut_type;		# 切檔的方法 , 有 "jing" 一經一檔 及 "juan" 一卷一檔, 預設是一卷一檔.
 
@@ -109,16 +113,17 @@ $parser->setHandlers (
 
 for my $file (sort(@files))
 {
-	if($file =~ /^(\D+\d+)n(.*?)\.xml/)
+	if($file =~ /^(${vol}n(.{4,5}))\.xml/)
 	{
-		my $v = $1;
-		$sutra_num = $2;
-		if($vol ne $v)
+		# 由檔名取出相關資料
+		$sutra_id = $sutra_id_ = $1;
+		$sutra_num = $sutra_num_ = $2;
+		if(length($sutra_num) == 4)
 		{
-			# 冊數與 $vol 不同
-			print tobig5("錯誤：發現奇怪檔名 $file！\n");
-			exit;
+			$sutra_id_ .= "_";
+			$sutra_num_ .= "_";
 		}
+		print $sutra_id_ . " " . $sutra_num_
 	}
 	else
 	{
@@ -284,6 +289,7 @@ sub init_handler
 
 sub final_handler 
 {
+	# 輸出結果
 	print_file(\$text);
 }
 
@@ -294,13 +300,28 @@ sub start_handler
 	my $p = shift;
 	my $tag = shift;
 	my (%att) = @_;
-
-	### <cb:mulu> ###
-	# <cb:mulu level="1" type="序">序</cb:mulu>
-	# <cb:mulu type="卷"></cb:mulu>
-	if ($tag eq "cb:mulu")
+	
+	### <lb ed="N" n="0001a01"/>
+	if ($tag eq "lb")
 	{
-		# $mulu_type = $att{"type"};	# 目錄的總類
+		my $n = $att{"n"};
+		$text .= $sutra_id_ . "p" . $n . "║";
+		return;
+	}
+	
+	### <pb ed="N" xml:id="N01.0001.0001a" n="0001a"/>
+	
+	if ($tag eq "pb")
+	{
+		return;
+	}
+	
+	### <milestone unit="juan" n="1"/>
+	
+	if ($tag eq "milestone" and $att{"unit"} eq "juan")
+	{
+		# 先記錄 <heaven:juan 1> , 留待未來分卷的標記
+		$text .= "<heaven:juan " . $att{"n"} . ">";
 	}
 }
 
