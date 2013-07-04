@@ -32,6 +32,8 @@ my $mulu_type = "";		# 目錄的總類
 my $juan_num = ""; 		# 目前的卷數
 my $mulu_tree = "";		# 非卷的目錄樹
 my $juan_tree = "";		# 卷的目錄樹
+my $page = "";			# 記錄目前的頁數
+my $thismulu = "";		# 記錄目前目錄的內容
 
 # 開啟目錄, 找出所有檔案
 
@@ -121,11 +123,14 @@ sub start_handler
 	if ($tag eq "cb:mulu")
 	{
 		$inMulu = 1;
+		$thismulu = "";
+		
 		$mulu_type = $att{"type"};	# 目錄的總類
 		if($mulu_type eq "卷")
 		{
 			$juan_num = $att{"n"};
 			$juan_tree .= "\n\t\t" . "第 " . $juan_num . " 卷 ";
+			$thismulu .= "第 " . $juan_num . " 卷 ";
 		}
 		else
 		{
@@ -133,6 +138,13 @@ sub start_handler
 			$mulu_tree .= "\n" . "\t" x ($mulu_level + 1);	# 第 n 層就要空 n+1 個 tab
 		}
 	}
+	
+	### <lb ed="N" n="0001a01"/>
+	if ($tag eq "lb")
+	{
+		$page = "p" . $att{"n"};
+	}
+	
 }
 
 sub end_handler {
@@ -146,6 +158,21 @@ sub end_handler {
 	#<cb:mulu level="1" type="序">序</cb:mulu>
 	if ($tag eq "cb:mulu")
 	{
+		# 在該行尾端加上頁碼
+		if($mulu_type eq "卷")
+		{
+			my $tmp = encode("big5", $thismulu);
+			my $linelen = 70 - length($tmp);
+			my $aa = length($tmp);
+			$juan_tree .= "　" x ($linelen /2)  . "( $page )";
+		}
+		else
+		{
+			my $tmp = encode("big5", $thismulu);
+			my $linelen = 70 - length($tmp) - $mulu_level * 2;
+			my $aa = length($tmp);
+			$mulu_tree .= "　" x ($linelen/2)  . "( $page )";
+		}
 		$inMulu = 0;
 	}
 }
@@ -172,6 +199,7 @@ sub char_handler {
 		{
 			$mulu_tree .= $char;
 		}
+		$thismulu .= $char;
 	}
 }
 
