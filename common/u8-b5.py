@@ -14,6 +14,7 @@ u8-b5.py
 2009.12.02 Ray: 從 Unicode 網站取得 Unihan.txt, 取出裏面的異寫字資訊 kCompatibilityVariant, 放在 variant
 
 Heaven 修改:
+2013/07/10 修改遇到 0xFEFF 時寫入 log 檔的小錯誤
 2013/06/09 變數改用設定檔 ../cbwork_bin.ini
 2013/03/05 增加 -n 使用通用字的參數
 '''
@@ -1165,7 +1166,7 @@ def my_err_handler(exc):
 		i = ord(c)
 			
 		if i==0xFEFF:	#FEFF=65279
-			print >>f3,'if i==0xFEFF:	\n'
+			f3.write('if i==0xFEFF:	\n')
 			continue
 		elif high_word != 0:
 			f3.write('high_word != 0:	\n')
