@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2013/07/20 處理修訂格式中包含組字式、校勘數字的問題, 以及一些小問題.
 2013/06/27 1.<T,y> 格式改成 <T,x,y> , 與 <p,x,y> 同步. 
            2.若遇到 <p>, <Q> P, Q 自動結束偈頌, 不一定要用 </T>
 2013/06/24 BM 版經文最後的空白行也要轉出 XML 來
@@ -216,6 +217,7 @@ def start_inline_q(tag):
 	if mo is None:
 		label = ''
 		globals['mulu_start'] = True
+		globals['muluType']='其他'
 	else:
 		label=mo.group(1)
 		if label != '':
@@ -250,6 +252,7 @@ def start_q(tag):
 	buf += '<head>'
 	opens['head'] = 1
 
+# 可能用不上了, 已在 do_corr 處理了.
 def choice(tag):
 	'''  把 [A>B] 換成 <choice> '''
 	mo = re.match(r'\[([^>\]]*?)>(.*?)\]', tag) 
@@ -332,8 +335,10 @@ def start_inline_u(tag):
 def inline_tag(tag):
 	global char_count, buf
 	#print(tag, sep=' ', end='')
-	if re.match(r'\[([^>\]]*?)>(.*?)\]', tag):	# 處理修訂 [A>B]
+	if re.match(r'\[([^>\]]*?)>(.*?)\]', tag):	# 處理修訂 [A>B] # 可能用不上了, 已在 do_corr 處理了.
 		out(choice(tag))
+	elif re.match(r'<\[(([\da-zA-Z]{2,3})|＊)\]>', tag):	# 在 do_corr 處理過的校勘數字 , 原來為 <[01]> , 要直接處理成 [01]
+		out(tag[1:-1])
 	elif re.match(r'\[([\da-zA-Z]+?)\]', tag):	# 處理校勘數字
 		out('<anchor xml:id="fn%sp%s%s"/>' % (vol, old_pb, tag[1:-1]))
 	elif re.match(r'\[[^>\[ ]+?\]', tag):		# 處理組字式
@@ -390,6 +395,19 @@ def inline_tag(tag):
 		closeTags('p')
 		out1('</cb:div>')
 		opens['div'] -= 1
+	#以下這些直接輸出 <choice cb:resp="CBETA.maha"><corr>Ｂ</corr><sic>Ａ</sic></choice>
+	elif tag.startswith('<choice'):
+		out(tag)
+	elif tag=='<corr>':
+		out(tag)
+	elif tag=='</corr>':
+		out(tag)
+	elif tag=='<sic>':
+		out(tag)
+	elif tag=='</sic>':
+		out(tag)
+	elif tag=='</choice>':
+		out(tag)
 	else:
 		print(old_pb+line_num+'未處理的標記: ' + tag)
 
@@ -428,6 +446,31 @@ def do_chars(s):
 	#print('chars:', s, file=log)
 	char_count += myLength(s)
 	out2(s)
+
+'''
+先把 [Ａ>Ｂ] 換成 <choice cb:resp="CBETA.maha"><corr>Ｂ</corr><sic>Ａ</sic></choice>
+因為 Ａ 與 B 也有可能是組字式或校勘數字, 例如 [[金*本]>[口*兄]] , [[01]>]
+'''
+def do_corr(text):
+	'''
+	先把 [xxx] 組字或校勘數字變成 :gaiji1:xxx:gaiji2:
+	先把 <xxx> 組字或校勘數字變成 :gaiji3:xxx:gaiji4:
+	再把[Ａ>Ｂ] 換成 <choice cb:resp="CBETA.maha"><corr>Ｂ</corr><sic>Ａ</sic></choice>
+	再把 <corr>[01]</corr> 這一類換成 <corr><[01]></corr> , 而 <[01]> 之後會換成 [01], 如不這樣處理, [01] 會被變成一般的校勘數字標記
+	再把:gaiji1:xxx:gaiji2: 換回 [xxx]
+	再把:gaiji3:xxx:gaiji4: 換回 <xxx>
+	'''
+	text = re.sub(r"\[([^>\[\]]+?)\]", r":gaiji1:\1:gaiji2:", text)
+	text = re.sub(r"<([^<>]+?)>", r":gaiji3:\1:gaiji4:", text)
+	text = re.sub(r"\[(.*?)>(.*?)\]", r'<choice cb:resp="CBETA.maha"><corr>\2</corr><sic>\1</sic></choice>', text)
+	text = re.sub(":gaiji1:", "[", text)
+	text = re.sub(":gaiji2:", "]", text)
+	text = re.sub(":gaiji3:", "<", text)
+	text = re.sub(":gaiji4:", ">", text)
+	text = re.sub(r"<corr>(\[(([\da-zA-Z]{2,3})|＊)\])<\/corr>", r'<corr><\1></corr>', text)
+	text = re.sub(r"<sic>(\[(([\da-zA-Z]{2,3})|＊)\])<\/sic>", r'<sic><\1></sic>', text)
+
+	return text
 
 # 分析每一行經文
 def do_text(s):
@@ -655,9 +698,10 @@ def convert():
 	for line in f1:
 		char_count = 1
 		line=line.rstrip()
+		if (line[:1] == "\ufeff"): line = line[1:]	# 扣除 utf8 格式有 feff 的檔頭
 		aline = line[:len(options.vol)+17]
 		text = line[len(options.vol)+17:]
-		mo=re.match(r'([A-Z]\d{2,3})(n\d+_)(p\d{4}[a-z])(\d\d)(.+)$', aline)
+		mo=re.match(r'([A-Z]+\d{2,3})(n\d+.)(p\d{4}[a-z])(\d\d)(.+)$', aline)
 		(vol, num, pb, line_num, head_tag) = mo.groups()
 		#print('line_num:', pb+line_num, file=log)
 		num=num.rstrip('_')
@@ -690,6 +734,12 @@ def convert():
 		buf += ' ed="{}" n="{}"/>'.format(ed, pb+line_num)
 		
 		do_line_head(head_tag)
+		'''
+		先把 [Ａ>Ｂ] 換成 <choice cb:resp="CBETA.maha"><corr>Ｂ</corr><sic>Ａ</sic></choice>
+		因為 Ａ 與 B 也有可能是組字式或校勘數字, 例如 [[金*本]>[口*兄]] , [[01]>]
+		'''
+		text = do_corr(text)
+		
 		do_text(text)
 	close_sutra(globals['sutraNumber'])
 	f1.close()
