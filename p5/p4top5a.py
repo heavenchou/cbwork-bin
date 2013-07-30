@@ -9,6 +9,8 @@
 2013.1.3 周邦信 改寫自 cbp4top5.py
 
 Heaven 修改:
+2013/07/26 1.將 P4 轉 P5a 的日期指定在 2013/05/20 , 因為後來只是小修改, 也不算是重轉, 因此日期不改, 以利比對新舊版差異.
+           2.修改 common/X2R 的目錄至正確的位置
 2013/06/09 變數改用設定檔 ../cbwork_bin.ini
 '''
 
@@ -635,7 +637,8 @@ class MyTransformer():
 		elif tag=='revisionDesc':
 			node=MyNode(e)
 			r += node.open_tag()
-			r += '\n\t\t<change when="{}">\n'.format(datetime.date.today())
+			#r += '\n\t\t<change when="{}">\n'.format(datetime.date.today()) ?????????????
+			r += '\n\t\t<change when="{}">\n'.format("2013-05-20")
 			r += '\t\t\t<name>CW</name><name>Ray Chou 周邦信</name>P4 to P5 conversion by p4top5a.py, intended for publication\n'
 			r += '\t\t</change>'
 			r += self.traverse(e, mode) + node.end_tag()
@@ -839,7 +842,7 @@ def spend_time(secs):
 	return r
 	
 def read_x2r(vol):
-	fn='D:/cbwork/common/X2R/' + vol + 'R.txt'
+	fn = cbwork_dir + '/common/X2R/' + vol + 'R.txt'
 	fi = open(fn, 'r', encoding='cp950')
 	result = {}
 	for line in fi:

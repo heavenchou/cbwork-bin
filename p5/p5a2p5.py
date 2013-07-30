@@ -3,6 +3,9 @@
 2013.1.4 周邦信 改寫自 cbp4top5.py
 
 Heaven 修改:
+2013/07/29 1.將 resp="【甲】【乙】" 這一類的格式插入空格, 【甲】與【乙】才能分離出來
+           2.加入通用 unicode 的處理
+2013/07/25 將一些 from="beg_xxx" 改成 from="#beg_xxx"
 2013/06/24 增加漢譯南傳大藏經的校勘支援
 2013/06/09 變數改用設定檔 ../cbwork_bin.ini
 '''
@@ -33,7 +36,7 @@ WITS = {
 	'K' : '【麗】',
 	'L' : '【龍】',
 	'M' : '【卍正】',
-	'N' : '【南藏】',
+	'N' : '【南傳】',
 	'P' : '【北藏】',
 	'Q' : '【磧砂】',
 	'S' : '【宋遺】',
@@ -146,12 +149,16 @@ def read_all_resp(root):
 	global resp_id
 	for e in root.iter(tag=etree.Element):
 		resp=e.get('resp', '')
+		# 將 resp="【甲】【乙】" 這一類的格式插入空格, 【甲】與【乙】才能分離出來 --2013/07/29
+		resp = resp.replace(u'】【','】 【')
 		resps = resp.split()
 		for r in resps:
 			if r not in resp_id:
 					resp_id[r]='resp{}'.format(len(resp_id)+1)
 					
 def handle_resp(resp):
+	# 將 resp="【甲】【乙】" 這一類的格式插入空格, 【甲】與【乙】才能分離出來 --2013/07/29
+	resp = resp.replace(u'】【','】 【')
 	resps = resp.split()
 	result = []
 	for r in resps:
@@ -268,12 +275,12 @@ class MyTransformer():
 			r += '\t<charName>CBETA CHARACTER {}</charName>\n'.format(cb)
 			attrib = get_gaiji_info(cb)
 			for k, v in sorted(attrib.items()):
-				if k != 'unicode':
+				if k != 'unicode' and  k != 'nor_unicode':
 					r += '\t<charProp>\n'
 					r += '\t\t<localName>'
 					if k == 'des':
 						r += 'composition'
-					elif k in ('big5', 'uniflag', 'nor_uni', 'rjchar'):
+					elif k in ('big5', 'uniflag', 'rjchar'):
 						r += k
 					elif k=='cb':
 						r += 'entity'
@@ -301,6 +308,8 @@ class MyTransformer():
 					r += '\t</charProp>\n'
 			if 'unicode' in attrib:
 				r += '\t<mapping type="unicode">U+{}</mapping>\n'.format(attrib['unicode'])
+			if 'nor_unicode' in attrib:
+				r += '\t<mapping type="normal_unicode">U+{}</mapping>\n'.format(attrib['nor_unicode'])
 			r += '\t<mapping cb:dec="{0}" type="PUA">U+{0:X}</mapping>\n'.format(cb2pua(cb))
 			r += '</char>\n'
 		if r != '':
@@ -434,8 +443,8 @@ class MyTransformer():
 		if new_type=='choice':
 			node = MyNode()
 			node.tag = 'choice'
-			node.attrib['cb:from'] = 'beg_{}'.format(id)
-			node.attrib['cb:to'] = 'end_{}'.format(id)
+			node.attrib['cb:from'] = '#beg_{}'.format(id)
+			node.attrib['cb:to'] = '#end_{}'.format(id)
 			lem = e.find('lem')
 			resp = lem.get('resp')
 			if resp is not None:
@@ -450,8 +459,8 @@ class MyTransformer():
 			self.back['app'] += node.end_tag() + '\n'
 		else:
 			node = MyNode(e)
-			node.attrib['from'] = 'beg_{}'.format(id)
-			node.attrib['to'] = 'end_{}'.format(id)
+			node.attrib['from'] = '#beg_{}'.format(id)
+			node.attrib['to'] = '#end_{}'.format(id)
 			new_mode = change_mode(mode, 'body', 'back')
 			self.back['app'] += node.open_tag()
 			self.back['app'] += self.traverse(e, new_mode)
@@ -588,8 +597,8 @@ class MyTransformer():
 					self.anchors.append(id)
 					r += '<anchor xml:id="{}"/>'.format(id)
 				node = MyNode(e)
-				node.attrib['from'] = 'beg{}'.format(n)
-				node.attrib['to'] = 'end{}'.format(n)
+				node.attrib['from'] = '#beg{}'.format(n)
+				node.attrib['to'] = '#end{}'.format(n)
 				del node.attrib['n']
 				new_mode = change_mode(mode, 'body', 'back')
 				back = node.open_tag() + '\n' + self.traverse(e, new_mode) + node.end_tag()
@@ -1031,7 +1040,8 @@ def handle_back(t):
 		elif k=='NCLRareBook':
 			r += '<cb:div type="ncl-notes">\n'
 			r += '<head>國家圖書館善本佛典 校勘記</head>\n'
-		elif k=='Northern Yongle Edition of the Canon':
+		#elif k=='Northern Yongle Edition of the Canon':
+		elif k=='Yonglebei':
 			r += '<cb:div type="yongle-notes">\n'
 			r += '<head>永樂北藏 校勘記</head>\n'
 		elif k=='Taisho':
@@ -1161,6 +1171,7 @@ def do1vol(vol):
 	print(vol, 'phase-1')
 	my_mkdir(PHASE1DIR+'/'+coll)
 	my_mkdir(PHASE1DIR+'/'+coll+'/'+vol)
+	print (IN_P5a+'/'+coll+'/'+vol+'/*.xml')
 	for p in glob.iglob(IN_P5a+'/'+coll+'/'+vol+'/*.xml'):
 		phase1(vol,p)
 	
@@ -1212,6 +1223,8 @@ def read_all_gaijis():
 					r[cb]['des'] = row['des']
 				if row['nor'] != '':
 					r[cb]['nor'] = row['nor']
+				if row['nor_unicode'] != '':
+					r[cb]['nor_unicode'] = row['nor_unicode']
 				if uni != '':
 					r[cb]['unicode'] = uni
 			if uni != '':
@@ -1241,7 +1254,8 @@ CBTEMP = config.get('default', 'temp')
 cbwork_dir = config.get('default', 'cbwork')
 JING = config.get('default', 'jing.jar_file')
 
-IN_P5a = CBTEMP + '/cbetap5a-ok' 		# XML P5a 來源資料夾
+#IN_P5a = CBTEMP + '/cbetap5a-ok' 		# XML P5a 來源資料夾
+IN_P5a = cbwork_dir + '/xml-p5a' 		# XML P5a 來源資料夾
 PHASE1DIR = CBTEMP + '/cbetap5-tmp1'	# 暫存資料夾
 OUT_P5 = CBTEMP + '/cbetap5-ok'			# 最後結果
 GAIJI = cbwork_dir + '/bin/gaiji-m_u8.txt'

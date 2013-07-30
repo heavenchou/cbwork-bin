@@ -7,6 +7,8 @@
 Ray CHOU 周邦信 2011.6.11
 
 Heaven 修改:
+2013/07/30 normal 版只呈現 <anchor xml:id="nkr_note_orig_xxxxx" 這種格式的校勘數字
+2013/07/21 CBETA 自己加上的 note 不需要呈現校勘數字 <anchor xml:id="nkr_3f0"/>
 2013/06/28 第二卷之後卷首加上版本資訊
 2013/06/25 取消版本與日期的呈現, 非正式版不使用日期與版本
 2013/06/24 修改校勘數字呈現, [a01] 改成 [01]
@@ -91,15 +93,17 @@ def getJKMark(e):
 	if id is None: return ''
 	if id.startswith('fx'): return '[＊]'
 	if id.startswith('end'): return ''
+	if not id.startswith('nkr_note_orig'): return ''	# 例 T01n0026.xml => <lb n="0574a12" ed="T"/>眠、調<anchor xml:id="nkr_3f0"/>
 	jk = id[-3:]
 	jk = re.sub("0(\d\d)", r"\g<1>", jk)		# 如果有三個數字且<100 , 第一個 0 移除
-	jk = re.sub("\D(\d\d)", r"\g<1>", jk)		# 如果前面不是數字則移除
 	
 	# 處理 kbj => 【科】 【標】 【解】
 	if jk[0] == 'k': jk = '【科' + jk[1:] + '】'
 	elif jk[0] == 'b': jk = '【標' + jk[1:] + '】'
 	elif jk[0] == 'j': jk = '【解' + jk[1:] + '】'
-	else: jk = '[' + jk + ']'
+	else:
+		jk = re.sub("\D(\d\d)", r"\g<1>", jk)		# 如果前面不是數字則移除
+		jk = '[' + jk + ']'
 	return jk
 
 def handle_anchor(e):
@@ -264,11 +268,11 @@ def fileHeader(tree):
 	globals['title']=title[title.rfind(' ')+1:]
 	#globals['ver']=tree.findtext("//editionStmt/edition")
 	#globals['ver']=globals['ver'][11:-2]	# $Revision: 1.29 $ ==> 1.72
-	globals['ver']='v.v'	# 非正式版不使用日期與版本
+	globals['ver']='v.v'						# 非正式版不使用日期與版本
 	globals['encoding']='UTF-8'
 	globals['cFormat']='普及版'
 	#globals['date']=datetime.date.today().strftime('%Y/%m/%d')
-	globals['date']= 'yyyy/mm/dd (非正式版不使用日期與版本)'	#非正式版不使用日期與版本
+	globals['date']= 'yyyy/mm/dd'				#非正式版不使用日期與版本
 	p=tree.xpath("//projectDesc/p[@lang='zh']")
 	globals['ly_zh']=p[0].text
 	p=tree.xpath("//projectDesc/p[@lang='en']")
