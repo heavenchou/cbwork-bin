@@ -7,6 +7,8 @@
 Ray CHOU 周邦信 2011.6.11
 
 Heaven 修改:
+2013/08/02 處理 <text rend='no_nor'> 及 <term rend='no_nor'> , 讓這二種標記的範圍內不使用通用字
+2013/08/01 增加悉曇字有 big5 的呈現字
 2013/07/30 normal 版只呈現 <anchor xml:id="nkr_note_orig_xxxxx" 這種格式的校勘數字
 2013/07/21 CBETA 自己加上的 note 不需要呈現校勘數字 <anchor xml:id="nkr_3f0"/>
 2013/06/28 第二卷之後卷首加上版本資訊
@@ -71,7 +73,7 @@ def chineseNumber(num):
 def handleText(s):
 	if s is None: return ''
 	s=s.replace('\n','')
-	s=re.sub(r"(◇){2,}","【◇】",s);
+	#s=re.sub(r"(◇){2,}","【◇】",s);	# 最後再處理, 否則在隔行對照的地方無法成功處理
 	return s
 
 def traverse(e):
@@ -127,10 +129,15 @@ def handleNode(e):
 		ref = e.get('ref')
 		ref = ref[1:]
 		if ref.startswith('SD') or ref.startswith('RJ'):
-			if options.siddham==0: r+=globals['siddham'][ref]
+			if options.siddham==0: r+=globals['siddham'][ref]	# 沒有羅馬轉寫的字怎麼辦? 這裡會有錯誤 , T54n2132.xml 的 SD-CFC3 ??????
 			elif options.siddham==1: r+='&'+ref+';'
-			else: r+='◇'
-		elif options.gaijiNormalize and ref in globals['gaiji-normal']:
+			else: 
+				#if ref in globals['siddham-big5']:		#有一種悉曇字是有 big5 字的 -- 2013/08/01
+				#	r += globals['siddham-big5'][ref]
+				#else:
+				#	r += '◇'
+				r += '◇'								# 想想, 還是直接用 ◇ , 未來應該直接用羅馬轉寫字來比對
+		elif options.gaijiNormalize and ref in globals['gaiji-normal'] and globals['no_nor'] == 0:
 			r+=globals['gaiji-normal'][ref]
 		elif ref in globals['zuzishi']:
 			r+=globals['zuzishi'][ref]
@@ -190,6 +197,12 @@ def handleNode(e):
 		mo=re.match('#PTS\..*\.(\d+)', target)
 		if mo is not None:
 			r = ' ' + mo.group(1) + ' '
+	elif e.tag=='term':
+		# <term rend="no_nor"> , 這種的就不要使用通用字
+		if e.get('rend') == 'no_nor':
+			globals['no_nor'] += 1
+			r += traverse(e)
+			globals['no_nor'] -= 1
 	else: r+=traverse(e)
 	return r
 
@@ -197,6 +210,7 @@ def readCharInfo(tree):
 	''' 從 teiHeader 中讀入缺字資訊 '''
 	globals['zuzishi']={}
 	globals['siddham']={}
+	globals['siddham-big5']={}
 	globals['gaiji-normal']={}
 	for e in tree.iterfind('.//charDecl/char'):
 		id=e.get('id')
@@ -205,7 +219,18 @@ def readCharInfo(tree):
 			value=next.text
 			if id.startswith('SD') or id.startswith('RJ'):
 				if n.text=='Romanized form in Unicode transcription':
+					# 沒有羅馬轉寫的字怎麼辦? T54n2132.xml 的 SD-CFC3 ??????
 					globals['siddham'][id]=value
+				'''
+				有一種悉曇字是有 big5 字的 -- 2013/08/01
+				<char xml:id="SD-E347">
+					<charName>CBETA CHARACTER SD-E347</charName>
+					<charProp>
+						<localName>big5</localName>
+						<value>□</value>
+				'''
+				if n.text=='big5':
+					globals['siddham-big5'][id]=value
 			else:
 				if n.text=='composition': 
 					globals['zuzishi'][id]=value
@@ -264,7 +289,10 @@ def fileHeader(tree):
 =========================================================================''')
 	globals['edition_c']=collectionName[globals['collection']]
 	globals['vol_c']=chineseNumber(int(globals['vol'][1:]))
-	title=tree.findtext('.//title')
+	#title=tree.findtext('.//title')
+	# 不能用上面的方法, 因為有些 title 裡面還有缺字的標記
+	title_tag=tree.find('.//title')
+	title = handleNode(title_tag)
 	globals['title']=title[title.rfind(' ')+1:]
 	#globals['ver']=tree.findtext("//editionStmt/edition")
 	#globals['ver']=globals['ver'][11:-2]	# $Revision: 1.29 $ ==> 1.72
@@ -300,11 +328,19 @@ def handle1sutra(xml, folder_out):
 	tree=zbx_xml.stripNamespaces(tree) # 去掉 namespace
 	#zbx_xml.stripComments(tree) # 去掉 xml 註解
 	
-	if options.fileHeader: fo.write(fileHeader(tree))
 	readCharInfo(tree)
+	if options.fileHeader: fo.write(fileHeader(tree))
+	
+	# 處理 <text rend='no_nor'> 的情況
+	globals['no_nor'] = 0
+	text_tag = tree.find('.//text')
+	if text_tag.get('rend') == 'no_nor': globals['no_nor'] += 1
 	
 	body=tree.find('.//body')
-	fo.write(handleNode(body))
+	outtxt = handleNode(body)
+	# 在這裡處理連續悉曇字
+	outtxt = re.sub(r"((（)|(［)|(？)|(…)|(．)|(‧))*◇((◇)|( )|(　)|(．)|(‧)|(（)|(）)|(［)|(］)|(？)|(…))*◇((）)|(］)|(？)|(…)|(．)|(‧))*","【◇】",outtxt);
+	fo.write(outtxt)
 	fo.close()
 	if options.splitByJuan: splitByJuan(path_out, folder_out)
 
