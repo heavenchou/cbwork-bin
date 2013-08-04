@@ -9,6 +9,7 @@
 2013.1.3 周邦信 改寫自 cbp4top5.py
 
 Heaven 修改:
+2013/07/31 修改在 no_normal 的情況下, 通用詞應該只呈現 orig 的內容, 而不是 reg 的內容
 2013/07/26 1.將 P4 轉 P5a 的日期指定在 2013/05/20 , 因為後來只是小修改, 也不算是重轉, 因此日期不改, 以利比對新舊版差異.
            2.修改 common/X2R 的目錄至正確的位置
 2013/06/09 變數改用設定檔 ../cbwork_bin.ini
@@ -125,7 +126,7 @@ class MyTransformer():
 		tag=e.tag
 		if tag!='change':
 			r += self.handle_text(e.text, mode)
-		for n in e.iterchildren(): 
+		for n in e.iterchildren():
 			r+=self.handle_node(n, mode)
 			if tag != 'change':
 				r += self.handle_text(n.tail, mode)
@@ -492,7 +493,8 @@ class MyTransformer():
 			new_mode = change_mode(mode, '', 'change')
 			r = node.open_tag() + self.traverse(e, new_mode) + node.end_tag()
 		elif tag=='choice':
-			orig = e.find('reg')
+			#orig = e.find('reg')
+			orig = e.find('orig')	# 在不採用通用字的情況下, 對於通用詞應該是用 orig 才對 --2013/07/31
 			if orig is None or rend_nor[-1]:
 				node=MyNode(e)
 				r += node.open_tag() + self.traverse(e, mode) + node.end_tag()
