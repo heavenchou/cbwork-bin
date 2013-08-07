@@ -1380,7 +1380,7 @@ sub print_jun_head()
 # 日期與版本都不用了 -- V3.0 , 因為換了 git 再次不用日期與版本了 -- V7.5 2013/06/25
 
 $ver = "Vv.v";
-$date = "yyyy/mm/dd (非正式版不使用日期與版本)";
+$date = "yyyy/mm/dd";
 
  if($nohead == 0)
  {
