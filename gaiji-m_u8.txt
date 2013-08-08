@@ -1,48 +1,50 @@
 cb	mojikyo	entity	uni_flag	unicode	nor_unicode	des	nor	cx
 		imacron	1	012B		[-/i]	ii	
-	M063068		1	00FC		[‥/u]		
+		Gacute	1	01F4		[′/G]	`G	
 		Amacron	1	0100		[-/A]	AA	
 		amacron	1	0101		[-/a]	aa	
 		Cdotabv	1	010A		[./C]	^C	
 		cdotabv	1	010B		[./c]	^c	
 	M063013		1	010D		[ˇ/c]		
 	M063021		1	0115		[ˇ/e]		
-		Gacute	1	01F4		[′/G]	`G	
+		ucirc	1	00FB		[^/u]	^u	
 	M062937	Imacron	1	012A		[-/I]	II	
-	M063051		1	00F6		[‥/o]		
+		uacute	1	00FA		[′/u]	`u	
 		Omacron	1	014C		[-/O]	OO	
 	M063055	omacron	1	014D		[-/o]	oo	
 		Sacute	1	015A		[′/S]	`S	
 		sacute	1	015B		[′/s]	`s	
 	M062962		1	0160		[ˇ/S]		
-		Umacron	1	016A		[-/U]	UU	
-			1	016D		[ˇ/u]		
+			1	00D6		[‥/O]	‥O	
+		umacron	1	016B		[-/u]	uu	
+	M062986		1	017D		[ˇ/Z]		
 			1	0119		ę		
 	M063014		1	00E7		ç		
 	M062914		1	00C7		Ç		
 	M062917	Eacute	1	00C9		[′/E]	`E	
 		Ntilde	1	00D1		[~/N]	~N	
-	M062968		1	00DC		[‥/U]		
+	M062968		1	00DC		[‥/U]	‥U	
 			1	00E0		[`/i]		
 	M063001	aacute	1	00E1		[′/a]	`a	
 		acirc	1	00E2		[^/a]	^a	
-		ucirc	1	00FB		[^/u]	^u	
-	M063051		1	00E4		[‥/a]		
-		uacute	1	00FA		[′/u]	`u	
+	M063068		1	00FC		[‥/u]	‥u	
+	M063051		1	00E4		[‥/a]	‥a	
+			1	016D		[ˇ/u]		
 			1	00E8		[`/e]		
 	M063017	eacute	1	00E9		[′/e]	`e	
 	M063020	ecirc	1	00EA		[^/e]	^e	
-			1	00EB		[‥/e]		
+			1	00EB		[‥/e]	‥e	
 		iacute	1	00ED		[′/i]	`I	
 		ntilde	1	00F1		[~/n]	~n	
 		oacute	1	00F3		[′/o]	`o	
-	M062986		1	017D		[ˇ/Z]		
+	M063051		1	00F6		[‥/o]	‥o	
 		atilde	1	00E3		[~/a]	~a	
-		adotblw	1	1EA1		[a/.]	.a	
-		cdotblw				[c/.]	.c	
-		umacron	1	016B		[-/u]	uu	
 		udotblw	1	1EE5		[u/.]	.u	
+			1	00C4		[‥/A]	‥A	
+		Umacron	1	016A		[-/U]	UU	
+		Cdotblw				[C/.]	.C	
 		Bdotblw	1	1E04		[B/.]	.B	
+		adotblw	1	1EA1		[a/.]	.a	
 		tdotblw	1	1E6D		[t/.]	.t	
 		Tdotblw	1	1E6C		[T/.]	.T	
 		sdotblw	1	1E63		[s/.]	.s	
@@ -50,18 +52,18 @@ cb	mojikyo	entity	uni_flag	unicode	nor_unicode	des	nor	cx
 		rdotblw	1	1E5B		[r/.]	.r	
 		Rdotblw	1	1E5A		[R/.]	.R	
 		ndotblw	1	1E47		[n/.]	.n	
+		ddotblw	1	1E0D		[d/.]	.d	
+		cdotblw				[c/.]	.c	
 		Ndotblw	1	1E46		[N/.]	.N	
 		Ddotblw	1	1E0C		[D/.]	.D	
-		Ndotabv	1	1E44		[./N]	^N	
-		mdotblw	1	1E43		[m/.]	.m	
-		mdotabv	1	1E41		[./m]	^m	
-		ldotblw	1	1E37		[l/.]	.l	
-		Ldotblw	1	1E36		[L/.]	.L	
-		kdotblw	1	1E33		[k/.]	.k	
-		hdotblw	1	1E25		[h/.]	.h	
 		Hdotblw	1	1E24		[H/.]	.H	
-		ddotblw	1	1E0D		[d/.]	.d	
-		Cdotblw				[C/.]	.C	
+		hdotblw	1	1E25		[h/.]	.h	
+		kdotblw	1	1E33		[k/.]	.k	
+		Ldotblw	1	1E36		[L/.]	.L	
+		ldotblw	1	1E37		[l/.]	.l	
+		mdotabv	1	1E41		[./m]	^m	
+		mdotblw	1	1E43		[m/.]	.m	
+		Ndotabv	1	1E44		[./N]	^N	
 		ndotabv	1	1E45		[./n]	^n	
 00001	M016085	M016085	1	6B35		[肄-聿+欠]	款	
 00002	M024824	M024824	1	9834		[(匕/示)*頁]	穎	
