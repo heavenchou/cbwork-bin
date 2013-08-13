@@ -3,6 +3,7 @@
 2013.1.4 周邦信 改寫自 cbp4top5.py
 
 Heaven 修改:
+2013/08/13 各經的 resp 及 wit 記錄不要累積, 各經用各經的記錄. 另外程式中也加上一些註解文字.
 2013/07/29 1.將 resp="【甲】【乙】" 這一類的格式插入空格, 【甲】與【乙】才能分離出來
            2.加入通用 unicode 的處理
 2013/07/25 將一些 from="beg_xxx" 改成 from="#beg_xxx"
@@ -64,6 +65,10 @@ RESP2WIT = {
 resp_id={}
 wit_id={}
 
+##########################################
+# 羅馬轉寫字轉換, 這應該可以在缺字表中處理 ????
+##########################################
+
 def dia2uni(s):
 	s = s.replace('a^', 'ā')
 	s = s.replace('i^', 'ī')
@@ -110,7 +115,11 @@ def big5_uni(s):
 	data = (int(s[:2],16), int(s[2:],16))
 	big5_bytes = bytes(data)
 	return big5_bytes.decode('big5')
-	
+
+##########################################
+# 處理缺字資料
+##########################################
+
 def get_gaiji_info(cb):
 	if cb.startswith('SD-'):
 		r = {}
@@ -144,9 +153,14 @@ def resp2wit(resp):
 		return RESP2WIT[resp]
 	else:
 		sys.exit('error 73: ' + resp)
+		
+####################################
+# 讀取所有的 resp 屬性
+####################################
 
 def read_all_resp(root):
 	global resp_id
+	resp_id={}			# 先清掉舊的記錄, 免得愈累積愈多	--2013/08/13
 	for e in root.iter(tag=etree.Element):
 		resp=e.get('resp', '')
 		# 將 resp="【甲】【乙】" 這一類的格式插入空格, 【甲】與【乙】才能分離出來 --2013/07/29
@@ -165,8 +179,13 @@ def handle_resp(resp):
 		result.append(resp_id[r])
 	return '#' + ' '.join(result)
 
+####################################
+# 讀取所有的 wit 屬性
+####################################
+
 def read_all_wit(root):
 	global wit_id
+	wit_id={}			# 先清掉舊的記錄, 免得愈累積愈多	--2013/08/13
 	for e in root.iter(tag=etree.Element):
 		wit=e.get('wit', '')
 		wits = re.findall('【.*?】', wit)
@@ -201,7 +220,11 @@ def change_mode(mode, old, new):
 		new_mode.remove(old)
 	new_mode.add(new)
 	return new_mode
-	
+
+############################
+# MyTransformer 物件
+############################
+
 class MyTransformer():
 	def __init__(self, xml_file):
 		self.xml_file = xml_file
@@ -930,6 +953,10 @@ class MyTransformer():
 			r += node.open_tag() + self.traverse(e, mode) + node.end_tag()
 		return r
 
+############################
+# MyNode 物件
+############################
+
 class MyNode():
 	def __init__(self, e=None):
 		if e is None:
@@ -982,6 +1009,7 @@ class MyNode():
 	def get(self, name):
 		return self.attrib.get(name)
 
+################################################################
 
 def app_new_type(e):
 	''' lem 及 rdg 最多只有 【CBETA】【CB】【大】 , 沒有其他的版本, 就是 choice 
@@ -1071,11 +1099,15 @@ def handle_back(t):
 	r += '</back>'
 	return r
 
+############################
+# phase1
+############################
+
 def phase1(vol,path):
 	print('phase1', path)
-	print(path, file=log)
-	fn=os.path.basename(path)
-	file_id=fn.rpartition('.')[0]
+	print(path, file=log)			# ex. path = c:/cbwork/xml-p5a/N/N10\N10n0003.xml
+	fn=os.path.basename(path)		#	fn = N10n0003.xml
+	file_id=fn.rpartition('.')[0]	#	file_id = N10n0003
 	text = '''<?xml version="1.0" encoding="UTF-8"?>
 <TEI xmlns="http://www.tei-c.org/ns/1.0" xmlns:cb="http://www.cbeta.org/ns/1.0" xml:id="{}">'''.format(file_id)
 
@@ -1103,6 +1135,10 @@ def repl_lg(mo):
 	r += s
 	r += mo.group(3)
 	return r
+
+############################
+# phase2
+############################
 
 def phase2(vol,p):
 	print('phase2 vol=%s p=%s' % (vol,p))
@@ -1136,7 +1172,12 @@ def spend_time(secs):
 	if secs<60: r+='%.2f seconds' % secs
 	else: r+='%.1f minutes' % (secs/60)
 	return r
-	
+
+###########################################
+# 這段應該沒用了
+# P5a 已有卍續藏的 R 版行號, 就不需再產生了
+###########################################
+'''
 def read_x2r(vol):
 	fn='D:/cbwork/common/X2R/' + vol + 'R.txt'
 	fi = open(fn, 'r', encoding='cp950')
@@ -1151,6 +1192,11 @@ def read_x2r(vol):
 		result[x] = r
 	fi.close()
 	return result
+'''
+
+############################
+# 處理一冊
+############################
 
 def do1vol(vol):
 	global globals, x2r
@@ -1168,18 +1214,24 @@ def do1vol(vol):
 	#if vol.startswith('X'):
 	#	x2r = read_x2r(vol)
 	
+	# phase- 1 #################################
+	
 	print(vol, 'phase-1')
 	my_mkdir(PHASE1DIR+'/'+coll)
 	my_mkdir(PHASE1DIR+'/'+coll+'/'+vol)
 	print (IN_P5a+'/'+coll+'/'+vol+'/*.xml')
 	for p in glob.iglob(IN_P5a+'/'+coll+'/'+vol+'/*.xml'):
 		phase1(vol,p)
+		
+	# phase- 2 #################################
 	
 	print(vol, 'phase-2')
 	my_mkdir(OUT_P5+'/'+vol[:1])
 	my_mkdir(OUT_P5+'/'+vol[:1]+'/'+vol)
 	for p in glob.iglob(PHASE1DIR+'/'+coll+'/'+vol+'/*.xml'): 
 		phase2(vol,p)
+	
+	# 驗證 #################################
 	
 	for p in glob.iglob(OUT_P5+'/'+coll+'/'+vol+'/*.xml'): 
 		print('validate', p)
@@ -1191,6 +1243,10 @@ def do1vol(vol):
 	s=spend_time(time.time()-time_begin)
 	print(vol, s)
 	log.write(vol+' '+s+'\n')
+
+############################
+# 處理整個目錄
+############################
 
 def do1dir(dir):
 	colls=os.listdir(dir)
