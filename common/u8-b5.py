@@ -14,6 +14,7 @@ u8-b5.py
 2009.12.02 Ray: 從 Unicode 網站取得 Unihan.txt, 取出裏面的異寫字資訊 kCompatibilityVariant, 放在 variant
 
 Heaven 修改:
+2013/08/15 python 3.3.1 處理 ext-b 有問題, 所以改成逐字處理, 不用 error handler 了.
 2013/07/31 使用通用字參數時同時處理通用詞
 2013/07/10 修改遇到 0xFEFF 時寫入 log 檔的小錯誤
 2013/06/09 變數改用設定檔 ../cbwork_bin.ini
@@ -1104,7 +1105,7 @@ def trans_jep(line):
 	return line
 
 #################################################
-# 處理通用詞
+# 處理通用詞 (有斷行就麻煩了)
 #################################################
 def normal_words(line):
 	line = line.replace('髣髣髴髴', '彷彷彿彿')
@@ -1145,7 +1146,9 @@ def trans_file(fn1, fn2):
 	high_word=0
 	print( fn1 + ' => ' + fn2)
 	f1=codecs.open(fn1, "r", "utf-8")
-	f2=codecs.open(fn2, "w", "cp950", 'cbeta')
+	#python 3.3.1 處理 ext-b 有問題, 所以改成逐字處理, 不用 error handler 了 -- 2013/08/15
+	#f2=codecs.open(fn2, "w", "cp950", 'cbeta')
+	f2=codecs.open(fn2, "w", "cp950")
 	for line in f1:
 		#修改版本
 		line = line.replace('(UTF-8) 普及版', '(Big5) 普及版')
@@ -1159,7 +1162,17 @@ def trans_file(fn1, fn2):
 		#處理通用詞
 		if options.gaijiNormalize:
 			line=normal_words(line)
-		f2.write(line)
+		
+		# python 3.3.1 處理 ext-b 有問題, 所以改成逐字處理, 不用 error handler 了 -- 2013/08/15
+		new = ''
+		for c in line:
+			try:
+				temp = c.encode('cp950') # 測試能否編碼為 cp950
+				new += c
+			except:
+				new += u8tob5(c)
+				
+		f2.write(new)
 	f1.close()
 	f2.close()
 
@@ -1180,10 +1193,61 @@ def trans_dir(source, dest):
 #################################################
 # 處理無法直接由 utf8 轉 big5 的文字
 #################################################
+def u8tob5(c):
+	global high_word
+	rs = win32com.client.Dispatch(r'ADODB.Recordset')
+	l = [] 
+	counter=0
+	#	使用UTF-16表達字符。
+	#	UTF-16使用16至21位二進制位表達，即從/u0000到 /u10FFFF  0~65535 表示基本的16位字符
+	#	/u10000到/u10FFFF表示輔助字符（supplymentary characters）
+	#	輔助字符由一個高位替代符（high-surrogate ）和一個低位替代符（low-surrogate ）共同組成。
+	#	高位替代符使用一個/uD800到/uDBFF之間的字符表示；	55296~56319
+	#	低位替代符使用一個/uDC00到/uDFFF之間的字符表示。	56320~57343
+	#	假設：A代表輔助字符（SC）的碼點值； B代表SC的高位替代符的碼點（Unicode code point）值； 
+	#	C代表SC的低位替代符的碼點值。
+	#	那麼下面的等式成立：A = (B - 0xD800) << 10 + (C - 0xDC00) + 0x10000在將Unicode還原為可閱讀字符的時候，
+	#	當且僅當當前字符時高位替代符，下一字符是低位替代符時，此連續的兩個字符被解釋為輔助字符。
+	#	<<	左移		把一個數的比特向左移一定數目（每個數在內存中都表示為比特或二進制數字，即0和1）ex:   2 << 2  =       10<<10=1000 得到8。
+	#﨟 	&#x64031;
+	
+#for c in exc.object[exc.start:exc.end]:
+	print ("counter: {} , ".format(counter), file=f3)
+	counter+=1
+	i = ord(c)
+		
+	if i==0xFEFF:	#FEFF=65279
+		f3.write('if i==0xFEFF:	\n')
+		return ''
+	u = "%04X" % i
+	f3.write('unicode : ' + u)
+	sql = "SELECT des,cb, nor FROM gaiji WHERE unicode='%s'" % u
+	rs.Open('[' + sql + ']', conn, 1, 3)
+	
+	if rs.RecordCount > 0:
+		des = rs.Fields.Item('des').Value
+		cb = rs.Fields.Item('cb').Value
+		nor = rs.Fields.Item('nor').Value
+		if des!=None and len(des)>0 and cb!=None and len(cb)>0:
+			if options.gaijiNormalize and nor!=None and len(nor)>0:
+				l.append(nor)
+			else:
+				l.append(des)
+		else:
+			l.append(nor)
+	
+	else:
+		l.append('&#x%s;' % u)
+	r = "".join(l)
+	f3.write(' result: ' + r)
+	return (r)
+
+#################################################
+# 處理無法直接由 utf8 轉 big5 的文字
+#################################################
 def my_err_handler(exc):
 	global high_word
 	rs = win32com.client.Dispatch(r'ADODB.Recordset')
-	rs2 = win32com.client.Dispatch(r'ADODB.Recordset')
 	l = [] 
 	counter=0
 	#	使用UTF-16表達字符。
@@ -1262,7 +1326,8 @@ config.read('../cbwork_bin.ini')
 gaiji = config.get('default', 'gaiji-m.mdb_file')
 
 high_word = 0
-codecs.register_error('cbeta', my_err_handler) # 先登記遇到缺字時的 error handler
+# python 3.3.1 處理 ext-b 有問題, 所以改成逐字處理, 不用 error handler 了 -- 2013/08/15
+#codecs.register_error('cbeta', my_err_handler) 	# 先登記遇到缺字時的 error handler 
 
 # 準備存取 gaiji-m.mdb
 conn = win32com.client.Dispatch(r'ADODB.Connection')
