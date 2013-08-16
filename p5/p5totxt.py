@@ -7,6 +7,7 @@
 Ray CHOU 周邦信 2011.6.11
 
 Heaven 修改:
+2013/08/16 處理 <term> 卻非 <term rend='no_nor'> 而沒有呈現內容的問題
 2013/08/02 處理 <text rend='no_nor'> 及 <term rend='no_nor'> , 讓這二種標記的範圍內不使用通用字
 2013/08/01 增加悉曇字有 big5 的呈現字
 2013/07/30 normal 版只呈現 <anchor xml:id="nkr_note_orig_xxxxx" 這種格式的校勘數字
@@ -203,6 +204,7 @@ def handleNode(e):
 			globals['no_nor'] += 1
 			r += traverse(e)
 			globals['no_nor'] -= 1
+		else: r+=traverse(e)
 	else: r+=traverse(e)
 	return r
 

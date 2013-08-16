@@ -9,6 +9,8 @@
 2013.1.3 周邦信 改寫自 cbp4top5.py
 
 Heaven 修改:
+2013/08/14 1.所有星號一律使用 <app> 標記, 不要用 <choice>
+           2.原書的校勘一律使用 <app> 標記, 不要用 <choice>, 這二者都是因為有ヵ這類的校勘, 再加上有修訂, 之前的版本就變成 <choice> , 應改回 <app>
 2013/07/31 修改在 no_normal 的情況下, 通用詞應該只呈現 orig 的內容, 而不是 reg 的內容
 2013/07/26 1.將 P4 轉 P5a 的日期指定在 2013/05/20 , 因為後來只是小修改, 也不算是重轉, 因此日期不改, 以利比對新舊版差異.
            2.修改 common/X2R 的目錄至正確的位置
@@ -95,7 +97,11 @@ def change_mode(mode, old, new):
 		new_mode.remove(old)
 	new_mode.add(new)
 	return new_mode
-	
+
+############################
+# MyTransformer 物件
+############################
+
 class MyTransformer():
 	def __init__(self, xml_file):
 		self.xml_file = xml_file
@@ -212,7 +218,10 @@ class MyTransformer():
 		return r
 		
 	def handle_app_star(self, e, mode):
-		new_type = app_new_type(e)
+		# 有星號的部份, 就一定是原書中就有的, 不是 CBETA 自己修改的, 所以不應該用 <choice> , 一定是 <app>
+		# 之前產生的 XML 會有 <choice> , 是因為校勘有ヵ這類的校勘及修訂, 所以看起來不像是原書的校勘, 就以為是 CBETA 的修訂了. -- 2013/08/14
+		# new_type = app_new_type(e)
+		new_type = 'app'
 		r = ''
 		node = MyNode(e)
 		node.attrib['type'] = 'star'
@@ -287,8 +296,10 @@ class MyTransformer():
 			print(node.open_tag())
 			sys.exit()
 		elif n is not None:
-			#r=self. handle_app_nor(e, mode)
-			r=self. handle_app_cb(e, mode)
+			r=self. handle_app_nor(e, mode)
+			# 在 2013/2/22 有提到要把一些產生 <app> 的改成 <choice>, 所以上面那一行被 mark 起來, 改成底下的 r=self. handle_app_cb(e, mode)
+			# 2013/8/7 我回信說還是改成 <app> 才對, 所以又改用上面的 r=self. handle_app_nor(e, mode) -- 2013/08/14
+			#r=self. handle_app_cb(e, mode)
 		else:
 			r = self.handle_app_cb(e, mode)
 		return r
@@ -684,6 +695,10 @@ class MyTransformer():
 		rend_nor.pop()
 		return r
 
+############################
+# MyNode 物件
+############################
+
 class MyNode():
 	def __init__(self, e=None):
 		if e is None:
@@ -734,6 +749,7 @@ class MyNode():
 	def get(self, name):
 		return self.attrib.get(name)
 
+####################################################################################
 
 def app_new_type(e):
 	''' lem 及 rdg 最多只有 【CBETA】【CB】【大】 , 沒有其他的版本, 就是 choice 
@@ -751,6 +767,10 @@ def app_new_type(e):
 		return 'choice'
 	else:
 		return 'app'
+
+############################
+# phase1
+############################
 
 def phase1(vol,path):
 	'''
@@ -792,6 +812,10 @@ def replaceTongYongCi(mo):
 	r = tongYongCiTable[ent]
 	return r
 
+############################
+# phase2
+############################
+
 def phase2(vol,path):
 	''' call cbetap4top5.xsl '''
 	print('phase2', path)
@@ -808,6 +832,10 @@ def phase2(vol,path):
 	fo=open(out_fn, 'w', encoding='utf8')
 	fo.write(text)
 	fo.close()
+
+############################
+# phase3
+############################
 
 def phase3(vol,p):
 	print('phase3 vol=%s p=%s' % (vol,p))
@@ -858,6 +886,10 @@ def read_x2r(vol):
 	fi.close()
 	return result
 
+############################
+# 處理一冊
+############################
+
 def do1vol(vol):
 	global globals, x2r
 	globals['vol'] = vol
@@ -870,6 +902,8 @@ def do1vol(vol):
 	time_begin=time.time()
 	print(now())
 	
+	# phase-1 #################################
+	
 	print(vol,'phase-1')
 	os.makedirs(PHASE1DIR+'/'+vol, exist_ok=True)
 	for p in glob.iglob(XML_P4+'/'+vol+'/*.xml'):
@@ -878,15 +912,22 @@ def do1vol(vol):
 	if vol.startswith('X'):
 		x2r = read_x2r(vol)
 	
+	# phase-2 #################################
+	
 	print(vol, 'phase-2')
 	os.makedirs(PHASE2DIR+'/'+vol, exist_ok=True)
 	for p in glob.iglob(PHASE1DIR+'/'+vol+'/*.xml'):
 		phase2(vol,p)
 	
+	# phase-3 #################################
+	
 	print(vol, 'phase-3')
 	os.makedirs(OUT_P5a+'/'+vol[:1], exist_ok=True)
 	os.makedirs(OUT_P5a+'/'+vol[:1]+'/'+vol, exist_ok=True)
-	for p in glob.iglob(PHASE2DIR+'/'+vol+'/*.xml'): phase3(vol,p)
+	for p in glob.iglob(PHASE2DIR+'/'+vol+'/*.xml'):
+		phase3(vol,p)
+	
+	# validate #################################
 	
 	for p in glob.iglob(OUT_P5a+'/'+vol[:1]+'/'+vol+'/*.xml'): 
 		print('validate', p)
@@ -898,6 +939,10 @@ def do1vol(vol):
 	s=spend_time(time.time()-time_begin)
 	print(vol, s)
 	log.write(vol+' '+s+'\n')
+
+############################
+# 處理整個目錄
+############################
 
 def do1dir(dir):
 	vols=os.listdir(dir)
