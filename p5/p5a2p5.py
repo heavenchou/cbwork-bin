@@ -3,6 +3,7 @@
 2013.1.4 周邦信 改寫自 cbp4top5.py
 
 Heaven 修改:
+2013/08/22 全部處理時忽略 .git 及 schema 目錄
 2013/08/13 各經的 resp 及 wit 記錄不要累積, 各經用各經的記錄. 另外程式中也加上一些註解文字.
 2013/07/29 1.將 resp="【甲】【乙】" 這一類的格式插入空格, 【甲】與【乙】才能分離出來
            2.加入通用 unicode 的處理
@@ -1252,6 +1253,7 @@ def do1dir(dir):
 	colls=os.listdir(dir)
 	colls.sort()
 	for coll in colls:
+		if coll in ('.git', 'schema'): continue
 		if (options.collection is None) or coll.startswith(options.collection): 
 			path = os.path.join(dir, coll)
 			vols = os.listdir(path)
