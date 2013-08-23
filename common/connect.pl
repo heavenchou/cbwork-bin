@@ -8,6 +8,7 @@
 #       -c ¤Á°£¦æ­º¡A¦pªG¦æ­º¬O T01n0001_a01ùø ³oºØ«¬®æ¡A¬Ò¤@«ß²¾°£
 #       -v ÀÉ®×«e¤Q¦æ­Y¦³ V1.0 ³oºØª©¥»®æ¦¡¡A¤@«ß´«¦¨ Vv.v¡A¥H¤è«K¤ñ¹ï
 #       -d ÀÉ®×«e¤Q¦æ­Y¦³ 2013/06/11 ³oºØ¤é´Á®æ¦¡¡A¤@«ß´«¦¨ yyyy/mm/dd¡A¥H¤è«K¤ñ¹ï
+#		-w ²¾°£¥þ«¬ªÅ¥Õ, ¥H§Qª½±µ¤ñ¹ï
 # ½d¨Ò¡G
 #       perl connect.pl -s c:\release\bm\normal\T01\*.txt -o c:\temp\T01.txt -c -v -d
 ######################################################################################
@@ -17,7 +18,7 @@ use Encode;
 use strict;
 use autodie;
 use Getopt::Std;
-use vars qw($opt_s $opt_o $opt_c $opt_v $opt_d);		# ¦pªG¦³¨Ï¥Î use strict; , ¥»¦æ´N­n¥[¤W¥h
+use vars qw($opt_s $opt_o $opt_c $opt_v $opt_d $opt_w);		# ¦pªG¦³¨Ï¥Î use strict; , ¥»¦æ´N­n¥[¤W¥h
 
 ############################################################
 # ÅÜ¼Æ
@@ -25,12 +26,13 @@ use vars qw($opt_s $opt_o $opt_c $opt_v $opt_d);		# ¦pªG¦³¨Ï¥Î use strict; , ¥»¦
 
 my $code = "";	# §PÂ_½s½X¬O utf8 ©Î big5
 my $endline = encode("utf8",decode("big5", "ùø"));	# ùø²Å¸¹ªº utf8 ½s½X
+my $fullspace = encode("utf8",decode("big5", "¡@"));	# ¥þ«¬ªÅ¥Õªº utf8 ½s½X
 
 ############################################################
 # ÀË¬d°Ñ¼Æ
 ############################################################
 
-getopts('s:o:cvd');
+getopts('s:o:cvdw');
 
 print "¡iÀÉ®×¦X¨Öµ{¦¡¡j\n";
 
@@ -91,6 +93,20 @@ foreach my $filename (sort (@file))
 			if($opt_d)
 			{
 				s/\d{4}\/\d+\/\d+/yyyy\/mm\/dd/g;
+			}
+		}
+		
+		if($opt_w)
+		{
+			# ©¿²¤¥þ«¬ªÅ¥Õ
+			if($code eq "big5")
+			{
+				s/¡@//g;
+			}
+			
+			if($code eq "utf8")
+			{
+				s/${fullspace}//g;
 			}
 		}
 		
