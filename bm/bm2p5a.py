@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2013/08/26 處理藏經代碼為二位數的情況, 例如西蓮淨苑的 'SL'
 2013/07/20 處理修訂格式中包含組字式、校勘數字的問題, 以及一些小問題.
 2013/06/27 1.<T,y> 格式改成 <T,x,y> , 與 <p,x,y> 同步. 
            2.若遇到 <p>, <Q> P, Q 自動結束偈頌, 不一定要用 </T>
@@ -38,6 +39,7 @@ wits={
 'P': '【北藏】',
 'Q': '【磧砂】',
 'S': '【宋遺】',
+'SL': '【西蓮】',
 'T': '【大】', 
 'U': '【洪武】',
 'W': '【藏外】',
@@ -62,6 +64,7 @@ collectionEng={
 'Q': 'Qisha Edition of the Canon - Xinwenfeng Edition',
 'R': 'Manji Zokuzōkyō - Xinwenfeng Edition',
 'S': 'Songzang yizhen - Xinwenfeng Edition',
+'SL': 'SeeLand',
 'T': 'Taishō Tripiṭaka',
 'U': 'Southern Hongwu Edition of the Canon',
 'W': 'Buddhist Texts not contained in the Tripiṭaka',
@@ -768,12 +771,19 @@ def read_source():
 			fields = line.split()
 			if len(fields)<5: continue
 			if not re.match('[A-Z]', fields[1]): continue
-			n = fields[1][1:5]
+			if len(ed) == 2:		# ex. ed=SL (??? 有大於二位數的就再說了) - 2013/08/26
+				n = fields[1][2:7]	# SL0001_01_p0017
+			else:
+				n = fields[1][1:6]	# T0099-02-p0001 or T0128a02-p0835
+			if n[-1:] == '-' or n[-1:] == '_':
+				n = n[0:-1]
 			sutras[n] = {}
 			sutras[n]['title'] = fields[5]
 			sutras[n]['juan'] = fields[4]
-			s = ' '.join(fields[6:])
-			sutras[n]['author'] = s[1:-1]
+			s = ' '.join(fields[6:])		
+			#sutras[n]['author'] = s[1:-1]		# 這樣用有危險, 有時譯者之後還有其他欄位, 例如 T02 有高麗藏的對應 - 2013/08/26
+			mo = re.search(r'【(.*?)】', s)
+			sutras[n]['author'] = mo.group(1)
 			c = ''
 			e = ''
 			for s in fields[0]:
@@ -790,15 +800,22 @@ parser.add_option("-v", dest="vol", help="指定要轉換哪一冊")
 parser.add_option("-o", action='store', dest="output", help="輸出資料夾")
 (options, args) = parser.parse_args()
 vol = options.vol.upper()
-ed = vol[0:1]
+mo = re.search(r'^\D+', vol)	# 因為會有兩位數以上的代碼, 例如 SL01 - 2013/08/26
+ed = mo.group()
+
 
 # 讀取 設定檔 cbwork_bin.ini
 config = configparser.SafeConfigParser()
 config.read('../cbwork_bin.ini')
 gaijiMdb = config.get('default', 'gaiji-m.mdb_file')
 cbwork_dir = config.get('default', 'cbwork')
-BMLaiYuan = cbwork_dir + '/bm/{ed}/{vol}/source.txt'.format(vol=vol, ed=ed)
-BMJingWen = cbwork_dir + '/bm/{ed}/{vol}/new.txt'.format(vol=vol, ed=ed)
+if(ed == 'SL'):			# 西蓮的來源在 Google Drive 的目錄中, 故要另外處理 - 2013/08/26
+	seeland_dir = config.get('default', 'seeland_dir')
+	BMLaiYuan = seeland_dir + '/bm/{vol}/source.txt'.format(vol=vol)
+	BMJingWen = seeland_dir + '/bm/{vol}/new.txt'.format(vol=vol)
+else:
+	BMLaiYuan = cbwork_dir + '/bm/{ed}/{vol}/source.txt'.format(vol=vol, ed=ed)
+	BMJingWen = cbwork_dir + '/bm/{ed}/{vol}/new.txt'.format(vol=vol, ed=ed)
 
 log=open('bm2p5a.log', 'w', encoding='utf8')
 
