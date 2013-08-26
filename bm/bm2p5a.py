@@ -194,7 +194,7 @@ def start_inline_p(tag):
 	opens['p']=1
 	
 def start_div(level, type):
-	closeTags('p', 'cb:jhead', 'cb:juan')
+	closeTags('byline', 'p', 'cb:jhead', 'cb:juan')
 	close_div(level)
 	closeTags('l', 'lg')
 	opens['div'] = level
@@ -349,6 +349,8 @@ def inline_tag(tag):
 		out2(gaiji(tag))
 	elif tag=='<□>':							# 未知字
 		out('<unclear/>')
+	elif re.match(r'<\D+\d+n\d\d\d\d', tag):	# 出處連結, 例如 : SL01n0001_p0020a02_##...佛於經中說，【<T09n0262_p0007c07-09>舍利弗！汝等當一心...
+		pass
 	elif re.match(r'<I\d+>', tag):
 		start_i(tag)
 	elif re.match(r'<PTS.', tag):
@@ -593,7 +595,8 @@ def close_sutra(num):
 	s += '''$</date></edition>
 		</editionStmt>
 		<extent>{juan}卷</extent>\n'''.format(juan=sutras[n]['juan'])
-	v = vol[1:]
+	mo = re.search(r'\D+(\d+)', vol)
+	v = mo.group(1)
 	v = v.lstrip('0')
 	s += '''\t\t<publicationStmt>
 			<distributor>

@@ -3,6 +3,7 @@
 2013.1.4 周邦信 改寫自 cbp4top5.py
 
 Heaven 修改:
+2013/08/26 處理藏經代碼為二位數的情況, 例如西蓮淨苑的 'SL'
 2013/08/22 全部處理時忽略 .git 及 schema 目錄
 2013/08/13 各經的 resp 及 wit 記錄不要累積, 各經用各經的記錄. 另外程式中也加上一些註解文字.
 2013/07/29 1.將 resp="【甲】【乙】" 這一類的格式插入空格, 【甲】與【乙】才能分離出來
@@ -42,6 +43,7 @@ WITS = {
 	'P' : '【北藏】',
 	'Q' : '【磧砂】',
 	'S' : '【宋遺】',
+	'SL' : '【西蓮】',
 	'T' : '【大】',
 	'U' : '【洪武】',
 	'W' : '【藏外】',
@@ -1120,8 +1122,9 @@ def phase1(vol,path):
 	
 	char_decl = t.prepare_charDecl()
 	text = text.replace('<charDecl></charDecl>', char_decl)
-
-	out_fn=os.path.join(PHASE1DIR, vol[:1], vol, fn)
+	mo = re.search(r'^\D+', vol)
+	coll = mo.group()
+	out_fn=os.path.join(PHASE1DIR, coll, vol, fn)
 	fo=open(out_fn, 'w', encoding='utf8')
 	fo.write(text)
 	fo.close()
@@ -1163,8 +1166,9 @@ def phase2(vol,p):
 	
 	# 如果 sourceDesc 下有 <p> 的話, listWit 要放在 p 裡面.
 	s = re.sub(r'(</p>)\s*(<listWit>.*?</listWit>)', r'\n\2\1', s, flags=re.DOTALL)
-	
-	fo=open(OUT_P5+'/'+vol[:1]+'/'+vol+'/'+os.path.basename(p),'w', encoding='utf8')
+	mo = re.search(r'^\D+', vol)
+	coll = mo.group()
+	fo=open(OUT_P5+'/'+coll+'/'+vol+'/'+os.path.basename(p),'w', encoding='utf8')
 	fo.write(s)
 	fo.close()
 
@@ -1202,7 +1206,9 @@ def read_x2r(vol):
 def do1vol(vol):
 	global globals, x2r
 	globals['vol'] = vol
-	coll = vol[:1]
+	#coll = vol[:1]
+	mo = re.search(r'^\D+', vol)
+	coll = mo.group()
 	globals['coll'] = coll
 	globals['collection-wit'] = WITS[coll] # 如果冊數 T 開頭, 就是 【大】
 	if coll in RESPS:
@@ -1227,8 +1233,8 @@ def do1vol(vol):
 	# phase- 2 #################################
 	
 	print(vol, 'phase-2')
-	my_mkdir(OUT_P5+'/'+vol[:1])
-	my_mkdir(OUT_P5+'/'+vol[:1]+'/'+vol)
+	my_mkdir(OUT_P5+'/'+coll)
+	my_mkdir(OUT_P5+'/'+coll+'/'+vol)
 	for p in glob.iglob(PHASE1DIR+'/'+coll+'/'+vol+'/*.xml'): 
 		phase2(vol,p)
 	
@@ -1312,8 +1318,12 @@ CBTEMP = config.get('default', 'temp')
 cbwork_dir = config.get('default', 'cbwork')
 JING = config.get('default', 'jing.jar_file')
 
-#IN_P5a = CBTEMP + '/cbetap5a-ok' 		# XML P5a 來源資料夾
 IN_P5a = cbwork_dir + '/xml-p5a' 		# XML P5a 來源資料夾
+if options.volumn is not None:
+	if options.volumn[:2] == 'SL':
+		seeland_dir = config.get('default', 'seeland_dir')
+		IN_P5a = seeland_dir + '/xml-p5a' 		# XML P5a 來源資料夾
+
 PHASE1DIR = CBTEMP + '/cbetap5-tmp1'	# 暫存資料夾
 OUT_P5 = CBTEMP + '/cbetap5-ok'			# 最後結果
 GAIJI = cbwork_dir + '/bin/gaiji-m_u8.txt'

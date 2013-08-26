@@ -15,6 +15,7 @@
 # Copyright (C) 1998-2013 CBETA
 # Copyright (C) 1999-2013 Heaven Chou
 ########################################################################
+# 2013/08/16 V8.5  處理藏經代碼為二位數的情況, 例如西蓮淨苑的 'SL'
 # 2013/07/16 V8.4  若檔尾沒有換行符號, 則自動加上去
 # 2013/06/27 V8.3  <T,y> 改成 <T,x,y>, 比照 <p,x,y> 的規則處理
 # 2013/06/19 V8.2  <trans-mark,...> 前後的空格移除.
@@ -199,6 +200,7 @@ my $cfg = Config::IniFiles->new( -file => "../cbwork_bin.ini" );
 
 my $release_dir = $cfg->val('default', 'release', '/release');	# 讀取 release 目錄
 my $cbwork_dir = $cfg->val('default', 'cbwork', '/cbwork');	# 讀取 cbwork 目錄
+my $seeland_dir = $cfg->val('default', 'seeland_dir', '');	# 讀取 google drive 下 seeland 的目錄
 my $Xfile = $cfg->val('bm2nor', 'Xfile', 0);		# 1 : 表示序要單獨一個檔, 0: 表示不用了 -- V2.0
 
 my $outdir = $release_dir . "/bm/";				# 輸出的目錄
@@ -254,7 +256,7 @@ my $has_d = 0;			# 若有 <d> 標記, 則 <p> 標記不要切斷前面 <n,1,2> �
 
 sub check_format()
 {
-	print_help() if ($ARGV[0] !~ /([TXJHWIABCDFGKLMNPQSU])\d\d/i);	# 沒有第一個參數就錯了!
+	print_help() if ($ARGV[0] !~ /^(\D+)\d+/i);	# 沒有第一個參數就錯了!
 	$vol_head = uc($1);								#判斷是 "T"(大正), "X" 或是其它.
 	$T_vol = uc($ARGV[0]);
 	
@@ -360,7 +362,7 @@ reinitial();                    #初值設定
 while($line=shift(@all_sutra))	# 取得每一行資料
 {
 	next if($line !~ /^[TXJHWIABCDFGKLMNPQSU]/);
-	$line =~ /^.\d+n(.{5}).{8}(...)/;
+	$line =~ /^\D+\d+n(.{5}).{8}(...)/;
 	$now_sutra = $1;
 
 	if(($now_sutra ne $sutra_num) and ($sutra_num ne ""))   #換新的經文了
@@ -1248,13 +1250,18 @@ sub print_jun_head()
 		$sutraver_c = "宋藏遺珍";
 		$sutraver_e = "Songzang yizhen";
 	}
+	elsif($vol_head eq "SL")
+	{
+		$sutraver_c = "智諭老和尚全集";
+		$sutraver_e = "SeeLand";
+	}
 	elsif($vol_head eq "U")
 	{
 		$sutraver_c = "洪武南藏";
 		$sutraver_e = "Southern Hongwu Edition of the Canon";
 	}
 
-	$content[0] =~ /^[TXJHWIABCDFGKLMNPQSU](\d+)n(.{5})/;
+	$content[0] =~ /^\D+(\d+)n(.{5})/;
 	my $vol = $1;
 	my $full_sutra = $2;
 	my $sutra_num = $full_sutra;
@@ -1439,7 +1446,7 @@ sub get_source()
 		#SK4    T0310-11-p0001 K0022-06 120 大寶積經(120卷)【唐 菩提流志譯并合】
 		#elsif (/^(.*?)\s+T(.{5}).*?\s+.*?\s+.*?\s+(.*?)(?:(?:\()|(?:【))/)
 		#APJ    T0220-05-p0001  V1.0   1999/12/10  200  大般若波羅蜜多經    【唐 玄奘譯】                  K0001-01
-		elsif (/^(.*?)\s[TXJHWIABCDFGKLMNPQSU](.{5})\d*[\-_].*?\s+(.*?)\s+(.*?)\s+.*?\s+(.*?)\s+/)
+		elsif (/^(.*?)\s\D+(.{5})\d*[\-_].*?\s+(.*?)\s+(.*?)\s+.*?\s+(.*?)\s+/)
 		{
 			my $from = $1;
 			my $sut_num = $2;
@@ -1557,7 +1564,8 @@ sub getfilename()
 	
 	if ($format eq "NORMAL" or $format eq "APP")
 	{
-		$_ = substr($content[0],0,1);
+		$content[0] =~ /^(\D+)/;
+		$_ = $1;
 		$_ .= $sutra_num;
 		$_ .= sprintf ("%03d.txt", "$jun_num");
 		#tr/A-Z/a-z/;
@@ -1565,13 +1573,15 @@ sub getfilename()
 	}
 	elsif  ($format eq "NORMAL1" or $format eq "APP1")
 	{
-		my $tmp = substr($content[0],1,7);
-		my $other = substr($content[0],8,1);
-		if ($other ne "_")
-		{
+		#my $tmp = substr($content[0],1,7);
+		#my $other = substr($content[0],8,1);
+		#if ($other ne "_")
+		#{
 			#substr($tmp,2,1) = $other;
-			$tmp .= $other;
-		}
+		#	$tmp .= $other;
+		#}
+		$content[0] =~ /^\D+(\d+n\d{4}[a-zA-Z]?)/;
+		my $tmp = $1;
 		
 		$tmp = substr($T_vol,0,1) . lc($tmp) . ".txt";
 		return $tmp;
@@ -1619,7 +1629,7 @@ sub make_app()
 		chomp;
 
 		#/([TXJHWIABCDFGKLMNPQSU].{16})(...)(.*)/;
-		/([TXJHWIABCDFGKLMNPQSU]\d+n.*?p\d+.\d\d)(...)(.*)/;
+		/(\D+\d+n.*?p\d+.\d\d)(...)(.*)/;
 		$line_head = $1;
 		$this_sign = $2;		# 取出簡單標記
 		$line = $3;
@@ -1955,7 +1965,7 @@ s之後的第一個Ｐ：變成二個空格。（是否是不管之前的繼承�
 	my $preline = "";		# 以後要加在 line 之前的, 例如增加的空格
 
 	# /([TXJHWIABCDFGKLMNPQSU].{16})(\(*\d+\))?(...)(.*\n)/;
-	/([TXJHWIABCDFGKLMNPQSU]\d+n.*?p\d+.\d\d)(\(*\d+\))?(...)(.*\n)/;
+	/(\D+\d+n.*?p\d+.\d\d)(\(*\d+\))?(...)(.*\n)/;
 	$linehead = $1;
 	$shift_str = $2;
 	$sign = $3;		# 取出簡單標記
@@ -1981,7 +1991,7 @@ s之後的第一個Ｐ：變成二個空格。（是否是不管之前的繼承�
 	{
 		my $lastline = $content[$line_index-1];
 		#$lastline =~ /[TXJHWIABCDFGKLMNPQSU].{16}(\(*\d+\))?(...)/;
-		$lastline =~ /[TXJHWIABCDFGKLMNPQSU]\d+n.*?p\d+.\d\d(\(*\d+\))?(...)/;
+		$lastline =~ /\D+\d+n.*?p\d+.\d\d(\(*\d+\))?(...)/;
 		my $lastsign = $2;		# 取出簡單標記
 		$lastsign =~ /(\d)/;
 		my $lastnum = $1;
@@ -1993,7 +2003,7 @@ s之後的第一個Ｐ：變成二個空格。（是否是不管之前的繼承�
 		{
 			$lastline = $content[$line_index-2];
 			#$lastline =~ /[TXJHWIABCDFGKLMNPQSU].{16}(\(*\d+\))?(...)/;
-			$lastline =~ /[TXJHWIABCDFGKLMNPQSU]\d+n.*?p\d+.\d\d(\(*\d+\))?(...)/;
+			$lastline =~ /\D+\d+n.*?p\d+.\d\d(\(*\d+\))?(...)/;
 			$lastsign = $2;		# 取出簡單標記
 			$lastsign =~ /(\d)/;
 			$lastnum = $1;			
@@ -2626,7 +2636,12 @@ s之後的第一個Ｐ：變成二個空格。（是否是不管之前的繼承�
 			s/<trans-mark,(.*?)>/$1/;
 			next;
 		}
-		
+		if($thistag =~ /<\D+\d+n\d{4}.*?>/)	# 西蓮出處連結, 例如 : SL01n0001_p0020a02_##...佛於經中說，【<T09n0262_p0007c07-09>舍利弗！汝等當一心...
+		{
+			s/<\D+\d+n\d{4}.*?>//;
+			next;
+		}
+	
 		if($thistag eq "Ｐ")
 		{
 			#s/^($big5*)Ｐ(.*\n)/$1。$2/;
@@ -2851,7 +2866,14 @@ sub prenormal
 	my @key;
 	readGaiji();	# 先讀取缺字資料
 	
-	open (IN, "<:utf8", "${cbwork_dir}/bm/$vol_head/$T_vol/new.txt");
+	if($vol_head eq "SL")	# 西蓮淨苑的資料在 google drive 目錄
+	{
+		open (IN, "<:utf8", "${seeland_dir}/bm/$T_vol/new.txt");
+	}
+	else
+	{
+		open (IN, "<:utf8", "${cbwork_dir}/bm/$vol_head/$T_vol/new.txt");
+	}
 	#open (OUT, ">$out") || die "Open $out error : $!";
 	#open (TABLE,"$table") || die "Open $table error : $!";
 	
@@ -3016,7 +3038,15 @@ sub prenormal
 	# 處理 source.txt 來源檔
 	###############################################################
 	
-	open (IN, "<:utf8", "${cbwork_dir}/bm/$vol_head/$T_vol/source.txt");
+	if($vol_head eq "SL")	# 西蓮淨苑的資料在 google drive 目錄
+	{
+		open (IN, "<:utf8", "${seeland_dir}/bm/$T_vol/source.txt");
+	}
+	else
+	{
+		open (IN, "<:utf8", "${cbwork_dir}/bm/$vol_head/$T_vol/source.txt");
+	}
+	
 	#open (OUT,">source4.txt") || die "Open source4.txt error : $!";
 	
 	while(<IN>)

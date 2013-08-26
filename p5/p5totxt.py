@@ -7,6 +7,7 @@
 Ray CHOU 周邦信 2011.6.11
 
 Heaven 修改:
+2013/08/26 處理藏經代碼為二位數的情況, 例如西蓮淨苑的 'SL'
 2013/08/16 處理 <term> 卻非 <term rend='no_nor'> 而沒有呈現內容的問題
 2013/08/02 處理 <text rend='no_nor'> 及 <term rend='no_nor'> , 讓這二種標記的範圍內不使用通用字
 2013/08/01 增加悉曇字有 big5 的呈現字
@@ -46,6 +47,7 @@ collectionName={
 	"P":"永樂北藏",
 	"Q":"磧砂大藏經",
 	"S":"宋藏遺珍",
+	"SL":"智諭老和尚全集",
 	"U":"洪武南藏",
 }
 
@@ -290,7 +292,8 @@ def fileHeader(tree):
 # Distributed free of charge. For details please read at http://www.cbeta.org/copyright_e.htm
 =========================================================================''')
 	globals['edition_c']=collectionName[globals['collection']]
-	globals['vol_c']=chineseNumber(int(globals['vol'][1:]))
+	mo=re.search(r'^\D+(\d+)', globals['vol'])
+	globals['vol_c']=chineseNumber(int(mo.group(1)))
 	#title=tree.findtext('.//title')
 	# 不能用上面的方法, 因為有些 title 裡面還有缺字的標記
 	title_tag=tree.find('.//title')
@@ -350,10 +353,12 @@ def handle1vol(vol):
 	''' 處理一冊 '''
 	print(vol)
 	globals['vol']=vol
-	globals['collection']=vol[0]
-	folder_out=os.path.join(outBase,vol[0], vol)
+	mo = re.search(r'^\D+', vol)
+	ed = mo.group()
+	globals['collection']=ed
+	folder_out=os.path.join(outBase, ed, vol)
 	if not os.path.exists(folder_out): os.makedirs(folder_out)
-	p=os.path.join(xmlP5Base, vol[0], vol)
+	p=os.path.join(xmlP5Base, ed, vol)
 	print(p)
 	for s in os.listdir(p):
 		if not s.startswith(vol): continue
@@ -364,14 +369,6 @@ def handle1vol(vol):
 # 主程式
 ####################################################################
 
-# 讀取 設定檔 cbwork_bin.ini
-config = configparser.SafeConfigParser()
-config.read('../cbwork_bin.ini')
-xmlP5Base = config.get('default', 'cbwork') + '/xml-p5'
-outBase = config.get('p5totxt', 'output_dir')
-print('Input XML P5 Folder:', xmlP5Base)
-print('Output Normal Folder:', outBase)
-
 # 讀取 命令列參數
 parser = OptionParser()
 parser.add_option("-a", action="store_false", dest="fileHeader", default=True, help="不要檔頭資訊")
@@ -381,6 +378,18 @@ parser.add_option("-u", action="store_true", dest="splitByJuan", default=False, 
 parser.add_option("-x", type='int', dest="siddham", default='0', help="悉曇字呈現方法: 0=轉寫(預設), 1=entity &SD-xxxx, 2=◇【◇】")
 parser.add_option("-z", action="store_false", dest="gaijiNormalize", default=True, help="不使用通用字")
 (options, args) = parser.parse_args()
+
+# 讀取 設定檔 cbwork_bin.ini
+config = configparser.SafeConfigParser()
+config.read('../cbwork_bin.ini')
+xmlP5Base = config.get('default', 'cbwork') + '/xml-p5'
+outBase = config.get('p5totxt', 'output_dir')
+if options.volumn is not None:
+	if options.volumn[:2] == 'SL':	# 西蓮淨苑的資料
+		xmlP5Base = config.get('default', 'seeland_dir') + '/xml-p5'
+
+print('Input XML P5 Folder:', xmlP5Base)
+print('Output Normal Folder:', outBase)
 
 globals={}
 globals['nextLineBuf']=''
