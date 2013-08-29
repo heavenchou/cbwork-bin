@@ -1253,7 +1253,7 @@ sub print_jun_head()
 	elsif($vol_head eq "SL")
 	{
 		$sutraver_c = "智諭老和尚全集";
-		$sutraver_e = "SeeLand";
+		$sutraver_e = "the Complete Works of Ven Zhiyu";
 	}
 	elsif($vol_head eq "U")
 	{

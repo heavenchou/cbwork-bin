@@ -64,7 +64,7 @@ collectionEng={
 'Q': 'Qisha Edition of the Canon - Xinwenfeng Edition',
 'R': 'Manji Zokuzōkyō - Xinwenfeng Edition',
 'S': 'Songzang yizhen - Xinwenfeng Edition',
-'SL': 'SeeLand',
+'SL': 'the Complete Works of Ven Zhiyu',
 'T': 'Taishō Tripiṭaka',
 'U': 'Southern Hongwu Edition of the Canon',
 'W': 'Buddhist Texts not contained in the Tripiṭaka',
