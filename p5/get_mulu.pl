@@ -15,13 +15,25 @@ use Config::IniFiles;
 
 my $vol = shift;				# $vol = T01 , 冊數
 exit if($vol eq "");			# 沒參數就結束
-my $ed = substr($vol,0,1);		# $ed = T
+$vol =~ /^(\D+)/;				# 因為不只一個英文字, 所以用正規式來判斷, 例如西蓮為 'SL'
+my $ed = $1;					# $ed = T
 
 my $cfg = Config::IniFiles->new( -file => "../cbwork_bin.ini" );
 
 my $cbwork_dir = $cfg->val('default', 'cbwork', '/cbwork');	# 讀取 cbwork 目錄
 my $output_dir = $cfg->val('get_mulu', 'tree_dir', '/cbwork/bin/p5/tree');	# 讀取 cbwork 目錄
-my $xml_path = $cbwork_dir . "/xml-p5a/$ed/$vol/";
+my $seeland_dir = $cfg->val('default', 'seeland_dir', '');	# 讀取 google drive 西蓮的目錄
+my $xml_path;
+
+if($ed eq "SL")
+{
+	# 西蓮淨苑的資料在 google drive 目錄中
+	$xml_path = $seeland_dir . "/xml-p5a/$ed/$vol/";
+}
+else
+{
+	 $xml_path = $cbwork_dir . "/xml-p5a/$ed/$vol/";
+}
 
 my $tree = "";			# 目錄樹全文
 my $inTitleStmt = 0;
