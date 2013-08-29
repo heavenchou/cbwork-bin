@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2013/08/29 處理藏西蓮淨苑的 "引文" 標記 <quote ...>...</quote>
 2013/08/26 處理藏經代碼為二位數的情況, 例如西蓮淨苑的 'SL'
 2013/07/20 處理修訂格式中包含組字式、校勘數字的問題, 以及一些小問題.
 2013/06/27 1.<T,y> 格式改成 <T,x,y> , 與 <p,x,y> 同步. 
@@ -349,8 +350,12 @@ def inline_tag(tag):
 		out2(gaiji(tag))
 	elif tag=='<□>':							# 未知字
 		out('<unclear/>')
-	elif re.match(r'<\D+\d+n\d\d\d\d', tag):	# 出處連結, 例如 : SL01n0001_p0020a02_##...佛於經中說，【<T09n0262_p0007c07-09>舍利弗！汝等當一心...
-		pass
+	elif re.match(r'<quote .*?>', tag):	# 出處連結, 例如 : SL01n0001_p0020a02_##...佛於經中說，<quote T09n0262_p0007c07-09>舍利弗！汝等當一心...</quote>
+		# 要做成 <quote source="CBETA.T09n0262_p0007c07-09">
+		mo = re.match(r'<quote (.*?)>', tag)
+		out('<quote source="CBETA.{}">'.format(mo.group(1)))
+	elif tag == '</quote>':
+		out('</quote>')
 	elif re.match(r'<I\d+>', tag):
 		start_i(tag)
 	elif re.match(r'<PTS.', tag):
