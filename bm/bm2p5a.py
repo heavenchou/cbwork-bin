@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2013/09/11 處理 <p=h1> 這種格式
 2013/08/29 處理藏西蓮淨苑的 "引文" 標記 <quote ...>...</quote>
 2013/08/26 處理藏經代碼為二位數的情況, 例如西蓮淨苑的 'SL'
 2013/07/20 處理修訂格式中包含組字式、校勘數字的問題, 以及一些小問題.
@@ -183,13 +184,22 @@ def start_inline_p(tag):
 	closeTags('l', 'lg')
 	s = '<p xml:id="p%sp%s%s%02d"' % (vol, old_pb, line_num, char_count)
 	if char_count>1: s += ' cb:type="inline"'
+	
+	# 處理 <p,1,2> 這種格式
 	mo = re.search(r'<p,(\d+),(\d+)>', tag)
 	if mo!=None:
 		s += ' rend="margin-left:%sem;text-indent:%sem"' % mo.groups()
-	else:
-		mo = re.search(r'\d+', tag)
-		if mo!=None:
-			s += ' rend="margin-left:%sem"' % mo.group()
+	
+	# 處理 <p,1> 這種格式
+	mo = re.search(r'<p,(\d+)>', tag)
+	if mo!=None:
+		s += ' rend="margin-left:%sem"' % mo.group(1)
+	
+	# 處理 <p=h1> 這種格式	- 2013/09/11
+	mo = re.search(r'<p=h(\d+)>', tag)
+	if mo!=None:
+		s += ' cb:type="head{}"'.format(mo.group(1))
+	
 	s += '>'
 	out(s)
 	opens['p']=1
