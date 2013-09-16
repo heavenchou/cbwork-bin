@@ -239,7 +239,8 @@ sub run_des
 		my $des = $1;
 		if($des2cb{$des})
 		{
-			my $tmp = "&CB" . $des2cb{$des} . ";";
+			# my $tmp = "&CB" . $des2cb{$des} . ";";			# 這是 P4 的格式
+			my $tmp = "<g ref=\"#CB" . $des2cb{$des} . "\"/>";	# P5 的格式是用 <g> 來處理 -- 2013/09/16
 			s/\Q$des\E/$tmp/g;
 		}
 		else
