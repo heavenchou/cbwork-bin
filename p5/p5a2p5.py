@@ -3,6 +3,7 @@
 2013.1.4 周邦信 改寫自 cbp4top5.py
 
 Heaven 修改:
+2013/09/23 校勘 note 中的 <p> 也要處理, 這是因為遇到了 N27 p217 的 0217001 校勘有 <p> 標記 
 2013/08/26 處理藏經代碼為二位數的情況, 例如西蓮淨苑的 'SL'
 2013/08/22 全部處理時忽略 .git 及 schema 目錄
 2013/08/13 各經的 resp 及 wit 記錄不要累積, 各經用各經的記錄. 另外程式中也加上一些註解文字.
@@ -353,7 +354,7 @@ class MyTransformer():
 			t = e.get('type')
 			node.attrib['type'] = t.replace(' ', '_')
 			
-		new_mode = change_mode(mode, 'body', 'back')
+		new_mode = change_mode(mode, 'body', 'back')	# mode 換成 back , 表示接下來的資料都是在 back 區的, 不是在 body 區的
 		back = node.open_tag() + self.traverse(e, new_mode) + node.end_tag() + '\n'
 		self.write_log('247 back: ' + back)
 		self.back_notes[type] += back
@@ -672,6 +673,8 @@ class MyTransformer():
 				node.attrib['cb:type'] = place
 				del node.attrib['place']
 		if 'body' in mode:
+			r = node.open_tag() + self.traverse(e, mode) + node.end_tag()
+		elif 'back' in mode:	# 校勘 note 中的 <p> 也要處理, 這是因為遇到了 N27 p217 的 0217001 校勘有 <p> 標記  -- 2013/09/23
 			r = node.open_tag() + self.traverse(e, mode) + node.end_tag()
 		else:
 			r = self.traverse(e, mode)
@@ -1117,7 +1120,7 @@ def phase1(vol,path):
 	t=MyTransformer(path)
 	read_all_resp(t.root)
 	read_all_wit(t.root)
-	text += t.traverse(t.root, mode=set(['body']))
+	text += t.traverse(t.root, mode=set(['body']))	# mode = body , 表示處理的都在 body 區, 若遇到校勘, mode 換成 back , 表示接下來的資料都是在 back 區的
 	text += '</TEI>'
 	
 	char_decl = t.prepare_charDecl()
