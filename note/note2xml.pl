@@ -62,6 +62,10 @@ while(<IN>)
 	chomp;
 	next if(/^[A-Z]\d\d$/i);			# 第一行的 X01 這類不管它
 	
+	# 把 & 換成 &amp;
+	
+	s/&/&amp;/g;
+	
 	#p0002
 	if(/^p(\d{4})/)		# 頁碼
 	{

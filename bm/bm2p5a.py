@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2013/09/24 把 & 換成 &amp;
 2013/09/11 處理 <p=h1> 這種格式
 2013/08/29 處理藏西蓮淨苑的 "引文" 標記 <quote ...>...</quote>
 2013/08/26 處理藏經代碼為二位數的情況, 例如西蓮淨苑的 'SL'
@@ -679,6 +680,8 @@ $Log:'''.format(today=today)
 	#最後的要處理一些特例
 	#移除 <head></head> 及將 <ref target="PTS.Vin.3.110"/></head> 換成 <ref target="PTS.Vin.3.110"/>
 	buf1 = re.sub('<head>((?:<ref target="PTS.[^>]*>)?)</head>',r'\1',buf1)
+	
+	buf1 = buf1.replace('&', '&amp;')	# 把 & 換成 &amp;  - 2013/09/24
 	
 	fo.write(buf1)
 	buf1 = ''
