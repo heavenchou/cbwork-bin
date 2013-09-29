@@ -3,6 +3,7 @@
 2013.1.4 周邦信 改寫自 cbp4top5.py
 
 Heaven 修改:
+2013/09/29 在 back 區, 只有校勘 note 中的 <p> 要處理, 其他如 app 內不能有 <p> , 所以再度改程式
 2013/09/23 校勘 note 中的 <p> 也要處理, 這是因為遇到了 N27 p217 的 0217001 校勘有 <p> 標記 
 2013/08/26 處理藏經代碼為二位數的情況, 例如西蓮淨苑的 'SL'
 2013/08/22 全部處理時忽略 .git 及 schema 目錄
@@ -355,6 +356,7 @@ class MyTransformer():
 			node.attrib['type'] = t.replace(' ', '_')
 			
 		new_mode = change_mode(mode, 'body', 'back')	# mode 換成 back , 表示接下來的資料都是在 back 區的, 不是在 body 區的
+		new_mode.add('note')		# 加入 note 判斷, 如 p 在 back 中, 且在 note 中, 就可以呈現, 但若只在 back 中就不可呈現 (例如在 app 中)  -- 2013/09/29
 		back = node.open_tag() + self.traverse(e, new_mode) + node.end_tag() + '\n'
 		self.write_log('247 back: ' + back)
 		self.back_notes[type] += back
@@ -674,7 +676,9 @@ class MyTransformer():
 				del node.attrib['place']
 		if 'body' in mode:
 			r = node.open_tag() + self.traverse(e, mode) + node.end_tag()
-		elif 'back' in mode:	# 校勘 note 中的 <p> 也要處理, 這是因為遇到了 N27 p217 的 0217001 校勘有 <p> 標記  -- 2013/09/23
+		elif ('back' in mode) and ('note' in mode):
+			# 校勘 note 中的 <p> 也要處理, 這是因為遇到了 N27 p217 的 0217001 校勘有 <p> 標記  -- 2013/09/23
+			# 加入 note 判斷, 如 p 在 back 中, 且在 note 中, 就可以呈現, 但若只在 back 中就不可呈現 (例如在 app 中)	-- 2013/09/29
 			r = node.open_tag() + self.traverse(e, mode) + node.end_tag()
 		else:
 			r = self.traverse(e, mode)
