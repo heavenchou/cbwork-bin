@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2013/09/30 卷的結尾要考慮是否加上 </l>, </lg>
 2013/09/24 把 & 換成 &amp;
 2013/09/11 處理 <p=h1> 這種格式
 2013/08/29 處理藏西蓮淨苑的 "引文" 標記 <quote ...>...</quote>
@@ -673,7 +674,7 @@ $Log:'''.format(today=today)
 </teiHeader>
 <text><body>'''
 	fo.write(s)
-	closeTags('p')
+	closeTags('l','lg','p')		# 加上 l, lg  -- 2013/09/30
 	close_div(1)
 	out('')		# 處理最後的 <lb> , 因為 BM 版經文最後可能會有空白行, 也要轉出 XML 來
 	
