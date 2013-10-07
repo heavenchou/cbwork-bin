@@ -9,6 +9,7 @@
 2013.1.3 周邦信 改寫自 cbp4top5.py
 
 Heaven 修改:
+2013/10/07 處理百品的 <unclear>..</unclear> 標記, 不可與 <unclear/> 標記混用.
 2013/08/14 1.所有星號一律使用 <app> 標記, 不要用 <choice>
            2.原書的校勘一律使用 <app> 標記, 不要用 <choice>, 這二者都是因為有ヵ這類的校勘, 再加上有修訂, 之前的版本就變成 <choice> , 應改回 <app>
 2013/07/31 修改在 no_normal 的情況下, 通用詞應該只呈現 orig 的內容, 而不是 reg 的內容
@@ -28,7 +29,7 @@ import zbxxml
 
 time_format='%Y.%m.%d %H:%M'
 
-EMPTY=['anchor', 'lb', 'milestone', 'mulu', 'pb', 'space', 'unclear']
+EMPTY=['anchor', 'lb', 'milestone', 'mulu', 'pb', 'space']
 
 WITS = {
 	'A' : '【金藏】',
@@ -688,6 +689,15 @@ class MyTransformer():
 			del node.attrib['doc']
 			del node.attrib['loc']
 			r += node.open_tag() + self.traverse(e, mode) + node.end_tag()
+		elif tag=='unclear':
+			# <unclear> 有二種, 百品的有前後標記 I01n0001.xml : <unclear cert="medium" reason="damage">之</unclear>
+			# 其他就是指未知的字 <unclear/> -- 2013/10/07
+			tmp_child = self.traverse(e, mode)	# 判斷有沒有子層, 百品的就有 (原本要判斷屬性的, 想想還是子層比較可靠)
+			node=MyNode(e)
+			if tmp_child:
+				r += node.open_tag() + tmp_child + node.end_tag()
+			else:
+				r += '<unclear/>'
 		else:
 			node=MyNode(e)
 			self.write_log(node.open_tag())
