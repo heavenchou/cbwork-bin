@@ -11,7 +11,7 @@ cb	mojikyo	entity	uni_flag	unicode	nor_unicode	des	nor	cx
 	M062937	Imacron	1	012A		[-/I]	II	
 		uacute	1	00FA		[′/u]	`u	
 		Omacron	1	014C		[-/O]	OO	
-	M063055	omacron	1	014D		[-/o]	oo	
+	M063055	omacron	1	014D		[-/o]		
 		Sacute	1	015A		[′/S]	`S	
 		sacute	1	015B		[′/s]	`s	
 	M062962		1	0160		[ˇ/S]		
@@ -18393,7 +18393,7 @@ cb	mojikyo	entity	uni_flag	unicode	nor_unicode	des	nor	cx
 20174			0	20876		[(勝-月)*力]		
 20175			0	20744		[利-禾+(爪/勿)]		
 20176						[(土/(冗-几+舛))*殳]		
-20177						[涓-口＋(└@口)]		
+20177						[涓-口+(└@口)]		
 20178			0	283D6		[(車/車)*戔]	車	
 20179						[弋@((或-弋)/呈)]		
 20180						[利-禾+(勝-月)]		
@@ -27208,7 +27208,7 @@ cb	mojikyo	entity	uni_flag	unicode	nor_unicode	des	nor	cx
 30106			0	22770		[(牛*匆)/心]	總	
 30107			0	2326A		[日*荒]		
 30108			0	21EBC		[山/臬]	嵲	
-30109						[游-方＋(打-丁)]		
+30109						[游-方+(打-丁)]		
 30110						[(里*占)/火]		
 30112			0	29D4B		[魚-(烈-列)+大]		
 30113						[(山/木)*(弋-、)]	柴	
@@ -28778,7 +28778,6 @@ cb	mojikyo	entity	uni_flag	unicode	nor_unicode	des	nor	cx
 31718						[彳*(一/八/土)]		
 31719						[琬-(厄-厂)+匕]		
 31720						[轤-(├/七)+王]		
-31721						[遊-方＋(打-丁)]		
 31723						[((印-ㄗ)*月)/壬]		
 31724						[(虍/(火/目))*又]		
 31725						[女*(匕*(└@匕))]		
