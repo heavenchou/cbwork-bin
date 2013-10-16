@@ -8,7 +8,7 @@ cb	mojikyo	entity	uni_flag	unicode	nor_unicode	des	nor	cx
 	M063013		1	010D		[ˇ/c]		
 	M063021		1	0115		[ˇ/e]		
 		ucirc	1	00FB		[^/u]	^u	
-	M062937	Imacron	1	012A		[-/I]	II	
+	M062937	Imacron	1	012A		[-/I]		
 		uacute	1	00FA		[′/u]	`u	
 		Omacron	1	014C		[-/O]	OO	
 	M063055	omacron	1	014D		[-/o]		
