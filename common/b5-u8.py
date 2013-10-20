@@ -382,9 +382,8 @@ def trans_file(fn1, fn2):
 	print( fn1 + ' => ' + fn2)
 	f1=codecs.open(fn1, "r", "cp950")
 	f2=codecs.open(fn2, "w", "utf-8")
-	#reo=re.compile(r'\[[^>\[]*?\]') # 組字式
 	for line in f1:
-		line=re.sub(r'\[[^>\[]*?\]', trans_des, line)	# 處理組字式 (缺字多的時候使用, 有先讀入全部的缺字)
+		line=re.sub(r'\[[^>\[]*?\]', trans_des, line)	# 處理組字式 (有先讀入全部的缺字)
 		line=trans_roma(line)	# 處理羅馬轉寫字
 		line=trans_jap(line)	# 處理日文
 		f2.write(line)
