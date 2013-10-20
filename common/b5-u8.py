@@ -18,6 +18,7 @@ b5-u8.py
 作者: 周邦信 2009.05.26
 
 Heaven 修改:
+2013/10/20 修改缺字的讀取, 由逐字查詢資料庫改成一次讀取全部資料庫
 2013/10/16 將日文拼音及 &M 碼轉成日文unicode
 2013/06/09 變數改用設定檔 ../cbwork_bin.ini
 '''
@@ -354,6 +355,26 @@ def trans_jap(line):
 		line = line.replace('&M062485;' , 'ヵ')
 		line = line.replace('&M062486;' , 'ヶ')
 	return line
+
+#################################################
+# 處理組字式 (缺字多的時候使用, 有先讀入全部的缺字)
+#################################################
+def trans_des(mo):
+	des=mo.group()
+	if des in des2u8:
+		return des2u8[des]
+	else:
+		return des
+
+#################################################
+# 轉換羅馬轉寫字成 unicode
+#################################################
+def trans_roma(line):
+	global romas
+	for nor in romas:
+		line=line.replace(nor, romas[nor])
+	return line
+
 #################################################
 # 處理單檔
 #################################################
@@ -361,9 +382,9 @@ def trans_file(fn1, fn2):
 	print( fn1 + ' => ' + fn2)
 	f1=codecs.open(fn1, "r", "cp950")
 	f2=codecs.open(fn2, "w", "utf-8")
-	reo=re.compile(r'\[[^>\[]*?\]') # 組字式
+	#reo=re.compile(r'\[[^>\[]*?\]') # 組字式
 	for line in f1:
-		line=reo.sub(repl,line)	# 處理組字式
+		line=re.sub(r'\[[^>\[]*?\]', trans_des, line)	# 處理組字式 (缺字多的時候使用, 有先讀入全部的缺字)
 		line=trans_roma(line)	# 處理羅馬轉寫字
 		line=trans_jap(line)	# 處理日文
 		f2.write(line)
@@ -378,26 +399,31 @@ def trans_dir(source, dest):
 	l=os.listdir(source)
 	for s in l:
 		if os.path.isdir(source+'/'+s):
-			trans_dir(source+'/'+s, dest+'/'+s)
+			if s != '.git':
+				if s[0] == 'T':
+					trans_dir(source+'/'+s, dest+'/'+s)
 		else:
-			trans_file(source+'/'+s, dest+'/'+s)
-
-#################################################
-# 處理組字式
-#################################################
-def repl(mo):
-	zuzi=mo.group()
-	#print(zuzi)
-	rs = win32com.client.Dispatch(r'ADODB.Recordset')
-	sql = "SELECT unicode FROM gaiji WHERE ((des='%s') AND (cb<='99999'))" % zuzi
-	rs.Open(sql, conn, 1, 3)
-	if rs.RecordCount > 0:
-		u = rs.Fields.Item('unicode').Value
-		if u!=None: # and len(u)<5: 	# 大於4碼的 extension-b 仍然用組字式, 這又取消了
-			c=chr(int(u,16))
-			return c
-	return zuzi
+			if s[0:4] != 'READ':
+				trans_file(source+'/'+s, dest+'/'+s)
 	
+#################################################
+# 讀取全部的 組字式與 unicode
+#################################################
+def get_des2u8():
+	global des2u8
+	rs = win32com.client.Dispatch(r'ADODB.Recordset')
+	sql = "SELECT unicode, des FROM gaiji WHERE ((cb Is Not Null) AND (cb<='99999') AND (unicode Is Not Null))"
+	rs.Open(sql, conn, 1, 3)
+	rs.MoveFirst()
+	while 1:
+		if rs.EOF:
+			break
+		else:
+			des = rs.Fields.Item('des').Value		# 通用字
+			uni = rs.Fields.Item('unicode').Value	# unicode
+			des2u8[des] = chr(int(uni,16))
+			rs.MoveNext()
+
 #################################################
 # 讀取全部的羅馬轉寫字
 #################################################
@@ -416,15 +442,6 @@ def get_roma():
 			romas[nor] = chr(int(uni,16))
 			rs.MoveNext()
 
-#################################################
-# 轉換羅馬轉寫字成 unicode
-#################################################
-def trans_roma(line):
-	global romas
-	for nor in romas:
-		line=line.replace(nor, romas[nor])
-	return line
-	
 #################################################
 # main 主程式
 #################################################
@@ -447,6 +464,8 @@ conn.Open(DSN)
 
 # 先讀取羅馬轉寫字
 romas = {}	# 宣告用來放羅馬拼音, ex { '`o' : '00F3' }
+des2u8 = {} # 宣告用來放組字式的 utf8 文字
 get_roma()
+get_des2u8()
 
 trans_dir(options.source, options.output)
