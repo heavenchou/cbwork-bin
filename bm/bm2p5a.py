@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2013/10/28 處理行首標記 Y 及處理 </o> 標記
 2013/09/30 卷的結尾要考慮是否加上 </l>, </lg>
 2013/09/24 把 & 換成 &amp;
 2013/09/11 處理 <p=h1> 這種格式
@@ -417,6 +418,10 @@ def inline_tag(tag):
 		closeTags('p')
 		out1('</cb:div>')
 		opens['div'] -= 1
+	elif tag=='</o>':
+		closeTags('p')
+		out1('</cb:div>')
+		opens['div'] -= 1
 	#以下這些直接輸出 <choice cb:resp="CBETA.maha"><corr>Ｂ</corr><sic>Ａ</sic></choice>
 	elif tag.startswith('<choice'):
 		out(tag)
@@ -547,6 +552,8 @@ def start_byline(tag):
 		out('<byline cb:type="collector">')
 	elif 'E' in tag:
 		out('<byline cb:type="editor">')
+	elif 'Y' in tag:
+		out('<byline cb:type="translator">')
 	opens['byline'] = 1
 	
 def start_x(tag):
@@ -568,7 +575,7 @@ def do_line_head(tag):
 				start_div(1, 'w')
 	elif globals['inw']:
 		globals['inw']=False
-	if ('A' in tag) or ('B' in tag) or ('C' in tag) or ('E' in tag):
+	if ('A' in tag) or ('B' in tag) or ('C' in tag) or ('E' in tag) or ('Y' in tag):
 		start_byline(tag)
 	elif 'I' in tag:
 		start_i(tag)
