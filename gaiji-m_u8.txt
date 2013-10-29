@@ -29775,6 +29775,7 @@ cb	mojikyo	entity	uni_flag	unicode	nor_unicode	des	nor	cx
 32764			1	8EF2		[車*古]		
 32765						[木*閂]		
 32766						[病-丙+白]		
+32767			0	23CE0		[車*古]		
 x0001	M024583	CI0001	1	&#x7914;&#x7930;		礔[石*歷]	霹靂	礔&CB00269;
 x0002	M025746	CI0002	1	&#x7ADB;&#x7AEE;		[立*令]竮	伶俜	&CB00277;竮
 x0003	M045414	CI0003	1	&#x9AE3;&#x9AF4;		髣[髟/弗]	彷彿	髣&CB00662;
