@@ -7,6 +7,10 @@
 Ray CHOU 周邦信 2011.6.11
 
 Heaven 修改:
+重要: 上傳前底下的xmlP5Base要改回來
+2013/10/11 處理百品的 <unclear ...>...</unclear> 標記
+2013/10/03 處理大般若經相關的經名問題, 也就是去除 0220 之後的英文字母
+2013/10/03 處理 T42n1828.xml 的 <ref>
 2013/08/26 處理藏經代碼為二位數的情況, 例如西蓮淨苑的 'SL'
 2013/08/16 處理 <term> 卻非 <term rend='no_nor'> 而沒有呈現內容的問題
 2013/08/02 處理 <text rend='no_nor'> 及 <term rend='no_nor'> , 讓這二種標記的範圍內不使用通用字
@@ -155,10 +159,10 @@ def handleNode(e):
 		if 'ed' in e.attrib and e.get('ed').startswith('R'): pass
 		else:
 			# 處理大般若經經號 T07n0220e => T07n0220_
-			if globals['vol'][0] == 'T' and globals['sutra_no'][0:4] == '0220':
-				r += '\n'+globals['vol']+'n0220_'
-			else:
-				r += '\n'+globals['vol']+'n'+globals['sutra_no']
+			#if globals['vol'][0] == 'T' and globals['sutra_no'][0:4] == '0220':
+			#	r += '\n'+globals['vol']+'n0220_'
+			#else:
+			r += '\n'+globals['vol']+'n'+globals['sutra_no']
 			if len(globals['sutra_no']) < 5:
 				r += '_'
 			r += 'p'+ globals['lb'] + '║'
@@ -193,13 +197,21 @@ def handleNode(e):
 			else:
 				globals['nextLineBuf']+=traverse(e)
 	elif e.tag=='unclear':
-		r='▆'
+		# 有二種情況
+		# 一般是 <unclear/> , 直接呈現 ▆
+		# 另一種是百品的 <unclear cert="medium" reason="damage">之</unclear> , 這種就不理它  - 2013/10/11
+		cert = e.get('cert')
+		if cert : r += traverse(e)
+		else : r = '▆'
 	elif e.tag=='ref':
-		# <ref target="#PTS.Vin.3.2"></ref>
+		# 漢譯南傳大藏經 : <ref target="#PTS.Vin.3.2"></ref>
+		# T42n1828.xml : <ref rend="margin-left:2em" target="../T30/T30n1579.xml#xpath2(//0279a03)">論本卷第一</ref>
+		# T49n2035.xml : <ref target="list4">天台智者禪師○</ref>
 		target = e.get('target')
 		mo=re.match('#PTS\..*\.(\d+)', target)
 		if mo is not None:
 			r = ' ' + mo.group(1) + ' '
+		r += traverse(e)
 	elif e.tag=='term':
 		# <term rend="no_nor"> , 這種的就不要使用通用字
 		if e.get('rend') == 'no_nor':
@@ -243,6 +255,53 @@ def readCharInfo(tree):
 
 def splitByJuan(source, folder_out):
 	''' 一卷一檔 '''
+	
+	# 逐行讀入, 若遇到 juan \d+ 表示換卷了(除非是第一次遇到)
+	# 遇到新卷時, 先把舊的寫入檔案中
+	# 最後再寫入最後一卷
+	
+	fi=open(source, 'r', encoding='utf8')
+	
+	s=globals['collection'] + globals['sutra_no'] + '_$juan.txt'
+	s=os.path.join(folder_out, s)
+	fn_template=Template(s)		# 檔名的模版
+	
+	header=shortFileHeader()	# 第二卷之後的卷首
+	
+	juan_pre = ''		# 上一卷的卷數
+	juan_txt = ''		# 記錄每一卷的內文
+	for line in fi:
+		mo=re.match('(.*?║)juan (\d+)', line)
+		if mo is not None:
+			juan='{:03d}'.format(int(mo.group(2)))
+			if juan_pre == '': 
+				juan_txt += mo.group(1)
+				juan_pre = juan
+				continue
+			
+			# 在此換卷了, 所以要寫入檔案
+			
+			path_out=fn_template.substitute(juan=juan_pre)
+			fo=open(path_out, 'w', encoding='utf8')
+			fo.write(juan_txt)
+			fo.close()
+			juan_pre = juan
+			# 新的一卷的起始內容
+			juan_txt = header
+			juan_txt += mo.group(1)
+			line=line.rstrip()
+		else: juan_txt += line
+	
+	# 寫入最後一卷
+	path_out=fn_template.substitute(juan=juan)
+	fo=open(path_out, 'w', encoding='utf8')
+	fo.write(juan_txt)
+	fo.close()
+	fi.close()
+	os.remove(source)	# 移除還未分卷的大檔
+
+def splitByJuan_old(source, folder_out):
+	''' 一卷一檔 '''
 	fi=open(source, 'r', encoding='utf8')
 	
 	s=globals['collection'] + globals['sutra_no'] + '_$juan.txt'
@@ -252,11 +311,13 @@ def splitByJuan(source, folder_out):
 	header=shortFileHeader()
 	path_out=fn_template.substitute(juan='001')
 	fo=open(path_out, 'w', encoding='utf8')
+	juan_counter = 0	# 記錄目前是第幾卷
 	for line in fi:
 		mo=re.match('(.*?║)juan (\d+)', line)
 		if mo is not None:
+			juan_counter += 1
 			juan='{:03d}'.format(int(mo.group(2)))
-			if juan=='001': 
+			if juan_counter==1: 
 				fo.write(mo.group(1))
 				continue
 			fo.close()
@@ -268,7 +329,7 @@ def splitByJuan(source, folder_out):
 		else: fo.write(line)
 	fo.close()
 	fi.close()
-	os.remove(source)
+	os.remove(source)	# 移除還未分卷的大檔
 
 def shortFileHeader():
 	template = Template('''【經文資訊】$edition_c 第${vol_c}冊 No. ${sutra_no_0}《${title}》CBETA 電子佛典 V${ver} $cFormat
@@ -313,6 +374,8 @@ def fileHeader(tree):
 	globals['ebib']=tree.findtext('.//sourceDesc//bibl')	# T08n0236a.xml 在 <bibl> 之前還有 <p> , 故用 //bibl
 	globals['ebib']=re.sub("No. 0*","No. ",globals['ebib'])
 	globals['ebib']=re.sub("Vol. 0*","Vol. ",globals['ebib'])
+	if globals['collection'] == 'T':
+		globals['ebib']=re.sub(r"No. 220[a-z]","No. 220",globals['ebib'])
 	globals['ebib']=re.sub("\s*$","",globals['ebib'])
 	globals['eFormat']='Normalized Version'
 	return fileHeadTemplate.substitute(globals)
@@ -323,18 +386,30 @@ def handle1sutra(xml, folder_out):
 	fn_in=os.path.basename(xml)
 	s=fn_in.replace('.xml','')
 	globals['sutra_no']=s[s.find('n')+1:]
+	if globals['collection'] == 'T':
+		globals['sutra_no']=re.sub("0220[a-z]","0220",globals['sutra_no'])	# 大般若經經號後面的 a-z 移除
 	globals['sutra_no_0']=re.sub("^0*","",globals['sutra_no'])	# sutra_no_0 是前面沒有 0 的經號
 	print('sutra_no:', globals['sutra_no'])
 	fn_out=fn_in.replace('.xml','.txt')
 	path_out=os.path.join(folder_out, fn_out)
-	fo=open(path_out, 'w', encoding='utf8')
 	
+	fo=open(path_out, 'w', encoding='utf8')
+
 	tree=etree.parse(xml)
 	tree=zbx_xml.stripNamespaces(tree) # 去掉 namespace
 	#zbx_xml.stripComments(tree) # 去掉 xml 註解
 	
 	readCharInfo(tree)
-	if options.fileHeader: fo.write(fileHeader(tree))
+	if options.fileHeader:		# 是否要印出卷首資訊		
+		mo=re.search(r'T07n0220[d-z]', xml)
+		if mo is not None:
+			# T07n0220d 之後的不要印出詳細卷首
+			tmp=fileHeader(tree)	# 還是要先執行, 以取得需要的資料
+			tmp=shortFileHeader()
+			tmp=tmp[:-1]			# 移除最後一個 '換行', 只有 T07 此處才需要
+			fo.write(tmp)
+		else:
+			fo.write(fileHeader(tree))
 	
 	# 處理 <text rend='no_nor'> 的情況
 	globals['no_nor'] = 0
@@ -382,7 +457,8 @@ parser.add_option("-z", action="store_false", dest="gaijiNormalize", default=Tru
 # 讀取 設定檔 cbwork_bin.ini
 config = configparser.SafeConfigParser()
 config.read('../cbwork_bin.ini')
-xmlP5Base = config.get('default', 'cbwork') + '/xml-p5'
+#xmlP5Base = config.get('default', 'cbwork') + '/xml-p5'
+xmlP5Base = 'c:/temp/cbetap5-ok'
 outBase = config.get('p5totxt', 'output_dir')
 if options.volumn is not None:
 	if options.volumn[:2] == 'SL':	# 西蓮淨苑的資料
