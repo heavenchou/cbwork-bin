@@ -3,6 +3,7 @@
 2013.1.4 周邦信 改寫自 cbp4top5.py
 
 Heaven 修改:
+2013/10/30 處理南傳校勘的 note 星號, 因為過去的星號都在 app 中, 南傳則有在 note 中的星號.
 2013/09/29 在 back 區, 只有校勘 note 中的 <p> 要處理, 其他如 app 內不能有 <p> , 所以再度改程式
 2013/09/23 校勘 note 中的 <p> 也要處理, 這是因為遇到了 N27 p217 的 0217001 校勘有 <p> 標記 
 2013/08/26 處理藏經代碼為二位數的情況, 例如西蓮淨苑的 'SL'
@@ -243,6 +244,9 @@ class MyTransformer():
 		self.counter=collections.Counter()
 		#self.apps={}
 		self.gaijis=set()
+		# 大部份經文的星號都在 app 標記處理, 南傳 note 有星號沒 app , 這是用來記錄哪些 note 有哪些 star
+		# note_star['#nkr_note_orig_0228007'] = ' #note_star_1 #note_star_5 #note_star_12'
+		self.note_star={}
 
 	def handle_text(self, s, mode):
 		if s is None: return ''
@@ -395,6 +399,19 @@ class MyTransformer():
 				else:
 					print('error 242')
 					sys.exit()
+			elif type=='star':
+				# P5a <note type="star" corresp="#0228007"/> 南傳特有的, 有星號的校勘, 但沒有 app 
+				# p5 要做成 <anchor xml:id="note_star_1" type="star"/>
+				# 並在 back 區做成 <note n="0228007" resp="#respx" type="orig" place="foot text" target="#nkr_note_orig_0228007 #note_star_1">....</note>
+				corresp=e.get('corresp', '')
+				corresp = '#nkr_note_orig_' + corresp[1:]
+				id = self.new_anchor_id()
+				target = 'note_star_{}'.format(id)
+				r='<anchor xml:id="{}" type="star"/>'.format(target)				# 此時已做出經文區的 <anchor xml:id="note_star_1" type="star"/>
+				if corresp in self.note_star:
+					self.note_star[corresp] += ' #' + target	# 此時要在 note_star[#nkr_note_orig_0228007] 加上 "#note_star_1"
+				else:
+					self.note_star[corresp] = ' #' + target
 			else:
 				node=MyNode(e)
 				r = node.open_tag() + self.traverse(e, mode) + node.end_tag()
@@ -403,7 +420,8 @@ class MyTransformer():
 				node=MyNode(e)
 				r = node.open_tag() + self.traverse(e, mode) + node.end_tag()
 		return r
-		
+	
+	# 取得一個新的 id , 主要是在星號校勘要提供不重複的代號
 	def new_anchor_id(self):
 		self.counter['anchor']+=1
 		return '{:x}'.format(self.counter['anchor'])
@@ -1041,6 +1059,22 @@ def app_new_type(e):
 def my_mkdir(p):
 	if not os.path.exists(p): os.mkdir(p)
 
+def handle_back_note_star(text, note_star):
+	'''
+	處理南傳校勘星號的問題.
+	如果有這種資料 note_star['#nkr_note_orig_0228007'] = ' #note_star_1 #note_star_5 #note_star_12'
+	則要把 back 區的校勘 note
+	<note n="0228007" resp="#respx" type="orig" place="foot text" target="#nkr_note_orig_0228007">........</note>
+	變成
+	<note n="0228007" resp="#respx" type="orig" place="foot text" target="#nkr_note_orig_0228007 #note_star_1 #note_star_5 #note_star_12">........</note>
+	'''
+	for k in sorted(note_star):
+		key = 'target="' + k
+		value = 'target="' + k + note_star[k]
+		text = text.replace(key, value)
+	return text
+
+#處理最後的 back 區資料
 def handle_back(t):
 	r = '\n<back>\n'
 	if t.back['app']!='':
@@ -1102,7 +1136,7 @@ def handle_back(t):
 		else:
 			sys.exit('error 1000: ' + k)
 		r += '<p>\n'
-		r += t.back_notes[k]
+		r += handle_back_note_star(t.back_notes[k], t.note_star)	# 要處理可能有星號的 note
 		r += '</p>\n'
 		r += '</cb:div>\n'
 		
