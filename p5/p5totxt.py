@@ -7,7 +7,6 @@
 Ray CHOU 周邦信 2011.6.11
 
 Heaven 修改:
-重要: 上傳前底下的xmlP5Base要改回來
 2013/10/11 處理百品的 <unclear ...>...</unclear> 標記
 2013/10/03 處理大般若經相關的經名問題, 也就是去除 0220 之後的英文字母
 2013/10/03 處理 T42n1828.xml 的 <ref>
@@ -457,8 +456,8 @@ parser.add_option("-z", action="store_false", dest="gaijiNormalize", default=Tru
 # 讀取 設定檔 cbwork_bin.ini
 config = configparser.SafeConfigParser()
 config.read('../cbwork_bin.ini')
-#xmlP5Base = config.get('default', 'cbwork') + '/xml-p5'
-xmlP5Base = 'c:/temp/cbetap5-ok'
+xmlP5Base = config.get('default', 'cbwork') + '/xml-p5'
+#xmlP5Base = 'c:/temp/cbetap5-ok'
 outBase = config.get('p5totxt', 'output_dir')
 if options.volumn is not None:
 	if options.volumn[:2] == 'SL':	# 西蓮淨苑的資料
