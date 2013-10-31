@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2013/11/01 處理 <J> 標記
 2013/10/28 處理行首標記 Y 及處理 </o> 標記
 2013/09/30 卷的結尾要考慮是否加上 </l>, </lg>
 2013/09/24 把 & 換成 &amp;
@@ -386,8 +387,8 @@ def inline_tag(tag):
 		out('<cb:juan fun="close"><cb:jhead>')
 		record_open('cb:juan')
 		record_open('cb:jhead')
-	#elif tag.startswith('<J'):
-	#	start_J(tag)
+	elif tag.startswith('<J'):
+		start_J(tag)
 	elif tag =='</L>':
 		closeTags('p')
 		while opens['list']>0:
