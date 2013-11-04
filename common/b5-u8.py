@@ -398,12 +398,9 @@ def trans_dir(source, dest):
 	l=os.listdir(source)
 	for s in l:
 		if os.path.isdir(source+'/'+s):
-			if s != '.git':
-				if s[0] == 'T':
-					trans_dir(source+'/'+s, dest+'/'+s)
+			trans_dir(source+'/'+s, dest+'/'+s)
 		else:
-			if s[0:4] != 'READ':
-				trans_file(source+'/'+s, dest+'/'+s)
+			trans_file(source+'/'+s, dest+'/'+s)
 	
 #################################################
 # 讀取全部的 組字式與 unicode
