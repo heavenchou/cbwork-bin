@@ -14,6 +14,7 @@ u8-b5.py
 2009.12.02 Ray: 從 Unicode 網站取得 Unihan.txt, 取出裏面的異寫字資訊 kCompatibilityVariant, 放在 variant
 
 Heaven 修改:
+2013/11/06 修改缺字的讀取, 由逐字查詢資料庫改成一次讀取全部資料庫.
 2013/08/15 python 3.3.1 處理 ext-b 有問題, 所以改成逐字處理, 不用 error handler 了.
 2013/07/31 使用通用字參數時同時處理通用詞
 2013/07/10 修改遇到 0xFEFF 時寫入 log 檔的小錯誤
@@ -1145,10 +1146,10 @@ def trans_file(fn1, fn2):
 	global high_word
 	high_word=0
 	print( fn1 + ' => ' + fn2)
-	f1=codecs.open(fn1, "r", "utf-8")
+	f1 = open(fn1, "r", encoding="utf-8")
+	f2 = open(fn2, "w", encoding="cp950")
 	#python 3.3.1 處理 ext-b 有問題, 所以改成逐字處理, 不用 error handler 了 -- 2013/08/15
 	#f2=codecs.open(fn2, "w", "cp950", 'cbeta')
-	f2=codecs.open(fn2, "w", "cp950")
 	for line in f1:
 		#修改版本
 		line = line.replace('(UTF-8) 普及版', '(Big5) 普及版')
@@ -1192,8 +1193,33 @@ def trans_dir(source, dest):
 
 #################################################
 # 處理無法直接由 utf8 轉 big5 的文字
+# (第三代, 因為第二代逐字讀取資料庫太慢了, 所以一次先把資料庫讀入)
 #################################################
 def u8tob5(c):
+	global uni2b5
+	
+	r = ''
+	i = ord(c)
+		
+	if i==0xFEFF:	#FEFF=65279
+		#f3.write('if i==0xFEFF:	\n')
+		return ''
+	u = '{:04X}'.format(i)
+	#f3.write('unicode : ' + u)
+	
+	if u in uni2b5:
+		r = uni2b5[u]
+	else:
+		r = '&#x{};'.format(u)
+
+	#f3.write(' result: ' + r)
+	return (r)
+	
+#################################################
+# 處理無法直接由 utf8 轉 big5 的文字 
+# (第二代做法, 適用 python 3.3, 雖然可讀取 ext-b , 但有 bug , 故自行判斷)
+#################################################
+def u8tob5_old(c):
 	global high_word
 	rs = win32com.client.Dispatch(r'ADODB.Recordset')
 	l = [] 
@@ -1243,7 +1269,8 @@ def u8tob5(c):
 	return (r)
 
 #################################################
-# 處理無法直接由 utf8 轉 big5 的文字
+# 處理無法直接由 utf8 轉 big5 的文字 
+# (第一代做法, 適用 python 3.2 , 因為當時還無法直接讀取 ext-b)
 #################################################
 def my_err_handler(exc):
 	global high_word
@@ -1307,6 +1334,36 @@ def my_err_handler(exc):
 	r = "".join(l)
 	f3.write(' result: ' + r)
 	return (r, exc.end)
+	
+#################################################
+# 讀取缺字資料庫
+#################################################
+def get_gaiji_m():
+	global uni2b5
+	rs = win32com.client.Dispatch(r'ADODB.Recordset')
+	sql = "SELECT cb, des, unicode, nor FROM gaiji WHERE (((cb Is Null) OR (cb<='99999')) AND (unicode Is Not Null))"
+	rs.Open(sql, conn, 1, 3)
+	rs.MoveFirst()
+	while 1:
+		if rs.EOF:
+			break
+		else:
+			cb = rs.Fields.Item('cb').Value			# cb 碼
+			des = rs.Fields.Item('des').Value		# 組字式
+			uni = rs.Fields.Item('unicode').Value	# unicode
+			nor = rs.Fields.Item('nor').Value		# 通用字
+			
+			uni=uni.upper()
+			if des!=None and len(des)>0 and cb!=None and len(cb)>0:
+				# 一般組字式缺字
+				if options.gaijiNormalize and nor!=None and len(nor)>0:
+					uni2b5[uni] = nor
+				else:
+					uni2b5[uni] = des
+			else:
+				# 羅馬轉寫字
+				uni2b5[uni] = nor
+			rs.MoveNext()
 
 #################################################
 # main 主程式
@@ -1334,7 +1391,11 @@ conn = win32com.client.Dispatch(r'ADODB.Connection')
 DSN = 'PROVIDER=Microsoft.JET.OLEDB.4.0;DATA SOURCE=%s;' % gaiji
 conn.Open(DSN)
 
+uni2b5 = {} 	# 宣告用來放 utf8 對應的組字式或通用字
+# 讀取缺字資料庫
+get_gaiji_m()
+
 # log 檔
-f3=codecs.open('u8-b5.log', "w", "utf-8")
+f3 = open('u8-b5.log', "w", encoding="utf-8")
 
 trans_dir(options.source, options.output)
