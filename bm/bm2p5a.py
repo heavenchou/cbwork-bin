@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2013/11/06 處理 <p,3,-2> 這類標記也支援負數
 2013/11/01 處理 <J> 標記
 2013/10/28 處理行首標記 Y 及處理 </o> 標記
 2013/09/30 卷的結尾要考慮是否加上 </l>, </lg>
@@ -190,12 +191,12 @@ def start_inline_p(tag):
 	if char_count>1: s += ' cb:type="inline"'
 	
 	# 處理 <p,1,2> 這種格式
-	mo = re.search(r'<p,(\d+),(\d+)>', tag)
+	mo = re.search(r'<p,(\-?\d+),(\-?\d+)>', tag)
 	if mo!=None:
 		s += ' rend="margin-left:%sem;text-indent:%sem"' % mo.groups()
 	
 	# 處理 <p,1> 這種格式
-	mo = re.search(r'<p,(\d+)>', tag)
+	mo = re.search(r'<p,(\-?\d+)>', tag)
 	if mo!=None:
 		s += ' rend="margin-left:%sem"' % mo.group(1)
 	
@@ -319,7 +320,7 @@ def start_inline_T(tag):
 		out('<lg xml:id="lg%sp%s%s01" type="abnormal">' % (vol, old_pb, line_num))	#??? lg 一定是在行首的第一個字嗎?
 		opens['lg'] = 1
 	closeTags('l')
-	mo = re.search(r'<T,(\d+),(\d+)>', tag)
+	mo = re.search(r'<T,(\-?\d+),(\-?\d+)>', tag)
 	if mo!=None:
 		if(mo.group(1) == '0'):
 			out('<l rend="text-indent:%sem">' % mo.group(2))
