@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2013/11/15 新增 <h1> (<hx>) 的處理, 類似 <Q1> 但只有 mulu 及 head , 沒有 div 
 2013/11/06 處理 <p,3,-2> 這類標記也支援負數
 2013/11/01 處理 <J> 標記
 2013/10/28 處理行首標記 Y 及處理 </o> 標記
@@ -246,6 +247,36 @@ def start_inline_q(tag):
 	buf += '<head>'
 	opens['head'] = 1
 
+# 2013/11/15 新增
+def start_inline_h(tag):
+	global buf, div_head, head_tag, globals
+	close_head()
+	closeTags('l', 'lg')
+	i=tag.find('m=')
+	div_head = ''
+	level = 0
+	
+	mo=re.match('<h(\d+)', tag)
+	level=int(mo.group(1))
+	
+	#start_div(level, 'other')
+	closeTags('byline', 'p', 'cb:jhead', 'cb:juan')	# 因為沒有 start_div , 所以要自己執行這一行
+	
+	mo=re.search('m=(.*?)>', tag)
+	if mo is None:
+		out('')					# 因為沒有 start_div , 所以要自己執行這一行
+		label = ''
+		globals['mulu_start'] = True
+		globals['muluType']='其他'
+	else:
+		label=mo.group(1)
+		if label != '':
+			out('<cb:mulu type="其他" level="%d">%s</cb:mulu>' % (level, label))
+		globals['mulu_start'] = False
+	globals['head_start'] = True
+	buf += '<head>'
+	opens['head'] = 1
+
 def close_div(level):
 	while opens['div'] >= level:
 		out1('</cb:div>')
@@ -311,6 +342,14 @@ def close_q(tag):
 	close_head()
 	level = int(tag[3:-1])
 	close_div(level)
+
+# 2013/11/15 新增
+def close_h(tag):
+	closeTags('cb:jhead', 'cb:juan', 'p')
+	close_head()
+	#level = int(tag[3:-1])
+	#close_div(level)
+
 		
 def start_inline_T(tag):
 	if not 'lg' in opens: opens['lg'] = 0
@@ -408,8 +447,12 @@ def inline_tag(tag):
 		start_inline_p(tag)
 	elif tag.startswith('<Q'):
 		start_inline_q(tag)
+	elif tag.startswith('<h'):
+		start_inline_h(tag)
 	elif tag.startswith('</Q'):
 		close_q(tag)
+	elif tag.startswith('</h'):
+		close_h(tag)
 	elif tag.startswith('<T'):
 		start_inline_T(tag)
 	elif tag=='</T>':
