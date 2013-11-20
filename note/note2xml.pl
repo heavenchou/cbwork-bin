@@ -1,6 +1,9 @@
 ######################################################################################
 # 處理校勘, 把純文字資料變成 XML 格式  by heaven 2007/04/11
 # 格式介紹在最底下
+#
+# 修訂記錄：
+# 2013/11/20 : 處理 N52 校注中有表格, 而且校注不只一行的情況.
 ######################################################################################
 
 use utf8;
@@ -54,13 +57,18 @@ my $errlog = "";	# 放置錯誤的內容
 ######################################################################################
 
 open IN , "<:utf8", $infile;
+my @lines = <IN>;
+close IN;
+
 open OUT , ">:utf8", $outfile;
 readGaiji();
 
-while(<IN>)
+for ($i=0; $i<= $#lines; $i++)
 {
+	$_ = $lines[$i];
+	
 	chomp;
-	next if(/^[A-Z]\d\d$/i);			# 第一行的 X01 這類不管它
+	next if(/^[A-Z]{1,2}\d{2,3}$/);			# 第一行的 X01 這類不管它
 	
 	# 把 & 換成 &amp;
 	
@@ -85,6 +93,25 @@ while(<IN>)
 		$kbj2 = "";		# 特殊的 "科,標,解" , 分別為 ke , biao , jie , 用在 <type="orig ke">
 		
 		$notenum = "0" . $notenum if(length($notenum) == 2);
+		
+		# 處理 N52 校注中有表格, 而且校注不只一行的情況. (2013/11/20)
+		$notedata = check_table($notedata);	# 檢查是否有表格標記, 要先處理, 因為一行是一個 <row>, 接起來就看不出每一行的位置了
+		
+		# 有時內容並不止一行, 所以要往下判斷
+		while($lines[$i+1])
+		{
+			my $nextline = $lines[$i+1];
+			last if($nextline =~ /^p(\d{4})/);	# 遇到頁碼則離開
+			last if($nextline =~ /^\s+(\d+)([a-zA-Z]?)(\-[a-zA-Z]?\d+)?\s+(.*)$/);	# 遇到另一個校注則離開
+			last if($nextline =~ /^\s+【((?:科)|(?:標)|(?:解))(\d+)([a-zA-Z]?)(\-[a-zA-Z]?\d+)?】\s*(.*)$/);	# 遇到另一個校注則離開
+			
+			# 到這裡表示這一行是校注的內容
+			
+			$nextline =~ s/^\s*(.*?)\s*$/\1/;	# 去前後空白
+			$nextline = check_table($nextline);	# 檢查是否有表格標記, 要先處理, 因為一行是一個 <row>, 接起來就看不出每一行的位置了
+			$notedata .= $nextline;
+			$i++;
+		}
 	}
 	#  【科01】釋止觀義例二初所述題目
 	if(/^\s+【((?:科)|(?:標)|(?:解))(\d+)([a-zA-Z]?)(\-[a-zA-Z]?\d+)?】\s*(.*)$/)
@@ -110,6 +137,24 @@ while(<IN>)
 		{
 			$kbj1 = "j";		# 特殊的 "科,標,解" , 分別為 k , b , j , 用在 <note n="0245k01" .....
 			$kbj2 = " jie";		# 特殊的 "科,標,解" , 分別為 ke , biao , jie , 用在 <type="orig ke">
+		}
+		
+		$notedata = check_table($notedata);	# 檢查是否有表格標記, 要先處理, 因為一行是一個 <row>, 接起來就看不出每一行的位置了
+		
+		# 有時內容並不止一行, 所以要往下判斷
+		while($lines[$i+1])
+		{
+			my $nextline = $lines[$i+1];
+			last if($nextline =~ /^p(\d{4})/);	# 遇到頁碼則離開
+			last if($nextline =~ /^\s+(\d+)([a-zA-Z]?)(\-[a-zA-Z]?\d+)?\s+(.*)$/);	# 遇到另一個校注則離開
+			last if($nextline =~ /^\s+【((?:科)|(?:標)|(?:解))(\d+)([a-zA-Z]?)(\-[a-zA-Z]?\d+)?】\s*(.*)$/);	# 遇到另一個校注則離開
+			
+			# 到這裡表示這一行是校注的內容
+			
+			$nextline =~ s/^\s*(.*?)\s*$/\1/;	# 去前後空白
+			$nextline = check_table($nextline);	# 檢查是否有表格標記, 要先處理, 因為一行是一個 <row>, 接起來就看不出每一行的位置了
+			$notedata .= $nextline;
+			$i++;
 		}
 	}
 	
@@ -137,6 +182,11 @@ while(<IN>)
 		$notemod =~ s/<\/p>//;
 		$notemod .= "</p>";
 		$notemod =~ s/<p,(\d+)>/<p rend="margin-left:\1em">/g;
+		if($notemod =~ /<\/table><\/p>/)
+		{
+			$notemod =~ s/<table /<\/p><table /g;	# <table> 前面要加上 </p> 結束
+			$notemod =~ s/<\/table><\/p>/<\/table>/g; #</table> 後面的 </p> 移除
+		}
 	}
 	
 	if($notedata =~ /<p(,\d+)?>/)
@@ -145,6 +195,11 @@ while(<IN>)
 		$notedata =~ s/<\/p>//;
 		$notedata .= "</p>";
 		$notedata =~ s/<p,(\d+)>/<p rend="margin-left:\1em">/g;
+		if($notedata =~ /<\/table><\/p>/)
+		{
+			$notedata =~ s/<table /<\/p><table /g;	# <table> 前面要加上 </p> 結束
+			$notedata =~ s/<\/table><\/p>/<\/table>/g; #</table> 後面的 </p> 移除
+		}
 	}
 	
 	# 印出資料
@@ -162,7 +217,6 @@ while(<IN>)
 	
 	print OUT "\n";
 }
-close IN;
 close OUT;
 
 if($errlog)
@@ -255,6 +309,57 @@ sub run_des
 	}
 	
 	s/●/&unrec;/g;
+	
+	return $_;
+}
+
+# 檢查是否有表格標記, 要先處理, 因為一行是一個 <row>, 接起來就看不出每一行的位置了
+#<F> => <table cols="5"><row>
+#每一行前後要加 <row>
+#<c> => <cell></cell>
+#<c2> => <cell cols="2">
+#<c r2> => <cell rows="2">
+sub check_table()
+{
+	local $_ = shift;
+	
+	if(/^<F>/)
+	{
+		# 要算有幾個 <c>
+		$count = 0;
+		my $tmp = $_;
+		
+		while(/<c>/)
+		{
+			s/<c>//;
+			$count++;
+		}
+		while(/<c\d+>/)
+		{
+			s/<c(\d+)>//;
+			$count += $1;
+		}
+		while(/<c r\d+>/)
+		{
+			s/<c r\d+>//;
+			$count++;
+		}
+		
+		$_ = $tmp;
+		s/^<F>(.*)/<table cols="$count"><row>\1<\/cell><\/row>/;
+	}
+	
+	if(/^<c[ r]?\d*>/)
+	{
+		$_ = "<row>" . $_ . "<\/cell><\/row>";
+	}
+	
+	s/<c>/<\/cell><cell>/g;
+	s/<c(\d+)>/<\/cell><cell cols="\1">/g;
+	s/<c r(\d+)>/<\/cell><cell rows="\1">/g;
+	s/<\/F><\/cell><\/row>/<\/cell><\/row><\/table>/;
+	
+	s/<row><\/cell>/<row>/;
 	
 	return $_;
 }
