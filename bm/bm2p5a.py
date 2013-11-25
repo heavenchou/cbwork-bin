@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2013/11/25 處理 <I> 標記
 2013/11/15 新增 <h1> (<hx>) 的處理, 類似 <Q1> 但只有 mulu 及 head , 沒有 div 
 2013/11/06 處理 <p,3,-2> 這類標記也支援負數
 2013/11/01 處理 <J> 標記
@@ -410,7 +411,7 @@ def inline_tag(tag):
 		out('<quote source="CBETA.{}">'.format(mo.group(1)))
 	elif tag == '</quote>':
 		out('</quote>')
-	elif re.match(r'<I\d+>', tag):
+	elif re.match(r'<I\d?>', tag):
 		start_i(tag)
 	elif re.match(r'<PTS.', tag):
 		start_PTS(tag)
