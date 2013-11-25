@@ -1172,7 +1172,7 @@ def trans_file(fn1, fn2):
 				new += c
 			except:
 				new += u8tob5(c)
-				
+					
 		f2.write(new)
 	f1.close()
 	f2.close()
