@@ -3,6 +3,7 @@
 2013.1.4 周邦信 改寫自 cbp4top5.py
 
 Heaven 修改:
+2014/02/09 unclear 標記並非單獨標記, 在百品是有頭尾的, 因此由 EMPTY 中移除.
 2013/10/30 處理南傳校勘的 note 星號, 因為過去的星號都在 app 中, 南傳則有在 note 中的星號.
 2013/09/29 在 back 區, 只有校勘 note 中的 <p> 要處理, 其他如 app 內不能有 <p> , 所以再度改程式
 2013/09/23 校勘 note 中的 <p> 也要處理, 這是因為遇到了 N27 p217 的 0217001 校勘有 <p> 標記 
@@ -27,7 +28,7 @@ import zbxxml, siddam, ranjana
 
 time_format='%Y.%m.%d %H:%M'
 
-EMPTY=['anchor', 'lb', 'milestone', 'mulu', 'pb', 'space', 'unclear']
+EMPTY=['anchor', 'lb', 'milestone', 'mulu', 'pb', 'space']
 
 WITS = {
 	'A' : '【金藏】',
