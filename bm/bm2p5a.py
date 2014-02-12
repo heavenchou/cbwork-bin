@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2014/02/12 行中段落由 <p cb:type="inline"> 改成 <p rend="inline"> 或 <p rend="margin-left:xem;text-indent:xem;inline">
 2013/12/31 處理 <T,-x> 沒有處理負數的問題. 
 2013/11/25 處理 <I> 標記
 2013/11/15 新增 <h1> (<hx>) 的處理, 類似 <Q1> 但只有 mulu 及 head , 沒有 div 
@@ -191,17 +192,25 @@ def start_inline_p(tag):
 	close_head()
 	closeTags('l', 'lg')
 	s = '<p xml:id="p%sp%s%s%02d"' % (vol, old_pb, line_num, char_count)
-	if char_count>1: s += ' cb:type="inline"'
 	
 	# 處理 <p,1,2> 這種格式
 	mo = re.search(r'<p,(\-?\d+),(\-?\d+)>', tag)
 	if mo!=None:
-		s += ' rend="margin-left:%sem;text-indent:%sem"' % mo.groups()
+		s += ' rend="margin-left:%sem;text-indent:%sem' % mo.groups()
+		if char_count>1: s += ';inline'		# 若是行中段落, 則加上 inline
+		s += '"'
 	
 	# 處理 <p,1> 這種格式
 	mo = re.search(r'<p,(\-?\d+)>', tag)
 	if mo!=None:
-		s += ' rend="margin-left:%sem"' % mo.group(1)
+		s += ' rend="margin-left:%sem' % mo.group(1)
+		if char_count>1: s += ';inline'		# 若是行中段落, 則加上 inline
+		s += '"'
+	
+	# 若都沒有 <p,1 這種格式, 又是在行中, 則用 rend="inline"
+	mo = re.search(r'<p,(\-?\d+)', tag)
+	if mo==None:
+		if char_count>1: s += ' rend="inline"'
 	
 	# 處理 <p=h1> 這種格式	- 2013/09/11
 	mo = re.search(r'<p=h(\d+)>', tag)
