@@ -347,6 +347,10 @@ class MyTransformer():
 				node.attrib['resp'] = globals['collection-resp']
 				node.attrib['wit'] = resp2wit(e.get('resp'))
 				node.attrib['type'] = 'variantRemark'
+			if wit=='【Ａ】':
+				node.attrib['type'] = 'variantRemark'
+			if wit=='【Ｂ】':
+				node.attrib['type'] = 'variantRemark'
 			if 'cf1' in node.attrib: 
 				del node.attrib['cf1']
 			if 'cf2' in node.attrib: 
