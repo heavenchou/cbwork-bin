@@ -9,6 +9,7 @@
 2013.1.3 周邦信 改寫自 cbp4top5.py
 
 Heaven 修改:
+2014/03/02 unicode 1.0 的通用詞取消, 直接使用 unicode , 不再使用 <choice> 標記
 2014/02/18 【Ａ】【Ｂ】校異自動加上 type="variantRemark"
 2013/10/07 處理百品的 <unclear>..</unclear> 標記, 不可與 <unclear/> 標記混用.
 2013/08/14 1.所有星號一律使用 <app> 標記, 不要用 <choice>
@@ -1008,7 +1009,11 @@ def createTongYongCiTable():
 			if ent.startswith('CI'):
 				cx = row['cx']
 				s = tongYongCiToUnicode(cx)
-				r[ent] = '<choice><orig>{}</orig><reg type="通用詞">{}</reg></choice>'.format(s, row['nor'])
+				if row['uni_flag'] == '0':
+					r[ent] = '<choice><orig>{}</orig><reg type="通用詞">{}</reg></choice>'.format(s, row['nor'])
+				else:
+					# 有 unicode 的通用字就直接用 unicode 了
+					r[ent] = s
 	return r
 
 ####################################################################

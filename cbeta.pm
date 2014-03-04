@@ -27,10 +27,10 @@ $data = $gaiji->cb2des("00001");
 
 $gaiji->cb2des();			# 由 cb 碼找組字式.                 ex. $gaiji->cb2des("00001") => [肄-聿+欠]
 $gaiji->cb2nor();			# 由 cb 碼找通用字 , 沒有則傳回 "". ex. $gaiji->cb2nor("00001") => 款
-$gaiji->cb2uni();			# 由 cb 碼找 unicode , 沒有則傳回 "". ex. $gaiji->cb2des("00001") => 6B35
-$gaiji->cb2uniword();		# 由 cb 碼找 uni word , 沒有則傳回 "". ex. $gaiji->cb2des("00001") => 欵
-$gaiji->cb2noruni();		# 由 cb 碼找 nor unicode , 沒有則傳回 "". ex. $gaiji->cb2des("00009") => 21EB2
-$gaiji->cb2noruniword();	# 由 cb 碼找 nor uni word , 沒有則傳回 "". ex. $gaiji->cb2des("00009") => 𡺲
+$gaiji->cb2uni();			# 由 cb 碼找 unicode , 沒有則傳回 "". ex. $gaiji->cb2uni("00001") => 6B35
+$gaiji->cb2uniword();		# 由 cb 碼找 uni word , 沒有則傳回 "". ex. $gaiji->cb2uniword("00001") => 欵
+$gaiji->cb2noruni();		# 由 cb 碼找 nor unicode , 沒有則傳回 "". ex. $gaiji->cb2noruni("00009") => 21EB2
+$gaiji->cb2noruniword();	# 由 cb 碼找 nor uni word , 沒有則傳回 "". ex. $gaiji->cb2noruniword("00009") => 𡺲
 $gaiji->des2cb();			# 由組字式找 cb 碼.                        ex. $gaiji->des2cb("[肄-聿+欠]") => "00001"
 $gaiji->uni2cb();			# 由 unicode 找 cb 碼.                     ex. $gaiji->uni2cb("6B35") => "00001"
 
