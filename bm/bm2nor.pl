@@ -12,10 +12,11 @@
 #
 # 設定檔：相關設定由 ../cbwork_bin.ini 取得
 #
-# Copyright (C) 1998-2013 CBETA
-# Copyright (C) 1999-2013 Heaven Chou
+# Copyright (C) 1998-2014 CBETA
+# Copyright (C) 1999-2014 Heaven Chou
 ########################################################################
-# 2013/??/?? V9.0  使用 cbeta.pm 模組中的缺字物件
+# 2014/03/06 V9.1  修改在 normal1 模式(一經一檔)時嘉興藏經名錯誤的問題
+# 2013/11/25 V9.0  使用 cbeta.pm 模組中的缺字物件
 # 2013/11/06 V8.9  處理 2013/08/26 修改後造成 source.txt 中空白的來源代碼產生的錯誤
 # 2013/10/10 V8.8  處理百品的 [A||B] 標記, 只呈現 B.
 # 2013/10/07 V8.7  處理百品的 <k><k1><f><f1> 標記, 也就是忽略它.
@@ -1601,10 +1602,11 @@ sub getfilename()
 			#substr($tmp,2,1) = $other;
 		#	$tmp .= $other;
 		#}
-		$content[0] =~ /^\D+(\d+n\d{4}[a-zA-Z]?)/;
+		$content[0] =~ /^\D+(\d+n[AB]?\d{3,4})([a-zA-Z]?)/;
 		my $tmp = $1;
+		my $tmp2 = $2;
 		
-		$tmp = substr($T_vol,0,1) . lc($tmp) . ".txt";
+		$tmp = substr($T_vol,0,1) . $tmp . lc($tmp2) . ".txt";
 		return $tmp;
 	}
 }
