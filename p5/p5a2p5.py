@@ -3,6 +3,7 @@
 2013.1.4 周邦信 改寫自 cbp4top5.py
 
 Heaven 修改:
+2014/03/08 增加 Unicode 區段 U+2E80 ~ U+2EF3 為 unicode 3.0 版
 2014/02/09 unclear 標記並非單獨標記, 在百品是有頭尾的, 因此由 EMPTY 中移除.
 2013/10/30 處理南傳校勘的 note 星號, 因為過去的星號都在 app 中, 南傳則有在 note 中的星號.
 2013/09/29 在 back 區, 只有校勘 note 中的 <p> 要處理, 其他如 app 內不能有 <p> , 所以再度改程式
@@ -260,8 +261,8 @@ class MyTransformer():
 		# unicode 1.0 以外的字就使用 <g> 標記
 		for c in text:
 			code = ord(c)
-			# Ext-A: U+3400–U+4DFF, 屬於 Unicode 3.0
-			if code>0xffff or (code>=0x3400 and code<=0x4DFF):
+			# Ext-A: U+3400~U+4DFF, U+2E80 ~ U+2EF3 屬於 Unicode 3.0
+			if code>0xffff or (code>=0x3400 and code<=0x4DFF) or (code>=0x2E80 and code<=0x2EF3):
 				hex = '{:X}'.format(code)
 				cb = unicode2cb[hex]
 				r += '<g ref="#{}">{}</g>'.format(cb, c)
