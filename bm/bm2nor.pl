@@ -15,6 +15,7 @@
 # Copyright (C) 1998-2014 CBETA
 # Copyright (C) 1999-2014 Heaven Chou
 ########################################################################
+# 2014/03/09 V9.2  處理部份經文在 "一經一檔" 的模式下不用改檔名的問題
 # 2014/03/06 V9.1  修改在 normal1 模式(一經一檔)時嘉興藏經名錯誤的問題
 # 2013/11/25 V9.0  使用 cbeta.pm 模組中的缺字物件
 # 2013/11/06 V8.9  處理 2013/08/26 修改後造成 source.txt 中空白的來源代碼產生的錯誤
@@ -825,178 +826,180 @@ while($line=shift(@all_sutra))	# 取得每一行資料
 }
 makefile();
 
-############################################
-# 改一些 85 冊的檔名 (因為開始不是由卷一開始
-############################################
-
-if($T_vol eq "T54")
+if ($format eq "NORMAL" or $format eq "APP")		# 一卷一檔才需要底下的作法
 {
-	rename("$outdir$format/$T_vol/T2139_002.txt","$outdir$format/$T_vol/T2139_010.txt");
+	############################################
+	# 改一些 85 冊的檔名 (因為開始不是由卷一開始
+	############################################
+	
+	if($T_vol eq "T54")
+	{
+		rename("$outdir$format/$T_vol/T2139_002.txt","$outdir$format/$T_vol/T2139_010.txt");
+	}
+	if($T_vol eq "T85")
+	{
+		rename("$outdir$format/$T_vol/T2742_001.txt","$outdir$format/$T_vol/T2742_002.txt");
+		rename("$outdir$format/$T_vol/T2744_001.txt","$outdir$format/$T_vol/T2744_002.txt");
+		rename("$outdir$format/$T_vol/T2748_001.txt","$outdir$format/$T_vol/T2748_003.txt");
+		rename("$outdir$format/$T_vol/T2754_001.txt","$outdir$format/$T_vol/T2754_003.txt");
+		rename("$outdir$format/$T_vol/T2757_001.txt","$outdir$format/$T_vol/T2757_003.txt");
+		rename("$outdir$format/$T_vol/T2764b001.txt","$outdir$format/$T_vol/T2764b004.txt");
+		rename("$outdir$format/$T_vol/T2769_001.txt","$outdir$format/$T_vol/T2769_004.txt");
+		rename("$outdir$format/$T_vol/T2772_001.txt","$outdir$format/$T_vol/T2772_003.txt");
+		rename("$outdir$format/$T_vol/T2772_002.txt","$outdir$format/$T_vol/T2772_006.txt");
+		rename("$outdir$format/$T_vol/T2799_002.txt","$outdir$format/$T_vol/T2799_003.txt");
+		rename("$outdir$format/$T_vol/T2803_001.txt","$outdir$format/$T_vol/T2803_004.txt");
+		rename("$outdir$format/$T_vol/T2805_001.txt","$outdir$format/$T_vol/T2805_005.txt");
+		rename("$outdir$format/$T_vol/T2805_002.txt","$outdir$format/$T_vol/T2805_007.txt");
+		rename("$outdir$format/$T_vol/T2809_001.txt","$outdir$format/$T_vol/T2809_004.txt");
+		rename("$outdir$format/$T_vol/T2814_003.txt","$outdir$format/$T_vol/T2814_005.txt");
+		rename("$outdir$format/$T_vol/T2814_002.txt","$outdir$format/$T_vol/T2814_004.txt");
+		rename("$outdir$format/$T_vol/T2814_001.txt","$outdir$format/$T_vol/T2814_003.txt");
+		rename("$outdir$format/$T_vol/T2820_001.txt","$outdir$format/$T_vol/T2820_012.txt");
+		rename("$outdir$format/$T_vol/T2825_002.txt","$outdir$format/$T_vol/T2825_003.txt");
+		rename("$outdir$format/$T_vol/T2827_002.txt","$outdir$format/$T_vol/T2827_003.txt");
+		rename("$outdir$format/$T_vol/T2827_001.txt","$outdir$format/$T_vol/T2827_002.txt");
+		rename("$outdir$format/$T_vol/T2880_003.txt","$outdir$format/$T_vol/T2880_004.txt");
+		rename("$outdir$format/$T_vol/T2880_002.txt","$outdir$format/$T_vol/T2880_003.txt");
+		rename("$outdir$format/$T_vol/T2880_001.txt","$outdir$format/$T_vol/T2880_002.txt");
+	}
+	if($T_vol eq "X03")
+	{
+		rename("$outdir$format/$T_vol/X0208_001.txt","$outdir$format/$T_vol/X0208_010.txt");
+		rename("$outdir$format/$T_vol/X0211_001.txt","$outdir$format/$T_vol/X0211_006.txt");
+	}
+	if($T_vol eq "X17")
+	{
+		# X17n0321.xml 由卷 1,2,5 不是 1~3 (沒有 3,4)
+		rename("$outdir$format/$T_vol/X0321_003.txt","$outdir$format/$T_vol/X0321_005.txt");
+	}
+	if($T_vol eq "X19")
+	{
+		# X19n0345.xml 由卷 4,5 不是 1~2 (沒有 1~3)
+		rename("$outdir$format/$T_vol/X0345_001.txt","$outdir$format/$T_vol/X0345_004.txt");
+		rename("$outdir$format/$T_vol/X0345_002.txt","$outdir$format/$T_vol/X0345_005.txt");
+	}
+	if($T_vol eq "X21")
+	{
+		# X21n0367.xml 由卷 4~8 不是 1~5 (沒有 1~3)
+		rename("$outdir$format/$T_vol/X0367_005.txt","$outdir$format/$T_vol/X0367_008.txt");
+		rename("$outdir$format/$T_vol/X0367_004.txt","$outdir$format/$T_vol/X0367_007.txt");
+		rename("$outdir$format/$T_vol/X0367_003.txt","$outdir$format/$T_vol/X0367_006.txt");
+		rename("$outdir$format/$T_vol/X0367_002.txt","$outdir$format/$T_vol/X0367_005.txt");
+		rename("$outdir$format/$T_vol/X0367_001.txt","$outdir$format/$T_vol/X0367_004.txt");
+		# X21n0368.xml 由卷 2~4 不是 1~3 (沒有 1)
+		rename("$outdir$format/$T_vol/X0368_003.txt","$outdir$format/$T_vol/X0368_004.txt");
+		rename("$outdir$format/$T_vol/X0368_002.txt","$outdir$format/$T_vol/X0368_003.txt");
+		rename("$outdir$format/$T_vol/X0368_001.txt","$outdir$format/$T_vol/X0368_002.txt");
+	}
+	if($T_vol eq "X26")
+	{
+		# X26n0560.xml 由卷 2 不是 1 (沒有 1)
+		rename("$outdir$format/$T_vol/X0560_001.txt","$outdir$format/$T_vol/X0560_002.txt");
+	}
+	if($T_vol eq "X39")
+	{
+		# X39n0705.xml 由卷 2 不是 1 (沒有 1)
+		rename("$outdir$format/$T_vol/X0705_001.txt","$outdir$format/$T_vol/X0705_002.txt");
+		# X39n0712.xml 由卷 3 不是 1 (沒有 1,2)
+		rename("$outdir$format/$T_vol/X0712_001.txt","$outdir$format/$T_vol/X0712_003.txt");
+	}
+	if($T_vol eq "X40")
+	{
+		# X40n0714.xml 由卷 3,4 不是 1,2 (沒有 1,2)
+		rename("$outdir$format/$T_vol/X0714_002.txt","$outdir$format/$T_vol/X0714_004.txt");
+		rename("$outdir$format/$T_vol/X0714_001.txt","$outdir$format/$T_vol/X0714_003.txt");
+	}
+	if($T_vol eq "X42")
+	{
+		# X42n0734.xml 由卷 9 不是 1 (沒有 1~8)
+		rename("$outdir$format/$T_vol/X0734_001.txt","$outdir$format/$T_vol/X0734_009.txt");
+	}
+	if($T_vol eq "X46")
+	{
+		# X46n0791.xml 由卷 1,6,14,15,17,21,24 不是 1~7 (沒有 ...)
+		rename("$outdir$format/$T_vol/X0791_007.txt","$outdir$format/$T_vol/X0791_024.txt");
+		rename("$outdir$format/$T_vol/X0791_006.txt","$outdir$format/$T_vol/X0791_021.txt");
+		rename("$outdir$format/$T_vol/X0791_005.txt","$outdir$format/$T_vol/X0791_017.txt");
+		rename("$outdir$format/$T_vol/X0791_004.txt","$outdir$format/$T_vol/X0791_015.txt");
+		rename("$outdir$format/$T_vol/X0791_003.txt","$outdir$format/$T_vol/X0791_014.txt");
+		rename("$outdir$format/$T_vol/X0791_002.txt","$outdir$format/$T_vol/X0791_006.txt");
+	}
+	if($T_vol eq "X48")
+	{
+		# X48n0797.xml 由卷 3 不是 1 (沒有 1,2)
+		rename("$outdir$format/$T_vol/X0797_001.txt","$outdir$format/$T_vol/X0797_003.txt");
+		# X48n0799.xml 由卷 1,2,7 不是 1~3 (沒有 3~6)
+		rename("$outdir$format/$T_vol/X0799_003.txt","$outdir$format/$T_vol/X0799_007.txt");
+		# X48n0808.xml 由卷 1,5,9,10 不是 1~4 (沒有 2,3,4,6,7,8)
+		rename("$outdir$format/$T_vol/X0808_004.txt","$outdir$format/$T_vol/X0808_010.txt");
+		rename("$outdir$format/$T_vol/X0808_003.txt","$outdir$format/$T_vol/X0808_009.txt");
+		rename("$outdir$format/$T_vol/X0808_002.txt","$outdir$format/$T_vol/X0808_005.txt");
+	}
+	if($T_vol eq "X49")
+	{
+		# X49n0812.xml 由卷 2 不是 1 (沒有 1)
+		rename("$outdir$format/$T_vol/X0812_001.txt","$outdir$format/$T_vol/X0812_002.txt");
+	}
+	if($T_vol eq "X50")
+	{
+		# X50n0817.xml 由卷 17 不是 1 (沒有 1~16)
+		rename("$outdir$format/$T_vol/X0817_001.txt","$outdir$format/$T_vol/X0817_017.txt");
+		# X50n0819.xml 由卷 1~14,16,18 不是 1~16 (沒有 15,17)
+		rename("$outdir$format/$T_vol/X0819_016.txt","$outdir$format/$T_vol/X0819_018.txt");
+		rename("$outdir$format/$T_vol/X0819_015.txt","$outdir$format/$T_vol/X0819_016.txt");
+	}
+	if($T_vol eq "X53")
+	{
+		# X53n0842.xml 由卷 29,30 不是 1,2 (沒有 1~28)
+		rename("$outdir$format/$T_vol/X0842_002.txt","$outdir$format/$T_vol/X0842_030.txt");
+		rename("$outdir$format/$T_vol/X0842_001.txt","$outdir$format/$T_vol/X0842_029.txt");
+		# X53n0843.xml 由卷 9,18 不是 1,2 (沒有 1~8,10~17)
+		rename("$outdir$format/$T_vol/X0843_002.txt","$outdir$format/$T_vol/X0843_018.txt");
+		rename("$outdir$format/$T_vol/X0843_001.txt","$outdir$format/$T_vol/X0843_009.txt");
+	}
+	if($T_vol eq "X55")
+	{
+		rename("$outdir$format/$T_vol/X0882_001.txt","$outdir$format/$T_vol/X0882_004.txt");
+		rename("$outdir$format/$T_vol/X0882_002.txt","$outdir$format/$T_vol/X0882_007.txt");
+		rename("$outdir$format/$T_vol/X0882_003.txt","$outdir$format/$T_vol/X0882_008.txt");
+	}
+	if($T_vol eq "X57")
+	{
+		rename("$outdir$format/$T_vol/X0952_001.txt","$outdir$format/$T_vol/X0952_010.txt");
+		rename("$outdir$format/$T_vol/X0966_004.txt","$outdir$format/$T_vol/X0966_005.txt");
+		rename("$outdir$format/$T_vol/X0966_003.txt","$outdir$format/$T_vol/X0966_004.txt");
+		rename("$outdir$format/$T_vol/X0966_002.txt","$outdir$format/$T_vol/X0966_003.txt");
+		rename("$outdir$format/$T_vol/X0966_001.txt","$outdir$format/$T_vol/X0966_002.txt");
+		rename("$outdir$format/$T_vol/X0967_001.txt","$outdir$format/$T_vol/X0967_003.txt");
+		rename("$outdir$format/$T_vol/X0967_002.txt","$outdir$format/$T_vol/X0967_004.txt");
+	}
+	if($T_vol eq "X58")
+	{
+		rename("$outdir$format/$T_vol/X1015_001.txt","$outdir$format/$T_vol/X1015_014.txt");
+		rename("$outdir$format/$T_vol/X1015_002.txt","$outdir$format/$T_vol/X1015_022.txt");
+	}
+	if($T_vol eq "J25")
+	{
+		rename("$outdir$format/$T_vol/JB165_001.txt","$outdir$format/$T_vol/JB165_006.txt");
+		rename("$outdir$format/$T_vol/JB166_001.txt","$outdir$format/$T_vol/JB166_007.txt");
+		rename("$outdir$format/$T_vol/JB167_001.txt","$outdir$format/$T_vol/JB167_008.txt");
+	}
+	if($T_vol eq "W01")
+	{
+		rename("$outdir$format/$T_vol/W0007_001.txt","$outdir$format/$T_vol/W0007_003.txt");
+	}
+	if($T_vol eq "W03")
+	{
+		rename("$outdir$format/$T_vol/W0025_001.txt","$outdir$format/$T_vol/W0025_002.txt");
+		rename("$outdir$format/$T_vol/W0030_001.txt","$outdir$format/$T_vol/W0030_014.txt");
+	}
+	if($T_vol eq "P181")
+	{
+		#為第 P181 1612 經由第51卷開始
+		rename("$outdir$format/$T_vol/P1612_001.txt","$outdir$format/$T_vol/P1612_051.txt");
+	}
 }
-if($T_vol eq "T85")
-{
-	rename("$outdir$format/$T_vol/T2742_001.txt","$outdir$format/$T_vol/T2742_002.txt");
-	rename("$outdir$format/$T_vol/T2744_001.txt","$outdir$format/$T_vol/T2744_002.txt");
-	rename("$outdir$format/$T_vol/T2748_001.txt","$outdir$format/$T_vol/T2748_003.txt");
-	rename("$outdir$format/$T_vol/T2754_001.txt","$outdir$format/$T_vol/T2754_003.txt");
-	rename("$outdir$format/$T_vol/T2757_001.txt","$outdir$format/$T_vol/T2757_003.txt");
-	rename("$outdir$format/$T_vol/T2764b001.txt","$outdir$format/$T_vol/T2764b004.txt");
-	rename("$outdir$format/$T_vol/T2769_001.txt","$outdir$format/$T_vol/T2769_004.txt");
-	rename("$outdir$format/$T_vol/T2772_001.txt","$outdir$format/$T_vol/T2772_003.txt");
-	rename("$outdir$format/$T_vol/T2772_002.txt","$outdir$format/$T_vol/T2772_006.txt");
-	rename("$outdir$format/$T_vol/T2799_002.txt","$outdir$format/$T_vol/T2799_003.txt");
-	rename("$outdir$format/$T_vol/T2803_001.txt","$outdir$format/$T_vol/T2803_004.txt");
-	rename("$outdir$format/$T_vol/T2805_001.txt","$outdir$format/$T_vol/T2805_005.txt");
-	rename("$outdir$format/$T_vol/T2805_002.txt","$outdir$format/$T_vol/T2805_007.txt");
-	rename("$outdir$format/$T_vol/T2809_001.txt","$outdir$format/$T_vol/T2809_004.txt");
-	rename("$outdir$format/$T_vol/T2814_003.txt","$outdir$format/$T_vol/T2814_005.txt");
-	rename("$outdir$format/$T_vol/T2814_002.txt","$outdir$format/$T_vol/T2814_004.txt");
-	rename("$outdir$format/$T_vol/T2814_001.txt","$outdir$format/$T_vol/T2814_003.txt");
-	rename("$outdir$format/$T_vol/T2820_001.txt","$outdir$format/$T_vol/T2820_012.txt");
-	rename("$outdir$format/$T_vol/T2825_002.txt","$outdir$format/$T_vol/T2825_003.txt");
-	rename("$outdir$format/$T_vol/T2827_002.txt","$outdir$format/$T_vol/T2827_003.txt");
-	rename("$outdir$format/$T_vol/T2827_001.txt","$outdir$format/$T_vol/T2827_002.txt");
-	rename("$outdir$format/$T_vol/T2880_003.txt","$outdir$format/$T_vol/T2880_004.txt");
-	rename("$outdir$format/$T_vol/T2880_002.txt","$outdir$format/$T_vol/T2880_003.txt");
-	rename("$outdir$format/$T_vol/T2880_001.txt","$outdir$format/$T_vol/T2880_002.txt");
-}
-if($T_vol eq "X03")
-{
-	rename("$outdir$format/$T_vol/X0208_001.txt","$outdir$format/$T_vol/X0208_010.txt");
-	rename("$outdir$format/$T_vol/X0211_001.txt","$outdir$format/$T_vol/X0211_006.txt");
-}
-if($T_vol eq "X17")
-{
-	# X17n0321.xml 由卷 1,2,5 不是 1~3 (沒有 3,4)
-	rename("$outdir$format/$T_vol/X0321_003.txt","$outdir$format/$T_vol/X0321_005.txt");
-}
-if($T_vol eq "X19")
-{
-	# X19n0345.xml 由卷 4,5 不是 1~2 (沒有 1~3)
-	rename("$outdir$format/$T_vol/X0345_001.txt","$outdir$format/$T_vol/X0345_004.txt");
-	rename("$outdir$format/$T_vol/X0345_002.txt","$outdir$format/$T_vol/X0345_005.txt");
-}
-if($T_vol eq "X21")
-{
-	# X21n0367.xml 由卷 4~8 不是 1~5 (沒有 1~3)
-	rename("$outdir$format/$T_vol/X0367_005.txt","$outdir$format/$T_vol/X0367_008.txt");
-	rename("$outdir$format/$T_vol/X0367_004.txt","$outdir$format/$T_vol/X0367_007.txt");
-	rename("$outdir$format/$T_vol/X0367_003.txt","$outdir$format/$T_vol/X0367_006.txt");
-	rename("$outdir$format/$T_vol/X0367_002.txt","$outdir$format/$T_vol/X0367_005.txt");
-	rename("$outdir$format/$T_vol/X0367_001.txt","$outdir$format/$T_vol/X0367_004.txt");
-	# X21n0368.xml 由卷 2~4 不是 1~3 (沒有 1)
-	rename("$outdir$format/$T_vol/X0368_003.txt","$outdir$format/$T_vol/X0368_004.txt");
-	rename("$outdir$format/$T_vol/X0368_002.txt","$outdir$format/$T_vol/X0368_003.txt");
-	rename("$outdir$format/$T_vol/X0368_001.txt","$outdir$format/$T_vol/X0368_002.txt");
-}
-if($T_vol eq "X26")
-{
-	# X26n0560.xml 由卷 2 不是 1 (沒有 1)
-	rename("$outdir$format/$T_vol/X0560_001.txt","$outdir$format/$T_vol/X0560_002.txt");
-}
-if($T_vol eq "X39")
-{
-	# X39n0705.xml 由卷 2 不是 1 (沒有 1)
-	rename("$outdir$format/$T_vol/X0705_001.txt","$outdir$format/$T_vol/X0705_002.txt");
-	# X39n0712.xml 由卷 3 不是 1 (沒有 1,2)
-	rename("$outdir$format/$T_vol/X0712_001.txt","$outdir$format/$T_vol/X0712_003.txt");
-}
-if($T_vol eq "X40")
-{
-	# X40n0714.xml 由卷 3,4 不是 1,2 (沒有 1,2)
-	rename("$outdir$format/$T_vol/X0714_002.txt","$outdir$format/$T_vol/X0714_004.txt");
-	rename("$outdir$format/$T_vol/X0714_001.txt","$outdir$format/$T_vol/X0714_003.txt");
-}
-if($T_vol eq "X42")
-{
-	# X42n0734.xml 由卷 9 不是 1 (沒有 1~8)
-	rename("$outdir$format/$T_vol/X0734_001.txt","$outdir$format/$T_vol/X0734_009.txt");
-}
-if($T_vol eq "X46")
-{
-	# X46n0791.xml 由卷 1,6,14,15,17,21,24 不是 1~7 (沒有 ...)
-	rename("$outdir$format/$T_vol/X0791_007.txt","$outdir$format/$T_vol/X0791_024.txt");
-	rename("$outdir$format/$T_vol/X0791_006.txt","$outdir$format/$T_vol/X0791_021.txt");
-	rename("$outdir$format/$T_vol/X0791_005.txt","$outdir$format/$T_vol/X0791_017.txt");
-	rename("$outdir$format/$T_vol/X0791_004.txt","$outdir$format/$T_vol/X0791_015.txt");
-	rename("$outdir$format/$T_vol/X0791_003.txt","$outdir$format/$T_vol/X0791_014.txt");
-	rename("$outdir$format/$T_vol/X0791_002.txt","$outdir$format/$T_vol/X0791_006.txt");
-}
-if($T_vol eq "X48")
-{
-	# X48n0797.xml 由卷 3 不是 1 (沒有 1,2)
-	rename("$outdir$format/$T_vol/X0797_001.txt","$outdir$format/$T_vol/X0797_003.txt");
-	# X48n0799.xml 由卷 1,2,7 不是 1~3 (沒有 3~6)
-	rename("$outdir$format/$T_vol/X0799_003.txt","$outdir$format/$T_vol/X0799_007.txt");
-	# X48n0808.xml 由卷 1,5,9,10 不是 1~4 (沒有 2,3,4,6,7,8)
-	rename("$outdir$format/$T_vol/X0808_004.txt","$outdir$format/$T_vol/X0808_010.txt");
-	rename("$outdir$format/$T_vol/X0808_003.txt","$outdir$format/$T_vol/X0808_009.txt");
-	rename("$outdir$format/$T_vol/X0808_002.txt","$outdir$format/$T_vol/X0808_005.txt");
-}
-if($T_vol eq "X49")
-{
-	# X49n0812.xml 由卷 2 不是 1 (沒有 1)
-	rename("$outdir$format/$T_vol/X0812_001.txt","$outdir$format/$T_vol/X0812_002.txt");
-}
-if($T_vol eq "X50")
-{
-	# X50n0817.xml 由卷 17 不是 1 (沒有 1~16)
-	rename("$outdir$format/$T_vol/X0817_001.txt","$outdir$format/$T_vol/X0817_017.txt");
-	# X50n0819.xml 由卷 1~14,16,18 不是 1~16 (沒有 15,17)
-	rename("$outdir$format/$T_vol/X0819_016.txt","$outdir$format/$T_vol/X0819_018.txt");
-	rename("$outdir$format/$T_vol/X0819_015.txt","$outdir$format/$T_vol/X0819_016.txt");
-}
-if($T_vol eq "X53")
-{
-	# X53n0842.xml 由卷 29,30 不是 1,2 (沒有 1~28)
-	rename("$outdir$format/$T_vol/X0842_002.txt","$outdir$format/$T_vol/X0842_030.txt");
-	rename("$outdir$format/$T_vol/X0842_001.txt","$outdir$format/$T_vol/X0842_029.txt");
-	# X53n0843.xml 由卷 9,18 不是 1,2 (沒有 1~8,10~17)
-	rename("$outdir$format/$T_vol/X0843_002.txt","$outdir$format/$T_vol/X0843_018.txt");
-	rename("$outdir$format/$T_vol/X0843_001.txt","$outdir$format/$T_vol/X0843_009.txt");
-}
-if($T_vol eq "X55")
-{
-	rename("$outdir$format/$T_vol/X0882_001.txt","$outdir$format/$T_vol/X0882_004.txt");
-	rename("$outdir$format/$T_vol/X0882_002.txt","$outdir$format/$T_vol/X0882_007.txt");
-	rename("$outdir$format/$T_vol/X0882_003.txt","$outdir$format/$T_vol/X0882_008.txt");
-}
-if($T_vol eq "X57")
-{
-	rename("$outdir$format/$T_vol/X0952_001.txt","$outdir$format/$T_vol/X0952_010.txt");
-	rename("$outdir$format/$T_vol/X0966_004.txt","$outdir$format/$T_vol/X0966_005.txt");
-	rename("$outdir$format/$T_vol/X0966_003.txt","$outdir$format/$T_vol/X0966_004.txt");
-	rename("$outdir$format/$T_vol/X0966_002.txt","$outdir$format/$T_vol/X0966_003.txt");
-	rename("$outdir$format/$T_vol/X0966_001.txt","$outdir$format/$T_vol/X0966_002.txt");
-	rename("$outdir$format/$T_vol/X0967_001.txt","$outdir$format/$T_vol/X0967_003.txt");
-	rename("$outdir$format/$T_vol/X0967_002.txt","$outdir$format/$T_vol/X0967_004.txt");
-}
-if($T_vol eq "X58")
-{
-	rename("$outdir$format/$T_vol/X1015_001.txt","$outdir$format/$T_vol/X1015_014.txt");
-	rename("$outdir$format/$T_vol/X1015_002.txt","$outdir$format/$T_vol/X1015_022.txt");
-}
-if($T_vol eq "J25")
-{
-	rename("$outdir$format/$T_vol/JB165_001.txt","$outdir$format/$T_vol/JB165_006.txt");
-	rename("$outdir$format/$T_vol/JB166_001.txt","$outdir$format/$T_vol/JB166_007.txt");
-	rename("$outdir$format/$T_vol/JB167_001.txt","$outdir$format/$T_vol/JB167_008.txt");
-}
-if($T_vol eq "W01")
-{
-	rename("$outdir$format/$T_vol/W0007_001.txt","$outdir$format/$T_vol/W0007_003.txt");
-}
-if($T_vol eq "W03")
-{
-	rename("$outdir$format/$T_vol/W0025_001.txt","$outdir$format/$T_vol/W0025_002.txt");
-	rename("$outdir$format/$T_vol/W0030_001.txt","$outdir$format/$T_vol/W0030_014.txt");
-}
-if($T_vol eq "P181")
-{
-	#為第 P181 1612 經由第51卷開始
-	rename("$outdir$format/$T_vol/P1612_001.txt","$outdir$format/$T_vol/P1612_051.txt");
-}
-
 close ERR;
 print " ... ok\n";
 exit;
