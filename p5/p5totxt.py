@@ -7,6 +7,7 @@
 Ray CHOU 周邦信 2011.6.11
 
 Heaven 修改:
+2014/03/09 把呈現的校勘[1-1]改成[01]
 2013/10/11 處理百品的 <unclear ...>...</unclear> 標記
 2013/10/03 處理大般若經相關的經名問題, 也就是去除 0220 之後的英文字母
 2013/10/03 處理 T42n1828.xml 的 <ref>
@@ -102,7 +103,9 @@ def getJKMark(e):
 	if id.startswith('fx'): return '[＊]'
 	if id.startswith('end'): return ''
 	if not id.startswith('nkr_note_orig'): return ''	# 例 T01n0026.xml => <lb n="0574a12" ed="T"/>眠、調<anchor xml:id="nkr_3f0"/>
-	jk = id[-3:]
+	jk = id
+	jk = re.sub("\-\d{1,3}$", r"", jk)
+	jk = jk[-3:]
 	jk = re.sub("0(\d\d)", r"\g<1>", jk)		# 如果有三個數字且<100 , 第一個 0 移除
 	
 	# 處理 kbj => 【科】 【標】 【解】
