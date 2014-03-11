@@ -88,7 +88,7 @@ if($inputFile eq "" and $vol =~ /^(([TXJHWIABCFGKLMNPQSU]|(ZS)|(ZW))\d*)n.*?\.xm
 
 $vol = uc($vol);	# T01
 my $edit = $vol;
-$edit =~ s/[AB]?\d+//;	# T
+$edit =~ s/\d+//;	# T
 
 unless($vol)
 {
@@ -478,8 +478,16 @@ sub start_handler
 				#$attrValue =~ s/($pattern)/$utf8out{$1}/g;
 				$attrs .= " $attrName=\"$attrValue\"";
 			}
-	
-			$start_tag[$milestoneNum] = "${attrs}>" . $start_tag[$milestoneNum];
+			
+			$attrs .= ">";
+			
+			# 百品第一卷前面都會有 <cb:div>, 這是在 <milestone> 之前 , 但會直接放入卷裡面.
+			# 不過在分析每一卷前面有多少標記時, 它會被分析到, 因此要移除, 以免出現連續二個 <cb:div>
+			if($edit eq "I" && $milestoneNum == 1 && $attrs eq "<cb:div>")
+			{
+				$attrs = "";
+			}
+			$start_tag[$milestoneNum] = $attrs . $start_tag[$milestoneNum];
 			$end_tag[$milestoneNum-1] .= "</${pnName}>";
 			$parentnode = $parentnode->getParentNode();
 		}
@@ -716,6 +724,16 @@ sub get_backs
 			{
 				$back .= $1;
 			}
+			# </back></text>
+			elsif(/^(<\/back><\/text>\n?)/)
+			{
+				$back .= $1;
+			}
+			# </TEI>
+			elsif(/^(<\/TEI>\n?)/)
+			{
+				$back .= $1;
+			}
 			# <note target="#beg0434012"><foreign n="0434012" cb:resp="#resp1" xml:lang="pi" cb:place="foot">Nigaṇṭhasāvaka.</foreign></note>
 			elsif(/^(<note .*?target="#(beg.*?)".*?<\/note>\n)/)
 			{
@@ -723,6 +741,11 @@ sub get_backs
 				{
 					$back .= $1;
 				}
+			}
+			# 空白行
+			elsif(/^(\s*)$/)
+			{
+				# pass
 			}
 			else
 			{
