@@ -7,6 +7,7 @@
 Ray CHOU 周邦信 2011.6.11
 
 Heaven 修改:
+2014/03/12 處理一卷一檔且不呈現檔頭的 bug
 2014/03/12 把 XML P5 的來源加入設定檔中
 2014/03/09 把呈現的校勘[1-1]改成[01]
 2013/10/11 處理百品的 <unclear ...>...</unclear> 標記
@@ -269,7 +270,9 @@ def splitByJuan(source, folder_out):
 	s=os.path.join(folder_out, s)
 	fn_template=Template(s)		# 檔名的模版
 	
-	header=shortFileHeader()	# 第二卷之後的卷首
+	header = ''
+	if options.fileHeader:		# 是否要印出卷首資訊
+		header=shortFileHeader()	# 第二卷之後的卷首
 	
 	juan_pre = ''		# 上一卷的卷數
 	juan_txt = ''		# 記錄每一卷的內文
