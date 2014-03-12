@@ -606,19 +606,25 @@ sub make_xml_back()
 			}
 		}
 	}
-	
+		
 	# 3. 把 <app>....</app> 分散在多行的, 合併在一筆陣列資料中.
 	for(my $i=0; $i<=$#xml_back_line; $i++)
 	{
 		if($xml_back_line[$i] =~ /^<app[ >]/)
 		{
-			if($xml_back_line[$i] !~ /<\/app>/)
+			$_ = $xml_back_line[$i];
+			my $app_head_num = app_head_num($_);	# <app 的數量
+			my $app_tail_num = app_tail_num($_);	# </app> 的數量
+			if($app_head_num != $app_tail_num)
 			{
 				# 有 <app 開頭, 沒有 </app> 結尾
 				for($j=$i+1; $j<=$#xml_back_line; $j++)
 				{
 					$xml_back_line[$i] .= $xml_back_line[$j];
-					if($xml_back_line[$j] =~ /<\/app>/)
+					$_ = $xml_back_line[$i];
+					$app_head_num = app_head_num($_);	# <app 的數量
+					$app_tail_num = app_tail_num($_);	# </app> 的數量					
+					if($app_head_num == $app_tail_num)
 					{
 						$xml_back_line[$j] = "";
 						last;
@@ -631,6 +637,33 @@ sub make_xml_back()
 			}
 		}
 	}
+}
+
+# 傳回某一行 <app> 及 <app 的數量
+sub app_head_num
+{
+	local $_ = shift;
+	my $num = 0;
+	while(/<app>/g)
+	{
+		$num++;
+	}
+	while(/<app\s/g)
+	{
+		$num++;
+	}
+	return $num;
+}
+# 傳回某一行 </app> 的數量
+sub app_tail_num
+{
+	local $_ = shift;
+	my $num = 0;
+	while(/<\/app>/g)
+	{
+		$num++;
+	}
+	return $num;
 }
 	
 ##############################################################################################
