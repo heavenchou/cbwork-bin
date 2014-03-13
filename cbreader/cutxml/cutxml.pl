@@ -300,8 +300,8 @@ sub cut_head_to_3blocks
 {
 	if(index($xml_head, "<charDecl>" , 0) >= 0)
 	{
-		# 有缺字
-		$xml_head =~ /^(.*<charDecl>\n)(.*)(<\/charDecl>.*)/s;
+		# 有缺字 , 先不放 <charDecl> , 以免該卷沒有缺字時, 還要再刪除.
+		$xml_head =~ /^(.*?)<charDecl>\n?(.*?)<\/charDecl>\n?(.*)/s;
 		$xml_head1 = $1;
 		$xml_gaiji = $2;
 		$xml_head2 = $3;
@@ -808,6 +808,11 @@ sub make_gaiji
 				{
 					$xml_gaiji[$i] .= $xml_gaiji{$key};
 				}
+			}
+			# 若該卷有缺字, 則要加上 <charDecl> 標記
+			if($xml_gaiji[$i])
+			{
+				$xml_gaiji[$i] = "<charDecl>\n". $xml_gaiji[$i] . "</charDecl>\n";
 			}
 		}
 	}
