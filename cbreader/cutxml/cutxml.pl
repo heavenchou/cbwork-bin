@@ -692,7 +692,7 @@ sub get_backs
 			# 校勘內容
 			# <app from="#beg0001007" to="#end0001007"><lem wit="#wit1">析</lem><rdg resp="#resp1" wit="#wit2">斤</rdg></app>
 			# <app from="#beg_1" to="#end_1" corresp="#0001004"><lem wit="#wit1">辨</lem><rdg resp="#resp1" wit="#wit2">辯</rdg></app>
-			if(/^(<app .*?from="#(beg.*?)".*?<\/app>\n)/s)
+			if(/^(<app .*?from="#(beg.*?)".*<\/app>\n)$/s)
 			{
 				if($xml_juan_id[$i]->{$2} == 1)
 				{
@@ -705,7 +705,7 @@ sub get_backs
 			# <note n="0011004" place="foot" type="equivalent" target="#nkr_note_equivalent_0011004">遊行經～D. 10. Mahāparinibbānasuttanta.</note>
 			# <note n="0030012" place="foot" type="cf." target="#nkr_note_cf._0030012">[No. 8]</note>
 			# <note resp="#resp7" target="#nkr_3f0">查永樂北藏 P055_p0650b10 調=掉</note> -- T01n0026.xml
-			elsif(/^(<note .*?target="#(nkr_.*?)".*?<\/note>\n)/)
+			elsif(/^(<note .*?target="#(nkr_.*?)".*<\/note>\n)$/)
 			{
 				if($xml_juan_id[$i]->{$2} == 1)
 				{
@@ -714,7 +714,7 @@ sub get_backs
 			}
 			# 修訂
 			# <choice cb:from="#beg_2" cb:to="#end_2"><corr>念</corr><sic>忘</sic></choice>
-			elsif(/^(<choice .*?from="#(beg.*?)".*?<\/choice>\n)/)
+			elsif(/^(<choice .*?from="#(beg.*?)".*<\/choice>\n)$/)
 			{
 				if($xml_juan_id[$i]->{$2} == 1)
 				{
@@ -727,7 +727,7 @@ sub get_backs
 			# <cb:t resp="#resp1" xml:lang="sa" place="foot">Dīrgha-āgama</cb:t>
 			# <cb:t resp="#resp1" xml:lang="pi" place="foot">Dīgha-nikāya</cb:t>
 			# </cb:tt>
-			elsif(/^(<cb:tt .*?from="#(beg.*?)".*?<\/cb:tt>\n)/s)
+			elsif(/^(<cb:tt .*?from="#(beg.*?)".*<\/cb:tt>\n)$/s)
 			{
 				if($xml_juan_id[$i]->{$2} == 1)
 				{
@@ -768,7 +768,7 @@ sub get_backs
 				$back .= $1;
 			}
 			# <note target="#beg0434012"><foreign n="0434012" cb:resp="#resp1" xml:lang="pi" cb:place="foot">Nigaṇṭhasāvaka.</foreign></note>
-			elsif(/^(<note .*?target="#(beg.*?)".*?<\/note>\n)/)
+			elsif(/^(<note .*?target="#(beg.*?)".*<\/note>\n)$/)
 			{
 				if($xml_juan_id[$i]->{$2} == 1)
 				{

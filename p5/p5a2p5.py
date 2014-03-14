@@ -3,6 +3,7 @@
 2013.1.4 周邦信 改寫自 cbp4top5.py
 
 Heaven 修改:
+2014/03/14 許多標記原本沒有加在 back區, 本版一一加進去, 這樣 CBReader 處理 back 區中的 lem 及 tt 標記時才不會漏掉那些標記.
 2014/03/08 增加 Unicode 區段 U+2E80 ~ U+2EF3 為 unicode 3.0 版
 2014/02/09 unclear 標記並非單獨標記, 在百品是有頭尾的, 因此由 EMPTY 中移除.
 2013/10/30 處理南傳校勘的 note 星號, 因為過去的星號都在 app 中, 南傳則有在 note 中的星號.
@@ -294,12 +295,17 @@ class MyTransformer():
 		parent = e.getparent()
 		if parent.tag=='juan':
 			node.tag = 'cb:jhead'
+		'''
+		# old
 		if 'body' in mode:
-			r = node.open_tag()
-			r += self.traverse(e, mode)
-			r += node.end_tag()
+			r = node.open_tag() + self.traverse(e, mode) + node.end_tag()
 		else:
 			r = self.traverse(e, mode)
+		'''
+		# new
+		r = node.open_tag() + self.traverse(e, mode) + node.end_tag()
+		
+		
 		return r
 		
 	def prepare_charDecl(self):
@@ -418,9 +424,16 @@ class MyTransformer():
 				node=MyNode(e)
 				r = node.open_tag() + self.traverse(e, mode) + node.end_tag()
 		else:
+			'''
+			# old
 			if (e.get('place') in ('inline', 'interlinear')) or type in ('cf1', 'cf2', 'cf3'):
 				node=MyNode(e)
 				r = node.open_tag() + self.traverse(e, mode) + node.end_tag()
+			'''
+			# new
+			node=MyNode(e)
+			r = node.open_tag() + self.traverse(e, mode) + node.end_tag()
+			
 		return r
 	
 	# 取得一個新的 id , 主要是在星號校勘要提供不重複的代號
@@ -696,12 +709,23 @@ class MyTransformer():
 				del node.attrib['place']
 		if 'body' in mode:
 			r = node.open_tag() + self.traverse(e, mode) + node.end_tag()
+			'''
+		# old
 		elif ('back' in mode) and ('note' in mode):
 			# 校勘 note 中的 <p> 也要處理, 這是因為遇到了 N27 p217 的 0217001 校勘有 <p> 標記  -- 2013/09/23
 			# 加入 note 判斷, 如 p 在 back 中, 且在 note 中, 就可以呈現, 但若只在 back 中就不可呈現 (例如在 app 中)	-- 2013/09/29
 			r = node.open_tag() + self.traverse(e, mode) + node.end_tag()
 		else:
 			r = self.traverse(e, mode)
+			'''
+		# new
+		else:
+			if 'id' in node.attrib:
+				del node.attrib['id']
+			if 'xml:id' in node.attrib:
+				del node.attrib['xml:id']
+			r = node.open_tag() + self.traverse(e, mode) + node.end_tag()
+			
 		return r
 		
 	def handle_foreign(self, e, mode):
@@ -803,7 +827,15 @@ class MyTransformer():
 				node.tag='cb:div'
 				r += node.open_tag() + self.traverse(e, mode) + node.end_tag()
 			else:
+				'''
+				# old
 				r += self.traverse(e, mode)
+				'''
+				# new , T12n0377.xml , T14n0434.xml 遇到
+				node=MyNode(e)
+				node.tag='cb:div'
+				r += node.open_tag() + self.traverse(e, mode) + node.end_tag()
+				
 		elif tag=='docNumber':
 			node=MyNode(e)
 			node.tag = 'cb:docNumber'
@@ -844,7 +876,18 @@ class MyTransformer():
 			r += self.handle_head(e, mode)
 		elif tag=='item':
 			if 'back' in mode:
+				'''
+				# old
 				r = self.traverse(e, mode)
+				'''
+				# new , T08 遇到
+				node = MyNode(e)
+				if 'id' in node.attrib:
+					del node.attrib['id']
+				if 'xml:id' in node.attrib:
+					del node.attrib['xml:id']
+				r += node.open_tag() + self.traverse(e, mode) + node.end_tag()
+				
 			else:
 				node = MyNode(e)
 				r += node.open_tag() + self.traverse(e, mode) + node.end_tag()
@@ -855,11 +898,18 @@ class MyTransformer():
 			node=MyNode(e)
 			r += node.open_tag() + self.traverse(e, mode) + node.end_tag()
 		elif tag=='l':
+			'''
+			# old
 			if 'body' in mode:
 				node=MyNode(e)
 				r += node.open_tag() + self.traverse(e, mode) + node.end_tag()
 			else:
 				r += self.traverse(e, mode)
+			'''
+			# new
+			node=MyNode(e)
+			r += node.open_tag() + self.traverse(e, mode) + node.end_tag()
+			
 		elif tag=='label':
 			node = MyNode(e)
 			if parent.tag == 'lg':
@@ -873,7 +923,9 @@ class MyTransformer():
 			self.write_log('lb ' + n)
 			ed = e.get('ed')
 			print('lb:', n, file=log)
-			if 'body' in mode:
+			'''
+			# old
+			if 'body' in mode:	# lb 也要在 back 區呈現
 				node=MyNode(e)
 				if 'C ' in ed:
 					node.attrib['type'] = 'honorific'
@@ -883,20 +935,48 @@ class MyTransformer():
 				#	sys.exit('error 814: ' + n + ' not in x2r')
 				#if globals['vol'].startswith('X') and 'x' not in x2r[n]:
 				#	r += x2r[n]
+			'''
+			# new
+			node=MyNode(e)
+			if 'C ' in ed:
+				node.attrib['type'] = 'honorific'
+				node.attrib['ed'] = ed.replace('C ', '')
+			r += node.open_tag()
+			
 		elif tag=='lem':
 			r += self.handle_lem(e, mode)
 		elif tag=='lg':
+			'''
+			# old
 			if 'body' in mode:
 				node=MyNode(e)
 				r += node.open_tag() + self.traverse(e, mode) + node.end_tag()
 			else:
 				r += self.traverse(e, mode)
+			'''
+			# new
+			if 'body' in mode:
+				node=MyNode(e)
+				r += node.open_tag() + self.traverse(e, mode) + node.end_tag()
+			else:
+				node=MyNode(e)
+				if 'id' in node.attrib:		# 不明白為什麼是 id 而不是 xml:id ?
+					del node.attrib['id']
+				r += node.open_tag() + self.traverse(e, mode) + node.end_tag()
+			
 		elif tag=='list':
+			'''
+			# old
 			if 'body' in mode:
 				node=MyNode(e)
 				r += node.open_tag() + self.traverse(e, mode) + node.end_tag()
 			else:
 				r += self.traverse(e, mode)
+			'''
+			# new , T08 遇到
+			node=MyNode(e)
+			r += node.open_tag() + self.traverse(e, mode) + node.end_tag()
+			
 		elif tag=='mulu':
 			node = MyNode(e)
 			r += node.open_tag() + self.traverse(e, mode) + node.end_tag()
