@@ -103,6 +103,7 @@ unless($vol)
 my $errlog = "cutxml_${vol}_err.txt";
 
 my $sourcePath = $cbwork_dir . "/xml-p5/$edit/$vol";	# xml-p5 經文的位置
+$sourcePath = "C:/Temp/cbetap5-ok" . "/$edit/$vol";
 $output_dir = $output_dir . "/$vol";					# 輸出的目錄
 
 my $myPath = cwd();										# 目前目錄
@@ -366,7 +367,7 @@ sub get_juans
 	{
 		# 卷尾的 <lb...> 要移到下一卷開頭
 		
-		if($xml_juan[$i] =~ s/^(.*)(<lb .*)$/\1/s)
+		if($xml_juan[$i] =~ s/^(.*)(<lb[^>]*ed="$edit".*)$/\1/s)	# 卍續藏有二組 lb, 所以要儘量移到下一卷
 		{
 			$xml_juan[$i+1] = $2 . $xml_juan[$i+1];
 		}
@@ -444,28 +445,17 @@ sub start_handler
 	# 處理 <lb> 標記
 	if ($el eq "lb")
 	{
-		my $lb_attmap = $node->getAttributes;
-		my $bingo = 0;
+		my $att_ed = $node->getAttributeNode("ed")->getValue;	# 取得 ed 屬性
+		my $att_n = $node->getAttributeNode("n")->getValue;		# 取得 n 屬性
 		
-		for my $lb_attr ($lb_attmap->getValues) 
-		{
-			my $attrName = $lb_attr->getName;
-			my $attrValue = $lb_attr->getValue;
-			
-			if ($attrName eq "n" and $attrValue eq $lbn[$milestoneNum+1])
-			{
-				# 至此, 表示這一個 <lb> 是某一卷的開始.
-				$bingo = 1;
-				last;
-			}
-		}
-		
-		return if($bingo == 0);
-
+		#n = 某卷第一行及 ed = 大藏經, 表示找到卷首了. (卍續藏有二個 <lb> 所以要檢查 ed 屬性)
+     	return if($att_n ne $lbn[$milestoneNum+1] || $att_ed ne $edit);	
+     			
 		# 至此, 表示找到另一卷的開頭處, 所以要記錄上卷未結束的各種標記, 才符合 XML 的原則.
 
 		$milestoneNum++;	# 第 N 個
-		
+		#print "mile : $milestoneNum \n";
+		#print "lb_n : $att_n \n";
 		$parentnode = $node->getParentNode();
 		while(($pnName = $parentnode->getTagName()) ne "body")
 		{
@@ -480,7 +470,9 @@ sub start_handler
 			}
 			
 			$attrs .= ">";
-			
+						
+			#print "attr : $attrs \n";
+						
 			# 百品第一卷前面都會有 <cb:div>, 這是在 <milestone> 之前 , 但會直接放入卷裡面.
 			# 不過在分析每一卷前面有多少標記時, 它會被分析到, 因此要移除, 以免出現連續二個 <cb:div>
 			if($edit eq "I" && $milestoneNum == 1 && $attrs eq "<cb:div>")
@@ -491,7 +483,6 @@ sub start_handler
 			$end_tag[$milestoneNum-1] .= "</${pnName}>";
 			$parentnode = $parentnode->getParentNode();
 		}
-		
 		# 記錄此卷的 mulu 標記
 		$mulu_tag[$milestoneNum] = "";
 		for($i = 1; $i<=$mulu_n; $i++)
@@ -1441,6 +1432,11 @@ sub get_real_juan_num()
 	{
 		$ii = sprintf("%03d",$i+12);
 	}
+	# P189n1629      天台四教儀集註(第2卷-第10卷)
+	if($file eq "P189n1629.xml")
+	{
+		$ii = sprintf("%03d",$i+1);
+	}
 	# S06n0046       上生經會古通今新抄(第2,4卷)
 	if($file eq "S06n0046.xml")
 	{
@@ -1455,7 +1451,261 @@ sub get_real_juan_num()
 		$ii = "005" if($i==2);
 		$ii = sprintf("%03d",$i+4) if($i > 2);
 	}
-	
+	# N,02,      ,0001,  11 ,律藏(第5卷-第15卷)              ,【通妙譯】
+	if($file eq "N02n0001.xml")
+	{
+		$ii = sprintf("%03d",$i+4);
+	}
+	# N,03,      ,0001,  10 ,律藏(第16卷-第25卷)             ,【通妙譯】
+	if($file eq "N03n0001.xml")
+	{
+		$ii = sprintf("%03d",$i+15);
+	}
+	# N,04,      ,0001,  12 ,律藏(第26卷-第37卷)             ,【通妙譯】
+	if($file eq "N04n0001.xml")
+	{
+		$ii = sprintf("%03d",$i+25);
+	}
+	# N,05,      ,0001,  19 ,律藏(第38卷-第56卷)             ,【通妙譯】
+	if($file eq "N05n0001.xml")
+	{
+		$ii = sprintf("%03d",$i+37);
+	}
+	# N,07,      ,0002,   9 ,長部經典(第15卷-第23卷)         ,【通妙譯】
+	if($file eq "N07n0002.xml")
+	{
+		$ii = sprintf("%03d",$i+14);
+	}
+	# N,08,      ,0002,  11 ,長部經典(第24卷-第34卷)         ,【通妙譯】
+	if($file eq "N08n0002.xml")
+	{
+		$ii = sprintf("%03d",$i+23);
+	}
+	# N,10,      ,0003,   4 ,中部經典(第5卷-第8卷)           ,【通妙譯】
+	if($file eq "N10n0003.xml")
+	{
+		$ii = sprintf("%03d",$i+4);
+	}
+	# N,11,      ,0003,   4 ,中部經典(第9卷-第12卷)          ,【通妙譯】
+	if($file eq "N11n0003.xml")
+	{
+		$ii = sprintf("%03d",$i+8);
+	}
+	# N,12,      ,0003,   4 ,中部經典(第13卷-第16卷)         ,【通妙譯】
+	if($file eq "N12n0003.xml")
+	{
+		$ii = sprintf("%03d",$i+12);
+	}
+	# N,14,      ,0004,  10 ,相應部經典(第12卷-第21卷)       ,【雲庵譯】
+	if($file eq "N14n0004.xml")
+	{
+		$ii = sprintf("%03d",$i+11);
+	}
+	# N,15,      ,0004,  13 ,相應部經典(第22卷-第34卷)       ,【雲庵譯】
+	if($file eq "N15n0004.xml")
+	{
+		$ii = sprintf("%03d",$i+21);
+	}
+	# N,16,      ,0004,   7 ,相應部經典(第35卷-第41卷)       ,【雲庵譯】
+	if($file eq "N16n0004.xml")
+	{
+		$ii = sprintf("%03d",$i+34);
+	}
+	# N,17,      ,0004,   6 ,相應部經典(第42卷-第47卷)       ,【雲庵譯】
+	if($file eq "N17n0004.xml")
+	{
+		$ii = sprintf("%03d",$i+41);
+	}
+	# N,18,      ,0004,   9 ,相應部經典(第48卷-第56卷)       ,【雲庵譯】
+	if($file eq "N18n0004.xml")
+	{
+		$ii = sprintf("%03d",$i+47);
+	}
+	# N,20,      ,0005,   1 ,增支部經典(第4卷)               ,【關世謙譯】
+	if($file eq "N20n0005.xml")
+	{
+		$ii = sprintf("%03d",$i+3);
+	}
+	# N,21,      ,0005,   1 ,增支部經典(第5卷)               ,【郭哲彰譯】
+	if($file eq "N21n0005.xml")
+	{
+		$ii = sprintf("%03d",$i+4);
+	}
+	# N,22,      ,0005,   2 ,增支部經典(第6卷-第7卷)         ,【郭哲彰譯】
+	if($file eq "N22n0005.xml")
+	{
+		$ii = sprintf("%03d",$i+5);
+	}
+	# N,23,      ,0005,   1 ,增支部經典(第8卷)               ,【郭哲彰譯】
+	if($file eq "N23n0005.xml")
+	{
+		$ii = sprintf("%03d",$i+7);
+	}
+	# N,24,      ,0005,   2 ,增支部經典(第9卷-第10卷)        ,【郭哲彰譯】
+	if($file eq "N24n0005.xml")
+	{
+		$ii = sprintf("%03d",$i+8);
+	}
+	# N,25,      ,0005,   2 ,增支部經典(第11卷-第12卷)       ,【郭哲彰譯】
+	if($file eq "N25n0005.xml")
+	{
+		$ii = sprintf("%03d",$i+10);
+	}
+	# N,30,      ,0015,  20 ,譬喻經(第40卷-第59卷)           ,【悟醒譯】
+	if($file eq "N30n0015.xml")
+	{
+		$ii = sprintf("%03d",$i+39);
+	}
+	# N,32,      ,0016,   1 ,本生經(第3卷)                   ,【悟醒譯】
+	if($file eq "N32n0016.xml")
+	{
+		$ii = sprintf("%03d",$i+2);
+	}
+	# N,33,      ,0016,   1 ,本生經(第4卷)                   ,【悟醒譯】
+	if($file eq "N33n0016.xml")
+	{
+		$ii = sprintf("%03d",$i+3);
+	}
+	# N,34,      ,0016,   2 ,本生經(第5卷-第6卷)             ,【悟醒譯】
+	if($file eq "N34n0016.xml")
+	{
+		$ii = sprintf("%03d",$i+4);
+	}
+	# N,35,      ,0016,   3 ,本生經(第7卷-第9卷)             ,【悟醒譯】
+	if($file eq "N35n0016.xml")
+	{
+		$ii = sprintf("%03d",$i+6);
+	}
+	# N,36,      ,0016,   4 ,本生經(第10卷-第13卷)           ,【悟醒譯】
+	if($file eq "N36n0016.xml")
+	{
+		$ii = sprintf("%03d",$i+9);
+	}
+	# N,37,      ,0016,   3 ,本生經(第14卷-第16卷)           ,【悟醒譯】
+	if($file eq "N37n0016.xml")
+	{
+		$ii = sprintf("%03d",$i+13);
+	}
+	# N,38,      ,0016,   2 ,本生經(第17卷-第18卷)           ,【悟醒譯】
+	if($file eq "N38n0016.xml")
+	{
+		$ii = sprintf("%03d",$i+16);
+	}
+	# N,39,      ,0016,   4 ,本生經(第19卷-第22卷)           ,【悟醒譯】
+	if($file eq "N39n0016.xml")
+	{
+		$ii = sprintf("%03d",$i+18);
+	}
+	# N,40,      ,0016,   2 ,本生經(第23卷-第24卷)           ,【悟醒譯】
+	if($file eq "N40n0016.xml")
+	{
+		$ii = sprintf("%03d",$i+22);
+	}
+	# N,41,      ,0016,   1 ,本生經(第25卷)                  ,【悟醒譯】
+	if($file eq "N41n0016.xml")
+	{
+		$ii = sprintf("%03d",$i+24);
+	}
+	# N,42,      ,0016,   1 ,本生經(第26卷)                  ,【悟醒譯】
+	if($file eq "N42n0016.xml")
+	{
+		$ii = sprintf("%03d",$i+25);
+	}
+	# N,44,      ,0017,   2 ,無礙解道(第3卷-第4卷)           ,【悟醒譯】
+	if($file eq "N44n0017.xml")
+	{
+		$ii = sprintf("%03d",$i+2);
+	}
+	# N,46,      ,0020,   6 ,大義釋(第11卷-第16卷)           ,【悟醒譯】
+	if($file eq "N46n0020.xml")
+	{
+		$ii = sprintf("%03d",$i+10);
+	}
+	# N,50,      ,0023,   3 ,分別論(第16卷-第18卷)           ,【郭哲彰譯】
+	if($file eq "N50n0023.xml")
+	{
+		$ii = sprintf("%03d",$i+15);
+	}
+	# N,52,      ,0026,   1 ,雙論(第7卷)                     ,【郭哲彰譯】
+	if($file eq "N52n0026.xml")
+	{
+		$ii = sprintf("%03d",$i+6);
+	}
+	# N,53,      ,0026,   3 ,雙論(第8卷-第10卷)              ,【郭哲彰譯】
+	if($file eq "N53n0026.xml")
+	{
+		$ii = sprintf("%03d",$i+7);
+	}
+	# N,55,      ,0027,   2 ,發趣論(第3卷-第4卷)             ,【郭哲彰譯】
+	if($file eq "N55n0027.xml")
+	{
+		$ii = sprintf("%03d",$i+2);
+	}
+	# N,56,      ,0027,   2 ,發趣論(第5卷-第6卷)             ,【郭哲彰譯】
+	if($file eq "N56n0027.xml")
+	{
+		$ii = sprintf("%03d",$i+4);
+	}
+	# N,57,      ,0027,   1 ,發趣論(第7卷)                   ,【郭哲彰譯】
+	if($file eq "N57n0027.xml")
+	{
+		$ii = sprintf("%03d",$i+6);
+	}
+	# N,58,      ,0027,   2 ,發趣論(第8卷-第9卷)             ,【郭哲彰譯】
+	if($file eq "N58n0027.xml")
+	{
+		$ii = sprintf("%03d",$i+7);
+	}
+	# N,59,      ,0027,   1 ,發趣論(第10卷)                  ,【郭哲彰譯】
+	if($file eq "N59n0027.xml")
+	{
+		$ii = sprintf("%03d",$i+9);
+	}
+	# N,60,      ,0027,   2 ,發趣論(第11卷-第12卷)           ,【郭哲彰譯】
+	if($file eq "N60n0027.xml")
+	{
+		$ii = sprintf("%03d",$i+10);
+	}
+	# N,62,      ,0028,  18 ,論事(第6卷-第23卷)              ,【郭哲彰譯】
+	if($file eq "N62n0028.xml")
+	{
+		$ii = sprintf("%03d",$i+5);
+	}
+	# N,64,      ,0029,  12 ,彌蘭王問經(第14卷-第25卷)       ,【郭哲彰譯】
+	if($file eq "N64n0029.xml")
+	{
+		$ii = sprintf("%03d",$i+13);
+	}
+	# N,68,      ,0033,   6 ,清淨道論(第8卷-第13卷)          ,【佛音撰　悟醒譯】
+	if($file eq "N68n0033.xml")
+	{
+		$ii = sprintf("%03d",$i+7);
+	}
+	# N,69,      ,0033,  10 ,清淨道論(第14卷-第23卷)         ,【佛音撰　悟醒譯】
+	if($file eq "N69n0033.xml")
+	{
+		$ii = sprintf("%03d",$i+13);
+	}
+	# D01, 8679,    1  佛說佛名經（存卷四）        只有卷 4
+	if($file eq "D01n8679.xml")
+	{
+		$ii = sprintf("%03d",$i+3);
+	}
+	# D02, 8680,    1  佛說佛名經（存卷七）        只有卷 7
+	if($file eq "D02n8680.xml")
+	{
+		$ii = sprintf("%03d",$i+6);
+	}
+	# D20, 8869,    1  惟教三昧（存卷下　前殘）    只有卷 2
+	if($file eq "D20n8869.xml")
+	{
+		$ii = sprintf("%03d",$i+1);
+	}
+	# D22, 8874,    1  成實論義記（存卷中　前殘）  只有卷 2
+	if($file eq "D22n8874.xml")
+	{
+		$ii = sprintf("%03d",$i+1);
+	}
 	return $ii;
 }
 
