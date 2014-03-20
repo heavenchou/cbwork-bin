@@ -3,6 +3,7 @@
 2013.1.4 周邦信 改寫自 cbp4top5.py
 
 Heaven 修改:
+2014/03/20 修改 tt , app 及 foreign 三個標記的處理法.
 2014/03/14 許多標記原本沒有加在 back區, 本版一一加進去, 這樣 CBReader 處理 back 區中的 lem 及 tt 標記時才不會漏掉那些標記.
 2014/03/08 增加 Unicode 區段 U+2E80 ~ U+2EF3 為 unicode 3.0 版
 2014/02/09 unclear 標記並非單獨標記, 在百品是有頭尾的, 因此由 EMPTY 中移除.
@@ -475,6 +476,8 @@ class MyTransformer():
 			sys.exit()
 		target='beg' + n
 		r = ''
+		'''
+		# 舊的
 		if target not in self.anchors:
 			self.anchors.append(target)
 			r+='<anchor xml:id="{}" n="{}"/>'.format(target, n)
@@ -483,7 +486,18 @@ class MyTransformer():
 		if id not in self.anchors:
 			self.anchors.append(id)
 			r+='<anchor xml:id="{}"/>'.format(id)
-			
+		'''
+		# 新的 2014/03/20
+		end_str = ''
+		if target not in self.anchors:
+			self.anchors.append(target)
+			r += '<anchor xml:id="{}" n="{}"/>'.format(target, n)
+			id = 'end' + n
+			self.anchors.append(id)
+			end_str = '<anchor xml:id="{}"/>'.format(id)
+		r += self.traverse(e, mode)
+		r += end_str
+		
 		node=MyNode(e)
 		node.attrib['from']='#beg{}'.format(n)
 		node.attrib['to']='#end{}'.format(n)
@@ -648,6 +662,7 @@ class MyTransformer():
 		if 'body' in mode:
 			type=e.get('type', '')
 			if type=='app':
+				''' 舊的
 				n = e.get('n')
 				id = 'beg' + n
 				if id not in self.anchors:
@@ -658,6 +673,20 @@ class MyTransformer():
 				if id not in self.anchors:
 					self.anchors.append(id)
 					r += '<anchor xml:id="{}"/>'.format(id)
+				'''
+				# 新的 2014/03/20
+				end_str = ''
+				n = e.get('n')
+				id = 'beg' + n
+				if id not in self.anchors:
+					self.anchors.append(id)
+					r='<anchor xml:id="{}" n="{}"/>'.format(id, n)
+					id = 'end' + n
+					self.anchors.append(id)
+					end_str = '<anchor xml:id="{}"/>'.format(id)	
+				r += self.traverse(e, mode)
+				r += end_str
+				
 				node = MyNode(e)
 				node.attrib['from'] = '#beg{}'.format(n)
 				node.attrib['to'] = '#end{}'.format(n)
@@ -735,7 +764,7 @@ class MyTransformer():
 		node=MyNode(e)
 		resp = e.get('resp')
 		if place=='foot':
-			target = 'beg' + n
+			target = 'nkr_note_foreign_' + n	# 原本為 'beg' , 改成 'nkr_note_foreign_' 2014/03/20
 			if target not in self.anchors:
 				self.anchors.append(target)
 				r += '<anchor xml:id="{}" n="{}"/>'.format(target, n)
