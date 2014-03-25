@@ -103,7 +103,7 @@ unless($vol)
 my $errlog = "cutxml_${vol}_err.txt";
 
 my $sourcePath = $cbwork_dir . "/xml-p5/$edit/$vol";	# xml-p5 經文的位置
-$sourcePath = "C:/Temp/cbetap5-ok" . "/$edit/$vol";
+#$sourcePath = "C:/Temp/cbetap5-ok" . "/$edit/$vol";
 $output_dir = $output_dir . "/$vol";					# 輸出的目錄
 
 my $myPath = cwd();										# 目前目錄

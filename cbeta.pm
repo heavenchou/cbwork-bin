@@ -1,4 +1,6 @@
 
+# 別的程式要呼叫本程式, 可以先用 use lib "/cbwork/bin"; 來指定本程式的目錄
+
 package Gaiji;
 use utf8;
 use Carp;
