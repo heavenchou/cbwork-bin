@@ -696,11 +696,23 @@ sub get_backs
 			# <note n="0011004" place="foot" type="equivalent" target="#nkr_note_equivalent_0011004">遊行經～D. 10. Mahāparinibbānasuttanta.</note>
 			# <note n="0030012" place="foot" type="cf." target="#nkr_note_cf._0030012">[No. 8]</note>
 			# <note resp="#resp7" target="#nkr_3f0">查永樂北藏 P055_p0650b10 調=掉</note> -- T01n0026.xml
-			elsif(/^(<note .*?target="#(nkr_.*?)".*<\/note>\n)$/)
+			# 因為 target 可能有好幾個, 所以要切開來處理
+			# <note n="0014001" resp="#resp2" place="foot text" type="orig" target="#nkr_note_orig_0014001 #note_star_3">
+			elsif(/^(<note .*?target="(.*?)".*<\/note>\n)$/)
 			{
-				if($xml_juan_id[$i]->{$2} == 1)
+				my $thisline = $1;
+				my $targets = $2;
+								
+				my @targets = split(/\s+/, $targets);
+				
+				foreach $key (@targets)
 				{
-					$back .= $1;
+					$key =~ s/^#//;
+					if($xml_juan_id[$i]->{$key} == 1)
+					{
+						$back .= $thisline;
+						last;
+					}
 				}
 			}
 			# 修訂
