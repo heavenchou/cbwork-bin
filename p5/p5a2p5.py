@@ -3,6 +3,9 @@
 2013.1.4 周邦信 改寫自 cbp4top5.py
 
 Heaven 修改:
+2014/03/30 1.修改南傳校勘星號處理錯誤的地方.
+           2.anchor 標記也要在 back 區出現, 為了避免 xml:id 重覆, back 區的 xml:id 最後加上 '_back'
+           3.南傳特有的 note 有星號, 這類 <note type="star"...> 要加上 n 屬性以資區別
 2014/03/20 修改 tt , app 及 foreign 三個標記的處理法.
 2014/03/14 許多標記原本沒有加在 back區, 本版一一加進去, 這樣 CBReader 處理 back 區中的 lem 及 tt 標記時才不會漏掉那些標記.
 2014/03/08 增加 Unicode 區段 U+2E80 ~ U+2EF3 為 unicode 3.0 版
@@ -413,10 +416,11 @@ class MyTransformer():
 				# p5 要做成 <anchor xml:id="note_star_1" type="star"/>
 				# 並在 back 區做成 <note n="0228007" resp="#respx" type="orig" place="foot text" target="#nkr_note_orig_0228007 #note_star_1">....</note>
 				corresp=e.get('corresp', '')
-				corresp = '#nkr_note_orig_' + corresp[1:]
+				new_n = corresp[1:]
+				corresp = '#nkr_note_orig_' + new_n
 				id = self.new_anchor_id()
 				target = 'note_star_{}'.format(id)
-				r='<anchor xml:id="{}" type="star"/>'.format(target)				# 此時已做出經文區的 <anchor xml:id="note_star_1" type="star"/>
+				r='<anchor xml:id="{}" n="{}" type="star"/>'.format(target, new_n)		# 此時已做出經文區的 <anchor xml:id="note_star_1" n="0228007" type="star"/>
 				if corresp in self.note_star:
 					self.note_star[corresp] += ' #' + target	# 此時要在 note_star[#nkr_note_orig_0228007] 加上 "#note_star_1"
 				else:
@@ -822,8 +826,19 @@ class MyTransformer():
 			type = e.get('type')
 			if type=='◎':
 				node.attrib['type'] = 'circle'
+			'''
+			# old
 			if 'body' in mode:
 				r = node.open_tag() + self.traverse(e, mode) + node.end_tag()
+			'''
+			# new
+			if 'body' in mode:
+				r = node.open_tag() + self.traverse(e, mode) + node.end_tag()
+			elif 'back' in mode:
+				if 'id' in node.attrib:
+					node.attrib['id'] = node.attrib['id'] + '_back'		# xml:id 的尾部加上 '_back' , 以資區別
+				r = node.open_tag() + self.traverse(e, mode) + node.end_tag()
+			
 		elif tag=='annals':
 			r = '<cb:event>'
 			d = e.find('date')
@@ -1180,8 +1195,8 @@ def handle_back_note_star(text, note_star):
 	<note n="0228007" resp="#respx" type="orig" place="foot text" target="#nkr_note_orig_0228007 #note_star_1 #note_star_5 #note_star_12">........</note>
 	'''
 	for k in sorted(note_star):
-		key = 'target="' + k
-		value = 'target="' + k + note_star[k]
+		key = 'target="' + k + '"'
+		value = 'target="' + k + note_star[k] + '"'
 		text = text.replace(key, value)
 	return text
 
