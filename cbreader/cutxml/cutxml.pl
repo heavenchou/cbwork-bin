@@ -198,7 +198,7 @@ sub do1file
 	local @end_tag = ();		# 記錄各卷結尾應該要補上的標記
 	
 	# 各卷目錄開頭的處理法:
-	# 每一卷一遇到 <mulu level="n"> 就記錄在 $this_juan_mulu[n] , 並把 n 記錄k在 $mulu_n 變數中
+	# 每一卷一遇到 <mulu level="n"> 就記錄在 $this_juan_mulu[n] , 並把 n 記錄在 $mulu_n 變數中
 	# 該卷結束時, 就把 1~n 的標記都記錄在 $mulu_tag[n] 之中
 	# 例如某一卷結束時, @this_juan_mulu 內容是 ("<mulu level=1 label=第一個/>", "<mulu level=2 label=第二個/>")
 	# 則 $mulu_tag[x] = "<mulu level=1 label=第一個/><mulu level=2 label=第二個/>"
@@ -496,31 +496,28 @@ sub start_handler
 	# 處理 <mulu> 標記 <mulu level="1" label="序" type="序"/>
 	
 	# 各卷目錄開頭的處理法:
-	# 每一卷一遇到 <mulu level="n"> 就記錄在 $this_juan_mulu[n] , 並把 n 記錄k在 $mulu_n 變數中
+	# 每一卷一遇到 <mulu level="n"> 就記錄在 $this_juan_mulu[n] , 並把 n 記錄在 $mulu_n 變數中
 	# 該卷結束時, 就把 1~n 的標記都記錄在 $mulu_tag[n] 之中
 	# 例如某一卷結束時, @this_juan_mulu 內容是 ("<mulu level=1 label=第一個/>", "<mulu level=2 label=第二個/>")
 	# 則 $mulu_tag[x] = "<mulu level=1 label=第一個/><mulu level=2 label=第二個/>"
 	
-	if ($el eq "mulu")
+	if ($el eq "cb:mulu")
 	{
 		my $map = $node->getAttributes;
-		my $attrs = "<mulu";
-		my $mulu_n_tmp = 0;
+
+		my $mulu_n_tmp = -1;			# 記錄 level 的數字
 		for my $attr ($map->getValues) 
 		{
 			my $attrName = $attr->getName;
 			my $attrValue = $attr->getValue;
-			#$attrValue =~ s/($pattern)/$utf8out{$1}/g;
-			$attrs .= " $attrName=\"$attrValue\"";
 			if($attrName eq "level")
 			{
 				$mulu_n_tmp = $attrValue;
+				
+				# 沒有 level 的不處理 <cb:mulu n="001" type="卷"></cb:mulu>
+				$mulu_n = $mulu_n_tmp;
+				$this_juan_mulu[$mulu_n] = $node->toString();
 			}
-		}
-		if($attrs =~ / level=/)		# 沒有 level 的不處理 <mulu n="002" type="卷"/>
-		{
-			$mulu_n = $mulu_n_tmp;
-			$this_juan_mulu[$mulu_n] = "${attrs}/>";
 		}
 	}
 }
