@@ -20,3 +20,6 @@
 /common/b5-u8.bat
 /common/u8-b5.bat
 /cbreader/cutxml/cutxml.bat
+/cbreader/index/wordindex.ndx
+/cbreader/index/buildlist.txt
+/cbreader/index/main.ndx
