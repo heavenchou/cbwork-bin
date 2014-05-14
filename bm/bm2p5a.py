@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2014/05/14 昨天 BM 的 <w>, <a> 標記誤處理成 P4 版本的標記, 應該成 P5a 的版本.
 2014/05/13 處理 BM 的 <w>, <a> 標記
 2014/02/12 行中段落由 <p cb:type="inline"> 改成 <p rend="inline"> 或 <p rend="margin-left:xem;text-indent:xem;inline">
 2013/12/31 處理 <T,-x> 沒有處理負數的問題. 
@@ -402,14 +403,14 @@ def start_inline_u(tag):
 	opens['commentary'] = 1
 
 def start_inline_w(tag):
-	closeTags('p','sp','dialog')
-	out('<dialog type="qa"><sp type="question">')
-	opens['dialog'] = 1
+	closeTags('p','sp','cb:dialog')
+	out('<cb:dialog type="qa"><sp cb:type="question">')
+	opens['cb:dialog'] = 1
 	opens['sp'] = 1
 	
 def start_inline_a(tag):
 	closeTags('p','sp')
-	out('<sp type="answer">')
+	out('<sp cb:type="answer">')
 	opens['sp'] = 1
 
 # 處理經文中的標記
@@ -508,7 +509,7 @@ def inline_tag(tag):
 	elif tag.startswith('<a>'):
 		start_inline_a(tag)
 	elif tag=='</w>':
-		closeTags('p','sp','dialog')
+		closeTags('p','sp','cb:dialog')
 	else:
 		print(old_pb+line_num+'未處理的標記: ' + tag)
 
