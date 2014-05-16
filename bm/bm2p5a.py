@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2014/05/16 1.處理<Q>標記要結束<w><a>標記. 2.處理 <o><u> 標記的結束問題
 2014/05/14 昨天 BM 的 <w>, <a> 標記誤處理成 P4 版本的標記, 應該成 P5a 的版本.
 2014/05/13 處理 BM 的 <w>, <a> 標記
 2014/02/12 行中段落由 <p cb:type="inline"> 改成 <p rend="inline"> 或 <p rend="margin-left:xem;text-indent:xem;inline">
@@ -236,7 +237,7 @@ def start_div(level, type):
 def start_inline_q(tag):
 	global buf, div_head, head_tag, globals
 	close_head()
-	closeTags('l', 'lg')
+	closeTags('l', 'lg', 'p', 'sp', 'cb:dialog')
 	i=tag.find('m=')
 	div_head = ''
 	level = 0
@@ -301,6 +302,7 @@ def start_q(tag):
 	if '=' in head_tag:
 		return
 	
+	closeTags('l', 'lg', 'sp', 'cb:dialog')
 	div_head = ''
 	level = 0
 	
@@ -391,6 +393,7 @@ def start_inline_o(tag):
 	if 'commentary' in opens and opens['commentary']>0:
 		out1('</cb:div>')
 		opens['div'] -= 1
+		opens['commentary'] -= 1
 	start_div(opens['div']+1, 'orig')
 	opens['orig'] = 1
 	
@@ -399,6 +402,7 @@ def start_inline_u(tag):
 	if 'orig' in opens and opens['orig']>0:
 		out1('</cb:div>')
 		opens['div'] -= 1
+		opens['orig'] -= 1
 	start_div(opens['div']+1, 'commentary')
 	opens['commentary'] = 1
 
@@ -487,10 +491,12 @@ def inline_tag(tag):
 		closeTags('p')
 		out1('</cb:div>')
 		opens['div'] -= 1
+		opens['commentary'] -= 1
 	elif tag=='</o>':
 		closeTags('p')
 		out1('</cb:div>')
 		opens['div'] -= 1
+		opens['orig'] -= 1
 	#以下這些直接輸出 <choice cb:resp="CBETA.maha"><corr>Ｂ</corr><sic>Ａ</sic></choice>
 	elif tag.startswith('<choice'):
 		out(tag)
