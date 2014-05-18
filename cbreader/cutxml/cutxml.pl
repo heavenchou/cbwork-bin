@@ -208,9 +208,9 @@ sub do1file
 	local $mulu_n = 0;
 	
 	# 各卷 PTS 開頭的處理法:
-	# 每一卷最後一個 PTS 都要記錄下來, 例如 N01n0001.xml 第一卷最後的 PTS 頁碼是 <ref target="#PTS.Vin.3.266"></ref>
-	# 將此記錄在 $this_juan_last_pts[1] = '<ref target="#PTS.Vin.3.266"></ref>';
-	# 因此在下一卷一開始要加上 <ref target="#PTS.Vin.3.266" type="PTS_hide"></ref> , 其中加上 type="PTS_hide" 是為了區別一般要呈現的標記.
+	# 每一卷最後一個 PTS 都要記錄下來, 例如 N01n0001.xml 第一卷最後的 PTS 頁碼是 <ref target="#PTS.Vin.3.109"></ref>
+	# 將此記錄在 $this_juan_last_pts[1] = '<ref target="#PTS.Vin.3.109"></ref>';
+	# 因此在下一卷一開始要加上 <ref target="#PTS.Vin.3.109" type="PTS_hide"></ref> , 其中加上 type="PTS_hide" 是為了區別一般要呈現的標記.
 	
 	local @this_juan_last_pts = ();	# 記錄某一卷最後遇到的 PTS 頁碼, 這要加在下一卷的開頭, 僅限南傳
 	
@@ -529,9 +529,9 @@ sub start_handler
 	}
 	
 	# 各卷 PTS 開頭的處理法:
-	# 每一卷最後一個 PTS 都要記錄下來, 例如 N01n0001.xml 第一卷最後的 PTS 頁碼是 <ref target="#PTS.Vin.3.266"></ref>
-	# 將此記錄在 $this_juan_last_pts[1] = '<ref target="#PTS.Vin.3.266"></ref>';
-	# 因此在下一卷一開始要加上 <ref target="#PTS.Vin.3.266" type="PTS_hide"></ref> , 其中加上 type="PTS_hide" 是為了區別一般要呈現的標記.
+	# 每一卷最後一個 PTS 都要記錄下來, 例如 N01n0001.xml 第一卷最後的 PTS 頁碼是 <ref target="#PTS.Vin.3.109"></ref>
+	# 將此記錄在 $this_juan_last_pts[1] = '<ref target="#PTS.Vin.3.109"></ref>';
+	# 因此在下一卷一開始要加上 <ref target="#PTS.Vin.3.109" type="PTS_hide"></ref> , 其中加上 type="PTS_hide" 是為了區別一般要呈現的標記.
 	
 	if ($el eq "ref")
 	{
@@ -555,9 +555,9 @@ sub add_tag_2_juan()
 {
 	for(my $i=1; $i<= $total_juannum; $i++)
 	{
-		# 把 <ref target="#PTS.Vin.3.266"></ref> 換成 <ref target="#PTS.Vin.3.266" type="PTS_hide"></ref>
+		# 把 <ref target="#PTS.Vin.3.109"></ref> 換成 <ref target="#PTS.Vin.3.109" type="PTS_hide"></ref>
 		$this_juan_last_pts[$i-1] =~ s/><\/ref>/ type="PTS_hide"><\/ref>/;	
-		# 把 <ref target="#PTS.Vin.3.266"/> 換成 <ref target="#PTS.Vin.3.266" type="PTS_hide"></ref>
+		# 把 <ref target="#PTS.Vin.3.109"/> 換成 <ref target="#PTS.Vin.3.109" type="PTS_hide"></ref>
 		$this_juan_last_pts[$i-1] =~ s/\/>/ type="PTS_hide"><\/ref>/;	# 
 
 		if($mulu_tag[$i] or $start_tag[$i] or $this_juan_last_pts[$i-1])
