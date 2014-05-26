@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2014/05/26 處理 BM 的 </p> 及 </P> 標記要結束 <p> 標記
 2014/05/16 1.處理<Q>標記要結束<w><a>標記. 2.處理 <o><u> 標記的結束問題
 2014/05/14 昨天 BM 的 <w>, <a> 標記誤處理成 P4 版本的標記, 應該成 P5a 的版本.
 2014/05/13 處理 BM 的 <w>, <a> 標記
@@ -473,6 +474,10 @@ def inline_tag(tag):
 		start_inline_o(tag)
 	elif tag.startswith('<p'):
 		start_inline_p(tag)
+	elif tag == '</p>':
+		closeTags('p')
+	elif tag == '</P>':
+		closeTags('p')
 	elif tag.startswith('<Q'):
 		start_inline_q(tag)
 	elif tag.startswith('<h'):

@@ -190,6 +190,7 @@ sub load_access_db
 # 各區段的文字, Unicode字元平面對映 http://zh.wikipedia.org/wiki/Unicode%E5%AD%97%E7%AC%A6%E5%B9%B3%E9%9D%A2%E6%98%A0%E5%B0%84
 # 官方表格 http://unicode.org/charts/
 # 左方有一些各版本的字 http://www.unicode.org/charts/About.html
+# ray 提供 Unicode 1.1 的字 http://www.unicode.org/Public/1.1-Update/UnicodeData-1.1.5.txt
 
 #各版本年份 http://zh.wikipedia.org/wiki/Unicode
 
