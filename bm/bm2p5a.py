@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2014/05/29 處理 BM 的 <A>, <B>, <C>, <E>, <Y> 標記
 2014/05/27 <cb:mulu type="卷" n="{}"/> 原本在 <J> 或 Ｊ 卷標記處理, 只有南傳因為無 <J> 所以在 <mj> 標記處理 , 後來全部在 <mj> 處理, 因為西蓮有些也沒有 <J> 標記.
 2014/05/26 處理 BM 的 </p> 及 </P> 標記要結束 <p> 標記
 2014/05/16 1.處理<Q>標記要結束<w><a>標記. 2.處理 <o><u> 標記的結束問題
@@ -434,20 +435,16 @@ def inline_tag(tag):
 		out2(gaiji(tag))
 	elif tag=='<□>':							# 未知字
 		out('<unclear/>')
-	elif re.match(r'<quote .*?>', tag):	# 出處連結, 例如 : SL01n0001_p0020a02_##...佛於經中說，<quote T09n0262_p0007c07-09>舍利弗！汝等當一心...</quote>
-		# 要做成 <quote source="CBETA.T09n0262_p0007c07-09">
-		mo = re.match(r'<quote (.*?)>', tag)
-		out('<quote source="CBETA.{}">'.format(mo.group(1)))
-	elif tag == '</quote>':
-		out('</quote>')
-	elif re.match(r'<I\d?>', tag):
-		start_i(tag)
-	elif re.match(r'<PTS.', tag):
-		start_PTS(tag)
-	elif re.match(r'<trans-mark', tag):
-		start_trans_mark(tag)
 	elif tag=='(':
 		out2('<note place="inline">')
+	elif re.match(r'<[ABCEY]>', tag):
+		start_inline_byline(tag)
+	elif tag.startswith('<h'):
+		start_inline_h(tag)
+	elif tag.startswith('</h'):
+		close_h(tag)
+	elif re.match(r'<I\d?>', tag):
+		start_i(tag)
 	elif tag=='<i>(':
 		out2('<note place="interlinear">')
 	elif tag==')' or tag==")</i>":
@@ -472,20 +469,26 @@ def inline_tag(tag):
 		buf += '<cb:mulu type="卷" n="{}"/>'.format(globals['juan_num'])
 	elif tag=='<o>':
 		start_inline_o(tag)
+	elif re.match(r'<PTS.', tag):
+		start_PTS(tag)
 	elif tag.startswith('<p'):
 		start_inline_p(tag)
 	elif tag == '</p>':
 		closeTags('p')
 	elif tag == '</P>':
 		closeTags('p')
+	elif re.match(r'<quote .*?>', tag):	# 出處連結, 例如 : SL01n0001_p0020a02_##...佛於經中說，<quote T09n0262_p0007c07-09>舍利弗！汝等當一心...</quote>
+		# 要做成 <quote source="CBETA.T09n0262_p0007c07-09">
+		mo = re.match(r'<quote (.*?)>', tag)
+		out('<quote source="CBETA.{}">'.format(mo.group(1)))
+	elif tag == '</quote>':
+		out('</quote>')
 	elif tag.startswith('<Q'):
 		start_inline_q(tag)
-	elif tag.startswith('<h'):
-		start_inline_h(tag)
 	elif tag.startswith('</Q'):
 		close_q(tag)
-	elif tag.startswith('</h'):
-		close_h(tag)
+	elif re.match(r'<trans-mark', tag):
+		start_trans_mark(tag)
 	elif tag.startswith('<T'):
 		start_inline_T(tag)
 	elif tag=='</T>':
@@ -639,6 +642,20 @@ def start_byline(tag):
 	elif 'E' in tag:
 		out('<byline cb:type="editor">')
 	elif 'Y' in tag:
+		out('<byline cb:type="translator">')
+	opens['byline'] = 1
+	
+def start_inline_byline(tag):
+	closeTags('byline', 'cb:jhead', 'cb:juan')
+	if tag == '<A>':
+		out('<byline cb:type="author">')
+	elif tag == '<B>':
+		out('<byline cb:type="other">')
+	elif tag == '<C>':
+		out('<byline cb:type="collector">')
+	elif tag == '<E>':
+		out('<byline cb:type="editor">')
+	elif tag == '<Y>':
 		out('<byline cb:type="translator">')
 	opens['byline'] = 1
 	
