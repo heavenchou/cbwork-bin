@@ -618,7 +618,7 @@ def record_open(tag):
 
 def start_J(tag):
 	n = get_number(tag)
-	out('<cb:juan fun="open" n="%s"><cb:jhead>' % (n, n))
+	out('<cb:juan fun="open" n="%s"><cb:jhead>' % n)
 	record_open('cb:juan')
 	record_open('cb:jhead')
 
