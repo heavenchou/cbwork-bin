@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2014/06/05 處理 BM 的表格標記, 也就是行首的 F, f 及行中的 <c> 標記
 2014/05/29 處理 BM 的 <A>, <B>, <C>, <E>, <Y> 標記
 2014/05/27 <cb:mulu type="卷" n="{}"/> 原本在 <J> 或 Ｊ 卷標記處理, 只有南傳因為無 <J> 所以在 <mj> 標記處理 , 後來全部在 <mj> 處理, 因為西蓮有些也沒有 <J> 標記.
 2014/05/26 處理 BM 的 </p> 及 </P> 標記要結束 <p> 標記
@@ -355,6 +356,32 @@ def myLength(s):
 		len += 1
 	return len
 
+# 表格中的 cell , 有這些形式
+# <c> => <cell>
+# <c3> => <cell cols="3">
+# <c r3> => <cell rows="3">
+# <c3 r3> => <cell cols="3" rows="3">
+def start_inline_c(tag):
+	closeTags('cell')
+	# 檢查有沒有 c3 這種格式
+	cols = ''
+	mo = re.search(r'c(\d+)', tag)
+	if mo!=None:
+		cols = mo.group(1)
+	# 檢查有沒有 r3 這種格式
+	rows = ''
+	mo = re.search(r'r(\d+)', tag)
+	if mo!=None:
+		rows = mo.group(1)
+	out('<cell')
+	if cols != '': out(' cols="{}"'.format(cols))
+	if rows != '': out(' rows="{}"'.format(rows))
+	out('>')
+	record_open('cell')
+
+def close_F(tag):
+	closeTags('cell', 'row', 'table')
+
 def close_q(tag):
 	closeTags('cb:jhead', 'cb:juan', 'p')
 	close_head()
@@ -439,6 +466,10 @@ def inline_tag(tag):
 		out2('<note place="inline">')
 	elif re.match(r'<[ABCEY]>', tag):
 		start_inline_byline(tag)
+	elif re.match(r'<c[\d\s>]', tag):
+		start_inline_c(tag)
+	elif tag=='</F>':
+		close_F(tag)
 	elif tag.startswith('<h'):
 		start_inline_h(tag)
 	elif tag.startswith('</h'):
@@ -668,8 +699,49 @@ def start_x(tag):
 	globals['head_start'] = True
 	div_head = ''
 
+# 計算一行有多少 <c> 標記
+# <c> 算 1 個
+# <c3> 算 3 個
+# <c4 r3> 算 4 個
+# <c r3> 算 1 個
+def count_c_from_line(text):
+	cnum = 0
+	# 算有多少個 <c> 或 <c r3>
+	findc = True
+	while(findc):
+		mo = re.search(r'<c[\s>]', text)
+		if mo!=None: 
+			text = re.sub(r'<c[\s>]', '', text, count=1)
+			cnum += 1
+		else:
+			findc = False
+	# 算有多少個 <c3> 或 <c3 r3>
+	findc = True
+	while(findc):
+		mo = re.search(r'<c(\d+)', text)
+		if mo!=None: 
+			cnum += int(mo.group(1))
+			text = re.sub(r'<c(\d+)', '', text, count=1)
+		else:
+			findc = False
+	return cnum
+
+# 處理表格 F 表格開始
+def start_F(tag, text):
+	# 計算一行有多少個 c 標記
+	cnum = count_c_from_line(text)
+	out('<table cols="{0:0d}"><row>'.format(cnum))
+	record_open('table')
+	record_open('row')
+
+# 處理表格 f 表示 <row> 的範圍
+def start_f(tag):
+	closeTags('cell', 'row')
+	out('<row>')
+	record_open('row')
+
 # 處理行首標記
-def do_line_head(tag):
+def do_line_head(tag, text):
 	if 'W' in tag:
 		tag = tag.replace('W', '')
 		if not globals['inw']:
@@ -680,6 +752,8 @@ def do_line_head(tag):
 		globals['inw']=False
 	if ('A' in tag) or ('B' in tag) or ('C' in tag) or ('E' in tag) or ('Y' in tag):
 		start_byline(tag)
+	elif 'F' in tag: start_F(tag, text)
+	elif 'f' in tag: start_f(tag)
 	elif 'I' in tag:
 		start_i(tag)
 		if 'P' in tag: start_p(tag)
@@ -868,7 +942,7 @@ def convert():
 			buf += ' type="honorific"'  # 強迫換行
 		buf += ' ed="{}" n="{}"/>'.format(ed, pb+line_num)
 		
-		do_line_head(head_tag)
+		do_line_head(head_tag, text)
 		'''
 		先把 [Ａ>Ｂ] 換成 <choice cb:resp="CBETA.maha"><corr>Ｂ</corr><sic>Ａ</sic></choice>
 		因為 Ａ 與 B 也有可能是組字式或校勘數字, 例如 [[金*本]>[口*兄]] , [[01]>]
