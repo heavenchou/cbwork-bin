@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2014/06/05 <J> 標記要結束 <p> 標記
 2014/06/05 處理 BM 的表格標記, 也就是行首的 F, f 及行中的 <c> 標記
 2014/05/29 處理 BM 的 <A>, <B>, <C>, <E>, <Y> 標記
 2014/05/27 <cb:mulu type="卷" n="{}"/> 原本在 <J> 或 Ｊ 卷標記處理, 只有南傳因為無 <J> 所以在 <mj> 標記處理 , 後來全部在 <mj> 處理, 因為西蓮有些也沒有 <J> 標記.
@@ -651,6 +652,7 @@ def record_open(tag):
 	opens[tag] += 1
 
 def start_J(tag):
+	closeTags('p')
 	n = get_number(tag)
 	out('<cb:juan fun="open" n="%s"><cb:jhead>' % n)
 	record_open('cb:juan')
