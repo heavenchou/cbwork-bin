@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2014/06/06 經末也要考慮結束 </cb:jhead> 標記
 2014/06/05 <J> 標記要結束 <p> 標記
 2014/06/05 處理 BM 的表格標記, 也就是行首的 F, f 及行中的 <c> 標記
 2014/05/29 處理 BM 的 <A>, <B>, <C>, <E>, <Y> 標記
@@ -860,7 +861,7 @@ $Log:'''.format(today=today)
 </teiHeader>
 <text><body>'''
 	fo.write(s)
-	closeTags('l','lg','p')		# 加上 l, lg  -- 2013/09/30
+	closeTags('l','lg','cb:jhead','p')		# 加上 l, lg  -- 2013/09/30 # 加上 cb:jhead 2014/06/06
 	close_div(1)
 	out('')		# 處理最後的 <lb> , 因為 BM 版經文最後可能會有空白行, 也要轉出 XML 來
 	
