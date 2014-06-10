@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2014/06/10 譯者要結束 </p> 標記
 2014/06/06 經末也要考慮結束 </cb:jhead> 標記
 2014/06/05 <J> 標記要結束 <p> 標記
 2014/06/05 處理 BM 的表格標記, 也就是行首的 F, f 及行中的 <c> 標記
@@ -666,7 +667,7 @@ def start_j(tag):
 
 def start_byline(tag):
 	if '=' in tag: return
-	closeTags('byline', 'cb:jhead', 'cb:juan')
+	closeTags('p', 'byline', 'cb:jhead', 'cb:juan')
 	if 'A' in tag:
 		out('<byline cb:type="author">')
 	elif 'B' in tag:
