@@ -3,6 +3,7 @@
 2013.1.4 周邦信 改寫自 cbp4top5.py
 
 Heaven 修改:
+2014/06/17 原西蓮代碼 "SL" 改成 智諭 "ZY", 取消西蓮專用目錄
 2014/03/30 1.修改南傳校勘星號處理錯誤的地方.
            2.anchor 標記也要在 back 區出現, 為了避免 xml:id 重覆, back 區的 xml:id 最後加上 '_back'
            3.南傳特有的 note 有星號, 這類 <note type="star"...> 要加上 n 屬性以資區別
@@ -53,11 +54,11 @@ WITS = {
 	'P' : '【北藏】',
 	'Q' : '【磧砂】',
 	'S' : '【宋遺】',
-	'SL' : '【西蓮】',
 	'T' : '【大】',
 	'U' : '【洪武】',
 	'W' : '【藏外】',
 	'X' : '【卍續】',
+	'ZY' : '【智諭】',
 }
 
 RESPS = {
@@ -1486,10 +1487,6 @@ cbwork_dir = config.get('default', 'cbwork')
 JING = config.get('default', 'jing.jar_file')
 
 IN_P5a = cbwork_dir + '/xml-p5a' 		# XML P5a 來源資料夾
-if options.volumn is not None:
-	if options.volumn[:2] == 'SL':
-		seeland_dir = config.get('default', 'seeland_dir')
-		IN_P5a = seeland_dir + '/xml-p5a' 		# XML P5a 來源資料夾
 
 PHASE1DIR = CBTEMP + '/cbetap5-tmp1'	# 暫存資料夾
 OUT_P5 = CBTEMP + '/cbetap5-ok'			# 最後結果

@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2014/06/17 原西蓮代碼 "SL" 改成 智諭 "ZY", 取消西蓮專用目錄
 2014/06/10 譯者要結束 </p> 標記
 2014/06/06 經末也要考慮結束 </cb:jhead> 標記
 2014/06/05 <J> 標記要結束 <p> 標記
@@ -60,7 +61,7 @@ wits={
 'P': '【北藏】',
 'Q': '【磧砂】',
 'S': '【宋遺】',
-'SL': '【西蓮】',
+'ZY': '【智諭】',
 'T': '【大】', 
 'U': '【洪武】',
 'W': '【藏外】',
@@ -85,7 +86,7 @@ collectionEng={
 'Q': 'Qisha Edition of the Canon - Xinwenfeng Edition',
 'R': 'Manji Zokuzōkyō - Xinwenfeng Edition',
 'S': 'Songzang yizhen - Xinwenfeng Edition',
-'SL': 'the Complete Works of Ven Zhiyu',
+'ZY': 'the Complete Works of Ven Zhiyu',
 'T': 'Taishō Tripiṭaka',
 'U': 'Southern Hongwu Edition of the Canon',
 'W': 'Buddhist Texts not contained in the Tripiṭaka',
@@ -511,7 +512,7 @@ def inline_tag(tag):
 		closeTags('p')
 	elif tag == '</P>':
 		closeTags('p')
-	elif re.match(r'<quote .*?>', tag):	# 出處連結, 例如 : SL01n0001_p0020a02_##...佛於經中說，<quote T09n0262_p0007c07-09>舍利弗！汝等當一心...</quote>
+	elif re.match(r'<quote .*?>', tag):	# 出處連結, 例如 : ZY01n0001_p0020a02_##...佛於經中說，<quote T09n0262_p0007c07-09>舍利弗！汝等當一心...</quote>
 		# 要做成 <quote source="CBETA.T09n0262_p0007c07-09">
 		mo = re.match(r'<quote (.*?)>', tag)
 		out('<quote source="CBETA.{}">'.format(mo.group(1)))
@@ -981,8 +982,8 @@ def read_source():
 			fields = line.split()
 			if len(fields)<5: continue
 			if not re.match('[A-Z]', fields[1]): continue
-			if len(ed) == 2:		# ex. ed=SL (??? 有大於二位數的就再說了) - 2013/08/26
-				n = fields[1][2:7]	# SL0001_01_p0017
+			if len(ed) == 2:		# ex. ed=ZY (??? 有大於二位數的就再說了) - 2013/08/26
+				n = fields[1][2:7]	# ZY0001_01_p0017
 			else:
 				n = fields[1][1:6]	# T0099-02-p0001 or T0128a02-p0835
 			if n[-1:] == '-' or n[-1:] == '_':
@@ -1010,7 +1011,7 @@ parser.add_option("-v", dest="vol", help="指定要轉換哪一冊")
 parser.add_option("-o", action='store', dest="output", help="輸出資料夾")
 (options, args) = parser.parse_args()
 vol = options.vol.upper()
-mo = re.search(r'^\D+', vol)	# 因為會有兩位數以上的代碼, 例如 SL01 - 2013/08/26
+mo = re.search(r'^\D+', vol)	# 因為會有兩位數以上的代碼, 例如 ZY01 - 2013/08/26
 ed = mo.group()
 
 
@@ -1019,13 +1020,8 @@ config = configparser.SafeConfigParser()
 config.read('../cbwork_bin.ini')
 gaijiMdb = config.get('default', 'gaiji-m.mdb_file')
 cbwork_dir = config.get('default', 'cbwork')
-if(ed == 'SL'):			# 西蓮的來源在 Google Drive 的目錄中, 故要另外處理 - 2013/08/26
-	seeland_dir = config.get('default', 'seeland_dir')
-	BMLaiYuan = seeland_dir + '/bm/{vol}/source.txt'.format(vol=vol)
-	BMJingWen = seeland_dir + '/bm/{vol}/new.txt'.format(vol=vol)
-else:
-	BMLaiYuan = cbwork_dir + '/bm/{ed}/{vol}/source.txt'.format(vol=vol, ed=ed)
-	BMJingWen = cbwork_dir + '/bm/{ed}/{vol}/new.txt'.format(vol=vol, ed=ed)
+BMLaiYuan = cbwork_dir + '/bm/{ed}/{vol}/source.txt'.format(vol=vol, ed=ed)
+BMJingWen = cbwork_dir + '/bm/{ed}/{vol}/new.txt'.format(vol=vol, ed=ed)
 
 log=open('bm2p5a.log', 'w', encoding='utf8')
 

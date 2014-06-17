@@ -7,6 +7,7 @@
 Ray CHOU 周邦信 2011.6.11
 
 Heaven 修改:
+2014/06/17 原西蓮代碼 "SL" 改成 智諭 "ZY", 取消西蓮專用目錄
 2014/03/12 處理一卷一檔且不呈現檔頭的 bug
 2014/03/12 把 XML P5 的來源加入設定檔中
 2014/03/09 把呈現的校勘[1-1]改成[01]
@@ -53,7 +54,7 @@ collectionName={
 	"P":"永樂北藏",
 	"Q":"磧砂大藏經",
 	"S":"宋藏遺珍",
-	"SL":"智諭老和尚全集",
+	"ZY":"智諭老和尚著作全集",
 	"U":"洪武南藏",
 }
 
@@ -465,9 +466,6 @@ config = configparser.SafeConfigParser()
 config.read('../cbwork_bin.ini')
 xmlP5Base = config.get('p5totxt', 'xml_p5')
 outBase = config.get('p5totxt', 'output_dir')
-if options.volumn is not None:
-	if options.volumn[:2] == 'SL':	# 西蓮淨苑的資料
-		xmlP5Base = config.get('default', 'seeland_dir') + '/xml-p5'
 
 print('Input XML P5 Folder:', xmlP5Base)
 print('Output Normal Folder:', outBase)

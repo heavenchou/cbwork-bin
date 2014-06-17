@@ -15,24 +15,13 @@ use Config::IniFiles;
 
 my $vol = shift;			# $vol = T01 , 冊數
 exit if($vol eq "");		# 沒參數就結束
-$vol =~ /^(\D+)/;			# 因為不只一個英文字, 所以用正規式來判斷, 例如西蓮為 'SL'
+$vol =~ /^(\D+)/;			# 因為不只一個英文字, 所以用正規式來判斷, 例如西蓮為 'ZY'
 my $ed = $1;				# $ed = T
 
 my $cfg = Config::IniFiles->new( -file => "../cbwork_bin.ini" );
 my $cbwork_dir = $cfg->val('default', 'cbwork', '/cbwork');	# 讀取 cbwork 目錄
-my $seeland_dir = $cfg->val('default', 'seeland_dir', '');	# 讀取 google drive 西蓮的目錄
-my $xml_path;
+my $xml_path = $cbwork_dir . "/xml-p5a/$ed/$vol/";
 
-if($ed eq "SL")
-{
-	# 西蓮淨苑的資料在 google drive 目錄中
-	$xml_path = $seeland_dir . "/xml-p5a/$ed/$vol/";
-}
-else
-{
-	 $xml_path = $cbwork_dir . "/xml-p5a/$ed/$vol/";
-}
- 
 #require "head.pl";
 #open (CFG, "../../work/bin/CBETA.CFG") || die "can't open cbeta.cfg\n";
 #xml_root=c:/cbwork/xml
