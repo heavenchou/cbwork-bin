@@ -32,7 +32,7 @@ if($ed eq "N")
 }
 elsif($ed eq "B")
 {
-	$source_ename = "Supplement";		# resp="xxx" 的名稱
+	$source_ename = "BuBian";		# resp="xxx" 的名稱
 	$source_cname = "補編";			#<rdg wit="xxxx"> 的名稱
 }
 else
