@@ -17,7 +17,8 @@ use Win32::ODBC;
 
 my $vol = shift;						# 傳入冊數 N01
 
-my $ed = substr($vol,0,1);				# 取出 $vol 第一個英文字
+my $ed = $vol;				
+$ed =~ s/\d+//;						# 取出 $vol 前面的英文字
 my $infile = $vol . ".txt";				# 來源檔名, N01.txt
 my $outfile = "out_" . $infile;		# 輸出檔名 , 也就是在輸入檔名前加上 out_ 
 my $errfile = "err_" . $infile;		# 錯誤檔名 , 也就是在輸入檔名前加上 err_ 
@@ -28,6 +29,11 @@ if($ed eq "N")
 {
 	$source_ename = "NanChuan";		# resp="xxx" 的名稱
 	$source_cname = "南傳";			#<rdg wit="xxxx"> 的名稱
+}
+elsif($ed eq "B")
+{
+	$source_ename = "Supplement";		# resp="xxx" 的名稱
+	$source_cname = "補編";			#<rdg wit="xxxx"> 的名稱
 }
 else
 {
