@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2014/06/27 處理 <z> 標記
 2014/06/17 原西蓮代碼 "SL" 改成 智諭 "ZY", 取消西蓮專用目錄
 2014/06/10 譯者要結束 </p> 標記
 2014/06/06 經末也要考慮結束 </cb:jhead> 標記
@@ -204,22 +205,28 @@ def start_inline_p(tag):
 	closeTags('l', 'lg')
 	s = '<p xml:id="p%sp%s%s%02d"' % (vol, old_pb, line_num, char_count)
 	
+	# 如果 tag 是 <z 開頭的, 就要變成
+	#<p xml:id="pxxxxxxxx" cb:type="dharani"
+	mo = re.search(r'<z', tag)
+	if mo!=None:
+		s += ' cb:type="dharani"'
+	
 	# 處理 <p,1,2> 這種格式
-	mo = re.search(r'<p,(\-?\d+),(\-?\d+)>', tag)
+	mo = re.search(r'<[pz],(\-?\d+),(\-?\d+)>', tag)
 	if mo!=None:
 		s += ' rend="margin-left:%sem;text-indent:%sem' % mo.groups()
 		if char_count>1: s += ';inline'		# 若是行中段落, 則加上 inline
 		s += '"'
 	
 	# 處理 <p,1> 這種格式
-	mo = re.search(r'<p,(\-?\d+)>', tag)
+	mo = re.search(r'<[pz],(\-?\d+)>', tag)
 	if mo!=None:
 		s += ' rend="margin-left:%sem' % mo.group(1)
 		if char_count>1: s += ';inline'		# 若是行中段落, 則加上 inline
 		s += '"'
 	
 	# 若都沒有 <p,1 這種格式, 又是在行中, 則用 rend="inline"
-	mo = re.search(r'<p,(\-?\d+)', tag)
+	mo = re.search(r'<[pz],(\-?\d+)', tag)
 	if mo==None:
 		if char_count>1: s += ' rend="inline"'
 	
@@ -559,6 +566,10 @@ def inline_tag(tag):
 		start_inline_a(tag)
 	elif tag=='</w>':
 		closeTags('p','sp','cb:dialog')
+	elif tag.startswith('<z'):	# 和 <p 一樣的處理法
+		start_inline_p(tag)
+	elif tag=='</z>':
+		closeTags('p')
 	else:
 		print(old_pb+line_num+'未處理的標記: ' + tag)
 
