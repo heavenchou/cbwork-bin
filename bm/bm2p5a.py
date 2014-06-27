@@ -10,7 +10,8 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
-2014/06/27 處理 <z> 標記
+2014/06/27 1.處理 <z> 標記
+           2.處理 <sd> 標記
 2014/06/17 原西蓮代碼 "SL" 改成 智諭 "ZY", 取消西蓮專用目錄
 2014/06/10 譯者要結束 </p> 標記
 2014/06/06 經末也要考慮結束 </cb:jhead> 標記
@@ -531,6 +532,11 @@ def inline_tag(tag):
 		close_q(tag)
 	elif re.match(r'<trans-mark', tag):
 		start_trans_mark(tag)
+	elif tag=='<sd>':
+		out('<term xml:lang="sa-Sidd">')
+		opens['term'] = 1
+	elif tag=='</sd>':
+		closeTags('term')
 	elif tag.startswith('<T'):
 		start_inline_T(tag)
 	elif tag=='</T>':
@@ -883,6 +889,8 @@ $Log:'''.format(today=today)
 	buf1 = re.sub('<head>((?:<ref target="PTS.[^>]*>)?)</head>',r'\1',buf1)
 	
 	buf1 = buf1.replace('&', '&amp;')	# 把 & 換成 &amp;  - 2013/09/24
+	buf1 = buf1.replace('&amp;SD-', '&SD-')	# 把 &amp;SD- 換成 &SD-
+	buf1 = buf1.replace('&amp;RJ-', '&RJ-')	# 把 &amp;RJ- 換成 &SD-
 	
 	fo.write(buf1)
 	buf1 = ''
