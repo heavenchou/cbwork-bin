@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2014/07/03 悉曇字 &SD-CFC5; 要變成 <g ref="#SD-CFC5"/> 這種格式
 2014/06/27 1.處理 <z> 標記
            2.處理 <sd> 標記
 2014/06/17 原西蓮代碼 "SL" 改成 智諭 "ZY", 取消西蓮專用目錄
@@ -333,6 +334,15 @@ def start_q(tag):
 	buf += '<head>'
 	opens['head'] = 1
 
+# 悉曇字或蘭札字
+# &SD-CFC5; => <g ref="#SD-CFC5"/>
+def start_inline_SDRJ(tag):
+	global char_count
+	mo = re.search(r'&(((SD)|(RJ))\-\w{4});', tag)
+	if mo!=None:
+		out2('<g ref="#{}"/>'.format(mo.group(1)))
+		char_count+=1
+
 # 可能用不上了, 已在 do_corr 處理了.
 def choice(tag):
 	'''  把 [A>B] 換成 <choice> '''
@@ -576,6 +586,8 @@ def inline_tag(tag):
 		start_inline_p(tag)
 	elif tag=='</z>':
 		closeTags('p')
+	elif re.match(r'&((SD)|(RJ))\-\w{4};', tag):	# 悉曇字或蘭札字
+		start_inline_SDRJ(tag)
 	else:
 		print(old_pb+line_num+'未處理的標記: ' + tag)
 
@@ -642,9 +654,9 @@ def do_corr(text):
 
 # 分析每一行經文
 def do_text(s):
-	tokens = re.findall(r'(<i>\(|\)</i>|<.*?>|\[[^\]]*?>.*?\]|\[[^>\[ ]+?\]|\(|\)|.)', s)
+	tokens = re.findall(r'(<i>\(|\)</i>|<.*?>|\[[^\]]*?>.*?\]|\[[^>\[ ]+?\]|\(|\)|&SD\-\w{4};|&RJ\-\w{4};|.)', s)
 	for t in tokens:
-		if re.match('[<\(\)\[]', t): inline_tag(t)	# 處理經文中的標記
+		if re.match('[<\(\)\[&]', t): inline_tag(t)	# 處理經文中的標記
 		else: do_chars(t)							# 處理經文中的文字
 	return s
 
