@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2014/07/04 處理行首資訊中的 r 標記 => <p xml:id="xxx" cb:type="pre">
 2014/07/03 悉曇字 &SD-CFC5; 要變成 <g ref="#SD-CFC5"/> 這種格式
 2014/06/27 1.處理 <z> 標記
            2.處理 <sd> 標記
@@ -195,7 +196,7 @@ def start_p(tag):
 	r = get_number(tag)
 	out('<p xml:id="p%sp%s%s01"' % (vol, old_pb, line_num))
 	if 'r' in head_tag:
-		out(' type="pre"')
+		out(' cb:type="pre"')
 	if r!='':
 		out(' rend="margin-left:%sem"' % r)
 	out('>')
@@ -784,6 +785,10 @@ def do_line_head(tag, text):
 				start_div(1, 'w')
 	elif globals['inw']:
 		globals['inw']=False
+		
+	if 'r' not in tag:
+		globals['inr']=False
+	
 	if ('A' in tag) or ('B' in tag) or ('C' in tag) or ('E' in tag) or ('Y' in tag):
 		start_byline(tag)
 	elif 'F' in tag: start_F(tag, text)
@@ -795,12 +800,15 @@ def do_line_head(tag, text):
 	elif 'j' in tag: start_j(tag)
 	elif 'P' in tag: start_p(tag)
 	elif 'Q' in tag: start_q(tag)
+	elif 'r' in tag: 
+		if(globals['inr'] == False):	# 第一個 r 才需要處理成 <p xml:id="xxx" cb:type="pre">
+			globals['inr'] = True
+			start_p(tag)	# 依 p 的方式處理
 	elif 'x' in tag: start_x(tag)
 	else: 
 		tag = tag.replace('#', '')
 		tag = tag.replace('_', '')
 		tag = tag.replace('k', '')
-		tag = tag.replace('r', '')
 		tag = re.sub(r'\d*', '', tag)
 		if tag!= '': print(old_pb+line_num+'未處理的標記: ' + tag)
 
@@ -930,6 +938,7 @@ def sutraInit(newSutraNumber):
 	globals['backApp']=''
 	globals['head_start'] = False
 	globals['inw'] = False
+	globals['inr'] = False
 	globals['juan_num'] = 0
 	globals['mulu_start'] = False
 	globals['sutraNumber'] = newSutraNumber
