@@ -10,6 +10,11 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2014/07/09 1. byline 要結束 head
+           2. <u> 要結束 byline
+           3. <o> 與 <u> 要結束 head
+           4. 沒資料的 <corr></corr> 及 <sic></sic> 要在中間加入 <space quantity="0"/>
+           5. <mj> 要結尾卷尾卷名的 <cb:jhead> 與 <cb:juan>
 2014/07/04 處理行首資訊中的 r 標記 => <p xml:id="xxx" cb:type="pre">
 2014/07/03 悉曇字 &SD-CFC5; 要變成 <g ref="#SD-CFC5"/> 這種格式
 2014/06/27 1.處理 <z> 標記
@@ -422,7 +427,7 @@ def close_h(tag):
 def start_inline_T(tag):
 	if not 'lg' in opens: opens['lg'] = 0
 	if opens['lg']==0:
-		closeTags('p')
+		closeTags('byline', 'p')
 		close_head()
 		out('<lg xml:id="lg%sp%s%s01" type="abnormal">' % (vol, old_pb, line_num))	#??? lg 一定是在行首的第一個字嗎?
 		opens['lg'] = 1
@@ -443,6 +448,7 @@ def start_inline_T(tag):
 
 def start_inline_o(tag):
 	closeTags('p')
+	close_head()
 	if 'commentary' in opens and opens['commentary']>0:
 		out1('</cb:div>')
 		opens['div'] -= 1
@@ -451,7 +457,8 @@ def start_inline_o(tag):
 	opens['orig'] = 1
 	
 def start_inline_u(tag):
-	closeTags('p')
+	closeTags('byline', 'p')
+	close_head()
 	if 'orig' in opens and opens['orig']>0:
 		out1('</cb:div>')
 		opens['div'] -= 1
@@ -515,6 +522,7 @@ def inline_tag(tag):
 		while opens['list']>0:
 			closeTag('item', 'list')
 	elif tag.startswith('<mj'):
+		closeTags('cb:jhead', 'cb:juan')
 		#n=get_number(tag)
 		globals['juan_num']+=1
 		#out('<milestone unit="juan" n="{}"/>'.format(globals['juan_num']))		# 若用 out() , 會有一堆 </p></cb:div> 標記出現在 <milestone> 後面
@@ -541,13 +549,15 @@ def inline_tag(tag):
 		start_inline_q(tag)
 	elif tag.startswith('</Q'):
 		close_q(tag)
-	elif re.match(r'<trans-mark', tag):
-		start_trans_mark(tag)
 	elif tag=='<sd>':
 		out('<term xml:lang="sa-Sidd">')
 		opens['term'] = 1
 	elif tag=='</sd>':
 		closeTags('term')
+	elif tag=='<space quantity="0"/>':
+		out2(tag)
+	elif re.match(r'<trans-mark', tag):
+		start_trans_mark(tag)
 	elif tag.startswith('<T'):
 		start_inline_T(tag)
 	elif tag=='</T>':
@@ -640,6 +650,7 @@ def do_corr(text):
 	再把 <corr>[01]</corr> 這一類換成 <corr><[01]></corr> , 而 <[01]> 之後會換成 [01], 如不這樣處理, [01] 會被變成一般的校勘數字標記
 	再把:gaiji1:xxx:gaiji2: 換回 [xxx]
 	再把:gaiji3:xxx:gaiji4: 換回 <xxx>
+	再把 <corr></corr> 換成 <corr><space quantity="0"/></corr>, <sic> 比對 <corr> 處理.
 	'''
 	text = re.sub(r"\[([^>\[\]]+?)\]", r":gaiji1:\1:gaiji2:", text)
 	text = re.sub(r"<([^<>]+?)>", r":gaiji3:\1:gaiji4:", text)
@@ -650,6 +661,9 @@ def do_corr(text):
 	text = re.sub(":gaiji4:", ">", text)
 	text = re.sub(r"<corr>(\[(([\da-zA-Z]{2,3})|＊)\])<\/corr>", r'<corr><\1></corr>', text)
 	text = re.sub(r"<sic>(\[(([\da-zA-Z]{2,3})|＊)\])<\/sic>", r'<sic><\1></sic>', text)
+	text = re.sub(r"<corr><\/corr>", r'<corr><space quantity="0"/></corr>', text)
+	text = re.sub(r"<sic><\/sic>", r'<sic><space quantity="0"/></sic>', text)
+	
 
 	return text
 
@@ -713,6 +727,7 @@ def start_byline(tag):
 	
 def start_inline_byline(tag):
 	closeTags('byline', 'cb:jhead', 'cb:juan')
+	close_head()
 	if tag == '<A>':
 		out('<byline cb:type="author">')
 	elif tag == '<B>':
