@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2014/11/27 處理行首標記有 S 及 s 的情況
 2014/07/09 1. byline 要結束 head
            2. <u> 要結束 byline
            3. <o> 與 <u> 要結束 head
@@ -517,6 +518,9 @@ def inline_tag(tag):
 		record_open('cb:jhead')
 	elif tag.startswith('<J'):
 		start_J(tag)
+	elif tag =='<l>':	out('<l>')	# 行首標記有 S 及 s 時, 會在行中自動將空格變成 <l></l></lg> 等標記
+	elif tag =='</l>':	out('</l>')	# 行首標記有 S 及 s 時, 會在行中自動將空格變成 <l></l></lg> 等標記
+	elif tag =='</lg>':	out('</lg>')	# 行首標記有 S 及 s 時, 會在行中自動將空格變成 <l></l></lg> 等標記
 	elif tag =='</L>':
 		closeTags('p')
 		while opens['list']>0:
@@ -739,7 +743,19 @@ def start_inline_byline(tag):
 	elif tag == '<Y>':
 		out('<byline cb:type="translator">')
 	opens['byline'] = 1
+
+def start_S(tag):
+	if not 'lg' in opens: opens['lg'] = 0
+	if opens['lg']==0:
+		closeTags('byline', 'p')
+		close_head()
+		out('<lg xml:id="lg%sp%s%s01">' % (vol, old_pb, line_num))
+		opens['lg'] = 1
+	closeTags('l')
 	
+def start_s(tag):
+	opens['lg'] = 0
+
 def start_x(tag):
 	global buf, div_head, globals
 	start_div(1, 'xu')
@@ -819,6 +835,16 @@ def do_line_head(tag, text):
 		if(globals['inr'] == False):	# 第一個 r 才需要處理成 <p xml:id="xxx" cb:type="pre">
 			globals['inr'] = True
 			start_p(tag)	# 依 p 的方式處理
+	elif 'S' in tag: 
+		start_S(tag)
+		text = re.sub("　　", "</l><l>", text)
+		text = re.sub("　", "<l>", text)
+		text = text + "</l>\n";
+	elif 's' in tag:
+		start_s(tag)
+		text = re.sub("　　", "</l><l>", text)
+		text = re.sub("　", "<l>", text)
+		text = text + "</l></lg>\n";
 	elif 'x' in tag: start_x(tag)
 	else: 
 		tag = tag.replace('#', '')
@@ -826,6 +852,7 @@ def do_line_head(tag, text):
 		tag = tag.replace('k', '')
 		tag = re.sub(r'\d*', '', tag)
 		if tag!= '': print(old_pb+line_num+'未處理的標記: ' + tag)
+	return text
 
 # 結束一部經, 全部印出來
 def close_sutra(num):
@@ -1002,7 +1029,7 @@ def convert():
 			buf += ' type="honorific"'  # 強迫換行
 		buf += ' ed="{}" n="{}"/>'.format(ed, pb+line_num)
 		
-		do_line_head(head_tag, text)
+		text = do_line_head(head_tag, text)	# 因為 S 標記會把空格處理成 <l></l> , 所以要有傳回處理過的 text
 		'''
 		先把 [Ａ>Ｂ] 換成 <choice cb:resp="CBETA.maha"><corr>Ｂ</corr><sic>Ａ</sic></choice>
 		因為 Ａ 與 B 也有可能是組字式或校勘數字, 例如 [[金*本]>[口*兄]] , [[01]>]
