@@ -1275,6 +1275,11 @@ sub print_jun_head()
 		$sutraver_c = "智諭老和尚全集";
 		$sutraver_e = "the Complete Works of Ven Zhiyu";
 	}
+	elsif($vol_head eq "DA")
+	{
+		$sutraver_c = "道安長老全集";
+		$sutraver_e = "the Complete Works of Ven Daoan";
+	}
 	elsif($vol_head eq "U")
 	{
 		$sutraver_c = "洪武南藏";

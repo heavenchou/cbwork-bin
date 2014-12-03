@@ -60,6 +60,7 @@ wits={
 'B': '【補編】',
 'C': '【中華】',
 'D': '【國圖】',
+'DA': '【道安】',
 'F': '【房山】',
 'G': '【佛教】',
 'H': '【正史】',
@@ -71,11 +72,11 @@ wits={
 'P': '【北藏】',
 'Q': '【磧砂】',
 'S': '【宋遺】',
-'ZY': '【智諭】',
 'T': '【大】', 
 'U': '【洪武】',
 'W': '【藏外】',
 'X': '【卍續】', 
+'ZY': '【智諭】',
 }
 
 collectionEng={
@@ -83,6 +84,7 @@ collectionEng={
 'B': 'Supplement to the Dazangjing',
 'C': 'Zhonghua Canon - Zhonghua shuju Edition',
 'D': 'Selections from the Taipei National Central Library Buddhist Rare Book Collection',
+'DA': 'the Complete Works of Ven Daoan',
 'F': 'Fangshan shijing',
 'G': 'Fojiao Canon',
 'H': 'Passages concerning Buddhism from the Official Histories',
@@ -96,12 +98,12 @@ collectionEng={
 'Q': 'Qisha Edition of the Canon - Xinwenfeng Edition',
 'R': 'Manji Zokuzōkyō - Xinwenfeng Edition',
 'S': 'Songzang yizhen - Xinwenfeng Edition',
-'ZY': 'the Complete Works of Ven Zhiyu',
 'T': 'Taishō Tripiṭaka',
 'U': 'Southern Hongwu Edition of the Canon',
 'W': 'Buddhist Texts not contained in the Tripiṭaka',
 'X': 'Manji Shinsan Dainihon Zokuzōkyō',
-'Z': 'Manji Dainihon Zokuzōkyō'
+'Z': 'Manji Dainihon Zokuzōkyō',
+'ZY': 'the Complete Works of Ven Zhiyu'
 }
 
 '''
