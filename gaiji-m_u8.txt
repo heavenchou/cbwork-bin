@@ -1,25 +1,25 @@
 cb	mojikyo	entity	uni_flag	unicode	nor_unicode	des	nor	cx
-			1	0119		ę		
-	M062986		1	017D		[ˇ/Z]		
+	M062937	Imacron	1	012A		[-/I]		
 		ucirc	1	00FB		[^/u]	^u	
 	M063068	udiaeresis	1	00FC		[‥/u]	‥u	
 		Amacron	1	0100		[-/A]	AA	
 		amacron	1	0101		[-/a]	aa	
 		Cdotabv	1	010A		[./C]	^C	
 		cdotabv	1	010B		[./c]	^c	
-	M063051	odiaeresis	1	00F6		[‥/o]	‥o	
-	M063021		1	0115		[ˇ/e]		
+	M063013		1	010D		[ˇ/c]		
+		Gacute	1	01F4		[′/G]	`G	
+			1	0119		ę		
 		oacute	1	00F3		[′/o]	`o	
-	M062937	Imacron	1	012A		[-/I]		
 		imacron	1	012B		[-/i]	ii	
 		Omacron	1	014C		[-/O]	OO	
 	M063055	omacron	1	014D		[-/o]		
 		Sacute	1	015A		[′/S]	`S	
 		sacute	1	015B		[′/s]	`s	
 	M062962		1	0160		[ˇ/S]		
-		umacron	1	016B		[-/u]	uu	
-	M063013		1	010D		[ˇ/c]		
-		atilde	1	00E3		[~/a]	~a	
+		Umacron	1	016A		[-/U]	UU	
+			1	016D		[ˇ/u]		
+	M063021		1	0115		[ˇ/e]		
+	M063051	adiaeresis	1	00E4		[‥/a]	‥a	
 		Adiaeresis	1	00C4		[‥/A]	‥A	
 	M062914	Ccedilla	1	00C7		Ç		
 	M062917	Eacute	1	00C9		[′/E]	`E	
@@ -27,10 +27,10 @@ cb	mojikyo	entity	uni_flag	unicode	nor_unicode	des	nor	cx
 		Odiaeresis	1	00D6		[‥/O]	‥O	
 	M062968	Udiaeresis	1	00DC		[‥/U]	‥U	
 		agrave	1	00E0		[`/a]		
+	M063001	aacute	1	00E1		[′/a]	`a	
 		uacute	1	00FA		[′/u]	`u	
-		acirc	1	00E2		[^/a]	^a	
-			1	016D		[ˇ/u]		
-	M063051	adiaeresis	1	00E4		[‥/a]	‥a	
+		atilde	1	00E3		[~/a]	~a	
+	M063051	odiaeresis	1	00F6		[‥/o]	‥o	
 	M063014	ccedilla	1	00E7		ç		
 		egrave	1	00E8		[`/e]		
 	M063017	eacute	1	00E9		[′/e]	`e	
@@ -38,22 +38,23 @@ cb	mojikyo	entity	uni_flag	unicode	nor_unicode	des	nor	cx
 		ediaeresis	1	00EB		[‥/e]	‥e	
 		iacute	1	00ED		[′/i]	`I	
 		ntilde	1	00F1		[~/n]	~n	
-	M063001	aacute	1	00E1		[′/a]	`a	
-		Tdotblw	1	1E6C		[T/.]	.T	
+	M062986		1	017D		[ˇ/Z]		
+		acirc	1	00E2		[^/a]	^a	
+		tdotblw	1	1E6D		[t/.]	.t	
 		cdotblw	1			[c/.]	.c	
 		Cdotblw	1			[C/.]	.C	
-		udotblw	1	1EE5		[u/.]	.u	
-		Umacron	1	016A		[-/U]	UU	
-		tdotblw	1	1E6D		[t/.]	.t	
-		Gacute	1	01F4		[′/G]	`G	
+		umacron	1	016B		[-/u]	uu	
+		adotblw	1	1EA1		[a/.]	.a	
+		Bdotblw	1	1E04		[B/.]	.B	
+		Tdotblw	1	1E6C		[T/.]	.T	
 		sdotblw	1	1E63		[s/.]	.s	
 		Sdotblw	1	1E62		[S/.]	.S	
 		rdotblw	1	1E5B		[r/.]	.r	
 		Rdotblw	1	1E5A		[R/.]	.R	
 		ndotblw	1	1E47		[n/.]	.n	
 		Ndotblw	1	1E46		[N/.]	.N	
-		ndotabv	1	1E45		[./n]	^n	
-		Bdotblw	1	1E04		[B/.]	.B	
+		Ddotblw	1	1E0C		[D/.]	.D	
+		Ndotabv	1	1E44		[./N]	^N	
 		mdotblw	1	1E43		[m/.]	.m	
 		mdotabv	1	1E41		[./m]	^m	
 		ldotblw	1	1E37		[l/.]	.l	
@@ -62,9 +63,8 @@ cb	mojikyo	entity	uni_flag	unicode	nor_unicode	des	nor	cx
 		hdotblw	1	1E25		[h/.]	.h	
 		Hdotblw	1	1E24		[H/.]	.H	
 		ddotblw	1	1E0D		[d/.]	.d	
-		Ddotblw	1	1E0C		[D/.]	.D	
-		adotblw	1	1EA1		[a/.]	.a	
-		Ndotabv	1	1E44		[./N]	^N	
+		udotblw	1	1EE5		[u/.]	.u	
+		ndotabv	1	1E45		[./n]	^n	
 00001	M016085	M016085	1	6B35		[肄-聿+欠]	款	
 00002	M024824	M024824	1	9834		[(匕/示)*頁]	穎	
 00003	M067838	M067838				[(工*刀)/言]	辯	
@@ -6108,7 +6108,7 @@ cb	mojikyo	entity	uni_flag	unicode	nor_unicode	des	nor	cx
 06223						[(麥-大+十)*戈]		
 06224						[葶-丁+呆]		
 06225	M023413	M023413	1	7753		[目*典]		
-06226						[○@一]		
+06226			1	3280		[○@一]		
 06227			1	8281		[卄/几]		
 06228			0	26BB0		[卄/亦]	赫	
 06229						[卄/佳]		
@@ -14190,7 +14190,7 @@ cb	mojikyo	entity	uni_flag	unicode	nor_unicode	des	nor	cx
 14566						[ㄙ/(刃*工*刃)/一/(八*、)/口]		
 14567						[(刃*(ㄙ/工)*刃)/一/(八*、)/口]		
 14568						[(木-(企-止)+((人/人)*(人/人)))/木]		
-14569						[○@九]		
+14569			1	3288		[○@九]		
 14570						[卄/兵]		
 14571						[口*蔓]		
 14572			0	266A3		[月*艮]		
@@ -14839,7 +14839,7 @@ cb	mojikyo	entity	uni_flag	unicode	nor_unicode	des	nor	cx
 15529						[○@╳]		
 15530						[丱-(丌-一)+八]		
 15531						[○@＊]		
-15532						[○@三]		
+15532			1	3282		[○@三]		
 15533						[○@川]		
 15534						[卄/漊]		
 15535						[一/一]		
@@ -18553,7 +18553,7 @@ cb	mojikyo	entity	uni_flag	unicode	nor_unicode	des	nor	cx
 21149						[疏-(梳-木)+亦]		
 21150						[示*皮]		
 21151						[毯-炎+藍]		
-21152						[○@八]		
+21152			1	3287		[○@八]		
 21153			1		8628	[卄/繇]		
 21154						[口*籃]		
 21155						[口*忉]		
@@ -19517,7 +19517,7 @@ cb	mojikyo	entity	uni_flag	unicode	nor_unicode	des	nor	cx
 22154			0	221B7		[ㄠ*少]		
 22155						[└-一+十]		
 22156			1		599B	[山/一/女]		
-22157						[○@四]		
+22157			1	3283		[○@四]		
 22158			1	85BB		[卄/漅]	藻	
 22159			0	22EA2		[打-丁+纍]	擂	
 22160			0	37E2		[山/奇]	崎	
@@ -29793,6 +29793,9 @@ cb	mojikyo	entity	uni_flag	unicode	nor_unicode	des	nor	cx
 32785						[烈-列+((白/匕)*旡)]		
 32786			1	5757		[土*夬]	塊	
 32787			1	917C		[醯-皿]	醢	
+32788			1	3285		[○@六]		
+32789			1	3286		[○@七]		
+32791			1	3289		[○@十]		
 x0001	M024583	CI0001	1	&#x7914;&#x7930;		礔[石*歷]	霹靂	礔&CB00269;
 x0002	M025746	CI0002	1	&#x7ADB;&#x7AEE;		[立*令]竮	伶俜	&CB00277;竮
 x0003	M045414	CI0003	1	&#x9AE3;&#x9AF4;		髣[髟/弗]	彷彿	髣&CB00662;
