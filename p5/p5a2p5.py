@@ -3,6 +3,7 @@
 2013.1.4 周邦信 改寫自 cbp4top5.py
 
 Heaven 修改:
+2014/12/23 增加道安長老全集的註解標記
 2014/06/17 原西蓮代碼 "SL" 改成 智諭 "ZY", 取消西蓮專用目錄
 2014/03/30 1.修改南傳校勘星號處理錯誤的地方.
            2.anchor 標記也要在 back 區出現, 為了避免 xml:id 重覆, back 區的 xml:id 最後加上 '_back'
@@ -1228,8 +1229,11 @@ def handle_back(t):
 		elif k=='CBETA':
 			r += '<cb:div type="cbeta-notes">\n'
 			r += '<head>CBETA 校勘記</head>\n'
+		elif k=='Daoan':
+			r += '<cb:div type="daoan-notes">\n'
+			r += '<head>道安長老全集 註解</head>\n'
 		elif k=='Dudoucheng':
-			r += '<cb:div type=" Dudoucheng-notes">\n'
+			r += '<cb:div type="dudoucheng-notes">\n'
 			r += '<head>正史佛教資料類编 校勘記</head>\n'
 		elif k=='ihp':
 			r += '<cb:div type="ihp-notes">\n'
