@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2014/12/25 處理 <sub> 及 <sup> 標記
 2014/12/04 處理<Ixx>標記中, 數字xx超過一位數的情況
 2014/11/27 處理行首標記有 S 及 s 的情況
 2014/07/09 1. byline 要結束 head
@@ -502,6 +503,15 @@ def inline_tag(tag):
 		start_inline_byline(tag)
 	elif re.match(r'<c[\d\s>]', tag):
 		start_inline_c(tag)
+	elif tag=='<corr>':
+		out(tag)
+	elif tag=='</corr>':
+		out(tag)
+	#以下這些直接輸出 <choice cb:resp="CBETA.maha"><corr>Ｂ</corr><sic>Ａ</sic></choice>
+	elif tag.startswith('<choice'):
+		out(tag)
+	elif tag=='</choice>':
+		out(tag)
 	elif tag=='</F>':
 		close_F(tag)
 	elif tag.startswith('<h'):
@@ -538,6 +548,11 @@ def inline_tag(tag):
 		buf += '<cb:mulu type="卷" n="{}"/>'.format(globals['juan_num'])
 	elif tag=='<o>':
 		start_inline_o(tag)
+	elif tag=='</o>':
+		closeTags('p')
+		out1('</cb:div>')
+		opens['div'] -= 1
+		opens['orig'] -= 1
 	elif re.match(r'<PTS.', tag):
 		start_PTS(tag)
 	elif tag.startswith('<p'):
@@ -563,6 +578,14 @@ def inline_tag(tag):
 		closeTags('term')
 	elif tag=='<space quantity="0"/>':
 		out2(tag)
+	elif tag=='<sub>':
+		out('<formula rend="vertical-align:suber">')
+	elif tag=='</sub>':
+		out2("</formula>")
+	elif tag=='<sup>':
+		out('<formula rend="vertical-align:super">')
+	elif tag=='</sup>':
+		out2("</formula>")
 	elif re.match(r'<trans-mark', tag):
 		start_trans_mark(tag)
 	elif tag.startswith('<T'):
@@ -576,23 +599,9 @@ def inline_tag(tag):
 		out1('</cb:div>')
 		opens['div'] -= 1
 		opens['commentary'] -= 1
-	elif tag=='</o>':
-		closeTags('p')
-		out1('</cb:div>')
-		opens['div'] -= 1
-		opens['orig'] -= 1
-	#以下這些直接輸出 <choice cb:resp="CBETA.maha"><corr>Ｂ</corr><sic>Ａ</sic></choice>
-	elif tag.startswith('<choice'):
-		out(tag)
-	elif tag=='<corr>':
-		out(tag)
-	elif tag=='</corr>':
-		out(tag)
 	elif tag=='<sic>':
 		out(tag)
 	elif tag=='</sic>':
-		out(tag)
-	elif tag=='</choice>':
 		out(tag)
 	elif tag.startswith('<w>'):
 		start_inline_w(tag)
