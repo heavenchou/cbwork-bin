@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2014/12/27 處理 formula 標記, 它和 sub, sup 是一組的.
 2014/12/25 處理 <sub> 及 <sup> 標記
 2014/12/04 處理<Ixx>標記中, 數字xx超過一位數的情況
 2014/11/27 處理行首標記有 S 及 s 的情況
@@ -520,6 +521,10 @@ def inline_tag(tag):
 		close_h(tag)
 	elif re.match(r'<I\d*>', tag):
 		start_i(tag)
+	elif tag=='<formula>':
+		out('<formula>')
+	elif tag=='</formula>':
+		out2("</formula>")
 	elif tag=='<i>(':
 		out2('<note place="interlinear">')
 	elif tag==')' or tag==")</i>":
@@ -579,13 +584,13 @@ def inline_tag(tag):
 	elif tag=='<space quantity="0"/>':
 		out2(tag)
 	elif tag=='<sub>':
-		out('<formula rend="vertical-align:suber">')
+		out('<hi rend="vertical-align:sub">')
 	elif tag=='</sub>':
-		out2("</formula>")
+		out2("</hi>")
 	elif tag=='<sup>':
-		out('<formula rend="vertical-align:super">')
+		out('<hi rend="vertical-align:super">')
 	elif tag=='</sup>':
-		out2("</formula>")
+		out2("</hi>")
 	elif re.match(r'<trans-mark', tag):
 		start_trans_mark(tag)
 	elif tag.startswith('<T'):
