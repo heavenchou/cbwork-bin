@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2015/02/13 處理 <S> 標記
 2014/12/27 處理 formula 標記, 它和 sub, sup 是一組的.
 2014/12/25 處理 <sub> 及 <sup> 標記
 2014/12/04 處理<Ixx>標記中, 數字xx超過一位數的情況
@@ -684,8 +685,21 @@ def do_corr(text):
 	text = re.sub(r"<sic>(\[(([\da-zA-Z]{2,3})|＊)\])<\/sic>", r'<sic><\1></sic>', text)
 	text = re.sub(r"<corr><\/corr>", r'<corr><space quantity="0"/></corr>', text)
 	text = re.sub(r"<sic><\/sic>", r'<sic><space quantity="0"/></sic>', text)
-	
 
+	return text
+
+'''
+把這種
+T04n0213_p0794a23D##[>法集要頌經樂品第三十]<S>　[06]忍勝則怨賊，　　自負則自鄙，
+把 <S> 後面的空格換成 <l></l>
+'''
+def do_tag_s(text):
+	while re.search("<S>.*　　", text):
+		text = re.sub(r"(<S>.*)　　", r"\1<\/l><l>", text)
+	while re.search("<S>.*　", text):
+		text = re.sub(r"(<S>.*)　", r"\1<l>", text)
+	if re.search("<S>", text):
+		text = text + "</l>\n";
 	return text
 
 # 分析每一行經文
@@ -1052,6 +1066,13 @@ def convert():
 		因為 Ａ 與 B 也有可能是組字式或校勘數字, 例如 [[金*本]>[口*兄]] , [[01]>]
 		'''
 		text = do_corr(text)
+		
+		'''
+		把這種
+		T04n0213_p0794a23D##[>法集要頌經樂品第三十]<S>　[06]忍勝則怨賊，　　自負則自鄙，
+		把 <S> 後面的空格換成 <l></l>
+		'''
+		text = do_tag_s(text)
 		
 		do_text(text)
 	close_sutra(globals['sutraNumber'])
