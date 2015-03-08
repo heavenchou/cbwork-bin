@@ -10,6 +10,9 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2015/03/08 1. 行首標記 j 要結束 <p> 標記 (<j> 已經有處理這部份了)
+           2. <S> 標記處理不夠完整, 同時處理偈頌末有 </Qn> 標記的情況
+           3. <T> 在非行首時, 在 xml:id 要記錄字數，以及加上 cb:place="inline" 屬性
 2015/02/13 處理 <S> 標記
 2014/12/27 處理 formula 標記, 它和 sub, sup 是一組的.
 2014/12/25 處理 <sub> 及 <sup> 標記
@@ -436,7 +439,9 @@ def start_inline_T(tag):
 	if opens['lg']==0:
 		closeTags('byline', 'p')
 		close_head()
-		out('<lg xml:id="lg%sp%s%s01" type="abnormal">' % (vol, old_pb, line_num))	#??? lg 一定是在行首的第一個字嗎?
+		out('<lg xml:id="lg%sp%s%s%02d" type="abnormal"' % (vol, old_pb, line_num, char_count))
+		if char_count>1: out(' cb:place="inline"')		# 若是行中段落, 則加上 cb:place="inline"
+		out('>')
 		opens['lg'] = 1
 	closeTags('l')
 	mo = re.search(r'<T,(\-?\d+),(\-?\d+)>', tag)
@@ -577,6 +582,8 @@ def inline_tag(tag):
 		start_inline_q(tag)
 	elif tag.startswith('</Q'):
 		close_q(tag)
+	elif tag=='<S>':
+		start_S(tag)
 	elif tag=='<sd>':
 		out('<term xml:lang="sa-Sidd">')
 		opens['term'] = 1
@@ -592,6 +599,10 @@ def inline_tag(tag):
 		out('<hi rend="vertical-align:super">')
 	elif tag=='</sup>':
 		out2("</hi>")
+	elif tag=='<sic>':
+		out(tag)
+	elif tag=='</sic>':
+		out(tag)
 	elif re.match(r'<trans-mark', tag):
 		start_trans_mark(tag)
 	elif tag.startswith('<T'):
@@ -605,10 +616,6 @@ def inline_tag(tag):
 		out1('</cb:div>')
 		opens['div'] -= 1
 		opens['commentary'] -= 1
-	elif tag=='<sic>':
-		out(tag)
-	elif tag=='</sic>':
-		out(tag)
 	elif tag.startswith('<w>'):
 		start_inline_w(tag)
 	elif tag.startswith('<a>'):
@@ -695,7 +702,7 @@ T04n0213_p0794a23D##[>法集要頌經樂品第三十]<S>　[06]忍勝則怨賊�
 '''
 def do_tag_s(text):
 	while re.search("<S>.*　　", text):
-		text = re.sub(r"(<S>.*)　　", r"\1<\/l><l>", text)
+		text = re.sub(r"(<S>.*)　　", r"\1</l><l>", text)
 	while re.search("<S>.*　", text):
 		text = re.sub(r"(<S>.*)　", r"\1<l>", text)
 	if re.search("<S>", text):
@@ -741,6 +748,7 @@ def start_J(tag):
 	record_open('cb:jhead')
 
 def start_j(tag):
+	closeTags('p')
 	out('<cb:juan fun="close" n="{}"><cb:jhead>'.format(globals['juan_num']))
 	record_open('cb:juan')
 	record_open('cb:jhead')
@@ -876,6 +884,7 @@ def do_line_head(tag, text):
 		text = re.sub("　　", "</l><l>", text)
 		text = re.sub("　", "<l>", text)
 		text = text + "</l></lg>\n";
+		text = re.sub(r"(</Q\d*>)(</l></lg>)$", r"\2\1", text)	# 把 </Qx> 移到後面, 例: B10n0068_p0839b03s##　能令清淨諸儀軌　　如智者論顯了說</Q1>
 	elif 'x' in tag: start_x(tag)
 	else: 
 		tag = tag.replace('#', '')
