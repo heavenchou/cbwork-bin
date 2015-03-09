@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2015/03/10 處理 <no_chg> 標記
 2015/03/08 1. 行首標記 j 要結束 <p> 標記 (<j> 已經有處理這部份了)
            2. <S> 標記處理不夠完整, 同時處理偈頌末有 </Qn> 標記的情況
            3. <T> 在非行首時, 在 xml:id 要記錄字數，以及加上 cb:place="inline" 屬性
@@ -609,6 +610,10 @@ def inline_tag(tag):
 		start_inline_T(tag)
 	elif tag=='</T>':
 		closeTags('l', 'lg')
+	elif tag=='<no_chg>':
+		out('<term rend="no_nor">')
+	elif tag=='</no_chg>':
+		out('</term>')
 	elif tag=='<u>':
 		start_inline_u(tag)
 	elif tag=='</u>':
