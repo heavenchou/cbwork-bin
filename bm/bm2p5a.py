@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2015/03/18 處理 Z 行首標記
 2015/03/10 處理 <no_chg> 標記
 2015/03/08 1. 行首標記 j 要結束 <p> 標記 (<j> 已經有處理這部份了)
            2. <S> 標記處理不夠完整, 同時處理偈頌末有 </Qn> 標記的情況
@@ -213,6 +214,8 @@ def start_p(tag):
 	out('<p xml:id="p%sp%s%s01"' % (vol, old_pb, line_num))
 	if 'r' in head_tag:
 		out(' cb:type="pre"')
+	if 'Z' in head_tag:
+		out(' cb:type="dharani"')
 	if r!='':
 		out(' rend="margin-left:%sem"' % r)
 	out('>')
@@ -891,6 +894,7 @@ def do_line_head(tag, text):
 		text = text + "</l></lg>\n";
 		text = re.sub(r"(</Q\d*>)(</l></lg>)$", r"\2\1", text)	# 把 </Qx> 移到後面, 例: B10n0068_p0839b03s##　能令清淨諸儀軌　　如智者論顯了說</Q1>
 	elif 'x' in tag: start_x(tag)
+	elif 'Z' in tag: start_p(tag)
 	else: 
 		tag = tag.replace('#', '')
 		tag = tag.replace('_', '')
