@@ -3,6 +3,8 @@
 # 格式介紹在最底下
 #
 # 修訂記錄：
+# 2015/04/18 : 1. 將 <□> 轉換成 <unclear/>
+#              2. 修改 <c r2> 這類標記在行首沒有出現 <row> 的問題
 # 2013/11/20 : 處理 N52 校注中有表格, 而且校注不只一行的情況.
 ######################################################################################
 
@@ -69,17 +71,23 @@ close IN;
 open OUT , ">:utf8", $outfile;
 readGaiji();
 
+# 先做必要的變更
+
+for ($i=0; $i<= $#lines; $i++)
+{
+	$lines[$i] =~ s/&/&amp;/g;		# 把 & 換成 &amp;
+	$lines[$i] =~ s/<□>/＜□＞/g;	# 先換成全型, 以免不易處理	
+}
+
+# 逐行處理
+
 for ($i=0; $i<= $#lines; $i++)
 {
 	$_ = $lines[$i];
 	
 	chomp;
 	next if(/^[A-Z]{1,2}\d{2,3}$/);			# 第一行的 X01 這類不管它
-	
-	# 把 & 換成 &amp;
-	
-	s/&/&amp;/g;
-	
+
 	#p0002
 	if(/^p(\d{4})/)		# 頁碼
 	{
@@ -212,13 +220,17 @@ for ($i=0; $i<= $#lines; $i++)
 	#<note n="0008002" resp="Xuzangjing" place="foot text" type="orig">省略普賢行願品文</note>
 	#<note n="0245k01" resp="Xuzangjing" place="foot text" type="orig ke">釋止觀義例二初所述題目</note>
 	
-	print OUT "<note n=\"${page}${kbj1}${notenum}${noteABC}${note_sub_num}\" resp=\"${source_ename}\" place=\"foot text\" type=\"orig${kbj2}\">${notedata}</note>";
+	$out = "<note n=\"${page}${kbj1}${notenum}${noteABC}${note_sub_num}\" resp=\"${source_ename}\" place=\"foot text\" type=\"orig${kbj2}\">${notedata}</note>";
+	$out =~ s/＜□＞/<unclear\/>/g;
+	print OUT $out;
 	
 	# 印出有 mod 的資料
 	# <note n="0240001A" resp="CBETA" type="mod">冷疑作細</note>
 	if($notemod)
 	{
-		print OUT "<note n=\"${page}${kbj1}${notenum}${noteABC}${note_sub_num}\" resp=\"CBETA\" type=\"mod${kbj2}\">${notemod}</note>";
+		$out = "<note n=\"${page}${kbj1}${notenum}${noteABC}${note_sub_num}\" resp=\"CBETA\" type=\"mod${kbj2}\">${notemod}</note>";
+		$out =~ s/＜□＞/<unclear\/>/g;
+		print OUT $out;
 	}
 	
 	print OUT "\n";
@@ -355,7 +367,7 @@ sub check_table()
 		s/^<F>(.*)/<table cols="$count"><row>\1<\/cell><\/row>/;
 	}
 	
-	if(/^<c[ r]?\d*>/)
+	if(/^<c( r)?\d*>/)
 	{
 		$_ = "<row>" . $_ . "<\/cell><\/row>";
 	}
