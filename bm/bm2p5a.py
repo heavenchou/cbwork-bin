@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2015/04/29 處理 <e><d></e> 標記
 2015/03/18 處理 Z 行首標記
 2015/03/10 處理 <no_chg> 標記
 2015/03/08 1. 行首標記 j 要結束 <p> 標記 (<j> 已經有處理這部份了)
@@ -421,6 +422,22 @@ def start_inline_c(tag):
 	out('>')
 	record_open('cell')
 
+def start_inline_d(tag):
+	closeTags('form')
+	out('<cb:def>')
+	record_open('cb:def')
+	
+def start_inline_e(tag):
+	closeTags('head', 'p', 'cb:def', 'entry')
+	out('<entry')
+	if char_count>1: out(' cb:place="inline"')		# 若是行中段落, 則加上 inline
+	out('><form>')
+	record_open('entry')
+	record_open('form')
+
+def close_e(tag):
+	closeTags('cb:def', 'entry')
+
 def close_F(tag):
 	closeTags('cell', 'row', 'table')
 
@@ -523,6 +540,12 @@ def inline_tag(tag):
 		out(tag)
 	elif tag=='</choice>':
 		out(tag)
+	elif tag=='<d>':
+		start_inline_d(tag)
+	elif tag=='<e>':
+		start_inline_e(tag)
+	elif tag=='</e>':
+		close_e(tag)
 	elif tag=='</F>':
 		close_F(tag)
 	elif tag.startswith('<h'):
