@@ -428,7 +428,8 @@ def start_inline_d(tag):
 	record_open('cb:def')
 	
 def start_inline_e(tag):
-	closeTags('head', 'p', 'cb:def', 'entry')
+	close_head()
+	closeTags('p', 'cb:def', 'entry')
 	out('<entry')
 	if char_count>1: out(' cb:place="inline"')		# 若是行中段落, 則加上 inline
 	out('><form>')
