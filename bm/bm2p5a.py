@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2015/05/18 處理 <annals><date><event> 標記
 2015/04/29 處理 <e><d></e> 標記
 2015/03/18 處理 Z 行首標記
 2015/03/10 處理 <no_chg> 標記
@@ -275,7 +276,7 @@ def start_div(level, type):
 def start_inline_q(tag):
 	global buf, div_head, head_tag, globals
 	close_head()
-	closeTags('l', 'lg', 'p', 'sp', 'cb:dialog')
+	closeTags('l', 'lg', 'p', 'sp', 'cb:dialog', 'cb:event')
 	i=tag.find('m=')
 	div_head = ''
 	level = 0
@@ -436,6 +437,9 @@ def start_inline_e(tag):
 	record_open('entry')
 	record_open('form')
 
+def close_annals(tag):
+	closeTags('p', 'cb:event')
+	
 def close_e(tag):
 	closeTags('cb:def', 'entry')
 
@@ -528,6 +532,18 @@ def inline_tag(tag):
 		out('<unclear/>')
 	elif tag=='(':
 		out2('<note place="inline">')
+		
+	# J01nA042_p0793a14_##<Q2 m=哲宗><annals><date><p>哲宗皇帝元祐四年[已>己]巳
+	# J01nA042_p0793a15_##<event><p,1>師宣州寧國縣人也姓奚氏其母初夢神人衛一
+	# ... </annals>
+	# 還有 <Q> <annals> 也可以結束 <annals>
+	# <event> 是用來結束 <date> 的
+	# 轉成
+	# <cb:event><date>ＸＸＸ</date><p,1>ＹＹＹ</p></cb:event>
+	elif tag=='<annals>':
+		start_inline_annals(tag)
+	elif tag=='</annals>':
+		close_annals(tag)
 	elif re.match(r'<[ABCEY]>', tag):
 		start_inline_byline(tag)
 	elif re.match(r'<c[\d\s>]', tag):
@@ -543,10 +559,14 @@ def inline_tag(tag):
 		out(tag)
 	elif tag=='<d>':
 		start_inline_d(tag)
+	elif tag=='<date>':
+		start_inline_date(tag)
 	elif tag=='<e>':
 		start_inline_e(tag)
 	elif tag=='</e>':
 		close_e(tag)
+	elif tag=='<event>':
+		start_inline_event(tag)
 	elif tag=='</F>':
 		close_F(tag)
 	elif tag.startswith('<h'):
@@ -771,6 +791,28 @@ def get_number(s):
 def record_open(tag):
 	if not tag in opens: opens[tag] = 0
 	opens[tag] += 1
+
+# J01nA042_p0793a14_##<Q2 m=哲宗><annals><date><p>哲宗皇帝元祐四年[已>己]巳
+# J01nA042_p0793a15_##<event><p,1>師宣州寧國縣人也姓奚氏其母初夢神人衛一
+# ... </annals>
+# 還有 <Q> <annals> 也可以結束 <annals>
+# <event> 是用來結束 <date> 的
+# 轉成
+# <cb:event><date>ＸＸＸ</date><p,1>ＹＹＹ</p></cb:event>
+
+def start_inline_annals(tag):
+	close_head()
+	closeTags('p', 'cb:event')
+	out('<cb:event>')
+	opens['cb:event'] = 1
+
+def start_inline_date(tag):
+	out('<date>')
+	opens['date'] = 1
+
+# 參考 <annals> 標記, 此標記是用來結束 <date> 用的
+def start_inline_event(tag):
+	closeTags('p', 'date')
 
 def start_J(tag):
 	closeTags('p')
