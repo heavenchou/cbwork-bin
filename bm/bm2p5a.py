@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2015/05/19 增加行首有誤的判斷
 2015/05/18 處理 <annals><date><event> 標記
 2015/04/29 處理 <e><d></e> 標記
 2015/03/18 處理 Z 行首標記
@@ -1113,7 +1114,10 @@ def convert():
 		aline = line[:len(options.vol)+17]
 		text = line[len(options.vol)+17:]
 		mo=re.match(r'([A-Z]+\d{2,3})(n\d+.)(p\d{4}[a-z])(\d\d)(.+)$', aline)
-		(vol, num, pb, line_num, head_tag) = mo.groups()
+		if mo!=None:
+			(vol, num, pb, line_num, head_tag) = mo.groups()
+		else:
+			print("行首有錯:", aline)
 		#print('line_num:', pb+line_num, file=log)
 		num=num.rstrip('_')
 		if num!=globals['sutraNumber']:
