@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2015/06/11 處理 <L_sp> 標記, 呈現 <list rend="simple">
 2015/05/19 增加行首有誤的判斷
 2015/05/18 處理 <annals><date><event> 標記
 2015/04/29 處理 <e><d></e> 標記
@@ -460,7 +461,20 @@ def close_h(tag):
 	#level = int(tag[3:-1])
 	#close_div(level)
 
-		
+def start_inline_Lsp(tag):
+	if not 'list' in opens: opens['list'] = 0
+	closeTags('cb:jhead', 'cb:juan', 'p')
+	while level<opens['list']:
+		out1('</item></list>')
+		opens['list'] -= 1
+		opens['item'] -= 1
+	if  level==opens['list']:
+		out1('</item>')
+		opens['item'] -= 1
+	if level>opens['list']:
+		record_open('list')
+		out('<list rend="simple">')
+
 def start_inline_T(tag):
 	if not 'lg' in opens: opens['lg'] = 0
 	if opens['lg']==0:
@@ -591,6 +605,8 @@ def inline_tag(tag):
 		record_open('cb:jhead')
 	elif tag.startswith('<J'):
 		start_J(tag)
+	elif tag=='<L_sp>':
+		start_inline_Lsp(tag)
 	elif tag =='<l>':	out('<l>')	# 行首標記有 S 及 s 時, 會在行中自動將空格變成 <l></l></lg> 等標記
 	elif tag =='</l>':	out('</l>')	# 行首標記有 S 及 s 時, 會在行中自動將空格變成 <l></l></lg> 等標記
 	elif tag =='</lg>':	out('</lg>')	# 行首標記有 S 及 s 時, 會在行中自動將空格變成 <l></l></lg> 等標記
