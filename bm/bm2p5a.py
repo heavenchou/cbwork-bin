@@ -10,7 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
-2015/06/11 處理 <L_sp> 標記, 呈現 <list rend="simple">
+2015/06/12 處理 <L_sp> 標記, 呈現 <list rend="simple">
 2015/05/19 增加行首有誤的判斷
 2015/05/18 處理 <annals><date><event> 標記
 2015/04/29 處理 <e><d></e> 標記
@@ -163,6 +163,7 @@ def out2(s):
 		out(s)
 
 def start_i(tag):
+	global L_type
 	level = 1
 	mo = re.search(r'\d+', tag)
 	if mo!=None: level = int(mo.group())
@@ -178,7 +179,11 @@ def start_i(tag):
 		opens['item'] -= 1
 	if level>opens['list']:
 		record_open('list')
-		out('<list>')
+		if L_type == 'simple':
+			out('<list rend="simple">')
+			L_type = ""
+		else:
+			out('<list>')
 	s = '<item xml:id="item{}p{}{}{:02d}">'.format(vol, old_pb, line_num, char_count)
 	out(s)
 	opens['item'] += 1
@@ -462,18 +467,8 @@ def close_h(tag):
 	#close_div(level)
 
 def start_inline_Lsp(tag):
-	if not 'list' in opens: opens['list'] = 0
-	closeTags('cb:jhead', 'cb:juan', 'p')
-	while level<opens['list']:
-		out1('</item></list>')
-		opens['list'] -= 1
-		opens['item'] -= 1
-	if  level==opens['list']:
-		out1('</item>')
-		opens['item'] -= 1
-	if level>opens['list']:
-		record_open('list')
-		out('<list rend="simple">')
+	global L_type
+	L_type = "simple"
 
 def start_inline_T(tag):
 	if not 'lg' in opens: opens['lg'] = 0
@@ -1277,6 +1272,7 @@ opens['div'] = 0
 old_pb = ''
 sutras = {}
 globals={}
+L_type = ""		# 記錄 <L> 的type , 若是 <L_sp> 則 L_type="simple"
 
 read_source()
 convert()
