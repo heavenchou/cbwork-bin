@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2015/06/12 <p> 標記支援小數點, 例如 <p,1,-1.5>
 2015/06/12 處理 <L_sp> 標記, 呈現 <list rend="simple">
 2015/05/19 增加行首有誤的判斷
 2015/05/18 處理 <annals><date><event> 標記
@@ -243,21 +244,21 @@ def start_inline_p(tag):
 		s += ' cb:type="dharani"'
 	
 	# 處理 <p,1,2> 這種格式
-	mo = re.search(r'<[pz],(\-?\d+),(\-?\d+)>', tag)
+	mo = re.search(r'<[pz],(\-?[\d\.]+),(\-?[\d\.]+)>', tag)
 	if mo!=None:
 		s += ' rend="margin-left:%sem;text-indent:%sem' % mo.groups()
 		if char_count>1: s += ';inline'		# 若是行中段落, 則加上 inline
 		s += '"'
 	
 	# 處理 <p,1> 這種格式
-	mo = re.search(r'<[pz],(\-?\d+)>', tag)
+	mo = re.search(r'<[pz],(\-?[\d\.]+)>', tag)
 	if mo!=None:
 		s += ' rend="margin-left:%sem' % mo.group(1)
 		if char_count>1: s += ';inline'		# 若是行中段落, 則加上 inline
 		s += '"'
 	
 	# 若都沒有 <p,1 這種格式, 又是在行中, 則用 rend="inline"
-	mo = re.search(r'<[pz],(\-?\d+)', tag)
+	mo = re.search(r'<[pz],(\-?[\d\.]+)', tag)
 	if mo==None:
 		if char_count>1: s += ' rend="inline"'
 	
@@ -480,7 +481,7 @@ def start_inline_T(tag):
 		out('>')
 		opens['lg'] = 1
 	closeTags('l')
-	mo = re.search(r'<T,(\-?\d+),(\-?\d+)>', tag)
+	mo = re.search(r'<T,(\-?[\d\.]+),(\-?[\d\.]+)>', tag)
 	if mo!=None:
 		if(mo.group(1) == '0'):
 			out('<l rend="text-indent:%sem">' % mo.group(2))
@@ -489,7 +490,7 @@ def start_inline_T(tag):
 		else:
 			out('<l rend="margin-left:%sem;text-indent:%sem">' % mo.groups())
 	else:
-		mo = re.search(r'\-?\d+', tag)
+		mo = re.search(r'\-?[\d\.]+', tag)
 		if mo!=None:
 			out('<l rend="margin-left:%sem">' % mo.group())
 	record_open('l')
