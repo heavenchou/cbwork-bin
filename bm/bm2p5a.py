@@ -10,6 +10,8 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2015/06/23 1. <p> 標記要先結束 <byline> 標記
+           2. 處理行首 J= 的標記
 2015/06/12 <p> 標記支援小數點, 例如 <p,1,-1.5>
 2015/06/12 處理 <L_sp> 標記, 呈現 <list rend="simple">
 2015/05/19 增加行首有誤的判斷
@@ -232,7 +234,7 @@ def start_p(tag):
 	opens['p']=1
 
 def start_inline_p(tag):
-	closeTags('p')
+	closeTags('p', 'byline')
 	close_head()
 	closeTags('l', 'lg')
 	s = '<p xml:id="p%sp%s%s%02d"' % (vol, old_pb, line_num, char_count)
@@ -828,6 +830,8 @@ def start_inline_event(tag):
 	closeTags('p', 'date')
 
 def start_J(tag):
+	if '=' in head_tag:
+		return
 	closeTags('p')
 	n = get_number(tag)
 	out('<cb:juan fun="open" n="%s"><cb:jhead>' % n)
