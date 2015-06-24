@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2015/06/24 <table> 標記要先結束 <byline> 標記
 2015/06/23 1. <p> 標記要先結束 <byline> 標記
            2. 處理行首 J= 的標記
 2015/06/12 <p> 標記支援小數點, 例如 <p,1,-1.5>
@@ -924,6 +925,7 @@ def count_c_from_line(text):
 
 # 處理表格 F 表格開始
 def start_F(tag, text):
+	closeTags('byline')
 	# 計算一行有多少個 c 標記
 	cnum = count_c_from_line(text)
 	out('<table cols="{0:0d}"><row>'.format(cnum))
