@@ -15,6 +15,7 @@
 # Copyright (C) 1998-2015 CBETA
 # Copyright (C) 1999-2015 Heaven Chou
 ########################################################################
+# 2015/06/24 V9.10  處理 <p,1.5,-2.5> 這類有小數的情況, 空格一律採用四捨五入處理
 # 2015/06/24 V9.9  處理 <L_sp> 標記, 忽略不處理
 # 2015/04/12 V9.8  <c> 標記處理超過 10 的數字, 例如 <c11>
 # 2014/12/27 V9.7  處理 formula 標記, 它和 sub, sup 是一組的.
@@ -2281,13 +2282,17 @@ s之後的第一個Ｐ：變成二個空格。（是否是不管之前的繼承�
 	
 	# 先處理行首的一些問題
 
-	if(/^<p,?(-?\d*),?(-?\d*)>/)		# 行首發現小p標記
+	if(/^<p,?(-?[\d\.]*),?(-?[\d\.]*)>/)		# 行首發現小p標記
 	{
 		$smallp1 = $1;
 		$smallp2 = $2;
-
+		
 		$smallp1 = 0 if($smallp1 eq "");
 		$smallp2 = 0 if($smallp2 eq "");
+		
+		$smallp1 = ($smallp1>=0)?int($smallp1+0.5):int($smallp1-0.5);
+		$smallp2 = ($smallp2>=0)?int($smallp2+0.5):int($smallp2-0.5);
+
 		$is_p = 1;		# 現在是新的段落開始
 		
 		# <p> 在行首, 所以要先繼承再空格
@@ -2300,7 +2305,7 @@ s之後的第一個Ｐ：變成二個空格。（是否是不管之前的繼承�
 		
 		my $space = "　" x ($smallp1+$smallp2);
 
-		s/^<p,?(-?\d*),?(-?\d*)>/$space/;
+		s/^<p,?(-?[\d\.]*),?(-?[\d\.]*)>/$space/;
 	}
 	else
 	{
@@ -2352,13 +2357,17 @@ s之後的第一個Ｐ：變成二個空格。（是否是不管之前的繼承�
 		
 		# 處理小寫的 p 標記 (<p,x,y> , x : 整段縮排, y : 行首縮排)
 
-		if($thistag =~ /<p,?(-?\d*),?(-?\d*)>/)	
+		if($thistag =~ /<p,?(-?[\d\.]*),?(-?[\d\.]*)>/)	
 		{
 			$smallp1 = $1;
 			$smallp2 = $2;
 			
 			$smallp1 = 0 if($smallp1 eq "");
 			$smallp2 = 0 if($smallp2 eq "");
+		
+			$smallp1 = ($smallp1>=0)?int($smallp1+0.5):int($smallp1-0.5);
+			$smallp2 = ($smallp2>=0)?int($smallp2+0.5):int($smallp2-0.5);
+			
 			$is_p = 1;		# 現在是新的段落開始
 			
 			my $myspace = $smallp1 + $smallp2;
@@ -2369,7 +2378,7 @@ s之後的第一個Ｐ：變成二個空格。（是否是不管之前的繼承�
 			$myspace = 1 if($myspace == 0 and $pretagtmp ne "" and $pretagtmp !~ /$fullspace$/);
 			
 			my $space = "　" x $myspace;
-			s/<p,?(-?\d*),?(-?\d*)>/$space/;
+			s/<p,?(-?[\d\.]*),?(-?[\d\.]*)>/$space/;
 			
 			# <p> 在行中, 所以先處理空格, 再處理繼承
 			
