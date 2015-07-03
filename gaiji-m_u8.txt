@@ -1,34 +1,24 @@
 cb	mojikyo	entity	uni_flag	unicode	nor_unicode	des	nor	cx
-		Hdotblw	1	1E24		[H/.]	.H	
-		Sdotblw	1	1E62		[S/.]	.S	
+			1	0119		ę		
+		uacute	1	00FA		[′/u]	`u	
+		ucirc	1	00FB		[^/u]	^u	
+	M063068	udiaeresis	1	00FC		[‥/u]	‥u	
+		Amacron	1	0100		[-/A]	AA	
+		amacron	1	0101		[-/a]	aa	
+		Cdotabv	1	010A		[./C]	^C	
+		cdotabv	1	010B		[./c]	^c	
+			1	016D		[ˇ/u]		
+	M063021		1	0115		[ˇ/e]		
+		ntilde	1	00F1		[~/n]	~n	
+	M062937	Imacron	1	012A		[-/I]		
 		Omacron	1	014C		[-/O]	OO	
-	M063055	omacron	1	014D		[-/o]		
 		Sacute	1	015A		[′/S]	`S	
 		sacute	1	015B		[′/s]	`s	
 	M062962		1	0160		[ˇ/S]		
 		Umacron	1	016A		[-/U]	UU	
 		umacron	1	016B		[-/u]	uu	
-			1	016D		[ˇ/u]		
-	M062986		1	017D		[ˇ/Z]		
-		Gacute	1	01F4		[′/G]	`G	
-		Bdotblw	1	1E04		[B/.]	.B	
-	M062937	Imacron	1	012A		[-/I]		
-		ddotblw	1	1E0D		[d/.]	.d	
-			1	0119		ę		
-		hdotblw	1	1E25		[h/.]	.h	
-		kdotblw	1	1E33		[k/.]	.k	
-		Ldotblw	1	1E36		[L/.]	.L	
-		ldotblw	1	1E37		[l/.]	.l	
-		mdotabv	1	1E41		[./m]	^m	
-		mdotblw	1	1E43		[m/.]	.m	
-		Ndotabv	1	1E44		[./N]	^N	
-		ndotabv	1	1E45		[./n]	^n	
-		Ndotblw	1	1E46		[N/.]	.N	
-		ndotblw	1	1E47		[n/.]	.n	
-		Rdotblw	1	1E5A		[R/.]	.R	
-		rdotblw	1	1E5B		[r/.]	.r	
-		Ddotblw	1	1E0C		[D/.]	.D	
-	M063020	ecirc	1	00EA		[^/e]	^e	
+	M063013		1	010D		[ˇ/c]		
+		atilde	1	00E3		[~/a]	~a	
 		Adiaeresis	1	00C4		[‥/A]	‥A	
 	M062914	Ccedilla	1	00C7		Ç		
 	M062917	Eacute	1	00C9		[′/E]	`E	
@@ -36,35 +26,45 @@ cb	mojikyo	entity	uni_flag	unicode	nor_unicode	des	nor	cx
 		Odiaeresis	1	00D6		[‥/O]	‥O	
 	M062968	Udiaeresis	1	00DC		[‥/U]	‥U	
 		agrave	1	00E0		[`/a]		
-	M063001	aacute	1	00E1		[′/a]	`a	
+	M063051	odiaeresis	1	00F6		[‥/o]	‥o	
 		acirc	1	00E2		[^/a]	^a	
-		atilde	1	00E3		[~/a]	~a	
+		oacute	1	00F3		[′/o]	`o	
 	M063051	adiaeresis	1	00E4		[‥/a]	‥a	
 	M063014	ccedilla	1	00E7		ç		
-		imacron	1	012B		[-/i]	ii	
+		egrave	1	00E8		[`/e]		
 	M063017	eacute	1	00E9		[′/e]	`e	
-		amacron	1	0101		[-/a]	aa	
+	M063020	ecirc	1	00EA		[^/e]	^e	
 		ediaeresis	1	00EB		[‥/e]	‥e	
 		iacute	1	00ED		[′/i]	`I	
-		ntilde	1	00F1		[~/n]	~n	
-		oacute	1	00F3		[′/o]	`o	
-	M063051	odiaeresis	1	00F6		[‥/o]	‥o	
-		uacute	1	00FA		[′/u]	`u	
-		ucirc	1	00FB		[^/u]	^u	
-		Amacron	1	0100		[-/A]	AA	
-		Cdotabv	1	010A		[./C]	^C	
-		cdotabv	1	010B		[./c]	^c	
-	M063013		1	010D		[ˇ/c]		
-	M063021		1	0115		[ˇ/e]		
-		egrave	1	00E8		[`/e]		
-		Tdotblw	1	1E6C		[T/.]	.T	
-		tdotblw	1	1E6D		[t/.]	.t	
-		adotblw	1	1EA1		[a/.]	.a	
-		udotblw	1	1EE5		[u/.]	.u	
+	M063055	omacron	1	014D		[-/o]		
+	M063001	aacute	1	00E1		[′/a]	`a	
 		Cdotblw	1			[C/.]	.C	
+		imacron	1	012B		[-/i]	ii	
 		cdotblw	1			[c/.]	.c	
-	M063068	udiaeresis	1	00FC		[‥/u]	‥u	
+	M062986		1	017D		[ˇ/Z]		
+		udotblw	1	1EE5		[u/.]	.u	
+		adotblw	1	1EA1		[a/.]	.a	
+		tdotblw	1	1E6D		[t/.]	.t	
+		Tdotblw	1	1E6C		[T/.]	.T	
 		sdotblw	1	1E63		[s/.]	.s	
+		Sdotblw	1	1E62		[S/.]	.S	
+		rdotblw	1	1E5B		[r/.]	.r	
+		Rdotblw	1	1E5A		[R/.]	.R	
+		ndotblw	1	1E47		[n/.]	.n	
+		Ndotblw	1	1E46		[N/.]	.N	
+		ndotabv	1	1E45		[./n]	^n	
+		hdotblw	1	1E25		[h/.]	.h	
+		Gacute	1	01F4		[′/G]	`G	
+		Bdotblw	1	1E04		[B/.]	.B	
+		Ddotblw	1	1E0C		[D/.]	.D	
+		Ndotabv	1	1E44		[./N]	^N	
+		Hdotblw	1	1E24		[H/.]	.H	
+		kdotblw	1	1E33		[k/.]	.k	
+		Ldotblw	1	1E36		[L/.]	.L	
+		ldotblw	1	1E37		[l/.]	.l	
+		mdotabv	1	1E41		[./m]	^m	
+		mdotblw	1	1E43		[m/.]	.m	
+		ddotblw	1	1E0D		[d/.]	.d	
 00001	M016085	M016085	1	6B35		[肄-聿+欠]	款	
 00002	M024824	M024824	1	9834		[(匕/示)*頁]	穎	
 00003	M067838	M067838				[(工*刀)/言]	辯	
@@ -28764,7 +28764,7 @@ cb	mojikyo	entity	uni_flag	unicode	nor_unicode	des	nor	cx
 31705						[辟-辛+(〦/羊)]		
 31706						[寥-(彰-章)+小]		
 31707						[澹-言+(工/口)]		
-31708						[龜-(色-巴)+、]		
+31708						[龜-(色-巴)+、]	龜	
 31709						[繆-(彰-章)+小]		
 31710						[薛-辛+(〦/羊)]		
 31711						[蹈-臼+(〡*日)]		
@@ -28884,7 +28884,7 @@ cb	mojikyo	entity	uni_flag	unicode	nor_unicode	des	nor	cx
 31843						[料/木]		
 31844						[馬*麥]		
 31845						[商*欠]		
-31846						[磁-石]		
+31846			1	5179		[磁-石]		
 31847						[气-一]		
 31848						[內-入+?]		
 31850						[仁-二+巳]		
@@ -30021,6 +30021,33 @@ cb	mojikyo	entity	uni_flag	unicode	nor_unicode	des	nor	cx
 33021			1	68A5		[穴/ㄙ/木]	松	
 33022			0	279FC		[誼-且+(夕/一)]	誼	
 33023						[暘-勿+((傘-(企-止))-┬+(一/ㄎ))]		
+33024						[月*兼]		
+33025						[月*留]		
+33026						[月*真]		
+33027			1	77AF		[目*閒]	瞷	
+33028						[糸*朁]		
+33029			0	26A77		[舟*冓]		
+33030			0	27B3B		[言*達]		
+33031						[叔/木]		
+33032			0	25EA4		[叔/米]	粲	
+33033			0	29925		[馬*咸]		
+33034			0	4BA2		[馬*臿]		
+33035			0	4BDE		[骨*咼]		
+33036			0	399D		[貌/心]		
+33037						[齒*夬]		
+33038						[冇*隹]		
+33039			0	24575		[爿*令]		
+33040						[刃-刀+乃]		
+33041						[廷-壬+向]		
+33042			0	25B74		[竺-二+辛]		
+33043			0	25BC3		[竺-二+奄]	罨	
+33044			0	297ED		[飢-几+龍]		
+33045			0	26C17		[葉-木+十]	葉	
+33046			0	28A50		[鏻-舛+女]	鏤	
+33047			1	8954		[袖-由+(瞞-目)]		
+33048			0	3BFD		[梡-元+(眉-目+貝)]	檳	
+33049			1	7DD1		[綠-(彖-豕)+(┐@一)]	綠	
+33050						[洨-乂+(ㄠ-ㄙ+?)]		
 x0001	M024583	CI0001	1	&#x7914;&#x7930;		礔[石*歷]	霹靂	礔&CB00269;
 x0002	M025746	CI0002	1	&#x7ADB;&#x7AEE;		[立*令]竮	伶俜	&CB00277;竮
 x0003	M045414	CI0003	1	&#x9AE3;&#x9AF4;		髣[髟/弗]	彷彿	髣&CB00662;
