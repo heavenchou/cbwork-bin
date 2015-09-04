@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2015/09/04 <Q> 標記要先結束 <form> 標記 (因為有些 e 標記不一定有 d 標記來結束 <form> , ex:B19n0103_p0049a08)
 2015/09/02 <Q> 標記要先結束 e 及 d 標記 (<entry> 及 <cb:def>)
 2015/06/24 <table> 標記要先結束 <byline> 標記
 2015/06/23 1. <p> 標記要先結束 <byline> 標記
@@ -288,7 +289,7 @@ def start_div(level, type):
 def start_inline_q(tag):
 	global buf, div_head, head_tag, globals
 	close_head()
-	closeTags('l', 'lg', 'p', 'sp', 'cb:dialog', 'cb:event', 'cb:def', 'entry')
+	closeTags('l', 'lg', 'p', 'sp', 'cb:dialog', 'cb:event', 'form', 'cb:def', 'entry')
 	i=tag.find('m=')
 	div_head = ''
 	level = 0
@@ -353,7 +354,7 @@ def start_q(tag):
 	if '=' in head_tag:
 		return
 	
-	closeTags('l', 'lg', 'sp', 'cb:dialog', 'cb:def', 'entry')
+	closeTags('l', 'lg', 'sp', 'cb:dialog', 'form', 'cb:def', 'entry')
 	div_head = ''
 	level = 0
 	
@@ -453,7 +454,7 @@ def close_annals(tag):
 	closeTags('p', 'cb:event')
 	
 def close_e(tag):
-	closeTags('cb:def', 'entry')
+	closeTags('p', 'cb:def', 'entry')
 
 def close_F(tag):
 	closeTags('cell', 'row', 'table')
