@@ -2301,7 +2301,7 @@ sd2dia = {
 "B2B1":"vmau",
 "B2B2":"vmam!",
 "B2B3":"vmah!",
-"B2B3":"s/ma",
+"B2B4":"s/ma",
 "B2B5":"s/ma^",
 "B2B6":"s/mi",
 "B2B7":"s/mi^",
