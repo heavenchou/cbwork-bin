@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2015/10/08 把 <list rend="simple"> 改成 <list rendition="simple">
 2015/09/04 <Q> 標記要先結束 <form> 標記 (因為有些 e 標記不一定有 d 標記來結束 <form> , ex:B19n0103_p0049a08)
 2015/09/02 <Q> 標記要先結束 e 及 d 標記 (<entry> 及 <cb:def>)
 2015/06/24 <table> 標記要先結束 <byline> 標記
@@ -186,7 +187,7 @@ def start_i(tag):
 	if level>opens['list']:
 		record_open('list')
 		if L_type == 'simple':
-			out('<list rend="simple">')
+			out('<list rendition="simple">')
 			L_type = ""
 		else:
 			out('<list>')
