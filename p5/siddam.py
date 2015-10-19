@@ -7853,7 +7853,7 @@ sd2dia = {
 "E37B":"du^",
 "E37C":"n!n!a",
 "E37E":"n~ja^",
-"E3A1":"n!pa",
+"E3A1":"lpa",
 "E3A2":"tsya",
 "E3A3":"lga",
 "E3A4":"lam!",
