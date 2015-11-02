@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2015/11/03 修改雙行標題在附文中會造成標題無法接成一行的問題
 2015/10/08 把 <list rend="simple"> 改成 <list rendition="simple">
 2015/09/04 <Q> 標記要先結束 <form> 標記 (因為有些 e 標記不一定有 d 標記來結束 <form> , ex:B19n0103_p0049a08)
 2015/09/02 <Q> 標記要先結束 e 及 d 標記 (<entry> 及 <cb:def>)
@@ -1146,7 +1147,7 @@ def convert():
 		pb=pb.lstrip('p')
 		
 		# 換行時, 發現前一行是 head , 而且沒有延續到本行, 就要印出相關文字
-		if globals['head_start'] and not re.match(r'Q\d?=', head_tag):
+		if globals['head_start'] and not re.search(r'Q\d?=', head_tag):
 			close_head()
 			'''
 			# 底下全部移到 close_head 裡面處理
