@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2015/11/20 <annals> 裡面也可能沒有 <event> , 所以 <annals> 也要結束 <date>
 2015/11/03 修改雙行標題在附文中會造成標題無法接成一行的問題
 2015/10/08 把 <list rend="simple"> 改成 <list rendition="simple">
 2015/09/04 <Q> 標記要先結束 <form> 標記 (因為有些 e 標記不一定有 d 標記來結束 <form> , ex:B19n0103_p0049a08)
@@ -820,9 +821,15 @@ def record_open(tag):
 # 轉成
 # <cb:event><date>ＸＸＸ</date><p,1>ＹＹＹ</p></cb:event>
 
+# <annals> 裡面也可能沒有 <event> , 所以 <annals> 也可以結束 <date>
+# <annals><date>......
+# <event><p>..........
+# <annals><date>......
+# <annals><date>......
+
 def start_inline_annals(tag):
 	close_head()
-	closeTags('p', 'cb:event')
+	closeTags('date', 'p', 'cb:event')
 	out('<cb:event>')
 	opens['cb:event'] = 1
 
