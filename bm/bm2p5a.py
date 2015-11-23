@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2015/11/24 因為標題也可能有組字式, 所以 <Q m=xxxx> 的 xxx 也要處理組字式
 2015/11/20 <annals> 裡面也可能沒有 <event> , 所以 <annals> 也要結束 <date>
 2015/11/03 修改雙行標題在附文中會造成標題無法接成一行的問題
 2015/10/08 把 <list rend="simple"> 改成 <list rendition="simple">
@@ -309,6 +310,15 @@ def start_inline_q(tag):
 		globals['muluType']='其他'
 	else:
 		label=mo.group(1)
+
+		# 標題也可能會有組字式
+		mo2=re.search(r'(\[[^>\[ ]+?\])', label)
+		while mo2 is not None:
+			des = mo2.group(1)
+			des2 = gaiji(des)
+			label = label.replace(des,des2)
+			mo2=re.search(r'(\[[^>\[ ]+?\])', label)
+		
 		if label != '':
 			out('<cb:mulu type="其他" level="%d">%s</cb:mulu>' % (level, label))
 		globals['mulu_start'] = False
