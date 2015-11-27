@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2015/11/27 處理 <n><d></n> 標記
 2015/11/24 因為標題也可能有組字式, 所以 <Q m=xxxx> 的 xxx 也要處理組字式
 2015/11/20 <annals> 裡面也可能沒有 <event> , 所以 <annals> 也要結束 <date>
 2015/11/03 修改雙行標題在附文中會造成標題無法接成一行的問題
@@ -489,6 +490,27 @@ def start_inline_Lsp(tag):
 	global L_type
 	L_type = "simple"
 
+def start_inline_n(tag):
+	closeTags('p', 'cb:def', 'entry')
+	out('<entry')
+	if char_count>1: out(' cb:place="inline"')		# 若是行中段落, 則加上 inline
+	out('><form>')
+	record_open('entry')
+	record_open('form')
+
+def close_n(tag):
+	closeTags('p', 'cb:def', 'entry')
+
+def start_inline_o(tag):
+	closeTags('p')
+	close_head()
+	if 'commentary' in opens and opens['commentary']>0:
+		out1('</cb:div>')
+		opens['div'] -= 1
+		opens['commentary'] -= 1
+	start_div(opens['div']+1, 'orig')
+	opens['orig'] = 1
+
 def start_inline_T(tag):
 	if not 'lg' in opens: opens['lg'] = 0
 	if opens['lg']==0:
@@ -513,16 +535,6 @@ def start_inline_T(tag):
 			out('<l rend="margin-left:%sem">' % mo.group())
 	record_open('l')
 
-def start_inline_o(tag):
-	closeTags('p')
-	close_head()
-	if 'commentary' in opens and opens['commentary']>0:
-		out1('</cb:div>')
-		opens['div'] -= 1
-		opens['commentary'] -= 1
-	start_div(opens['div']+1, 'orig')
-	opens['orig'] = 1
-	
 def start_inline_u(tag):
 	closeTags('byline', 'p')
 	close_head()
@@ -636,6 +648,10 @@ def inline_tag(tag):
 		buf += '<milestone unit="juan" n="{}"/>'.format(globals['juan_num'])
 		# 原本<cb:mulu type="卷" n="{}"/>是在 <J> 或 Ｊ卷標記處理, 只有南傳在 <mj> 處理, 現在全部移到 <mj> 處理, 因為有卷沒有卷標記
 		buf += '<cb:mulu type="卷" n="{}"/>'.format(globals['juan_num'])
+	elif tag.startswith('<n'):
+		start_inline_n(tag)
+	elif tag=='</n>':
+		close_n(tag)
 	elif tag=='<o>':
 		start_inline_o(tag)
 	elif tag=='</o>':
