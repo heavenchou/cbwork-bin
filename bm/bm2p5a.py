@@ -10,6 +10,8 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2015/11/27 1.處理 <Qn m=> 這種空標記, 轉出正確的空目錄 <cb:mulu type="其他" level="n"/> (同時, <hn m=> 比照辦理, 同時 <hn m=xxxx> 的 xxx 也要處理組字式)
+           2.處理空目錄, 一律轉成單一標記 <cb:mulu type="其他" level="n"/>
 2015/11/27 處理 <n><d></n> 標記
 2015/11/24 因為標題也可能有組字式, 所以 <Q m=xxxx> 的 xxx 也要處理組字式
 2015/11/20 <annals> 裡面也可能沒有 <event> , 所以 <annals> 也要結束 <date>
@@ -322,6 +324,8 @@ def start_inline_q(tag):
 		
 		if label != '':
 			out('<cb:mulu type="其他" level="%d">%s</cb:mulu>' % (level, label))
+		else:
+			out('<cb:mulu type="其他" level="%d"/>' % (level))
 		globals['mulu_start'] = False
 	globals['head_start'] = True
 	buf += '<head>'
@@ -350,8 +354,19 @@ def start_inline_h(tag):
 		globals['muluType']='其他'
 	else:
 		label=mo.group(1)
+		
+		# 標題也可能會有組字式
+		mo2=re.search(r'(\[[^>\[ ]+?\])', label)
+		while mo2 is not None:
+			des = mo2.group(1)
+			des2 = gaiji(des)
+			label = label.replace(des,des2)
+			mo2=re.search(r'(\[[^>\[ ]+?\])', label)
+		
 		if label != '':
 			out('<cb:mulu type="其他" level="%d">%s</cb:mulu>' % (level, label))
+		else:
+			out('<cb:mulu type="其他" level="%d"/>' % (level))
 		globals['mulu_start'] = False
 	globals['head_start'] = True
 	buf += '<head>'
@@ -1226,6 +1241,8 @@ def close_head():
 		if globals['mulu_start']:
 			if div_head != '':
 				out1('<cb:mulu type="{}" level="{}">{}</cb:mulu>'.format(globals['muluType'], opens['div'], div_head))
+			else:
+				out1('<cb:mulu type="{}" level="{}"/>'.format(globals['muluType'], opens['div']))
 			globals['mulu_start'] = False
 		out('')
 		closeTags('head')
