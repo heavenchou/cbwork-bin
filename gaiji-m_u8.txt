@@ -22342,7 +22342,6 @@ cb	mojikyo	entity	uni_flag	unicode	nor_unicode	des	nor	cx
 25059						[句-口+肖]		
 25060						[句-口+蟲]		
 25061						[句-口+离]		
-25062						[幼-力+刀]		
 25063						[打-丁+ㄎ]		
 25064						[打-丁+了]		
 25065						[打-丁+几]		
