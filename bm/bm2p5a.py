@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2015/12/25 如果 W## 接著 <Q , 也不用執行 start_div, 因為 <Q 會執行
 2015/11/27 1.處理 <Qn m=> 這種空標記, 轉出正確的空目錄 <cb:mulu type="其他" level="n"/> (同時, <hn m=> 比照辦理, 同時 <hn m=xxxx> 的 xxx 也要處理組字式)
            2.處理空目錄, 一律轉成單一標記 <cb:mulu type="其他" level="n"/>
 2015/11/27 處理 <n><d></n> 標記
@@ -997,7 +998,8 @@ def do_line_head(tag, text):
 		if not globals['inw']:
 			globals['inw']=True
 			if 'Q' not in tag and 'x' not in tag:
-				start_div(1, 'w')
+				if not re.match(r'^<Q', text):	# 如果 W## 接著 <Q , 也不用執行 start_div, 因為 <Q 會執行
+					start_div(1, 'w')
 	elif globals['inw']:
 		globals['inw']=False
 		
