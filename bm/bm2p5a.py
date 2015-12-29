@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2015/12/30 遇到 <L_sp> , 則底下所有的 <I> 都要處理成 <list rendition="simple">, 而不是只有第一層處理.
 2015/12/29 修改 <no_chg> 的處理順序
 2015/12/25 如果 W## 接著 <Q , 也不用執行 start_div, 因為 <Q 會執行
 2015/11/27 1.處理 <Qn m=> 這種空標記, 轉出正確的空目錄 <cb:mulu type="其他" level="n"/> (同時, <hn m=> 比照辦理, 同時 <hn m=xxxx> 的 xxx 也要處理組字式)
@@ -196,7 +197,6 @@ def start_i(tag):
 		record_open('list')
 		if L_type == 'simple':
 			out('<list rendition="simple">')
-			L_type = ""
 		else:
 			out('<list>')
 	s = '<item xml:id="item{}p{}{}{:02d}">'.format(vol, old_pb, line_num, char_count)
@@ -655,6 +655,7 @@ def inline_tag(tag):
 	elif tag =='</lg>':	out('</lg>')	# 行首標記有 S 及 s 時, 會在行中自動將空格變成 <l></l></lg> 等標記
 	elif tag =='</L>':
 		closeTags('p')
+		L_type = ""
 		while opens['list']>0:
 			closeTag('item', 'list')
 	elif tag.startswith('<mj'):
