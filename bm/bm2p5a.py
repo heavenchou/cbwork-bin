@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2015/12/29 修改 <no_chg> 的處理順序
 2015/12/25 如果 W## 接著 <Q , 也不用執行 start_div, 因為 <Q 會執行
 2015/11/27 1.處理 <Qn m=> 這種空標記, 轉出正確的空目錄 <cb:mulu type="其他" level="n"/> (同時, <hn m=> 比照辦理, 同時 <hn m=xxxx> 的 xxx 也要處理組字式)
            2.處理空目錄, 一律轉成單一標記 <cb:mulu type="其他" level="n"/>
@@ -664,6 +665,10 @@ def inline_tag(tag):
 		buf += '<milestone unit="juan" n="{}"/>'.format(globals['juan_num'])
 		# 原本<cb:mulu type="卷" n="{}"/>是在 <J> 或 Ｊ卷標記處理, 只有南傳在 <mj> 處理, 現在全部移到 <mj> 處理, 因為有卷沒有卷標記
 		buf += '<cb:mulu type="卷" n="{}"/>'.format(globals['juan_num'])
+	elif tag=='<no_chg>':
+		out('<term rend="no_nor">')
+	elif tag=='</no_chg>':
+		out('</term>')
 	elif tag.startswith('<n'):
 		start_inline_n(tag)
 	elif tag=='</n>':
@@ -720,10 +725,6 @@ def inline_tag(tag):
 		start_inline_T(tag)
 	elif tag=='</T>':
 		closeTags('l', 'lg')
-	elif tag=='<no_chg>':
-		out('<term rend="no_nor">')
-	elif tag=='</no_chg>':
-		out('</term>')
 	elif tag=='<u>':
 		start_inline_u(tag)
 	elif tag=='</u>':
