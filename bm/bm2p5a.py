@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2015/12/31 第一個 <n> 標記, 要加上 <cb:div type="note"> ,直到 </n> 才結束 </cb:div>
 2015/12/30 遇到 <L_sp> , 則底下所有的 <I> 都要處理成 <list rendition="simple">, 而不是只有第一層處理.
 2015/12/29 修改 <no_chg> 的處理順序
 2015/12/25 如果 W## 接著 <Q , 也不用執行 start_div, 因為 <Q 會執行
@@ -508,7 +509,14 @@ def start_inline_Lsp(tag):
 	L_type = "simple"
 
 def start_inline_n(tag):
+	global div_type_note
 	closeTags('p', 'cb:def', 'entry')
+	
+	# 第一個 n 要加上 <cb:div type="note"><entry><form>...</form><cb:def>...</cb:def>...</div>
+	if div_type_note == 0:
+		start_div(opens['div']+1, 'note')
+		div_type_note = 1
+		
 	out('<entry')
 	if char_count>1: out(' cb:place="inline"')		# 若是行中段落, 則加上 inline
 	out('><form>')
@@ -517,6 +525,8 @@ def start_inline_n(tag):
 
 def close_n(tag):
 	closeTags('p', 'cb:def', 'entry')
+	close_div(opens['div'])
+	div_type_note = 0
 
 def start_inline_o(tag):
 	closeTags('p')
@@ -1338,6 +1348,7 @@ old_pb = ''
 sutras = {}
 globals={}
 L_type = ""		# 記錄 <L> 的type , 若是 <L_sp> 則 L_type="simple"
+div_type_note = 0 # 記錄是否有在 <cb:div type="note"> 之中
 
 read_source()
 convert()
