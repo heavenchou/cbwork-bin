@@ -80,7 +80,7 @@ my $output_dir = $cfg->val('cutxml', 'output_dir', '/release/cutxml');	# 讀取�
 # 分析傳入的參數
 ###############################################################################
 
-if($inputFile eq "" and $vol =~ /^(([TXJHWIABCFGKLMNPQSU]|(ZS)|(ZW)|(ZY))\d*)n.*?\.xml$/)
+if($inputFile eq "" and $vol =~ /^(([TXJHWIABCFGKLMNPQSU]|(DA)|(ZS)|(ZW)|(ZY))\d*)n.*?\.xml$/)
 {
 	$inputFile = $vol;
 	$vol = $1;
@@ -1774,7 +1774,48 @@ sub get_real_juan_num()
 	{
 		$ii = sprintf("%03d",$i+5);
 	}
-	
+	# DA,04,   ,0004, 1,二力室文集（上）                              ,【道安法師撰述】
+	# DA,05,   ,0004, 1,二力室文集（下）                              ,【道安法師撰述】
+	if($file eq "DA05n0004.xml")
+	{
+		$ii = sprintf("%03d",$i+1);
+	}
+	# DA,06,   ,0005, 4,日記（一）                                    ,【道安法師撰述】
+	# DA,07,   ,0005, 2,日記（二）                                    ,【道安法師撰述】
+	# DA,08,   ,0005, 3,日記（三）                                    ,【道安法師撰述】
+	# DA,09,   ,0005, 5,日記（四）                                    ,【道安法師撰述】
+	# DA,10,   ,0005, 5,日記（五）                                    ,【道安法師撰述】
+	# DA,11,   ,0005, 4,日記（六）                                    ,【道安法師撰述】
+	# DA,12,   ,0005, 5,日記（七）                                    ,【道安法師撰述】
+	# DA,13,   ,0005, 3,日記（八）（含墨蹟、函札、法語、編後贅語）    ,【道安法師撰述】
+	if($file eq "DA07n0005.xml")
+	{
+		$ii = sprintf("%03d",$i+4);
+	}
+	if($file eq "DA08n0005.xml")
+	{
+		$ii = sprintf("%03d",$i+6);
+	}
+	if($file eq "DA09n0005.xml")
+	{
+		$ii = sprintf("%03d",$i+9);
+	}
+	if($file eq "DA10n0005.xml")
+	{
+		$ii = sprintf("%03d",$i+14);
+	}
+	if($file eq "DA11n0005.xml")
+	{
+		$ii = sprintf("%03d",$i+19);
+	}
+	if($file eq "DA12n0005.xml")
+	{
+		$ii = sprintf("%03d",$i+23);
+	}
+	if($file eq "DA13n0005.xml")
+	{
+		$ii = sprintf("%03d",$i+28);
+	}
 	return $ii;
 }
 
