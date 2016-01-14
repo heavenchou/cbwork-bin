@@ -3,6 +3,7 @@
 2013.1.4 周邦信 改寫自 cbp4top5.py
 
 Heaven 修改:
+2016/01/14 改了一個版本, 可以不再使用 gaiji-m_u8.txt , 不過變的很慢...
 2014/12/23 增加道安長老全集的註解標記
 2014/06/17 原西蓮代碼 "SL" 改成 智諭 "ZY", 取消西蓮專用目錄
 2014/03/30 1.修改南傳校勘星號處理錯誤的地方.
@@ -29,6 +30,7 @@ import configparser, collections, csv, datetime, glob, os, re, shutil, sys, time
 from optparse import OptionParser
 from lxml import etree
 import zbxxml, siddam, ranjana
+import win32com.client # 要安裝 PythonWin
 
 # 使用 lxml 3.0.2 的 RelaxNG 在 validate T18n0850 時有問題
 #relaxng_doc = etree.parse('D:/git-repos/ddbc-cbeta/schema/cbeta-p5.rng')
@@ -1453,6 +1455,7 @@ def read_all_gaijis():
 		for row in reader:
 			cb = row['cb']
 			uni = row['unicode']
+			# print (cb)
 			if cb != '':
 				cb = 'CB' + cb
 				r[cb] = {}
@@ -1466,6 +1469,45 @@ def read_all_gaijis():
 					r[cb]['unicode'] = uni
 			if uni != '':
 				unicode2cb[uni] = cb
+	return r
+
+def read_all_gaijis_by_mdb():
+	r = {}
+	rs = win32com.client.Dispatch(r'ADODB.Recordset')
+	sql = "SELECT cb, unicode, des, nor, uni FROM gaiji WHERE cb Is Not Null"
+	rs.Open(sql, conn, 1, 3)
+	if rs.RecordCount > 0:
+		rs.MoveFirst()
+		while 1:
+			if rs.EOF:
+				break
+			else:
+				cb = rs.Fields.Item('cb').Value
+				# print (cb)
+				unicode = rs.Fields.Item('unicode').Value	# 此欄位只有有 unicode 的才有, 不包含 nor_unicode , 反之 uni 欄位就包含 nor_uni 了
+				des = rs.Fields.Item('des').Value
+				nor = rs.Fields.Item('nor').Value
+				# 因為在 gaiji-m.mdb 中, 'uni' 欄位是同時包含有 unicode 及 nor_uni 的
+				# 所以只有當 'unicode' 欄位為空白時, 'uni' 欄位的才是真正代表 nor_uni 的內容
+				if unicode == '' or unicode == None :
+					nor_unicode = rs.Fields.Item('uni').Value
+				else:
+					nor_unicode = '';
+					
+				if cb != '' and cb != None:
+					cb = 'CB' + cb
+					r[cb] = {}
+					if des != '' and des != None:
+						r[cb]['des'] = des
+					if nor != '' and nor != None:
+						r[cb]['nor'] = nor
+					if nor_unicode != '' and nor_unicode != None:
+						r[cb]['nor_unicode'] = nor_unicode
+					if unicode != '' and unicode != None:
+						r[cb]['unicode'] = unicode
+				if unicode != '' and unicode != None:
+					unicode2cb[unicode] = cb
+			rs.MoveNext()
 	return r
 
 ####################################################################
@@ -1490,6 +1532,7 @@ config.read('../cbwork_bin.ini')
 CBTEMP = config.get('default', 'temp')
 cbwork_dir = config.get('default', 'cbwork')
 JING = config.get('default', 'jing.jar_file')
+gaijiMdb = config.get('default', 'gaiji-m.mdb_file')
 
 IN_P5a = cbwork_dir + '/xml-p5a' 		# XML P5a 來源資料夾
 
@@ -1500,7 +1543,14 @@ RNC = cbwork_dir + '/xml-p5/schema/cbeta-p5.rnc'
 
 globals={}
 unicode2cb = {}
-all_gaijis=read_all_gaijis()
+
+# 準備存取 gaiji-m.mdb
+conn = win32com.client.Dispatch(r'ADODB.Connection')
+DSN = 'PROVIDER=Microsoft.Jet.OLEDB.4.0;DATA SOURCE=%s;' % gaijiMdb
+conn.Open(DSN)
+
+# all_gaijis=read_all_gaijis()	# 開啟 cvs 的資料庫
+all_gaijis=read_all_gaijis_by_mdb()	# 開啟 MS Access 的 mdb 資料庫, 不過很慢
 
 log=open('p5a2p5.log', 'w', encoding='utf8')
 log.write(now()+'\n')
