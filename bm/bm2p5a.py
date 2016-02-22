@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2016/02/23 處理在表格的 cell 中也會有 <p> 的情況
 2015/12/31 第一個 <n> 標記, 要加上 <cb:div type="note"> ,直到 </n> 才結束 </cb:div>
 2015/12/30 遇到 <L_sp> , 則底下所有的 <I> 都要處理成 <list rendition="simple">, 而不是只有第一層處理.
 2015/12/29 修改 <no_chg> 的處理順序
@@ -451,7 +452,7 @@ def myLength(s):
 # <c r3> => <cell rows="3">
 # <c3 r3> => <cell cols="3" rows="3">
 def start_inline_c(tag):
-	closeTags('cell')
+	closeTags('p', 'cell')
 	# 檢查有沒有 c3 這種格式
 	cols = ''
 	mo = re.search(r'c(\d+)', tag)
@@ -489,7 +490,7 @@ def close_e(tag):
 	closeTags('p', 'cb:def', 'entry')
 
 def close_F(tag):
-	closeTags('cell', 'row', 'table')
+	closeTags('p', 'cell', 'row', 'table')
 
 def close_q(tag):
 	closeTags('cb:jhead', 'cb:juan', 'p')
@@ -990,7 +991,7 @@ def count_c_from_line(text):
 
 # 處理表格 F 表格開始
 def start_F(tag, text):
-	closeTags('byline')
+	closeTags('byline','p')
 	# 計算一行有多少個 c 標記
 	cnum = count_c_from_line(text)
 	out('<table cols="{0:0d}"><row>'.format(cnum))
@@ -999,7 +1000,7 @@ def start_F(tag, text):
 
 # 處理表格 f 表示 <row> 的範圍
 def start_f(tag):
-	closeTags('cell', 'row')
+	closeTags('p', 'cell', 'row')
 	out('<row>')
 	record_open('row')
 
