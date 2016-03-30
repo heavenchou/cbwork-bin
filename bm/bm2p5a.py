@@ -10,6 +10,8 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2016/03/31 新增 GA, GB 二種經文代碼，支援法鼓山做的佛寺志，修訂一律預設為 <choice cb:resp="DILA">
+           如果 BM 的修訂是 [Ａ>Ｂ]<resp="XXX">，則 p5a 變成 <choice cb:resp="XXX"><corr>Ｂ</corr><sic>Ａ</sic></choice>
 2016/02/23 處理在表格的 cell 中也會有 <p> 的情況
 2015/12/31 第一個 <n> 標記, 要加上 <cb:div type="note"> ,直到 </n> 才結束 </cb:div>
 2015/12/30 遇到 <L_sp> , 則底下所有的 <I> 都要處理成 <list rendition="simple">, 而不是只有第一層處理.
@@ -94,6 +96,8 @@ wits={
 'DA': '【道安】',
 'F': '【房山】',
 'G': '【佛教】',
+'GA': '【志彙】',
+'GB': '【志叢】',
 'H': '【正史】',
 'J': '【嘉興】',
 'K': '【麗】',
@@ -118,6 +122,8 @@ collectionEng={
 'DA': 'the Complete Works of Ven Daoan',
 'F': 'Fangshan shijing',
 'G': 'Fojiao Canon',
+'GA': 'Zhongguo Fosi Shizhi Huikan',
+'GB': 'Zhongguo fosizhi congkan',
 'H': 'Passages concerning Buddhism from the Official Histories',
 'I': 'Selections of Buddhist Stone Rubbings from the Northern Dynasties',
 'J': 'Jiaxing Canon - Xinwenfeng Edition',
@@ -800,10 +806,15 @@ def do_chars(s):
 因為 Ａ 與 B 也有可能是組字式或校勘數字, 例如 [[金*本]>[口*兄]] , [[01]>]
 '''
 def do_corr(text):
+	global ed
 	'''
 	先把 [xxx] 組字或校勘數字變成 :gaiji1:xxx:gaiji2:
 	先把 <xxx> 組字或校勘數字變成 :gaiji3:xxx:gaiji4:
-	再把[Ａ>Ｂ] 換成 <choice cb:resp="CBETA.maha"><corr>Ｂ</corr><sic>Ａ</sic></choice>
+	如果是佛寺志版本 (ed = GA or GB)
+		先把[Ａ>Ｂ]<resp="CBETA.maha">換成 <choice cb:resp="CBETA.maha"><corr>Ｂ</corr><sic>Ａ</sic></choice>
+		再把[Ａ>Ｂ] 換成 <choice cb:resp="DILA"><corr>Ｂ</corr><sic>Ａ</sic></choice>
+	否則一般版本則
+		把[Ａ>Ｂ] 換成 <choice cb:resp="CBETA.maha"><corr>Ｂ</corr><sic>Ａ</sic></choice>
 	再把 <corr>[01]</corr> 這一類換成 <corr><[01]></corr> , 而 <[01]> 之後會換成 [01], 如不這樣處理, [01] 會被變成一般的校勘數字標記
 	再把:gaiji1:xxx:gaiji2: 換回 [xxx]
 	再把:gaiji3:xxx:gaiji4: 換回 <xxx>
@@ -811,7 +822,11 @@ def do_corr(text):
 	'''
 	text = re.sub(r"\[([^>\[\]]+?)\]", r":gaiji1:\1:gaiji2:", text)
 	text = re.sub(r"<([^<>]+?)>", r":gaiji3:\1:gaiji4:", text)
-	text = re.sub(r"\[(.*?)>(.*?)\]", r'<choice cb:resp="CBETA.maha"><corr>\2</corr><sic>\1</sic></choice>', text)
+	text = re.sub(r"\[([^\]]*?)>([^\]]*?)\]:gaiji3:resp=\"(.*?)\":gaiji4:", r'<choice cb:resp="\3"><corr>\2</corr><sic>\1</sic></choice>', text)
+	if(ed == 'GB' or ed == 'GA'):
+		text = re.sub(r"\[(.*?)>(.*?)\]", r'<choice cb:resp="DILA"><corr>\2</corr><sic>\1</sic></choice>', text)
+	else:
+		text = re.sub(r"\[([^\]]*?)>([^\]]*?)\]", r'<choice cb:resp="CBETA.maha"><corr>\2</corr><sic>\1</sic></choice>', text)
 	text = re.sub(":gaiji1:", "[", text)
 	text = re.sub(":gaiji2:", "]", text)
 	text = re.sub(":gaiji3:", "<", text)
