@@ -3,6 +3,7 @@
 # 格式介紹在最底下
 #
 # 修訂記錄：
+# 2016/03/31 : 加入 GA, GB 佛寺志代碼, 不過校注都是 resp="DILA" ,因為是法鼓山處理的.
 # 2015/04/18 : 1. 將 <□> 轉換成 <unclear/>
 #              2. 修改 <c r2> 這類標記在行首沒有出現 <row> 的問題
 # 2013/11/20 : 處理 N52 校注中有表格, 而且校注不只一行的情況.
@@ -36,6 +37,16 @@ elsif($ed eq "B")
 {
 	$source_ename = "BuBian";		# resp="xxx" 的名稱
 	$source_cname = "補編";			#<rdg wit="xxxx"> 的名稱
+}
+elsif($ed eq "GA")
+{
+	$source_ename = "DILA";		# resp="xxx" 的名稱
+	$source_cname = "志彙";			#<rdg wit="xxxx"> 的名稱
+}
+elsif($ed eq "GB")
+{
+	$source_ename = "DILA";		# resp="xxx" 的名稱
+	$source_cname = "志叢";			#<rdg wit="xxxx"> 的名稱
 }
 else
 {
