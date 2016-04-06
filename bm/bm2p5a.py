@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2016/04/07 修改 </L> 沒有取消前一組 <L_SP> 的問題
 2016/03/31 新增 GA, GB 二種經文代碼，支援法鼓山做的佛寺志，修訂一律預設為 <choice cb:resp="DILA">
            如果 BM 的修訂是 [Ａ>Ｂ]<resp="XXX">，則 p5a 變成 <choice cb:resp="XXX"><corr>Ｂ</corr><sic>Ａ</sic></choice>
 2016/02/23 處理在表格的 cell 中也會有 <p> 的情況
@@ -592,7 +593,7 @@ def start_inline_a(tag):
 
 # 處理經文中的標記
 def inline_tag(tag):
-	global char_count, buf
+	global char_count, buf, L_type
 	#print(tag, sep=' ', end='')
 	if re.match(r'\[([^>\]]*?)>(.*?)\]', tag):	# 處理修訂 [A>B] # 可能用不上了, 已在 do_corr 處理了.
 		out(choice(tag))
