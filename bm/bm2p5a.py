@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2016/04/07 <cb:juan> 的卷數若沒有資料, 就預設加 1
 2016/04/07 修改 </L> 沒有取消前一組 <L_SP> 的問題
 2016/03/31 新增 GA, GB 二種經文代碼，支援法鼓山做的佛寺志，修訂一律預設為 <choice cb:resp="DILA">
            如果 BM 的修訂是 [Ａ>Ｂ]<resp="XXX">，則 p5a 變成 <choice cb:resp="XXX"><corr>Ｂ</corr><sic>Ａ</sic></choice>
@@ -913,15 +914,18 @@ def start_inline_event(tag):
 	closeTags('p', 'date')
 
 def start_J(tag):
+	global globals
 	if '=' in head_tag:
 		return
 	closeTags('p')
 	n = get_number(tag)
-	out('<cb:juan fun="open" n="%s"><cb:jhead>' % n)
+	if n != None and  n != "" : globals['juan_num'] = int(n)
+	out('<cb:juan fun="open" n="%s"><cb:jhead>' % globals['juan_num'])
 	record_open('cb:juan')
 	record_open('cb:jhead')
 
 def start_j(tag):
+	global globals
 	closeTags('p')
 	out('<cb:juan fun="close" n="{}"><cb:jhead>'.format(globals['juan_num']))
 	record_open('cb:juan')
