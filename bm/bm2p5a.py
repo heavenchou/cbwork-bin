@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2016/04/11 取消 <Qx m=> 及 <h m=> 造成的空目錄, 也就是取消 2015/11/27 所做的修改.
 2016/04/07 <cb:juan> 的卷數若沒有資料, 就預設加 1
 2016/04/07 修改 </L> 沒有取消前一組 <L_SP> 的問題
 2016/03/31 新增 GA, GB 二種經文代碼，支援法鼓山做的佛寺志，修訂一律預設為 <choice cb:resp="DILA">
@@ -336,8 +337,9 @@ def start_inline_q(tag):
 		
 		if label != '':
 			out('<cb:mulu type="其他" level="%d">%s</cb:mulu>' % (level, label))
-		else:
-			out('<cb:mulu type="其他" level="%d"/>' % (level))
+		# 取消 cb:mulu 的空標記 2016/04/11	
+		# else:
+			# out('<cb:mulu type="其他" level="%d"/>' % (level))
 		globals['mulu_start'] = False
 	globals['head_start'] = True
 	buf += '<head>'
@@ -377,8 +379,9 @@ def start_inline_h(tag):
 		
 		if label != '':
 			out('<cb:mulu type="其他" level="%d">%s</cb:mulu>' % (level, label))
-		else:
-			out('<cb:mulu type="其他" level="%d"/>' % (level))
+		# 取消 cb:mulu 的空標記 2016/04/11
+		# else:
+			# out('<cb:mulu type="其他" level="%d"/>' % (level))
 		globals['mulu_start'] = False
 	globals['head_start'] = True
 	buf += '<head>'
@@ -1276,8 +1279,9 @@ def close_head():
 		if globals['mulu_start']:
 			if div_head != '':
 				out1('<cb:mulu type="{}" level="{}">{}</cb:mulu>'.format(globals['muluType'], opens['div'], div_head))
-			else:
-				out1('<cb:mulu type="{}" level="{}"/>'.format(globals['muluType'], opens['div']))
+			# 取消 cb:mulu 的空標記 2016/04/11
+			# else:
+			#	out1('<cb:mulu type="{}" level="{}"/>'.format(globals['muluType'], opens['div']))
 			globals['mulu_start'] = False
 		out('')
 		closeTags('head')
