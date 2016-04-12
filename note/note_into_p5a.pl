@@ -2,6 +2,7 @@
 # 把卍續藏校注 XML 格式插入 XML 經文中  by heaven 2007/04/11
 # 格式介紹在最底下
 #
+# 2015/04/12 大藏經代碼支援超過 2 位數, 冊數支援超過 3 位數
 # 2013/08/19 處理校勘編號超過二位數的錯誤
 ######################################################################################
 
@@ -15,8 +16,11 @@ use Config::IniFiles;
 ######################################################################################
 
 my $vol = shift;						# 傳入冊數 N01
+my $ed;									# 大藏經代碼
 
-my $ed = substr($vol,0,1);						# 取出 $vol 第一個英文字
+$vol =~ /(\D+)/;
+$ed = $1;
+
 my $infile = "out_" . $vol . ".txt";			# 校注來源檔, 若改成 shift , 則表示由參數傳入
 
 my $cfg = Config::IniFiles->new( -file => "../cbwork_bin.ini" );
@@ -88,7 +92,7 @@ for($i=0; $i<=$#xmlfiles; $i++)
 		# <lb ed="X" n="0121a24"/>場眾<anchor id="fnX04p0121a01A"/>會海<anchor id="fnX04p0121a01B"/>巳即說頌言。</p>
 		# <lb ed="X" n="0121a24"/>場眾<anchor id="fnX04p0121a01A"/>會海<anchor id="fnX04p0121a01-02"/>巳即說頌言。</p>	# 這是假設的.
 		# <anchor xml:id="fnN01p0001a01"/>
-		while(/^.*?<anchor\s+xml:id="fn${ed}..p(....).(\d{2,3}[a-zA-Z]?\-?[a-zA-Z]?\d*)"\/>/)
+		while(/^.*?<anchor\s+xml:id="fn${ed}\d{2,}p(....).(\d{2,3}[a-zA-Z]?\-?[a-zA-Z]?\d*)"\/>/)
 		{
 			$page = $1;
 			my $tmp = $2;
@@ -115,7 +119,7 @@ for($i=0; $i<=$#xmlfiles; $i++)
 				print ERROUT "校注檔找不到校注 [$tmp] [$tmp2] , $_\n";
 			}
 			
-			s/^(.*?)<anchor\s+xml:id="fn${ed}..p(....).(\d{2,3}[a-zA-Z]?\-?[a-zA-Z]?\d*)"\/>/$1$find/;
+			s/^(.*?)<anchor\s+xml:id="fn${ed}\d{2,}p(....).(\d{2,3}[a-zA-Z]?\-?[a-zA-Z]?\d*)"\/>/$1$find/;
 		}
 		
 		# 有 【科01】 或 【標01】 或 【解01】
