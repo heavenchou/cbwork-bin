@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2016/04/12 附文底下的目錄 type 要用 "附文" 而不是 "其他"
 2016/04/11 取消 <Qx m=> 及 <h m=> 造成的空目錄, 也就是取消 2015/11/27 所做的修改.
 2016/04/07 <cb:juan> 的卷數若沒有資料, 就預設加 1
 2016/04/07 修改 </L> 沒有取消前一組 <L_SP> 的問題
@@ -323,7 +324,10 @@ def start_inline_q(tag):
 	if mo is None:
 		label = ''
 		globals['mulu_start'] = True
-		globals['muluType']='其他'
+		if 'W' in head_tag:
+			globals['muluType']='附文'
+		else:
+			globals['muluType']='其他'
 	else:
 		label=mo.group(1)
 
@@ -336,10 +340,13 @@ def start_inline_q(tag):
 			mo2=re.search(r'(\[[^>\[ ]+?\])', label)
 		
 		if label != '':
-			out('<cb:mulu type="其他" level="%d">%s</cb:mulu>' % (level, label))
+			if 'W' in head_tag:
+				out('<cb:mulu type="附文" level="%d">%s</cb:mulu>' % (level, label))			
+			else:
+				out('<cb:mulu type="其他" level="%d">%s</cb:mulu>' % (level, label))
 		# 取消 cb:mulu 的空標記 2016/04/11	
 		# else:
-			# out('<cb:mulu type="其他" level="%d"/>' % (level))
+		# 	out('<cb:mulu type="其他" level="%d"/>' % (level))
 		globals['mulu_start'] = False
 	globals['head_start'] = True
 	buf += '<head>'
