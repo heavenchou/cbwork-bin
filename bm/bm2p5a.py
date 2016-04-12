@@ -372,7 +372,10 @@ def start_inline_h(tag):
 		out('')					# 因為沒有 start_div , 所以要自己執行這一行
 		label = ''
 		globals['mulu_start'] = True
-		globals['muluType']='其他'
+		if 'W' in head_tag:
+			globals['muluType']='附文'
+		else:
+			globals['muluType']='其他'
 	else:
 		label=mo.group(1)
 		
@@ -385,10 +388,13 @@ def start_inline_h(tag):
 			mo2=re.search(r'(\[[^>\[ ]+?\])', label)
 		
 		if label != '':
-			out('<cb:mulu type="其他" level="%d">%s</cb:mulu>' % (level, label))
+			if 'W' in head_tag:
+				out('<cb:mulu type="附文" level="%d">%s</cb:mulu>' % (level, label))			
+			else:
+				out('<cb:mulu type="其他" level="%d">%s</cb:mulu>' % (level, label))			
 		# 取消 cb:mulu 的空標記 2016/04/11
 		# else:
-			# out('<cb:mulu type="其他" level="%d"/>' % (level))
+		#	out('<cb:mulu type="其他" level="%d"/>' % (level))
 		globals['mulu_start'] = False
 	globals['head_start'] = True
 	buf += '<head>'
