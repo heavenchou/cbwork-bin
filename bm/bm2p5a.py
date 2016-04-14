@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2016/04/14 上一版只修正這種情況 W##<Qn>，這一版修正 WQn 這種行首標記的情況。
 2016/04/12 附文底下的目錄 type 要用 "附文" 而不是 "其他"
 2016/04/11 取消 <Qx m=> 及 <h m=> 造成的空目錄, 也就是取消 2015/11/27 所做的修改.
 2016/04/07 <cb:juan> 的卷數若沒有資料, 就預設加 1
@@ -421,8 +422,14 @@ def start_q(tag):
 		
 	globals['mulu_start'] = True
 	globals['head_start'] = True
-	globals['muluType']='其他'
-	start_div(level, 'other')
+	
+	if 'W' in head_tag:
+		globals['muluType']='附文'
+		start_div(level, 'w')
+	else:
+		globals['muluType']='其他'
+		start_div(level, 'other')
+
 	buf += '<head>'
 	opens['head'] = 1
 
