@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2016/04/15 <Ix> 及 <L_sp> 標記要結束 head 標記，<[ABCEY]> byline 標記要結束 p 標記.
 2016/04/14 上一版只修正這種情況 W##<Qn>，這一版修正 WQn 這種行首標記的情況。
 2016/04/12 附文底下的目錄 type 要用 "附文" 而不是 "其他"
 2016/04/11 取消 <Qx m=> 及 <h m=> 造成的空目錄, 也就是取消 2015/11/27 所做的修改.
@@ -199,6 +200,7 @@ def start_i(tag):
 	if not 'item' in opens: opens['item'] = 0
 	if not 'list' in opens: opens['list'] = 0
 	closeTags('cb:jhead', 'cb:juan', 'p')
+	close_head()
 	while level<opens['list']:
 		out1('</item></list>')
 		opens['list'] -= 1
@@ -538,6 +540,7 @@ def close_h(tag):
 
 def start_inline_Lsp(tag):
 	global L_type
+	close_head()
 	L_type = "simple"
 
 def start_inline_n(tag):
@@ -692,7 +695,8 @@ def inline_tag(tag):
 		start_J(tag)
 	elif tag=='<L_sp>':
 		start_inline_Lsp(tag)
-	elif tag =='<l>':	out('<l>')	# 行首標記有 S 及 s 時, 會在行中自動將空格變成 <l></l></lg> 等標記
+	elif tag =='<l>':
+		out('<l>')	# 行首標記有 S 及 s 時, 會在行中自動將空格變成 <l></l></lg> 等標記
 	elif tag =='</l>':	out('</l>')	# 行首標記有 S 及 s 時, 會在行中自動將空格變成 <l></l></lg> 等標記
 	elif tag =='</lg>':	out('</lg>')	# 行首標記有 S 及 s 時, 會在行中自動將空格變成 <l></l></lg> 等標記
 	elif tag =='</L>':
@@ -970,7 +974,7 @@ def start_byline(tag):
 	opens['byline'] = 1
 	
 def start_inline_byline(tag):
-	closeTags('byline', 'cb:jhead', 'cb:juan')
+	closeTags('byline', 'cb:jhead', 'cb:juan', 'p')
 	close_head()
 	if tag == '<A>':
 		out('<byline cb:type="author">')
