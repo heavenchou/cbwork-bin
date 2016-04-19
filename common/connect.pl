@@ -145,12 +145,12 @@ sub cut_head
 	
 	if($code eq "big5")
 	{
-		s/^\D*\d\dn.{5}p\d{4}.\d\d.*?שר//;
+		s/^\D+\d+n.{5}p\d{4}.\d\d.*?שר//;
 	}
 	
 	if($code eq "utf8")
 	{
-		s/^\D*\d\dn.{5}p\d{4}.\d\d.*?${endline}//;
+		s/^\D+\d+n.{5}p\d{4}.\d\d.*?${endline}//;
 	}
 	
 	return $_;
