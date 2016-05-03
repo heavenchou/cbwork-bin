@@ -6,6 +6,7 @@
 # pushsign.pl 簡單標記版.txt 舊的xml.xml 結果檔xml.xml > 記錄檔.txt
 #
 ########################################################
+# 2016/05/03 : 行中的 p 原本是 <p place="inline">, 改成 <p rend="inline">
 # 2016/03/12 : 改成 utf8 版, 支援 P5a 的 XML 經文 (之前 的 big5 版是支援 P4 版的 XML)
 # 2011/12/30 : 處理模糊字 BM:□ , XML:&unrec;
 # 2008/12/11 : 雜阿含BM版也有（）這些標記，故加入判斷中。
@@ -313,7 +314,7 @@ sub get_word1
 				}
 				else
 				{
-					$tmp = "</p>$ouwsa<p place=\"inline\">";
+					$tmp = "</p>$ouwsa<p rend=\"inline\">";
 				}
 			}
 			if($tmp =~ /(<[ouwsa]>)?<P,(\d+)>/)
@@ -330,7 +331,7 @@ sub get_word1
 				}
 				else
 				{
-					$tmp = "</p>$ouwsa<p place=\"inline\" rend=\"margin-left:${tmpnum}em\">";
+					$tmp = "</p>$ouwsa<p rend=\"inline\" rend=\"margin-left:${tmpnum}em\">";
 				}
 			}
 				
