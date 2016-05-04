@@ -3,6 +3,7 @@
 2013.1.4 周邦信 改寫自 cbp4top5.py
 
 Heaven 修改:
+2016/05/05 佛寺志加入法鼓文理學院註解
 2016/04/19 加入佛寺志 GA 與 GB
 2016/01/14 改了一個版本, 可以不再使用 gaiji-m_u8.txt , 不過變的很慢...
 2014/12/23 增加道安長老全集的註解標記
@@ -1237,6 +1238,9 @@ def handle_back(t):
 		elif k=='Daoan':
 			r += '<cb:div type="daoan-notes">\n'
 			r += '<head>道安長老全集 註解</head>\n'
+		elif k=='DILA':
+			r += '<cb:div type="dila-notes">\n'
+			r += '<head>法鼓文理學院 註解</head>\n'
 		elif k=='Dudoucheng':
 			r += '<cb:div type="dudoucheng-notes">\n'
 			r += '<head>正史佛教資料類编 校勘記</head>\n'
