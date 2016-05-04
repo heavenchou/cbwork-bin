@@ -6,6 +6,7 @@
 # pushsign.pl 簡單標記版.txt 舊的xml.xml 結果檔xml.xml > 記錄檔.txt
 #
 ########################################################
+# 2016/05/04 : 處理 <cb:mulu> , <note> 之中有 <g> 標記, 處理 rdg 標記有 type = "correctionRemark" 及 "variantRemark"
 # 2016/05/03 : 行中的 p 原本是 <p place="inline">, 改成 <p rend="inline">
 # 2016/03/12 : 改成 utf8 版, 支援 P5a 的 XML 經文 (之前 的 big5 版是支援 P4 版的 XML)
 # 2011/12/30 : 處理模糊字 BM:□ , XML:&unrec;
@@ -331,7 +332,7 @@ sub get_word1
 				}
 				else
 				{
-					$tmp = "</p>$ouwsa<p rend=\"inline\" rend=\"margin-left:${tmpnum}em\">";
+					$tmp = "</p>$ouwsa<p rend=\"margin-left:${tmpnum}em;inline\">";
 				}
 			}
 				
@@ -518,8 +519,20 @@ sub get_word2
 		}
 
         # rdg 有二種, 一種要過濾(校勘), 一種要通過(修訂)
+		# 還有一種雖然有 wit="【大】" , 還是要過濾, 就是
+		# <rdg resp="Taisho" wit="【大】" type="correctionRemark">之因</rdg>
+		# <rdg resp="Taisho" wit="【大】" type="variantRemark">之因</rdg>
 
-	    #<rdg wit="【大】">叟</rdg>(修訂)
+
+		# <rdg resp="Taisho" wit="【大】" type="correctionRemark">之因</rdg> (correctionRemark)
+	    if($lines2[$index2] =~ /^<rdg[^>]*wit="【大】"[^>]*>/ && $lines2[$index2] =~ /^<rdg[^>]*type="(correction)|(variant)Remark"[^>]*>/)
+		{
+		    $lines2[$index2] =~ s/^(<rdg.*?>.*?<\/rdg>)//;
+			$tagbuff .= $1;
+			next;
+	    }
+
+	    # <rdg wit="【大】">叟</rdg>(修訂)
 	    if($lines2[$index2] =~ /^<rdg[^>]*wit="【大】"[^>]*>/)
 		{
 			$lines2[$index2] =~ s/^(<rdg[^>]*wit="【大】"[^>]*>)//;
@@ -595,7 +608,13 @@ sub get_word2
 			$tagbuff .= $1;
 			next;
 	    }
-	    
+		# <cb:mulu level="1" n="3" type="品">2 方便品</cb:mulu>
+	    if($lines2[$index2] =~ /^<cb:mulu .*?<\/cb:mulu>/)			
+	    {
+		    $lines2[$index2] =~ s/^(<cb:mulu .*?<\/cb:mulu>)//;
+			$tagbuff .= $1;
+			next;
+	    }	    
 	    
 	    # 上面的順序要在前
 	    # 底下這筆的順序要在後
@@ -742,9 +761,11 @@ sub get_word2
 	}
 	
 	# <note n="0150001" resp="Taisho" type="orig" place="foot text">西天譯經三藏＝宋【明】</note>
-	if(/^<note[^>]*?resp="Taisho"[^>]*?>[^<]*?<\/note>/)			
+	# if(/^<note[^>]*?resp="Taisho"[^>]*?>[^<]*?<\/note>/)
+	# 不能用上面的, 因為 <note> 標記中會有 <g ref..> 這種缺字標記, 要改用如下:
+	if(/^<note[^>]*?resp="Taisho"[^>]*?>.*?<\/note>/)			
 	{
-		$lines2[$index2] =~ s/^(<note[^>]*?resp="Taisho"[^>]*?>[^<]*?<\/note>)//;
+		$lines2[$index2] =~ s/^(<note[^>]*?resp="Taisho"[^>]*?>.*?<\/note>)//;
 		return "$1";
 	}
 
