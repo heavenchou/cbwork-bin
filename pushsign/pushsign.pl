@@ -6,6 +6,7 @@
 # pushsign.pl 簡單標記版.txt 舊的xml.xml 結果檔xml.xml > 記錄檔.txt
 #
 ########################################################
+# 2016/05/05 : 將 <tt> 改成 <cb:tt> , <t> 改成 <cb:t>
 # 2016/05/04 : 處理 <cb:mulu> , <note> 之中有 <g> 標記, 處理 rdg 標記有 type = "correctionRemark" 及 "variantRemark"
 # 2016/05/03 : 行中的 p 原本是 <p place="inline">, 改成 <p rend="inline">
 # 2016/03/12 : 改成 utf8 版, 支援 P5a 的 XML 經文 (之前 的 big5 版是支援 P4 版的 XML)
@@ -158,9 +159,9 @@ while(1)
 
 			if($tagbuff =~ /^<((\/rdg)|(\/lem)|(\/t)|(note[^>]*resp="CBETA".*?)|(app.*?))>/)
 			{
-			    if($tagbuff =~ /^.*<\/((app)|(tt)|(note))>/)
+			    if($tagbuff =~ /^.*<\/((app)|(cb:tt)|(note))>/)
 			    {
-				    $tagbuff =~ s/^(.*<\/(?:(?:app)|(?:tt)|(?:note))>)/$1$hasdot1/;
+				    $tagbuff =~ s/^(.*<\/(?:(?:app)|(?:cb:tt)|(?:note))>)/$1$hasdot1/;
 				    print OUTXml "$tagbuff";
 				}
 				else
@@ -550,10 +551,10 @@ sub get_word2
 	    
 	    # 過濾 <t lang="san" resp="Taisho" place="foot">D&imacron;rgha-&amacron;gama</t>
 	    #if($lines2[$index2] =~ /^<t[^>]*lang="(?:(?:san)|(?:pli)|(?:unknown))"[^>]*>.*?<\/t>/)			
-	    if($lines2[$index2] =~ /^<t[^>]*place="foot"[^>]*>.*?<\/t>/)	
+	    if($lines2[$index2] =~ /^<cb:t[^>]*place="foot"[^>]*>.*?<\/t>/)	
 	    {
             # $lines2[$index2] =~ s/^(<t[^>]*lang="(?:(?:san)|(?:pli)|(?:unknown))"[^>]*>.*?<\/t>)//;
-            $lines2[$index2] =~ s/^(<t[^>]*place="foot"[^>]*>.*?<\/t>)//;
+            $lines2[$index2] =~ s/^(<cb:t[^>]*place="foot"[^>]*>.*?<\/t>)//;
 			$tagbuff .= $1;
 			next;
 	    }
@@ -644,9 +645,9 @@ sub get_word2
 			last;
 		}
 	
-		if($lines2[$index2] =~ /^<tt>/)
+		if($lines2[$index2] =~ /^<cb:tt>/)
 		{
-		    $lines2[$index2] =~ s/^(<tt>)//;
+		    $lines2[$index2] =~ s/^(<cb:tt>)//;
 			$tagbuff .= $1;
 			if($istt == 0)
 			{
@@ -655,17 +656,17 @@ sub get_word2
 			next;
 		}
 		
-		if($lines2[$index2] =~ /^<t lang="san-sd">/)
+		if($lines2[$index2] =~ /^<cb:t lang="san-sd">/)
 		{
 		    $whicht = 1;
-		    $lines2[$index2] =~ s/^(<t lang="san-sd">)//;
+		    $lines2[$index2] =~ s/^(<cb:t lang="san-sd">)//;
 			$tagbuff .= $1;
 			next;
 		}
-		if($lines2[$index2] =~ /^<t lang="chi">/)
+		if($lines2[$index2] =~ /^<cb:t lang="chi">/)
 		{
 		    $whicht = 2;
-		    $lines2[$index2] =~ s/^(<t lang="chi">)//;
+		    $lines2[$index2] =~ s/^(<cb:t lang="chi">)//;
 			$tagbuff .= $1;
 			next;
 		}
