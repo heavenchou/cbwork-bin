@@ -3,6 +3,7 @@
 2013.1.4 周邦信 改寫自 cbp4top5.py
 
 Heaven 修改:
+2016/05/05 所有 "校勘記" 或 "註解" 都改成 "校註"
 2016/05/05 佛寺志加入法鼓文理學院註解
 2016/04/19 加入佛寺志 GA 與 GB
 2016/01/14 改了一個版本, 可以不再使用 gaiji-m_u8.txt , 不過變的很慢...
@@ -1214,7 +1215,7 @@ def handle_back(t):
 	r = '\n<back>\n'
 	if t.back['app']!='':
 		r += '<cb:div type="apparatus">\n'
-		r += '<head>校勘記</head>\n'
+		r += '<head>校註</head>\n'
 		r += '<p>\n'
 		r += t.back['app']
 		r += '</p>\n'
@@ -1231,41 +1232,41 @@ def handle_back(t):
 	for k in sorted(t.back_notes):
 		if k=='BuBian':
 			r += '<cb:div type="bubian-notes">\n'
-			r += '<head>大藏經補編 校勘記</head>\n'
+			r += '<head>大藏經補編 校註</head>\n'
 		elif k=='CBETA':
 			r += '<cb:div type="cbeta-notes">\n'
-			r += '<head>CBETA 校勘記</head>\n'
+			r += '<head>CBETA 校註</head>\n'
 		elif k=='Daoan':
 			r += '<cb:div type="daoan-notes">\n'
-			r += '<head>道安長老全集 註解</head>\n'
+			r += '<head>道安長老全集 校註</head>\n'
 		elif k=='DILA':
 			r += '<cb:div type="dila-notes">\n'
-			r += '<head>法鼓文理學院 註解</head>\n'
+			r += '<head>法鼓文理學院 校註</head>\n'
 		elif k=='Dudoucheng':
 			r += '<cb:div type="dudoucheng-notes">\n'
-			r += '<head>正史佛教資料類编 校勘記</head>\n'
+			r += '<head>正史佛教資料類编 校註</head>\n'
 		elif k=='ihp':
 			r += '<cb:div type="ihp-notes">\n'
-			r += '<head>中央研究院歷史語言研究所 校勘記</head>\n'
+			r += '<head>中央研究院歷史語言研究所 校註</head>\n'
 		elif k=='NanChuan':
 			r += '<cb:div type="nanchuan-notes">\n'
-			r += '<head>漢譯南傳大藏經 註解</head>\n'
+			r += '<head>漢譯南傳大藏經 校註</head>\n'
 		elif k=='NCLRareBook':
 			r += '<cb:div type="ncl-notes">\n'
-			r += '<head>國家圖書館善本佛典 校勘記</head>\n'
+			r += '<head>國家圖書館善本佛典 校註</head>\n'
 		#elif k=='Northern Yongle Edition of the Canon':
 		elif k=='Yonglebei':
 			r += '<cb:div type="yongle-notes">\n'
-			r += '<head>永樂北藏 校勘記</head>\n'
+			r += '<head>永樂北藏 校註</head>\n'
 		elif k=='Taisho':
 			r += '<cb:div type="taisho-notes">\n'
-			r += '<head>大正 校勘記</head>\n'
+			r += '<head>大正 校註</head>\n'
 		elif k=='Xuzangjing':
 			r += '<cb:div type="xuzang-notes">\n'
-			r += '<head>卍續藏 校勘記</head>\n'
+			r += '<head>卍續藏 校註</head>\n'
 		elif k=='ZangWai':
 			r += '<cb:div type="zangwai-notes">\n'
-			r += '<head>方廣錩 校勘記</head>\n'
+			r += '<head>方廣錩 校註</head>\n'
 		elif k=='equivalent':
 			r += '<cb:div type="equiv-notes">\n'
 			r += '<head>相對應巴利文書名</head>\n'
@@ -1273,7 +1274,7 @@ def handle_back(t):
 			if t.back_notes[k] =='':
 				continue
 			r += '<cb:div type="rest-notes">\n'
-			r += '<head>其他註解</head>\n'
+			r += '<head>其他校註</head>\n'
 		else:
 			sys.exit('error 1000: ' + k)
 		r += '<p>\n'
