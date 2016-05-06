@@ -6,6 +6,7 @@
 # pushsign.pl 簡單標記版.txt 舊的xml.xml 結果檔xml.xml > 記錄檔.txt
 #
 ########################################################
+# 2016/05/06 : 這一版是暫時移除梵漢對照
 # 2016/05/05 : 將 <tt> 改成 <cb:tt> , <t> 改成 <cb:t>
 # 2016/05/04 : 處理 <cb:mulu> , <note> 之中有 <g> 標記, 處理 rdg 標記有 type = "correctionRemark" 及 "variantRemark"
 # 2016/05/03 : 行中的 p 原本是 <p place="inline">, 改成 <p rend="inline">
@@ -651,7 +652,7 @@ sub get_word2
 			$tagbuff .= $1;
 			if($istt == 0)
 			{
-			    $istt = 1;
+			    $istt = 0;	# 註:這一版是暫時移除梵漢對照, 應該是 $istt = 1;
 			}
 			next;
 		}
@@ -802,10 +803,10 @@ sub get_word2
 		$lines2[$index2] =~ s/^(&((CB)|(CI)|(M)|(SD)).*?;)//;
 		return "$1";
 	}
-	# P5 版缺字 <g ref="#CB02436"/>
-	if(/^<g ref="#CB\d{5}"\/>/)		# 缺字
+	# P5 版缺字 <g ref="#CB02436"/> , 悉曇字 <g ref="#SD-ABA6"/>
+	if(/^<g ref="#((CB)|(SD)|(RJ)).*?"\/>/)		# 缺字
 	{
-		$lines2[$index2] =~ s/^(<g ref="#CB\d{5}"\/>)//;
+		$lines2[$index2] =~ s/^(<g ref="#((CB)|(SD)|(RJ)).*?"\/>)//;
 		return "$1";
 	}
 	
@@ -892,7 +893,11 @@ sub check_2_word
 	{
 		return 1;
 	}
-	if($word2 =~ /&SD.*?;/ and $word1 =~ /◇/)		# 悉曇字
+	if($word2 =~ /&SD.*?;/ and $word1 =~ /◇/)		# P4 悉曇字
+	{
+		return 1;
+	}
+	if($word2 =~ /<g ref="#((SD)|(RJ)).*?"\/>/ and $word1 =~ /◇/)		# P5 悉曇字
 	{
 		return 1;
 	}
