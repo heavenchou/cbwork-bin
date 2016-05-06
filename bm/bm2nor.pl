@@ -15,6 +15,7 @@
 # Copyright (C) 1998-2016 CBETA
 # Copyright (C) 1999-2016 Heaven Chou
 ########################################################################
+# 2016/05/07 V9.13 加入 GA , GB 佛寺志中英文名稱
 # 2016/05/04 V9.12 再次處理修訂作者的名稱 [A>B]<resp="CBETA.maha">
 # 2016/04/19 V9.11 處理修訂作者的名稱 [A>B]<resp="CBETA.maha">
 # 2015/06/24 V9.10 處理 <p,1.5,-2.5> 這類有小數的情況, 空格一律採用四捨五入處理
@@ -1239,6 +1240,16 @@ sub print_jun_head()
 	{
 		$sutraver_c = "佛教大藏經";
 		$sutraver_e = "Fojiao Canon";
+	}
+	elsif($vol_head eq "GA")
+	{
+		$sutraver_c = "中國佛寺史志彙刊";
+		$sutraver_e = "Zhongguo Fosi Shizhi Huikan";
+	}
+	elsif($vol_head eq "GB")
+	{
+		$sutraver_c = "中國佛寺志叢刊";
+		$sutraver_e = "Zhongguo fosizhi congkan";
 	}
 	elsif($vol_head eq "K")
 	{
