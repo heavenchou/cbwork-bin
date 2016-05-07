@@ -6,6 +6,8 @@
 # pushsign.pl 簡單標記版.txt 舊的xml.xml 結果檔xml.xml > 記錄檔.txt
 #
 ########################################################
+# 2016/05/08 : 處理 <anchor type="circle"/> = ◎
+# 2016/05/07 : 還原上一版的暫時移除梵漢對照
 # 2016/05/06 : 這一版是暫時移除梵漢對照
 # 2016/05/05 : 將 <tt> 改成 <cb:tt> , <t> 改成 <cb:t>
 # 2016/05/04 : 處理 <cb:mulu> , <note> 之中有 <g> 標記, 處理 rdg 標記有 type = "correctionRemark" 及 "variantRemark"
@@ -200,7 +202,7 @@ while(1)
 	}
 	else
 	{
-		print OUTXml "<?>$tagbuff$word2";
+		print OUTXml "<?><bm:$word1,xml:$word2>$tagbuff$word2";
 		print OUTXml $lines2[$index2];
 		$index1++;
 		$index2++;
@@ -652,7 +654,7 @@ sub get_word2
 			$tagbuff .= $1;
 			if($istt == 0)
 			{
-			    $istt = 0;	# 註:這一版是暫時移除梵漢對照, 應該是 $istt = 1;
+			    $istt = 1;	# 註:這一版是暫時移除梵漢對照, 應該是 $istt = 1;
 			}
 			next;
 		}
@@ -940,7 +942,11 @@ sub check_2_word
 		return 1;
 	}	
 	
-	if($word2 eq "<anchor type=\"◎\"/>" and $word1 eq "◎")
+	if($word2 eq "<anchor type=\"◎\"/>" and $word1 eq "◎") # p4 雙圈
+	{
+		return 1;
+	}
+	if($word2 eq "<anchor type=\"circle\"/>" and $word1 eq "◎") # p5 雙圈
 	{
 		return 1;
 	}
