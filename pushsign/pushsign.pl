@@ -45,6 +45,8 @@
 use utf8;
 use strict;
 
+my $debug = 0;
+
 local *INTxt;
 local *INXml;
 local *OUTXml;
@@ -128,7 +130,9 @@ while(1)
 	{
 	    $index1++;      # <tt> 中的漢字, 所以讀下一行
 	}
+	
 	my $word1 = get_word1();
+	
 	if($istt == 2 and $whicht == 2)
 	{
 	    $index1--;      # 還原
@@ -396,6 +400,7 @@ sub get_word1
 		$lines1[$index1] = $_;
 		
 		$lines1[$index1] =~ s/^\D+\d+n.{5}p(.{7}).{3}(║)?//;
+		
 		return "n=\"$1\"";
 	}
 	elsif(/^\[\d+[A-Za-z]?\]/)	# 校勘數字
@@ -883,11 +888,6 @@ sub check_2_word
 {
 	my $word1 = shift;
 	my $word2 = shift;
-	
-	if($word2 eq "典")
-	{
-	    my $debug = 1;
-	}
 	
 	if($word1 eq $word2)
 	{
