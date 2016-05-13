@@ -15,6 +15,7 @@
 # Copyright (C) 1998-2016 CBETA
 # Copyright (C) 1999-2016 Heaven Chou
 ########################################################################
+# 2016/05/13 V9.14 修改一經一檔的檔名, 要支援藏經代碼超過1個英文字母的經文
 # 2016/05/07 V9.13 加入 GA , GB 佛寺志中英文名稱
 # 2016/05/04 V9.12 再次處理修訂作者的名稱 [A>B]<resp="CBETA.maha">
 # 2016/04/19 V9.11 處理修訂作者的名稱 [A>B]<resp="CBETA.maha">
@@ -1630,11 +1631,11 @@ sub getfilename()
 			#substr($tmp,2,1) = $other;
 		#	$tmp .= $other;
 		#}
-		$content[0] =~ /^\D+(\d+n[AB]?\d{3,4})([a-zA-Z]?)/;
+		$content[0] =~ /^(\D+\d+n[AB]?\d{3,4})([a-zA-Z]?)/;
 		my $tmp = $1;
 		my $tmp2 = $2;
 		
-		$tmp = substr($T_vol,0,1) . $tmp . lc($tmp2) . ".txt";
+		$tmp = $tmp . lc($tmp2) . ".txt";
 		return $tmp;
 	}
 }
