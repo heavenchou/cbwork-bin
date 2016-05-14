@@ -7,6 +7,7 @@
 Ray CHOU 周邦信 2011.6.11
 
 Heaven 修改:
+2016/05/15 處理補編特殊的校勘編碼, 例如: xml:id="nkr_note_orig_0004003-n01"
 2016/04/19 增加佛寺志 GA , GB 的全名
 2014/06/17 原西蓮代碼 "SL" 改成 智諭 "ZY", 取消西蓮專用目錄
 2014/03/12 處理一卷一檔且不呈現檔頭的 bug
@@ -111,7 +112,7 @@ def getJKMark(e):
 	if id.startswith('end'): return ''
 	if not id.startswith('nkr_note_orig'): return ''	# 例 T01n0026.xml => <lb n="0574a12" ed="T"/>眠、調<anchor xml:id="nkr_3f0"/>
 	jk = id
-	jk = re.sub("\-\d{1,3}$", r"", jk)
+	jk = re.sub("\-n?\d{1,3}$", r"", jk)				# B06n0003.xml : <anchor xml:id="nkr_note_orig_0004003-n01" n="0004003-n01"/>
 	jk = jk[-3:]
 	jk = re.sub("0(\d\d)", r"\g<1>", jk)		# 如果有三個數字且<100 , 第一個 0 移除
 	
