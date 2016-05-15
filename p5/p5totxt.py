@@ -7,6 +7,7 @@
 Ray CHOU 周邦信 2011.6.11
 
 Heaven 修改:
+2016/05/15 呈現新的格式的 CBETA 校註. ex. B35n0195.xml => <anchor xml:id="nkr_note_editor_0836001" n="0836001"/>
 2016/05/15 處理補編特殊的校勘編碼, 例如: xml:id="nkr_note_orig_0004003-n01"
 2016/04/19 增加佛寺志 GA , GB 的全名
 2014/06/17 原西蓮代碼 "SL" 改成 智諭 "ZY", 取消西蓮專用目錄
@@ -110,7 +111,11 @@ def getJKMark(e):
 	if id is None: return ''
 	if id.startswith('fx'): return '[＊]'
 	if id.startswith('end'): return ''
-	if not id.startswith('nkr_note_orig'): return ''	# 例 T01n0026.xml => <lb n="0574a12" ed="T"/>眠、調<anchor xml:id="nkr_3f0"/>
+	
+	# 只有 "nkr_note_orig" 可以通過, 例如這種的不行 : T01n0026.xml => <lb n="0574a12" ed="T"/>眠、調<anchor xml:id="nkr_3f0"/>
+	# 2016/05/15 還有一種 "nkr_note_editor" 也可以通過, 例 B35n0195.xml => <anchor xml:id="nkr_note_editor_0836001" n="0836001"/>
+	if not id.startswith('nkr_note_orig') and not id.startswith('nkr_note_editor'): return ''	
+	
 	jk = id
 	jk = re.sub("\-n?\d{1,3}$", r"", jk)				# B06n0003.xml : <anchor xml:id="nkr_note_orig_0004003-n01" n="0004003-n01"/>
 	jk = jk[-3:]
