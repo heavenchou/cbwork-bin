@@ -3,6 +3,7 @@
 2013.1.4 周邦信 改寫自 cbp4top5.py
 
 Heaven 修改:
+2016/05/16 若 P5a 的缺字有 unicode 1.0 的字, 轉成 p5 時直接採用 unicode 的字
 2016/05/05 所有 "校勘記" 或 "註解" 都改成 "校註"
 2016/05/05 佛寺志加入法鼓文理學院註解
 2016/04/19 加入佛寺志 GA 與 GB
@@ -276,7 +277,7 @@ class MyTransformer():
 		# unicode 1.0 以外的字就使用 <g> 標記
 		for c in text:
 			code = ord(c)
-			# Ext-A: U+3400~U+4DFF, U+2E80 ~ U+2EF3 屬於 Unicode 3.0
+			# Ext-A: U+3400~U+4DFF, Ext-B: U+FFFF 之上, 而 U+2E80 ~ U+2EF3 屬於 Unicode 3.0
 			if code>0xffff or (code>=0x3400 and code<=0x4DFF) or (code>=0x2E80 and code<=0x2EF3):
 				hex = '{:X}'.format(code)
 				cb = unicode2cb[hex]
@@ -920,6 +921,17 @@ class MyTransformer():
 			r = self.handle_foreign(e, mode)
 		elif tag=='g':
 			cb = e.get('ref')[1:]
+			
+			# 要判斷是不是有 unicode 1.0 的缺字
+			if('unicode' in all_gaijis[cb]):
+				this_uni = '0x' + all_gaijis[cb]['unicode']
+				this_code = int(this_uni, 16)
+				# Ext-A: U+3400~U+4DFF, Ext-B: U+FFFF 之上, 而 U+2E80 ~ U+2EF3 屬於 Unicode 3.0
+				if this_code>0xffff or (this_code>=0x3400 and this_code<=0x4DFF) or (this_code>=0x2E80 and this_code<=0x2EF3):
+					pass
+				else:
+					r = chr(this_code)
+					return r
 			self.gaijis.add(cb)
 			node = MyNode(e)
 			r = node.open_tag() + chr(cb2pua(cb)) + node.end_tag()
