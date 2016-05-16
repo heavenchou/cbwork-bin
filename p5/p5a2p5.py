@@ -3,6 +3,8 @@
 2013.1.4 周邦信 改寫自 cbp4top5.py
 
 Heaven 修改:
+2016/05/16 1. 修正前一版的小錯誤, 缺字忘了考慮有悉曇及蘭札的情況.
+           2. 加上 -g txt 參數, 表示讀取缺字用 gaiji-m_u8.txt , 無參數就是預設的 gaiji-m.mdb
 2016/05/16 若 P5a 的缺字有 unicode 1.0 的字, 轉成 p5 時直接採用 unicode 的字
 2016/05/05 所有 "校勘記" 或 "註解" 都改成 "校註"
 2016/05/05 佛寺志加入法鼓文理學院註解
@@ -923,15 +925,16 @@ class MyTransformer():
 			cb = e.get('ref')[1:]
 			
 			# 要判斷是不是有 unicode 1.0 的缺字
-			if('unicode' in all_gaijis[cb]):
-				this_uni = '0x' + all_gaijis[cb]['unicode']
-				this_code = int(this_uni, 16)
-				# Ext-A: U+3400~U+4DFF, Ext-B: U+FFFF 之上, 而 U+2E80 ~ U+2EF3 屬於 Unicode 3.0
-				if this_code>0xffff or (this_code>=0x3400 and this_code<=0x4DFF) or (this_code>=0x2E80 and this_code<=0x2EF3):
-					pass
-				else:
-					r = chr(this_code)
-					return r
+			if cb.startswith('CB'):
+				if('unicode' in all_gaijis[cb]):
+					this_uni = '0x' + all_gaijis[cb]['unicode']
+					this_code = int(this_uni, 16)
+					# Ext-A: U+3400~U+4DFF, Ext-B: U+FFFF 之上, 而 U+2E80 ~ U+2EF3 屬於 Unicode 3.0
+					if this_code>0xffff or (this_code>=0x3400 and this_code<=0x4DFF) or (this_code>=0x2E80 and this_code<=0x2EF3):
+						pass
+					else:
+						r = chr(this_code)
+						return r
 			self.gaijis.add(cb)
 			node = MyNode(e)
 			r = node.open_tag() + chr(cb2pua(cb)) + node.end_tag()
@@ -1454,7 +1457,7 @@ def do1dir(dir):
 	colls=os.listdir(dir)
 	colls.sort()
 	for coll in colls:
-		if coll in ('.git', 'schema'): continue
+		if coll in ('.git', 'schema', '.gitignore'): continue
 		if (options.collection is None) or coll.startswith(options.collection): 
 			path = os.path.join(dir, coll)
 			vols = os.listdir(path)
@@ -1539,6 +1542,7 @@ parser = OptionParser()
 parser.add_option('-c', dest='collection', help='collections (e.g. TXJ...)')
 parser.add_option('-s', dest='vol_start', help='start volumn (e.g. x55)')
 parser.add_option('-v', dest='volumn', help='volumn (e.g. x55)')
+parser.add_option('-g', dest='gaiji_txt', help='use gaiji-m_u8.txt e.g. -g txt (default use gaiji-m.mdb)')
 (options, args) = parser.parse_args()
 
 if options.collection is not None:
@@ -1569,8 +1573,10 @@ conn = win32com.client.Dispatch(r'ADODB.Connection')
 DSN = 'PROVIDER=Microsoft.Jet.OLEDB.4.0;DATA SOURCE=%s;' % gaijiMdb
 conn.Open(DSN)
 
-# all_gaijis=read_all_gaijis()	# 開啟 cvs 的資料庫
-all_gaijis=read_all_gaijis_by_mdb()	# 開啟 MS Access 的 mdb 資料庫, 不過很慢
+if options.gaiji_txt is not None:
+	all_gaijis=read_all_gaijis()	# 開啟 cvs 的資料庫
+else:
+	all_gaijis=read_all_gaijis_by_mdb()	# 開啟 MS Access 的 mdb 資料庫, 不過很慢
 
 log=open('p5a2p5.log', 'w', encoding='utf8')
 log.write(now()+'\n')
