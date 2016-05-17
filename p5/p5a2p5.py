@@ -3,6 +3,7 @@
 2013.1.4 周邦信 改寫自 cbp4top5.py
 
 Heaven 修改:
+2016/05/17 unicode 的版本判斷改用較精準的版本
 2016/05/16 1. 修正前一版的小錯誤, 缺字忘了考慮有悉曇及蘭札的情況.
            2. 加上 -g txt 參數, 表示讀取缺字用 gaiji-m_u8.txt , 無參數就是預設的 gaiji-m.mdb
 2016/05/16 若 P5a 的缺字有 unicode 1.0 的字, 轉成 p5 時直接採用 unicode 的字
@@ -142,6 +143,139 @@ def big5_uni(s):
 	big5_bytes = bytes(data)
 	return big5_bytes.decode('big5')
 
+###############################################
+# 讀取 unicode 的版本, 參考 cbwork/bin/cbeta.pm
+###############################################
+
+def get_unicode_ver(uni):	
+
+	#這幾個移到前面, 速度看會不會快一點
+	if(uni >= 0x4E00 and uni <= 0x9FA5):	return "1.0" 	#4E00～9FA5：CJK Unified Ideographs (Han) 中日韓統一表意文字區 (原本標準是到 9FCC)。(20,902 字, Unicode 1.0 , 1993)
+	if(uni >= 0x3000 and uni <= 0x3036):	return "1.0" 	#3000～3036：CJK Symbols and Punctuation 符號和標點符號 (Unicode 1.0)
+	if(uni >= 0x3400 and uni <= 0x4DB5):	return "3.0" 	#3400～4DB5：CJK Extension A 中日韓統一表意文字擴充 A 區。(6582 字, Unicode 3.0 , 1999)
+	if(uni >= 0x20000 and uni <= 0x2A6D6):	return "3.1" 	#20000～2A6D6：CJK Unified Ideographs Extension B 中日韓統一表意文字擴展 B 區 (42711 字, Unicode 3.1 , 2001)
+
+	#底下是完整的
+	if(uni >= 0x0000 and uni <= 0x017E) :	return "1.0"     #0000～017E： (Unicode 1.0)
+	if(uni == 0x017F) :						return "1.1"     #017F： (Unicode 1.1)
+	if(uni >= 0x0180 and uni <= 0x01F0) :	return "1.0"     #0180～01F0： (Unicode 1.0)
+	if(uni >= 0x01F1 and uni <= 0x01F5) :	return "1.1"     #01F1～01F5： (Unicode 1.1)
+	if(uni >= 0x01F6 and uni <= 0x01F9) :	return "3.0"     #01F6～01F9： (Unicode 3.0)
+	if(uni >= 0x01FA and uni <= 0x0217) :	return "1.1"     #01FA～0217： (Unicode 1.1)
+	if(uni >= 0x0218 and uni <= 0x021F) :	return "3.0"     #0218～021F： (Unicode 3.0)
+	if(uni == 0x0220) :						return "3.2"     #0220： (Unicode 3.2)
+	if(uni == 0x0221) :						return "4.0"     #0221： (Unicode 4.0)
+	if(uni >= 0x0222 and uni <= 0x0233) :	return "3.0"     #0222～0233： (Unicode 3.0)
+	if(uni >= 0x0234 and uni <= 0x0236) :	return "4.0"     #0234～0236： (Unicode 4.0)
+	if(uni >= 0x0237 and uni <= 0x0241) :	return "4.1"     #0237～0241： (Unicode 4.1)
+	if(uni >= 0x0242 and uni <= 0x024F) :	return "5.0"     #0242～024F： (Unicode 5.0)
+	if(uni >= 0x0250 and uni <= 0x02A8) :	return "1.0"     #0250～02A8： (Unicode 1.0)
+	if(uni >= 0x02A9 and uni <= 0x02AD) :	return "3.0"     #02A9～02AD： (Unicode 3.0)
+	if(uni >= 0x02AE and uni <= 0x02AF) :	return "4.0"     #02AE～02AF： (Unicode 4.0)
+	if(uni >= 0x02B0 and uni <= 0x02DE) :	return "1.0"     #02B0～02DE： (Unicode 1.0)
+	if(uni == 0x02DF) :						return "3.0"     #02DF： (Unicode 3.0)
+	if(uni >= 0x02E0 and uni <= 0x02E9) :	return "1.0"     #02E0～02E9： (Unicode 1.0)
+	if(uni >= 0x02EA and uni <= 0x02EE) :	return "3.0"     #02EA～02EE： (Unicode 3.0)
+	if(uni >= 0x02EF and uni <= 0x02FF) :	return "4.0"     #02EF～02FF： (Unicode 4.0)
+	if(uni >= 0x0300 and uni <= 0x0341) :	return "1.0"     #0300～0341： (Unicode 1.0)
+	if(uni >= 0x0401 and uni <= 0x040C) :	return "1.0"     #0401～040C： (Unicode 1.0)
+	if(uni == 0x040D) :						return "3.0"     #040D： (Unicode 3.0)
+	if(uni >= 0x040E and uni <= 0x044F) :	return "1.0"     #040E～044F： (Unicode 1.0)
+	if(uni >= 0x1E00 and uni <= 0x1E9A) :	return "1.1"     #1E00～1E9A： (Unicode 1.1)
+	if(uni == 0x1E9B) :						return "2.0"     #1E9B： (Unicode 2.0)
+	if(uni >= 0x1E9C and uni <= 0x1E9F) :	return "5.1"     #1E9C～1E9F： (Unicode 5.1)
+	if(uni >= 0x1EA0 and uni <= 0x1EF9) :	return "1.1"     #1EA0～1EF9： (Unicode 1.1)
+	if(uni >= 0x1EFA and uni <= 0x1EFF) :	return "5.1"     #1EFA～1EFF： (Unicode 5.1)
+	if(uni >= 0x2100 and uni <= 0x2138) :	return "1.0"     #2100～2138： (Unicode 1.0)
+	if(uni >= 0x2153 and uni <= 0x2182) :	return "1.0"     #2153～2182： (Unicode 1.0)
+	if(uni >= 0x2190 and uni <= 0x21EA) :	return "1.0"     #2190～21EA： (Unicode 1.0)
+	if(uni >= 0x2200 and uni <= 0x22F1) :	return "1.0"     #2200～22F1： (Unicode 1.0)
+	if(uni >= 0x2460 and uni <= 0x24EA) :	return "1.0"     #2460～24EA：Enclosed Alphanumerics 括號及圓圈各種數字英文 (Unicode 1.0)
+	if(uni >= 0x24EB and uni <= 0x24FE) :	return "3.2"     #24EB～24FE：Enclosed Alphanumerics 括號及圓圈各種數字英文 (Unicode 3.2)
+	if(uni == 0x24FF) :						return "4.0"     #24FF： (Unicode 4.0)
+	if(uni >= 0x2500 and uni <= 0x2595) :	return "1.0"     #2500～2595： (Unicode 1.0)
+	if(uni >= 0x2596 and uni <= 0x259F) :	return "3.2"     #2596～259F： (Unicode 3.2)
+	if(uni >= 0x25A0 and uni <= 0x25EE) :	return "1.0"     #25A0～25EE： (Unicode 1.0)
+	if(uni == 0x25EF) :						return "1.1"     #25EF： (Unicode 1.1)
+	if(uni >= 0x2600 and uni <= 0x2613) :	return "1.0"     #2600～2613： (Unicode 1.0)
+	if(uni >= 0x261A and uni <= 0x266F) :	return "1.0"     #261A～266F： (Unicode 1.0)
+	if(uni >= 0x2E80 and uni <= 0x2EF3) :	return "3.0"     #2E80～2EF3：CJK Radicals Supplement 部首補充 (128 字, Unicode 3.0 , 1999)
+	if(uni >= 0x2F00 and uni <= 0x2FD5) :	return "3.0"     #2F00～2FD5：CJK Radicals / KangXi Radicals 部首 / 康熙字典部首 (224 字, Unicode 3.0 , 1999)
+	if(uni >= 0x2FF0 and uni <= 0x2FFB) :	return "3.0"     #2FF0～2FFB：Ideographic Description Characters 表意文字描述字符 (中研院的組字符號, Unicode 3.0 , 1999)
+	#if(uni >= 0x3000 and uni <= 0x3036) :	return "1.0"     #3000～3036：CJK Symbols and Punctuation 符號和標點符號 (Unicode 1.0)
+	if(uni == 0x3037) :						return "1.1"     #3037：CJK Symbols and Punctuation 符號和標點符號 (1 字, Unicode 1.1 , 1993)
+	if(uni >= 0x3038 and uni <= 0x303A) :	return "3.0"     #3038～303A：CJK Symbols and Punctuation 符號和標點符號 (3 字, Unicode 3.0 , 1999)
+	if(uni >= 0x303B and uni <= 0x303D) :	return "3.2"     #303B～303D：CJK Symbols and Punctuation 符號和標點符號 (3 字, Unicode 3.2 , 2002)
+	if(uni == 0x303E) :						return "3.0"     #303E：CJK Symbols and Punctuation 符號和標點符號 (1 字, Unicode 3.0 , 1999)
+	if(uni == 0x303F) :						return "1.0"     #303F：CJK Symbols and Punctuation 符號和標點符號 (1 字, Unicode 1.0)
+	if(uni >= 0x3041 and uni <= 0x3094) :	return "1.0"     #3041～3094：Hiragana 日文平假名 (Unicode 1.0)
+	if(uni >= 0x3095 and uni <= 0x3096) :	return "3.2"     #3095～3096：Hiragana 日文平假名 (Unicode 3.2)
+	if(uni >= 0x3099 and uni <= 0x309E) :	return "1.0"     #3099～309E：Hiragana 日文平假名 (Unicode 1.0)
+	if(uni == 0x309F) :						return "3.2"     #309F：Hiragana 日文平假名 (Unicode 3.2)
+	if(uni == 0x30A0) :						return "3.2"     #30A0：Katakana 日文片假名 (Unicode 3.2)
+	if(uni >= 0x30A1 and uni <= 0x30F6) :	return "1.0"     #30A1～30F6：Katakana 日文片假名 (Unicode 1.0)
+	if(uni >= 0x30F7 and uni <= 0x30FA) :	return "1.1"     #30F7～30FA：Katakana 日文片假名 (Unicode 1.1)
+	if(uni >= 0x30FB and uni <= 0x30FE) :	return "1.0"     #30FB～30FE：Katakana 日文片假名 (Unicode 1.0)
+	if(uni == 0x30FF) :						return "3.2"     #30FF：Katakana 日文片假名 (Unicode 3.2)
+	if(uni >= 0x3105 and uni <= 0x312C) :	return "1.0"     #3105～312C：Bopomofo 注音符號 (Unicode 1.0)
+	if(uni == 0x312D) :						return "5.1"     #312D：Bopomofo 上下顛倒的 'ㄓ' (Unicode 5.1)
+	if(uni >= 0x3131 and uni <= 0x318E) :	return "1.0"     #3131～318E：Hangul Compatibility Jamo 韓文 (Unicode 1.0)
+	if(uni >= 0x3190 and uni <= 0x319F) :	return "1.0"     #3190～319F：Kanbun 在上方的小漢字 (Unicode 1.0)
+	if(uni >= 0x31A0 and uni <= 0x31B7) :	return "3.0"     #31A0～31B7：Bopomofo Extended 注音擴展 (Unicode 3.0)
+	if(uni >= 0x31B8 and uni <= 0x31BA) :	return "6.0"     #31B8～31BA：Bopomofo Extended 注音擴展 (Unicode 6.0)
+	if(uni >= 0x31C0 and uni <= 0x31CF) :	return "4.1"     #31C0～31CF：CJK Strokes 筆劃 (基本筆劃, 如撇, 勾, 點...) (Unicode 4.1)
+	if(uni >= 0x31D0 and uni <= 0x31E3) :	return "5.1"     #31D0～31E3：CJK Strokes 筆劃 (基本筆劃, 如撇, 勾, 點...) (Unicode 5.1)
+	if(uni >= 0x31F0 and uni <= 0x31FF) :	return "3.2"     #31F0～31FF：Katakana Phonetic Extensions 日文片假名語音擴展 (Unicode 3.2)
+	if(uni >= 0x3200 and uni <= 0x321C) :	return "1.0"     #3200～321C：Enclosed CJK Letters and Months 括號韓文 (Unicode 1.0)
+	if(uni >= 0x321D and uni <= 0x321E) :	return "4.0"     #321D～321E：Enclosed CJK Letters and Months 括號韓文 (Unicode 4.0)
+	if(uni >= 0x3220 and uni <= 0x3243) :	return "1.0"     #3220～3243：Enclosed CJK Letters and Months 括號一~十及漢字 (Unicode 1.0)
+	if(uni >= 0x3244 and uni <= 0x324F) :	return "5.2"     #3244～324F：Enclosed CJK Letters and Months 圓圈中有字及10~80 (Unicode 5.2)
+	if(uni == 0x3250) :						return "4.0"     #3250：Enclosed CJK Letters and Months 'PTE' 組成一字 (Unicode 4.0)
+	if(uni >= 0x3251 and uni <= 0x325F) :	return "3.2"     #3251～325F：Enclosed CJK Letters and Months 圓圈 21~35 (Unicode 3.2)
+	if(uni >= 0x3260 and uni <= 0x327B) :	return "1.0"     #3260～327B：Enclosed CJK Letters and Months 圓圈韓文 (Unicode 1.0)
+	if(uni >= 0x327C and uni <= 0x327D) :	return "4.0"     #327C～327D：Enclosed CJK Letters and Months 圓圈韓文 (Unicode 4.0)
+	if(uni == 0x327E) :						return "4.1"     #327E：Enclosed CJK Letters and Months 圓圈韓文 (Unicode 4.1)
+	if(uni >= 0x327F and uni <= 0x32B0) :	return "1.0"     #327F～32B0：Enclosed CJK Letters and Months 圓圈一~十及漢字 (Unicode 1.0)
+	if(uni >= 0x32B1 and uni <= 0x32BF) :	return "3.2"     #32B1～32BF：Enclosed CJK Letters and Months 圓圈 36~50 (Unicode 3.2)
+	if(uni >= 0x32C0 and uni <= 0x32CB) :	return "1.1"     #32C0～32CB：Enclosed CJK Letters and Months 1月~12月 (Unicode 1.1)
+	if(uni >= 0x32CC and uni <= 0x32CF) :	return "4.0"     #32CC～32CF：Enclosed CJK Letters and Months 多英文組成一個字 (Unicode 4.0)
+	if(uni >= 0x32D0 and uni <= 0x32FE) :	return "1.0"     #32D0～32FE：Enclosed CJK Letters and Months 圓圈日文 (Unicode 1.0)
+	if(uni >= 0x3300 and uni <= 0x3357) :	return "1.0"     #3300～3357：CJK Compatibility 多個日文組成一字 (Unicode 1.0)
+	if(uni >= 0x3358 and uni <= 0x3376) :	return "1.1"     #3358～3376：CJK Compatibility 0奌~24奌 及多英文組成一字 (Unicode 1.1)
+	if(uni >= 0x3377 and uni <= 0x337A) :	return "4.0"     #3377～337A：CJK Compatibility 多英文組成一字 (Unicode 4.0)
+	if(uni >= 0x337B and uni <= 0x33DD) :	return "1.0"     #337B～33DD：CJK Compatibility 多日本漢字及多英文組成一字 (Unicode 1.0)
+	if(uni >= 0x33DE and uni <= 0x33DF) :	return "4.0"     #33DE～33DF：CJK Compatibility 多英文組成一字 (Unicode 4.0)
+	if(uni >= 0x33E0 and uni <= 0x33FE) :	return "1.1"     #33E0～33FE：CJK Compatibility 1日~31日 (Unicode 1.1)
+	if(uni == 0x33FF) :						return "4.0"     #33FF：CJK Compatibility 'gal' 組成一字 (Unicode 4.0)
+	#if(uni >= 0x3400 and uni <= 0x4DB5) :	return "3.0"     #3400～4DB5：CJK Extension A 中日韓統一表意文字擴充 A 區。(6582 字, Unicode 3.0 , 1999)
+	if(uni >= 0x4DC0 and uni <= 0x4DFF) :	return "4.0"     #4DC0～4DFF：易經六十四卦符號。(64 字, Unicode 4.0)
+	#if(uni >= 0x4E00 and uni <= 0x9FA5) :	return "1.0"     #4E00～9FA5：CJK Unified Ideographs (Han) 中日韓統一表意文字區 (原本標準是到 9FCC)。(20,902 字, Unicode 1.0 , 1993)
+	if(uni >= 0x9FA6 and uni <= 0x9FBB) :	return "4.1"     #9FA6～9FBB：14 個香港增補字符集的用字和 8 個 GB 18030 用字 (22 字, Unicode 4.1 , 2005)
+	if(uni >= 0x9FBC and uni <= 0x9FC3) :	return "5.1"     #9FBC～9FC3：7 個日語漢字及 U+9FC3 (8 字, Unicode 5.1 , 2008)
+	if(uni >= 0x9FC4 and uni <= 0x9FCB) :	return "5.2"     #9FC4～9FCB：2 個日語用漢字, 1 個新增漢字, 5 個香港漢字 (8 字, Unicode 5.2 , 2009)
+	if(uni == 0x9FCC) :						return "6.1"     #9FCC：1 個漢字 (1 字, Unicode 6.1 , 2012)
+	if(uni >= 0xA000 and uni <= 0xA48C) :	return "3.0"     #A000～A48C：Yi Syllables 彝族文字區 (Unicode 3.0)
+	if(uni >= 0xAC00 and uni <= 0xD7A3) :	return "2.0"     #AC00～D7A3：Hangul Syllables 韓文拼音 (Unicode 2.0)
+	if(uni >= 0xF900 and uni <= 0xFA2D) :	return "1.0"     #F900～FA2D：CJK Compatibility Ideographs 相容表意字 (Unicode 1.0 , 1993)
+	if(uni >= 0xFA30 and uni <= 0xFA6A) :	return "3.2"     #FA30～FA6A：CJK Compatibility Ideographs 相容表意字 (Unicode 3.2)
+	if(uni >= 0xFA70 and uni <= 0xFAD9) :	return "4.1"     #FA70～FAD9：CJK Compatibility Ideographs 相容表意字 - 106個來自北韓的相容漢字 (106 字, Unicode 4.1 , 2005)
+	if(uni >= 0xFE10 and uni <= 0xFE19) :	return "4.1"     #FE10～FE19：Vertical Forms 中文直排標點 (Unicode 4.1)
+	if(uni >= 0xFE20 and uni <= 0xFE23) :	return "1.1"     #FE20～FE23：Combining Half Marks (Unicode 1.1)
+	if(uni >= 0xFE24 and uni <= 0xFE26) :	return "5.1"     #FE24～FE26：Combining Half Marks (Unicode 5.1)
+	if(uni >= 0xFE30 and uni <= 0xFE44) :	return "1.0"     #FE30～FE44：CJK Compatibility Forms 兼容性表格 (看起來像直排用的符號) (Unicode 1.0)
+	if(uni >= 0xFE45 and uni <= 0xFE46) :	return "3.2"     #FE45～FE46：CJK Compatibility Forms 兼容性表格 (看起來像直排用的符號) (Unicode 3.2)
+	if(uni >= 0xFE47 and uni <= 0xFE48) :	return "4.0"     #FE47～FE48：CJK Compatibility Forms 兼容性表格 (看起來像直排用的符號) (Unicode 4.0)
+	if(uni >= 0xFE49 and uni <= 0xFE4F) :	return "1.0"     #FE49～FE4F：CJK Compatibility Forms 兼容性表格 (看起來像直排用的符號) (Unicode 1.0)
+	if(uni >= 0xFE50 and uni <= 0xFE52) :	return "1.0"     #FE50～FE52：Small Form Variants (Unicode 1.0)
+	if(uni >= 0xFE54 and uni <= 0xFE66) :	return "1.0"     #FE54～FE66：Small Form Variants (Unicode 1.0)
+	if(uni >= 0xFE68 and uni <= 0xFE6B) :	return "1.0"     #FE68～FE6B：Small Form Variants (Unicode 1.0)
+	if(uni >= 0xFF01 and uni <= 0xFF5E) :	return "1.0"     #FF01～FF5E：Halfwidth and Fullwidth Forms (Unicode 1.0)
+	if(uni >= 0xFF5F and uni <= 0xFF60) :	return "3.2"     #FF5F～FF60：Halfwidth and Fullwidth Forms (Unicode 3.2)
+	if(uni >= 0xFF61 and uni <= 0xFF9F) :	return "1.0"     #FF61～FF9F：Halfwidth and Fullwidth Forms (Unicode 1.0)
+	#if(uni >= 0x20000 and uni <= 0x2A6D6) : return "3.1"    #20000～2A6D6：CJK Unified Ideographs Extension B 中日韓統一表意文字擴展 B 區 (42711 字, Unicode 3.1 , 2001)
+	if(uni >= 0x2A700 and uni <= 0x2B734) :	return "5.2"     #2A700～2B734：CJK Unifi
+	return ""
+	
 ##########################################
 # 處理缺字資料
 ##########################################
@@ -280,7 +414,8 @@ class MyTransformer():
 		for c in text:
 			code = ord(c)
 			# Ext-A: U+3400~U+4DFF, Ext-B: U+FFFF 之上, 而 U+2E80 ~ U+2EF3 屬於 Unicode 3.0
-			if code>0xffff or (code>=0x3400 and code<=0x4DFF) or (code>=0x2E80 and code<=0x2EF3):
+			# if code>0xffff or (code>=0x3400 and code<=0x4DFF) or (code>=0x2E80 and code<=0x2EF3):
+			if get_unicode_ver(code) != "1.0" and get_unicode_ver(code) != "1.1" and get_unicode_ver(code) != "" :
 				hex = '{:X}'.format(code)
 				cb = unicode2cb[hex]
 				r += '<g ref="#{}">{}</g>'.format(cb, c)
@@ -930,9 +1065,8 @@ class MyTransformer():
 					this_uni = '0x' + all_gaijis[cb]['unicode']
 					this_code = int(this_uni, 16)
 					# Ext-A: U+3400~U+4DFF, Ext-B: U+FFFF 之上, 而 U+2E80 ~ U+2EF3 屬於 Unicode 3.0
-					if this_code>0xffff or (this_code>=0x3400 and this_code<=0x4DFF) or (this_code>=0x2E80 and this_code<=0x2EF3):
-						pass
-					else:
+					# if this_code>0xffff or (this_code>=0x3400 and this_code<=0x4DFF) or (this_code>=0x2E80 and this_code<=0x2EF3):
+					if get_unicode_ver(this_code) == "1.0" or get_unicode_ver(this_code) == "1.1"  or get_unicode_ver(this_code) == "" :
 						r = chr(this_code)
 						return r
 			self.gaijis.add(cb)
