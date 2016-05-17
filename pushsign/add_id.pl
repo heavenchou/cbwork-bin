@@ -22,6 +22,8 @@ use utf8;
 $vol = shift;
 $inputFile = shift;
 
+my $result = "";
+
 $dir = "/release/add-id/";  # 輸出目錄
 
 $chm;
@@ -93,8 +95,10 @@ sub process1file {
 	print STDERR "$file\n";
 	$parser1->parsefile($file);
 	open O, ">:utf8", "${dir}$vol/$file";
-	select O;
+	$result = "";
 	$parser->parsefile($file);
+	$result =~ s/(<cb:mulu [^>]*)><\/cb:mulu>/\1\/>/g;	# 把空的 <cb:mulu> 標記換成單一的封閉標記
+	print O $result;
 	close O;
 }
 
@@ -104,7 +108,7 @@ sub default {
 	my $string = shift;
 	$string =~ s/^&(.+);$/$1/;
 	if ($string eq 'amp' or $string eq 'lt') {
-		print "&$string;"; 
+		$result .= "&$string;"; 
 	}
 	if ($pass) { 
 		if ($string ne 'lac') {
@@ -115,7 +119,7 @@ sub default {
         
 sub init_handler
 {       
-	print "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n";
+	$result .= "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n";
 	$lb="";
 	$ent_declare = '';
 	$para_ent = "";
@@ -127,10 +131,10 @@ sub init_handler
         
 sub doctype {
 	my $s = $file;
-	print "\n<?xml-stylesheet type=\"text/xsl\" href=\"../dtd/cbeta.xsl\" ?>\n";
-	print "<!DOCTYPE TEI.2 SYSTEM \"../dtd/cbetaxml.dtd\"\n";
-	print "[$ent_declare";
-	print "$para_ent]>\n";
+	$result .= "\n<?xml-stylesheet type=\"text/xsl\" href=\"../dtd/cbeta.xsl\" ?>\n";
+	$result .= "<!DOCTYPE TEI.2 SYSTEM \"../dtd/cbetaxml.dtd\"\n";
+	$result .= "[$ent_declare";
+	$result .= "$para_ent]>\n";
 }
         
 sub start_handler 
@@ -229,13 +233,13 @@ sub start_handler
 	if ($el eq "t") {
 		if ($att{"place"} eq "foot") { $pass = 0; }
 	}
-	print "<$el";
+	$result .= "<$el";
 	while (($key,$value) = each %att) {
 		#$value = myDecode($value);	# P5 不用了
-		print " $key=\"$value\"";
+		$result .= " $key=\"$value\"";
 	}
-	if ($el =~ /^(anchor)|(figure)|(lb)|(milestone)|(pb)|(todo)$/) { print "/"; }
-	print ">";
+	if ($el =~ /^(anchor)|(figure)|(lb)|(milestone)|(pb)|(todo)$/) { $result .= "/"; }
+	$result .= ">";
 }
         
         
@@ -247,7 +251,7 @@ sub end_handler
 	my $att = pop(@saveatt);
 	pop @elements;
 	my $parent = lc($p->current_element);
-	if ($el !~ /^(anchor)|(figure)|(lb)|(milestone)|(mulu)|(pb)|(todo)$/) { print "</$el>"; }
+	if ($el !~ /^(anchor)|(figure)|(lb)|(milestone)|(pb)|(todo)$/) { $result .= "</$el>"; }
 	if ($el eq 'app') {
 		pop @appstack;
 	}  elsif ($el eq 'note') {
@@ -267,7 +271,7 @@ sub char_handler
 		$char_count += myLength($char)
 	}
 	#$char =~ s/($pattern)/&rep($1)/eg;
-	print $char;
+	$result .= $char;
 }
 
 sub rep{
@@ -285,7 +289,7 @@ sub comment {
 	my $expat = shift;
 	my $data = shift;
 	#$data =~ s/($pattern)/$utf8out{$1}/g;
-	print "<!--$data-->";
+	$result .= "<!--$data-->";
 }
 
 
