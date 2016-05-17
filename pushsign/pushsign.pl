@@ -6,6 +6,7 @@
 # pushsign.pl 簡單標記版.txt 舊的xml.xml 結果檔xml.xml > 記錄檔.txt
 #
 ########################################################
+# 2016/05/18 : 修訂某些標點無法置換的錯誤
 # 2016/05/09 : 原來的 XML 也可以是新標檔
 # 2016/05/08 : 處理 <anchor type="circle"/> = ◎
 # 2016/05/07 : 還原上一版的暫時移除梵漢對照
@@ -44,6 +45,7 @@
 
 use utf8;
 use strict;
+use Encode;
 
 my $debug = 0;
 
@@ -133,6 +135,11 @@ while(1)
 	
 	my $word1 = get_word1();
 	
+	if($word1 eq 'n="0756c01"')
+	{
+		$debug = 0;
+	}
+	
 	if($istt == 2 and $whicht == 2)
 	{
 	    $index1--;      # 還原
@@ -150,14 +157,33 @@ while(1)
 
 	if($result == 1)	# 二邊同步
 	{
+		if($debug)
+		{
+			print Encode::encode("big5","hasdot1 : $hasdot1  hasdot2 : $hasdot2\n");
+		}
+		
 		if($hasdot1 eq $hasdot2)	# 二邊標點同步
 		{
 			print OUTXml $tagbuff;
 		}
 		elsif($hasdot1 ne "" and $hasdot2 ne "")		# 二邊都有標點, 但不同步
 		{
-			$tagbuff =~ s/^(.*)$hasdot2/$1$hasdot1/;
-			$tagbuff =~ s/((?:「)|(?:『)|(?:（)|(?:《)|(?:〈)|(?:“))(<.*>)/$2$1/;	# 有點暴力了...要改...
+			if($debug)
+			{
+				print Encode::encode("big5","tagbuff : $tagbuff\n");
+			}
+			
+			# 有一種情況 tagbuff 找不到 hasdot2
+			# 例如 tagbuff = "。<tag>「" , hasdot2 = "。<tag>「"
+			if($tagbuff =~ /^(.*)$hasdot2/)
+			{
+				$tagbuff =~ s/^(.*)$hasdot2/$1$hasdot1/;
+				$tagbuff =~ s/((?:「)|(?:『)|(?:（)|(?:《)|(?:〈)|(?:“))(<.*>)/$2$1/;	# 有點暴力了...要改...
+			}
+			else
+			{
+				print OUTXml "<?><bm:$hasdot1,xml:$hasdot2>";
+			}
 			print OUTXml $tagbuff;
 		}
 		elsif($hasdot1 ne "" and $hasdot2 eq "")		# xml 沒標點, 所以要加上去
@@ -888,6 +914,11 @@ sub check_2_word
 {
 	my $word1 = shift;
 	my $word2 = shift;
+	
+	if($debug)
+	{
+		print Encode::encode("big5","word1 : $word1  word2 : $word2\n");
+	}
 	
 	if($word1 eq $word2)
 	{
