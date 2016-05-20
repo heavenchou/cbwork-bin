@@ -3,6 +3,7 @@
 2013.1.4 周邦信 改寫自 cbp4top5.py
 
 Heaven 修改:
+2016/05/20 P5a 轉 P5 的標準由 unicode 1.1 改為 2.0 , 因為韓文是 2.0
 2016/05/17 unicode 的版本判斷改用較精準的版本
 2016/05/16 1. 修正前一版的小錯誤, 缺字忘了考慮有悉曇及蘭札的情況.
            2. 加上 -g txt 參數, 表示讀取缺字用 gaiji-m_u8.txt , 無參數就是預設的 gaiji-m.mdb
@@ -273,7 +274,12 @@ def get_unicode_ver(uni):
 	if(uni >= 0xFF5F and uni <= 0xFF60) :	return "3.2"     #FF5F～FF60：Halfwidth and Fullwidth Forms (Unicode 3.2)
 	if(uni >= 0xFF61 and uni <= 0xFF9F) :	return "1.0"     #FF61～FF9F：Halfwidth and Fullwidth Forms (Unicode 1.0)
 	#if(uni >= 0x20000 and uni <= 0x2A6D6) : return "3.1"    #20000～2A6D6：CJK Unified Ideographs Extension B 中日韓統一表意文字擴展 B 區 (42711 字, Unicode 3.1 , 2001)
-	if(uni >= 0x2A700 and uni <= 0x2B734) :	return "5.2"     #2A700～2B734：CJK Unifi
+	if(uni >= 0x2A700 and uni <= 0x2B734) :	return "5.2"     #2A700～2B734：CJK Unified Ideographs Extension C 中日韓統一表意文字擴展 C 區 (4149 字, Unicode 5.2 , 2009)
+	if(uni >= 0x2B740 and uni <= 0x2B81D) :	return "6.0"	 #2B740～2B81D：CJK Unified Ideographs Extension D 中日韓統一表意文字擴展 D 區 (222 字, Unicode 6.0 , 2010)
+	if(uni >= 0x2B820 and uni <= 0x2F7FF) :	return "8.0"	 #2B820～2F7FF：CJK Unified Ideographs Extension E 中日韓統一表意文字擴展 E 區 (Unicode 8.0)
+	if(uni >= 0x2F800 and uni <= 0x2FA1D) :	return "3.1"	 #2F800～2FA1D：CJK Compatibility Ideographs Supplement 相容表意字補充 - 台灣的相容漢字 (542 字, Unicode 3.1 , 2001)
+	
+	
 	return ""
 	
 ##########################################
@@ -415,7 +421,8 @@ class MyTransformer():
 			code = ord(c)
 			# Ext-A: U+3400~U+4DFF, Ext-B: U+FFFF 之上, 而 U+2E80 ~ U+2EF3 屬於 Unicode 3.0
 			# if code>0xffff or (code>=0x3400 and code<=0x4DFF) or (code>=0x2E80 and code<=0x2EF3):
-			if get_unicode_ver(code) != "1.0" and get_unicode_ver(code) != "1.1" and get_unicode_ver(code) != "" :
+			# if get_unicode_ver(code) != "1.0" and get_unicode_ver(code) != "1.1" and get_unicode_ver(code) != "" :
+			if get_unicode_ver(code) > "2.0" :
 				hex = '{:X}'.format(code)
 				cb = unicode2cb[hex]
 				r += '<g ref="#{}">{}</g>'.format(cb, c)
@@ -1066,7 +1073,8 @@ class MyTransformer():
 					this_code = int(this_uni, 16)
 					# Ext-A: U+3400~U+4DFF, Ext-B: U+FFFF 之上, 而 U+2E80 ~ U+2EF3 屬於 Unicode 3.0
 					# if this_code>0xffff or (this_code>=0x3400 and this_code<=0x4DFF) or (this_code>=0x2E80 and this_code<=0x2EF3):
-					if get_unicode_ver(this_code) == "1.0" or get_unicode_ver(this_code) == "1.1"  or get_unicode_ver(this_code) == "" :
+					# if get_unicode_ver(this_code) == "1.0" or get_unicode_ver(this_code) == "1.1"  or get_unicode_ver(this_code) == "" :
+					if get_unicode_ver(this_code) <= "2.0" :
 						r = chr(this_code)
 						return r
 			self.gaijis.add(cb)
