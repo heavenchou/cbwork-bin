@@ -1171,6 +1171,8 @@ sub print_jun_head()
 # D 國家圖書館善本佛典 (Selections from the Taipei National Central Library Buddhist Rare Book Collection) 【國圖】
 # F 房山石經 (Fangshan shijing) 　 【房山】
 # G 佛教大藏經 (Fojiao Canon) 　 【教藏】
+# GA 中國佛寺史志彙刊 (Zhongguo Fosi Shizhi Huikan) 【志彙】
+# GB 中國佛寺志叢刊 (Zhongguo Fosizhi Congkan) 【志叢】
 # K 高麗大藏經 (Tripitaka Koreana) （高麗藏） 【麗】
 # L 乾隆大藏經(新文豐版) (Qianlong Edition of the Canon(Xinwenfeng Edition)) （清藏、龍藏、乾隆藏） 【龍】
 # M 卍正藏經(新文豐版) (Manji Daizokyo(Xinwenfeng Edition)) （卍正藏） 【卍正】
@@ -1252,7 +1254,7 @@ sub print_jun_head()
 	elsif($vol_head eq "GB")
 	{
 		$sutraver_c = "中國佛寺志叢刊";
-		$sutraver_e = "Zhongguo fosizhi congkan";
+		$sutraver_e = "Zhongguo Fosizhi Congkan";
 	}
 	elsif($vol_head eq "K")
 	{
