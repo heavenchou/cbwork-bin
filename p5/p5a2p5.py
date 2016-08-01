@@ -3,6 +3,7 @@
 2013.1.4 周邦信 改寫自 cbp4top5.py
 
 Heaven 修改:
+2016/08/02 原本【？】有特殊意義, 要轉成 type="variantRemark" , 現在不用了, 【？】當成是版本不明的版本.
 2016/05/20 P5a 轉 P5 的標準由 unicode 1.1 改為 2.0 , 因為韓文是 2.0
 2016/05/17 unicode 的版本判斷改用較精準的版本
 2016/05/16 1. 修正前一版的小錯誤, 缺字忘了考慮有悉曇及蘭札的情況.
@@ -798,10 +799,10 @@ class MyTransformer():
 		elif 'back' in mode:
 			node=MyNode(e)
 			wit = e.get('wit')
-			if wit=='【？】':
-				node.attrib['resp'] = globals['collection-resp']
-				node.attrib['wit'] = resp2wit(e.get('resp'))
-				node.attrib['type'] = 'variantRemark'
+			#if wit=='【？】':
+			#	node.attrib['resp'] = globals['collection-resp']
+			#	node.attrib['wit'] = resp2wit(e.get('resp'))
+			#	node.attrib['type'] = 'variantRemark'
 			if 'cf1' in node.attrib: 
 				del node.attrib['cf1']
 			if 'cf2' in node.attrib: 
