@@ -3,6 +3,7 @@
 2013.1.4 周邦信 改寫自 cbp4top5.py
 
 Heaven 修改:
+2016/11/01 將藏外佛教文獻的藏經代碼 W 改成 ZW , 正史佛教資料類編的 H 改成 ZS
 2016/08/02 原本【？】有特殊意義, 要轉成 type="variantRemark" , 現在不用了, 【？】當成是版本不明的版本.
 2016/05/20 P5a 轉 P5 的標準由 unicode 1.1 改為 2.0 , 因為韓文是 2.0
 2016/05/17 unicode 的版本判斷改用較精準的版本
@@ -59,7 +60,7 @@ WITS = {
 	'G' : '【佛教】',
 	'GA': '【志彙】',
 	'GB': '【志叢】',
-	'H' : '【正史】',
+	'ZS' : '【正史】',
 	'I' : '【史】',
 	'J' : '【嘉興】',
 	'K' : '【麗】',
@@ -71,7 +72,7 @@ WITS = {
 	'S' : '【宋遺】',
 	'T' : '【大】',
 	'U' : '【洪武】',
-	'W' : '【藏外】',
+	'ZW' : '【藏外】',
 	'X' : '【卍續】',
 	'ZY' : '【智諭】',
 }
@@ -79,10 +80,10 @@ WITS = {
 RESPS = {
 	'B' : 'BuBian',
 	'D' : 'NCLRareBook',
-	'H' : 'Dudoucheng',
+	'ZS' : 'Dudoucheng',
 	'J' : 'Jiaxing',
 	'T' : 'Taisho',
-	'W' : 'ZangWai',
+	'ZW' : 'ZangWai',
 	'X' : 'Xuzangjing',
 }
 
@@ -1343,7 +1344,11 @@ def app_new_type(e):
 		wits += c.get('wit', '')
 	wits = wits.replace('【CBETA】','')
 	wits = wits.replace('【CB】','')
-	col=globals['vol'][:1]
+
+	#col=globals['vol'][:1]
+	mo = re.search(r'^\D+', globals['vol'])
+	col = mo.group()
+	
 	wits = wits.replace(WITS[col], '')
 	if wits=='':
 		return 'choice'

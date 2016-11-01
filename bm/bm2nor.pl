@@ -15,6 +15,7 @@
 # Copyright (C) 1998-2016 CBETA
 # Copyright (C) 1999-2016 Heaven Chou
 ########################################################################
+# 2016/11/01 V9.17 將藏外佛教文獻的藏經代碼 W 改成 ZW , 正史佛教資料類編的 H 改成 ZS
 # 2016/05/20 V9.16 呈現的 unicode 由 1.1 改成 2.0 , 因為要呈現某些韓文
 # 2016/05/15 V9.15 處理 BM 檔有 UTF8 的 BOM 時, 會造成第一行被忽略的情況
 # 2016/05/13 V9.14 修改一經一檔的檔名, 要支援藏經代碼超過1個英文字母的經文
@@ -389,7 +390,7 @@ reinitial();                    #初值設定
 
 while($line=shift(@all_sutra))	# 取得每一行資料
 {
-	next if($line !~ /^[TXJHWIABCDFGKLMNPQSU]/);
+	next if($line !~ /^[TXJZIABCDFGKLMNPQSU]/);
 	$line =~ /^\D+\d+n(.{5}).{8}(...)/;
 	$now_sutra = $1;
 
@@ -998,14 +999,14 @@ if ($format eq "NORMAL" or $format eq "APP")		# 一卷一檔才需要底下的�
 		rename("$outdir$format/$T_vol/JB166_001.txt","$outdir$format/$T_vol/JB166_007.txt");
 		rename("$outdir$format/$T_vol/JB167_001.txt","$outdir$format/$T_vol/JB167_008.txt");
 	}
-	if($T_vol eq "W01")
+	if($T_vol eq "ZW01")
 	{
-		rename("$outdir$format/$T_vol/W0007_001.txt","$outdir$format/$T_vol/W0007_003.txt");
+		rename("$outdir$format/$T_vol/ZW0007_001.txt","$outdir$format/$T_vol/ZW0007_003.txt");
 	}
-	if($T_vol eq "W03")
+	if($T_vol eq "ZW03")
 	{
-		rename("$outdir$format/$T_vol/W0025_001.txt","$outdir$format/$T_vol/W0025_002.txt");
-		rename("$outdir$format/$T_vol/W0030_001.txt","$outdir$format/$T_vol/W0030_014.txt");
+		rename("$outdir$format/$T_vol/ZW0025_001.txt","$outdir$format/$T_vol/ZW0025_002.txt");
+		rename("$outdir$format/$T_vol/ZW0030_001.txt","$outdir$format/$T_vol/ZW0030_014.txt");
 	}
 	if($T_vol eq "P181")
 	{
@@ -1201,12 +1202,12 @@ sub print_jun_head()
 		$sutraver_c = "嘉興大藏經";
 		$sutraver_e = "Jiaxing Canon";
 	}
-	elsif($vol_head eq "H")
+	elsif($vol_head eq "ZS")
 	{
 		$sutraver_c = "正史佛教資料類編";
 		$sutraver_e = "Passages concerning Buddhism from the Official Histories";
 	}
-	elsif($vol_head eq "W")
+	elsif($vol_head eq "ZW")
 	{
 		$sutraver_c = "藏外佛教文獻";
 		$sutraver_e = "Buddhist Texts not contained in the Tripitaka";
