@@ -7,6 +7,7 @@
 Ray CHOU 周邦信 2011.6.11
 
 Heaven 修改:
+2016/12/04 支援印順法師佛學著作集新增的 : 規範字詞 <choice cb:type="規範字詞">, 行首頁碼有英文字母 _pa001
 2016/11/01 將藏外佛教文獻的藏經代碼 W 改成 ZW , 正史佛教資料類編的 H 改成 ZS
 2016/05/15 呈現新的格式的 CBETA 校註. ex. B35n0195.xml => <anchor xml:id="nkr_note_editor_0836001" n="0836001"/>
 2016/05/15 處理補編特殊的校勘編碼, 例如: xml:id="nkr_note_orig_0004003-n01"
@@ -113,7 +114,8 @@ def getJKMark(e):
 	
 	# 只有 "nkr_note_orig" 可以通過, 例如這種的不行 : T01n0026.xml => <lb n="0574a12" ed="T"/>眠、調<anchor xml:id="nkr_3f0"/>
 	# 2016/05/15 還有一種 "nkr_note_editor" 也可以通過, 例 B35n0195.xml => <anchor xml:id="nkr_note_editor_0836001" n="0836001"/>
-	if not id.startswith('nkr_note_orig') and not id.startswith('nkr_note_editor'): return ''	
+	# 2016/12/06 還有一種 "nkr_note_add" 也可以通過, 這是印順導師全集新增的, 後來查到的校注
+	if not id.startswith('nkr_note_orig') and not id.startswith('nkr_note_editor') and not id.startswith('nkr_note_add'): return ''	
 	
 	jk = id
 	jk = re.sub("\-n?\d{1,3}$", r"", jk)				# B06n0003.xml : <anchor xml:id="nkr_note_orig_0004003-n01" n="0004003-n01"/>
@@ -171,6 +173,7 @@ def handleNode(e):
 	elif e.tag=='lb':
 		globals['lb']=e.get('n')
 		if 'ed' in e.attrib and e.get('ed').startswith('R'): pass
+		elif 'type' in e.attrib and e.get('type') == "old" : pass
 		else:
 			# 處理大般若經經號 T07n0220e => T07n0220_
 			#if globals['vol'][0] == 'T' and globals['sutra_no'][0:4] == '0220':

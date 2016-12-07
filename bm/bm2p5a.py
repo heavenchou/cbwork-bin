@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2016/12/04 支援印順法師佛學著作集新增的 : 規範字詞 [A=B], 行首頁碼有英文字母 _pa001
 2016/04/15 <Ix> 及 <L_sp> 標記要結束 head 標記，<[ABCEY]> byline 標記要結束 p 標記.
 2016/04/14 上一版只修正這種情況 W##<Qn>，這一版修正 WQn 這種行首標記的情況。
 2016/04/12 附文底下的目錄 type 要用 "附文" 而不是 "其他"
@@ -117,6 +118,7 @@ wits={
 'U': '【洪武】',
 'W': '【藏外】',
 'X': '【卍續】', 
+'Y': '【印順】', 
 'ZY': '【智諭】',
 }
 
@@ -145,6 +147,7 @@ collectionEng={
 'U': 'Southern Hongwu Edition of the Canon',
 'W': 'Buddhist Texts not contained in the Tripiṭaka',
 'X': 'Manji Shinsan Dainihon Zokuzōkyō',
+'Y': 'Yinshun',
 'Z': 'Manji Dainihon Zokuzōkyō',
 'ZY': 'the Complete Works of Ven Zhiyu'
 }
@@ -247,7 +250,7 @@ def start_trans_mark(tag):
 	out(s)
 
 def start_p(tag):
-	closeTags('p', 'byline', 'head')
+	closeTags('cb:jhead', 'cb:juan', 'p', 'byline', 'head')
 	closeTags('l', 'lg')
 	r = get_number(tag)
 	out('<p xml:id="p%sp%s%s01"' % (vol, old_pb, line_num))
@@ -261,7 +264,7 @@ def start_p(tag):
 	opens['p']=1
 
 def start_inline_p(tag):
-	closeTags('p', 'byline')
+	closeTags('cb:jhead', 'cb:juan', 'p', 'byline')
 	close_head()
 	closeTags('l', 'lg')
 	s = '<p xml:id="p%sp%s%s%02d"' % (vol, old_pb, line_num, char_count)
@@ -727,6 +730,10 @@ def inline_tag(tag):
 		out1('</cb:div>')
 		opens['div'] -= 1
 		opens['orig'] -= 1
+	elif tag=='<orig>':
+		out(tag)
+	elif tag=='</orig>':
+		out(tag)
 	elif re.match(r'<PTS.', tag):
 		start_PTS(tag)
 	elif tag.startswith('<p'):
@@ -745,6 +752,10 @@ def inline_tag(tag):
 		start_inline_q(tag)
 	elif tag.startswith('</Q'):
 		close_q(tag)
+	elif tag=='<reg>':
+		out(tag)
+	elif tag=='</reg>':
+		out(tag)		
 	elif tag=='<S>':
 		start_S(tag)
 	elif tag=='<sd>':
@@ -867,6 +878,29 @@ def do_corr(text):
 
 	return text
 
+
+'''
+先把 [Ａ=Ｂ] 換成 <choice cb:type="規範字詞"><reg>Ｂ</reg><orig>Ａ</orig></choice>
+因為 Ａ 與 B 也有可能是組字式或校勘數字, 例如 [千[金*本]=千[金*本]經]
+'''
+def do_normalize(text):
+	'''
+	先把 [xxx] 組字或校勘數字變成 :gaiji1:xxx:gaiji2:
+	先把 <xxx> 組字或校勘數字變成 :gaiji3:xxx:gaiji4:
+	把[Ａ=Ｂ] 換成 <choice cb:type="規範字詞"><reg>Ｂ</reg><orig>Ａ</orig></choice>
+	再把:gaiji1:xxx:gaiji2: 換回 [xxx]
+	再把:gaiji3:xxx:gaiji4: 換回 <xxx>
+	'''
+	text = re.sub(r"\[([^=>\[\]]+?)\]", r":gaiji1:\1:gaiji2:", text)
+	text = re.sub(r"<([^<>]+?)>", r":gaiji3:\1:gaiji4:", text)
+	text = re.sub(r"\[([^\]]*?)=([^\]]*?)\]:gaiji3:resp=\"(.*?)\":gaiji4:", r'<choice cb:type="規範字詞" cb:resp="\3"><reg>\2</reg><orig>\1</orig></choice>', text)
+	text = re.sub(r"\[([^\]]*?)=([^\]]*?)\]", r'<choice cb:type="規範字詞"><reg>\2</reg><orig>\1</orig></choice>', text)
+	text = re.sub(":gaiji1:", "[", text)
+	text = re.sub(":gaiji2:", "]", text)
+	text = re.sub(":gaiji3:", "<", text)
+	text = re.sub(":gaiji4:", ">", text)
+	return text
+	
 '''
 把這種
 T04n0213_p0794a23D##[>法集要頌經樂品第三十]<S>　[06]忍勝則怨賊，　　自負則自鄙，
@@ -1245,7 +1279,7 @@ def convert():
 		if (line[:1] == "\ufeff"): line = line[1:]	# 扣除 utf8 格式有 feff 的檔頭
 		aline = line[:len(options.vol)+17]
 		text = line[len(options.vol)+17:]
-		mo=re.match(r'([A-Z]+\d{2,3})(n\d+.)(p\d{4}[a-z])(\d\d)(.+)$', aline)
+		mo=re.match(r'([A-Z]+\d{2,3})(n\d+.)(p.\d{3}[a-z])(\d\d)(.+)$', aline)
 		if mo!=None:
 			(vol, num, pb, line_num, head_tag) = mo.groups()
 		else:
@@ -1286,6 +1320,12 @@ def convert():
 		因為 Ａ 與 B 也有可能是組字式或校勘數字, 例如 [[金*本]>[口*兄]] , [[01]>]
 		'''
 		text = do_corr(text)
+		
+		'''
+		先把 [Ａ=Ｂ] 換成 <choice cb:type="規範字詞"><reg>Ｂ</reg><orig>Ａ</orig></choice>
+		因為 Ａ 與 B 也有可能是組字式或校勘數字, 例如 [千[金*本]=千[金*本]經]
+		'''
+		text = do_normalize(text)
 		
 		'''
 		把這種

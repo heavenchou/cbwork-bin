@@ -3,6 +3,7 @@
 2013.1.4 周邦信 改寫自 cbp4top5.py
 
 Heaven 修改:
+2016/12/04 支援印順法師佛學著作集新增的 : 規範字詞 <choice cb:type="規範字詞">, 行首頁碼有英文字母 _pa001
 2016/11/01 將藏外佛教文獻的藏經代碼 W 改成 ZW , 正史佛教資料類編的 H 改成 ZS
 2016/08/02 原本【？】有特殊意義, 要轉成 type="variantRemark" , 現在不用了, 【？】當成是版本不明的版本.
 2016/05/20 P5a 轉 P5 的標準由 unicode 1.1 改為 2.0 , 因為韓文是 2.0
@@ -74,6 +75,7 @@ WITS = {
 	'U' : '【洪武】',
 	'ZW' : '【藏外】',
 	'X' : '【卍續】',
+	'Y' : '【印順】',
 	'ZY' : '【智諭】',
 }
 
@@ -555,6 +557,8 @@ class MyTransformer():
 					self.handle_note_back(e, type, target, mode)
 				elif type in ('rest', 'cf.'):
 					self.handle_note_back(e, 'rest', target, mode)
+				elif type=='add':
+					self.handle_note_back(e, type, target, mode)
 				elif resp!='':
 					self.handle_note_back(e, resp, target, mode)
 				else:
@@ -686,7 +690,7 @@ class MyTransformer():
 			resp = lem.get('resp')
 			if resp is not None:
 				node.attrib['resp'] = resp
-			type = e.get('type')
+			type = e.get('cb:type')
 			if type is not None:
 				node.attrib['cb:type'] = type
 			self.back['app'] += node.open_tag()
@@ -745,8 +749,8 @@ class MyTransformer():
 			r = '<anchor xml:id="beg_{}" type="cb-app"/>'.format(id)
 			corr = e.find('corr')
 			if corr is None:
-				orig = e.find('orig')
-				r += self.traverse(orig, mode)
+				reg = e.find('reg')
+				r += self.traverse(reg, mode)
 			else:
 				r += self.traverse(corr, mode)
 			r += '<anchor xml:id="end_{}"/>'.format(id)
@@ -1393,7 +1397,10 @@ def handle_back(t):
 		r += '</cb:div>\n'
 		
 	for k in sorted(t.back_notes):
-		if k=='BuBian':
+		if k=='add':
+			r += '<cb:div type="add-notes">\n'
+			r += '<head>新增校註</head>\n'
+		elif k=='BuBian':
 			r += '<cb:div type="bubian-notes">\n'
 			r += '<head>大藏經補編 校註</head>\n'
 		elif k=='CBETA':
@@ -1509,6 +1516,8 @@ def phase2(vol,p):
 	# lb, pb 之前要換行
 	s=re.sub('>(<lb[^>]*?ed="%s)' % vol[0], r'>\n\1', s)
 	s=re.sub(r'([^\n])<pb ', r'\1\n<pb ', s)
+	# type="old" 的 lb 和 pb 不換行 (印順導師全集才有的)
+	s=re.sub('\n(<[lp]b[^>]*type="old")', r'\1', s)
 	
 	# 如果 sourceDesc 下有 <p> 的話, listWit 要放在 p 裡面.
 	s = re.sub(r'(</p>)\s*(<listWit>.*?</listWit>)', r'\n\2\1', s, flags=re.DOTALL)
