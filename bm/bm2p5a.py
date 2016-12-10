@@ -147,7 +147,7 @@ collectionEng={
 'U': 'Southern Hongwu Edition of the Canon',
 'W': 'Buddhist Texts not contained in the Tripiṭaka',
 'X': 'Manji Shinsan Dainihon Zokuzōkyō',
-'Y': 'Yinshun',
+'Y': 'Corpus of Venerable Yin Shun\'s Buddhist Studies',
 'Z': 'Manji Dainihon Zokuzōkyō',
 'ZY': 'the Complete Works of Ven Zhiyu'
 }

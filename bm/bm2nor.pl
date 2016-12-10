@@ -1171,6 +1171,7 @@ sub print_jun_head()
 # B 大藏經補編 (Supplement to the Dazangjing) 　 【補編】
 # C 中華大藏經 (Zhonghua Canon) （中華藏） 【中華】
 # D 國家圖書館善本佛典 (Selections from the Taipei National Central Library Buddhist Rare Book Collection) 【國圖】
+# DA 道安長老全集 (the Complete Works of Ven Daoan)  【道安】
 # F 房山石經 (Fangshan shijing) 　 【房山】
 # G 佛教大藏經 (Fojiao Canon) 　 【教藏】
 # GA 中國佛寺史志彙刊 (Zhongguo Fosi Shizhi Huikan) 【志彙】
@@ -1181,12 +1182,14 @@ sub print_jun_head()
 # N 永樂南藏 (Southern Yongle Edition of the Canon) （再刻南藏） 【南藏】
 # P 永樂北藏 (Northern Yongle Edition of the Canon) （北藏） 【北藏】
 # Q 磧砂大藏經(新文豐版) (Qisha Edition of the Canon(Xinwenfeng Edition)) （磧砂藏） 【磧砂】
+# R 卍續藏經(新文豐版) (Manji Zokuzokyo(Xinwenfeng Edition)) （卍續藏）
 # S 宋藏遺珍(新文豐版) (Songzang yizhen(Xinwenfeng Edition)) 　 【宋遺】
 # U 洪武南藏 (Southern Hongwu Edition of the Canon) （初刻南藏） 【洪武】
-
-# R 卍續藏經(新文豐版) (Manji Zokuzokyo(Xinwenfeng Edition)) （卍續藏）
+# Y 印順法師佛學著作集 (Corpus of Venerable Yin Shun's Buddhist Studies) 【印順】
 # Z 卍大日本續藏經 (Manji Dainihon Zokuzokyo)
-
+# ZY 智諭老和尚全集 (the Complete Works of Ven Zhiyu) 【智諭】
+		
+		
 	# TXJHWIABCDFGKLMNPQSU 的名稱
 	if($vol_head eq "T")
 	{
@@ -1313,9 +1316,9 @@ sub print_jun_head()
 	elsif($vol_head eq "Y")
 	{
 		$sutraver_c = "印順法師佛學著作集";
-		$sutraver_e = "Ven. Yinshun Books";
+		$sutraver_e = "Corpus of Venerable Yin Shun's Buddhist Studies";
 	}
-
+	
 	$content[0] =~ /^\D+(\d+)n(.{5})/;
 	my $vol = $1;
 	my $full_sutra = $2;
