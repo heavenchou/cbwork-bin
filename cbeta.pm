@@ -250,6 +250,11 @@ Unicode 6.3：2013年9月30日
 #1E9C～1E9F： (Unicode 5.1)
 #1EA0～1EF9： (Unicode 1.1)
 #1EFA～1EFF： (Unicode 5.1)
+# https://en.wikibooks.org/wiki/Unicode/Character_reference/2000-2FFF
+#2000～202E： (Unicode 1.0)
+#2045～2046： (Unicode 1.1)
+#2047： (Unicode 3.2)
+#2048～204F： (Unicode 3.0)
 #...
 #2100～2138： (Unicode 1.0)
 #2153～2182： (Unicode 1.0)
@@ -406,6 +411,10 @@ sub get_unicode_ver
 	return "5.1" if($uni >= 0x1E9C and $uni <= 0x1E9F);	#1E9C～1E9F： (Unicode 5.1)
 	return "1.1" if($uni >= 0x1EA0 and $uni <= 0x1EF9);	#1EA0～1EF9： (Unicode 1.1)
 	return "5.1" if($uni >= 0x1EFA and $uni <= 0x1EFF);	#1EFA～1EFF： (Unicode 5.1)
+	return "1.0" if($uni >= 0x2000 and $uni <= 0x202E);	#2000～202E： (Unicode 1.0)
+	return "1.1" if($uni >= 0x2045 and $uni <= 0x2046);	#2045～2046： (Unicode 1.1)
+	return "3.2" if($uni == 0x2047);	#2047： (Unicode 3.2)
+	return "3.0" if($uni >= 0x2048 and $uni <= 0x204F);	#2048～204F： (Unicode 3.0)
 	return "1.0" if($uni >= 0x2100 and $uni <= 0x2138);	#2100～2138： (Unicode 1.0)
 	return "1.0" if($uni >= 0x2153 and $uni <= 0x2182);	#2153～2182： (Unicode 1.0)
 	return "1.0" if($uni >= 0x2190 and $uni <= 0x21EA);	#2190～21EA： (Unicode 1.0)
@@ -599,14 +608,14 @@ sub pushtag
 	}
 
 	my %hash = ("tag" => $tag , "att" => \%att , "margin-left" => $margin_left , "text-indent" => $text_indent);
-	push($self->{"tags"} , \%hash);
+	push(@{$self->{"tags"}} , \%hash);
 }
 
 # 取出 $tag 及 %att , 要存入變數中
 sub poptag
 {
 	my $self = shift;
-	my $hash = pop($self->{"tags"});
+	my $hash = pop(@{$self->{"tags"}});
 	return ($hash->{"tag"} , $hash->{"margin-left"} , $hash->{"text-indent"} , %{$hash->{"att"}});
 }
 
