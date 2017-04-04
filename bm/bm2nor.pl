@@ -15,6 +15,7 @@
 # Copyright (C) 1998-2016 CBETA
 # Copyright (C) 1999-2016 Heaven Chou
 ########################################################################
+# 2017/04/04 V10.3 支援印順法師佛學著作集新增的 <F> , <r> 等表格標記。(等同行首標記的 F 與 f)
 # 2017/02/24 V10.2 支援無參數的 <quote> 標記
 # 2016/12/03 V10.1 支援印順法師佛學著作集新增的 : 規範字詞 [A=B], 行首頁碼有英文字母 _pa001
 # 2016/11/01 V9.17 將藏外佛教文獻的藏經代碼 W 改成 ZW , 正史佛教資料類編的 H 改成 ZS
@@ -2307,7 +2308,7 @@ s之後的第一個Ｐ：變成二個空格。（是否是不管之前的繼承�
 	s/<p=h[258]>/<p,3>/g;
 	s/<p=h[369]>/<p,4>/g;
 	
-	if($sign =~ /f/) {$ctag_num = 0;}
+	if($sign =~ /f/) {$ctag_num = 0;}	# <r> 也是比照處理
 	
 	# 先處理行首的一些問題
 
@@ -2510,21 +2511,31 @@ s之後的第一個Ｐ：變成二個空格。（是否是不管之前的繼承�
 		{
 			my $Qtag = $1;
 			if($Qtag eq "<Q>")  {s/<Q>/$fullspace2/;}
-			if($Qtag eq "<Q1>") {s/<Q1>/$fullspace2/;}
-			if($Qtag eq "<Q2>") {s/<Q2>/$fullspace3/;}
-			if($Qtag eq "<Q3>") {s/<Q3>/$fullspace4/;}
-			if($Qtag eq "<Q4>") {s/<Q4>/$fullspace2/;}
-			if($Qtag eq "<Q5>") {s/<Q5>/$fullspace3/;}
-			if($Qtag eq "<Q6>") {s/<Q6>/$fullspace4/;}
-			if($Qtag eq "<Q7>") {s/<Q7>/$fullspace2/;}
-			if($Qtag eq "<Q8>") {s/<Q8>/$fullspace3/;}
-			if($Qtag eq "<Q9>") {s/<Q9>/$fullspace4/;}
-			if($Qtag eq "<Q10>") {s/<Q10>/$fullspace2/;}
-			if($Qtag eq "<Q11>") {s/<Q11>/$fullspace3/;}
-			if($Qtag eq "<Q12>") {s/<Q12>/$fullspace4/;}
-			if($Qtag eq "<Q13>") {s/<Q13>/$fullspace2/;}
-			if($Qtag eq "<Q14>") {s/<Q14>/$fullspace3/;}
-			if($Qtag eq "<Q15>") {s/<Q15>/$fullspace4/;}
+			elsif($Qtag eq "<Q1>") {s/<Q1>/$fullspace2/;}
+			elsif($Qtag eq "<Q2>") {s/<Q2>/$fullspace3/;}
+			elsif($Qtag eq "<Q3>") {s/<Q3>/$fullspace4/;}
+			elsif($Qtag eq "<Q4>") {s/<Q4>/$fullspace2/;}
+			elsif($Qtag eq "<Q5>") {s/<Q5>/$fullspace3/;}
+			elsif($Qtag eq "<Q6>") {s/<Q6>/$fullspace4/;}
+			elsif($Qtag eq "<Q7>") {s/<Q7>/$fullspace2/;}
+			elsif($Qtag eq "<Q8>") {s/<Q8>/$fullspace3/;}
+			elsif($Qtag eq "<Q9>") {s/<Q9>/$fullspace4/;}
+			elsif($Qtag eq "<Q10>") {s/<Q10>/$fullspace2/;}
+			elsif($Qtag eq "<Q11>") {s/<Q11>/$fullspace3/;}
+			elsif($Qtag eq "<Q12>") {s/<Q12>/$fullspace4/;}
+			elsif($Qtag eq "<Q13>") {s/<Q13>/$fullspace2/;}
+			elsif($Qtag eq "<Q14>") {s/<Q14>/$fullspace3/;}
+			elsif($Qtag eq "<Q15>") {s/<Q15>/$fullspace4/;}
+			elsif($Qtag eq "<Q16>") {s/<Q16>/$fullspace2/;}
+			elsif($Qtag eq "<Q17>") {s/<Q17>/$fullspace3/;}
+			elsif($Qtag eq "<Q18>") {s/<Q18>/$fullspace4/;}
+			elsif($Qtag eq "<Q19>") {s/<Q19>/$fullspace2/;}
+			elsif($Qtag eq "<Q20>") {s/<Q20>/$fullspace3/;}
+			else
+			{
+				print "<Qxx> too much, ask heaven to update program.";
+				exit;
+			}
 			next;
 		}
 
@@ -2534,11 +2545,18 @@ s之後的第一個Ｐ：變成二個空格。（是否是不管之前的繼承�
 			$has_d = 1;
 			next;
 		}
-		if($thistag =~ /<[waouJSsi]>/)	# 不管 <w> , <a> , <J>, <S>, <s>, <o>, <u>, <i>
+		if($thistag =~ /<[FwaouJSsi]>/)	# 不管 <w> , <a> , <J>, <S>, <s>, <o>, <u>, <i>
 		{
-			s/<[waoudJSsi]>//;
+			s/<[FwaoudJSsi]>//;
 			next;
 		}
+		if($thistag eq "<r>")
+		{
+			$ctag_num = 0;	# f 也是比照處理
+			s/<r>//;
+			next;
+		}
+
 		if($thistag =~ /<mj>/)	# 不管 <mj>
 		{
 			s/<mj>//;
