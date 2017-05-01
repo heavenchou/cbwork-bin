@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2017/05/01 支援 <Q3=> 這類標記, 表示延續上一行的 <Q3> 標記
 2016/12/04 支援印順法師佛學著作集新增的 : 規範字詞 [A=B], 行首頁碼有英文字母 _pa001
 2016/04/15 <Ix> 及 <L_sp> 標記要結束 head 標記，<[ABCEY]> byline 標記要結束 p 標記.
 2016/04/14 上一版只修正這種情況 W##<Qn>，這一版修正 WQn 這種行首標記的情況。
@@ -314,6 +315,8 @@ def start_div(level, type):
 		out('<cb:div type="%s">' % type)
 	
 def start_inline_q(tag):
+	if(re.search("<Q\d?=",tag)):	# <Q3=> 這一種的表示是延續上一行的 <Q3>
+		return
 	global buf, div_head, head_tag, globals
 	close_head()
 	closeTags('l', 'lg', 'p', 'sp', 'cb:dialog', 'cb:event', 'form', 'cb:def', 'entry')
@@ -1291,7 +1294,7 @@ def convert():
 		pb=pb.lstrip('p')
 		
 		# 換行時, 發現前一行是 head , 而且沒有延續到本行, 就要印出相關文字
-		if globals['head_start'] and not re.search(r'Q\d?=', head_tag):
+		if globals['head_start'] and not re.search(r'Q\d?=', head_tag) and not re.search(r'<Q\d?=', text):
 			close_head()
 			'''
 			# 底下全部移到 close_head 裡面處理
