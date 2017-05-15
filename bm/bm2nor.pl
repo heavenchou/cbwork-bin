@@ -15,6 +15,7 @@
 # Copyright (C) 1998-2017 CBETA
 # Copyright (C) 1999-2017 Heaven Chou
 ########################################################################
+# 2017/05/15 V10.6 再次支援 <Qn=> 的標記, 比照 <Qn> 處理, 前版有問題
 # 2017/05/05 V10.5 支援 <Qn=> 的標記, 比照 <Qn> 處理
 # 2017/04/20 V10.4 支援佛寺志 <reg> 標記，表示是通用字，不理它即可。
 # 2017/04/04 V10.3 支援印順法師佛學著作集新增的 <F> , <r> 等表格標記。(等同行首標記的 F 與 f)
@@ -2513,27 +2514,27 @@ s之後的第一個Ｐ：變成二個空格。（是否是不管之前的繼承�
 		{
 			my $Qtag = $1;
 			$Qtag =~ s/=//;	# 把 = 去掉
-			if($Qtag eq "<Q>")  {s/<Q>/$fullspace2/;}
-			elsif($Qtag eq "<Q1>") {s/<Q1>/$fullspace2/;}
-			elsif($Qtag eq "<Q2>") {s/<Q2>/$fullspace3/;}
-			elsif($Qtag eq "<Q3>") {s/<Q3>/$fullspace4/;}
-			elsif($Qtag eq "<Q4>") {s/<Q4>/$fullspace2/;}
-			elsif($Qtag eq "<Q5>") {s/<Q5>/$fullspace3/;}
-			elsif($Qtag eq "<Q6>") {s/<Q6>/$fullspace4/;}
-			elsif($Qtag eq "<Q7>") {s/<Q7>/$fullspace2/;}
-			elsif($Qtag eq "<Q8>") {s/<Q8>/$fullspace3/;}
-			elsif($Qtag eq "<Q9>") {s/<Q9>/$fullspace4/;}
-			elsif($Qtag eq "<Q10>") {s/<Q10>/$fullspace2/;}
-			elsif($Qtag eq "<Q11>") {s/<Q11>/$fullspace3/;}
-			elsif($Qtag eq "<Q12>") {s/<Q12>/$fullspace4/;}
-			elsif($Qtag eq "<Q13>") {s/<Q13>/$fullspace2/;}
-			elsif($Qtag eq "<Q14>") {s/<Q14>/$fullspace3/;}
-			elsif($Qtag eq "<Q15>") {s/<Q15>/$fullspace4/;}
-			elsif($Qtag eq "<Q16>") {s/<Q16>/$fullspace2/;}
-			elsif($Qtag eq "<Q17>") {s/<Q17>/$fullspace3/;}
-			elsif($Qtag eq "<Q18>") {s/<Q18>/$fullspace4/;}
-			elsif($Qtag eq "<Q19>") {s/<Q19>/$fullspace2/;}
-			elsif($Qtag eq "<Q20>") {s/<Q20>/$fullspace3/;}
+			if($Qtag eq "<Q>")  {s/<Q=?>/$fullspace2/;}
+			elsif($Qtag eq "<Q1>") {s/<Q1=?>/$fullspace2/;}
+			elsif($Qtag eq "<Q2>") {s/<Q2=?>/$fullspace3/;}
+			elsif($Qtag eq "<Q3>") {s/<Q3=?>/$fullspace4/;}
+			elsif($Qtag eq "<Q4>") {s/<Q4=?>/$fullspace2/;}
+			elsif($Qtag eq "<Q5>") {s/<Q5=?>/$fullspace3/;}
+			elsif($Qtag eq "<Q6>") {s/<Q6=?>/$fullspace4/;}
+			elsif($Qtag eq "<Q7>") {s/<Q7=?>/$fullspace2/;}
+			elsif($Qtag eq "<Q8>") {s/<Q8=?>/$fullspace3/;}
+			elsif($Qtag eq "<Q9>") {s/<Q9=?>/$fullspace4/;}
+			elsif($Qtag eq "<Q10>") {s/<Q10=?>/$fullspace2/;}
+			elsif($Qtag eq "<Q11>") {s/<Q11=?>/$fullspace3/;}
+			elsif($Qtag eq "<Q12>") {s/<Q12=?>/$fullspace4/;}
+			elsif($Qtag eq "<Q13>") {s/<Q13=?>/$fullspace2/;}
+			elsif($Qtag eq "<Q14>") {s/<Q14=?>/$fullspace3/;}
+			elsif($Qtag eq "<Q15>") {s/<Q15=?>/$fullspace4/;}
+			elsif($Qtag eq "<Q16>") {s/<Q16=?>/$fullspace2/;}
+			elsif($Qtag eq "<Q17>") {s/<Q17=?>/$fullspace3/;}
+			elsif($Qtag eq "<Q18>") {s/<Q18=?>/$fullspace4/;}
+			elsif($Qtag eq "<Q19>") {s/<Q19=?>/$fullspace2/;}
+			elsif($Qtag eq "<Q20>") {s/<Q20=?>/$fullspace3/;}
 			else
 			{
 				print "<Qxx> too much, ask heaven to update program.";
