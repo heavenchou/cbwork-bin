@@ -3,6 +3,7 @@
 # 格式介紹在最底下
 #
 # 修訂記錄：
+# 2017/05/22 : 支援頁碼可能為 pa001 這種格式
 # 2016/03/31 : 加入 GA, GB 佛寺志代碼, 不過校注都是 resp="DILA" ,因為是法鼓山處理的.
 # 2015/04/18 : 1. 將 <□> 轉換成 <unclear/>
 #              2. 修改 <c r2> 這類標記在行首沒有出現 <row> 的問題
@@ -100,7 +101,7 @@ for ($i=0; $i<= $#lines; $i++)
 	next if(/^[A-Z]{1,2}\d{2,3}$/);			# 第一行的 X01 這類不管它
 
 	#p0002
-	if(/^p(\d{4})/)		# 頁碼
+	if(/^p(.{4})/)		# 頁碼
 	{
 		$page = $1;
 		print OUT "p" . $page . "\n";
@@ -126,7 +127,7 @@ for ($i=0; $i<= $#lines; $i++)
 		while($lines[$i+1])
 		{
 			my $nextline = $lines[$i+1];
-			last if($nextline =~ /^p(\d{4})/);	# 遇到頁碼則離開
+			last if($nextline =~ /^p(.{4})/);	# 遇到頁碼則離開
 			last if($nextline =~ /^\s+(\d+)([a-zA-Z]?)(\-[a-zA-Z]?\d+)?\s+(.*)$/);	# 遇到另一個校注則離開
 			last if($nextline =~ /^\s+【((?:科)|(?:標)|(?:解))(\d+)([a-zA-Z]?)(\-[a-zA-Z]?\d+)?】\s*(.*)$/);	# 遇到另一個校注則離開
 			
@@ -170,7 +171,7 @@ for ($i=0; $i<= $#lines; $i++)
 		while($lines[$i+1])
 		{
 			my $nextline = $lines[$i+1];
-			last if($nextline =~ /^p(\d{4})/);	# 遇到頁碼則離開
+			last if($nextline =~ /^p(.{4})/);	# 遇到頁碼則離開
 			last if($nextline =~ /^\s+(\d+)([a-zA-Z]?)(\-[a-zA-Z]?\d+)?\s+(.*)$/);	# 遇到另一個校注則離開
 			last if($nextline =~ /^\s+【((?:科)|(?:標)|(?:解))(\d+)([a-zA-Z]?)(\-[a-zA-Z]?\d+)?】\s*(.*)$/);	# 遇到另一個校注則離開
 			
