@@ -3,6 +3,7 @@
 # 格式介紹在最底下
 #
 # 修訂記錄：
+# 2017/05/24 : GA, GB 註解的修訂不用 <app> , 直接用 <choice>
 # 2017/05/22 : 支援頁碼可能為 pa001 這種格式
 # 2016/03/31 : 加入 GA, GB 佛寺志代碼, 不過校注都是 resp="DILA" ,因為是法鼓山處理的.
 # 2015/04/18 : 1. 將 <□> 轉換成 <unclear/>
@@ -283,8 +284,17 @@ sub run_corr
 			{
 				$strmod = $1;
 				$strorig = $2;
-
-				$strmod =~ s/\[($loseutf8*?)>($loseutf8*?)\]<resp="(.*?)">/<app><lem wit="【CBETA】" resp="$3">$2<\/lem><rdg wit="【${source_cname}】">$1<\/rdg><\/app>/g;
+				if($ed eq "GA" || $ed eq "GB")
+				{
+					# GA 和 GB 的修訂使用如下轉換
+					# [弟>第]<resp="CBETA.maha">
+					# <choice cb:resp="CBETA.maha"><corr>第</corr><sic>弟</sic></choice>
+					$strmod =~ s/\[($loseutf8*?)>($loseutf8*?)\]<resp="(.*?)">/<choice cb:resp="$3"><corr>$2<\/corr><sic>$1<\/sic><\/choice>/g;
+				}
+				else
+				{
+					$strmod =~ s/\[($loseutf8*?)>($loseutf8*?)\]<resp="(.*?)">/<app><lem wit="【CBETA】" resp="$3">$2<\/lem><rdg wit="【${source_cname}】">$1<\/rdg><\/app>/g;
+				}
 			}
 			else		# 無原始資料, 要自己產生
 			{
@@ -294,8 +304,14 @@ sub run_corr
 				# 要分成二組, 第一組還原, 第二組做成 XML 格式
 				
 				$strorig =~ s/\[($loseutf8*?)>$loseutf8*?\]<resp=".*?">/$1/g;
-				
-				$strmod =~ s/\[($loseutf8*?)>($loseutf8*?)\]<resp="(.*?)">/<app><lem wit="【CBETA】" resp="$3">$2<\/lem><rdg wit="【${source_cname}】">$1<\/rdg><\/app>/g;
+				if($ed eq "GA" || $ed eq "GB")
+				{
+					$strmod =~ s/\[($loseutf8*?)>($loseutf8*?)\]<resp="(.*?)">/<choice cb:resp="$3"><corr>$2<\/corr><sic>$1<\/sic><\/choice>/g;
+				}
+				else
+				{
+					$strmod =~ s/\[($loseutf8*?)>($loseutf8*?)\]<resp="(.*?)">/<app><lem wit="【CBETA】" resp="$3">$2<\/lem><rdg wit="【${source_cname}】">$1<\/rdg><\/app>/g;
+				}
 			}
 				
 			$strorig =~ s/:!:/\[/g;
