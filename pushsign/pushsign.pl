@@ -6,6 +6,7 @@
 # pushsign.pl 簡單標記版.txt 舊的xml.xml 結果檔xml.xml > 記錄檔.txt
 #
 ########################################################
+# 2017/05/27 : 支援 <I><P> 和 </L><P> 標記
 # 2016/05/18 : 修訂某些標點無法置換的錯誤
 # 2016/05/09 : 原來的 XML 也可以是新標檔
 # 2016/05/08 : 處理 <anchor type="circle"/> = ◎
@@ -81,16 +82,33 @@ my $OutXmlFile = shift;
 
 my $hasdot1 = "";		# 用來判斷是否有 dot , 0: 沒有, 1:句讀, 2:小黑點 , 新式標點版直接用該符號
 my $hasdot2 = "";		# 用來判斷是否有 dot , 0: 沒有, 1:句讀, 2:小黑點 , 新式標點版直接用該符號
-my $tagbuff = "";		# 暫存 tag 的 buff
+my $tagbuff = "";		# 暫存讀取 xml 遇到的 tag 的 buff
 
 my $istt = 0;           # 判斷是不是 <tt> 隔行對照, 0:一般狀況, 1:xml 發現 <tt> 2:sm 版已處理成 <tt> 格式(梵漢間格)
 my $whicht = 0;         # 目前是在哪一個 <t> 裡面? 梵 : 1 , 漢 : 2 
 
 my $firstword = 0;		# 若遇到 [TX]xxn.... 則 $firstword = 1 , 此時若遇到 <P> 則是行首, 否則設為 0 , 變成行中的 <P>
+my $firstitem = 1;		# 判斷是否是第一個 item , 用來處理 <I><P>, </L><P> 的情況
 
 ########################################################
 # 主程式
 ########################################################
+=begin
+
+處理流程
+
+1. 讀取 xml 一個字, 此字之前的標記放在 $tagbuff , 而標點則放在 $hasdot2
+2. 讀取 bm 一個字, 此字之前的標點則放在 $hasdot1
+3. 比較二字是否相同?
+3-1. 若相同, 則比較二邊的標點
+   a.二邊標點相同, 沒事.
+   b.標點不同, 則 bm 標點放到 xml 中.
+   c.xml 無標點, bm 有標點, 則 bm 標點放到 xml 中.
+   d.xml 有標點, bm 無標點, 則 xml 標點要移除.
+3-2. 若不同, 印出錯誤訊息
+
+=end
+=cut
 
 open INTxt, "<:utf8", "$InTxtFile" or die "open $InTxtFile error$!";
 open INXml, "<:utf8", "$InXmlFile" or die "open $InXmlFile error$!";
@@ -102,8 +120,8 @@ my @lines2 = <INXml>;
 close INTxt;
 close INXml;
 
-my $index1 = 0;
-my $index2 = 0;
+my $index1 = 0;	# 目前在 @lines1 的行位置
+my $index2 = 0;	# 目前在 @lines2 的行位置
 
 # 1. 先將不重要的 XML copy 過去
 
@@ -122,6 +140,8 @@ while(1)
 	
 	# ------------------------ 各取一個字
 	
+	# 讀取 xml 一個字, 此字之前的標記放在 $tagbuff , 而標點則放在 $hasdot2
+
 	my $word2 = get_word2();
 	if($istt == 1)
 	{
@@ -133,6 +153,8 @@ while(1)
 	    $index1++;      # <tt> 中的漢字, 所以讀下一行
 	}
 	
+	# 讀取 bm 一個字, 此字之前的標點放在 $hasdot1
+
 	my $word1 = get_word1();
 	
 	if($word1 eq 'n="0756c01"')
@@ -219,6 +241,7 @@ while(1)
 				print OUTXml "$hasdot1$tagbuff";
 			}
 		}
+		# xml 有標點, bm 無標點, 則 xml 標點要移除.
 		elsif($hasdot1 eq "" and $hasdot2 ne "")
 		{
 			$tagbuff =~ s/$hasdot2//;
@@ -231,6 +254,7 @@ while(1)
 
 		print OUTXml "$word2";
 	}
+	# 二邊文字不同步, 印出錯誤訊息
 	else
 	{
 		print OUTXml "<?><bm:$word1,xml:$word2>$tagbuff$word2";
@@ -334,45 +358,82 @@ sub get_word1
 			next;
 		}
 		# <[ouwsa]> 是為大智度論新標增加的段落格式 2007/07/04
-		if($lines1[$index1] =~ /^((?:。)|(?:、)|(?:，)|(?:．)|(?:；)|(?:：)|(?:「)|(?:」)|(?:『)|(?:』)|(?:（)|(?:）)|(?:？)|(?:！)|(?:—)|(?:…)|(?:《)|(?:》)|(?:〈)|(?:〉)|(?:“)|(?:”)|(?:(?:<[ouwsa]>)?<P>)|(?:(?:<[ouwsa]>)?<P,\d+>))/)
+		# <I></L> 是新增的標記 2017/05/27
+		#   第一個 <I><P> 要轉成 </p><list><item><p>
+		#   第二個 <I><P> 要轉成 </p></item><item><p> 
+		#   最後的 </L><P> 要轉成 </p></item></list><p>
+		if($lines1[$index1] =~ /^((?:。)|(?:、)|(?:，)|(?:．)|(?:；)|(?:：)|(?:「)|(?:」)|(?:『)|(?:』)|(?:（)|(?:）)|(?:？)|(?:！)|(?:—)|(?:…)|(?:《)|(?:》)|(?:〈)|(?:〉)|(?:“)|(?:”)|(?:(?:<\/?[ouwsaIL]>)?<P(?:,\d+)?>))/)
 		{
 			my $tmp = $1;
-			if($tmp =~ /(<[ouwsa]>)?<P>/)
+			if($tmp =~ /(<\/?[ouwsaIL]>)?(<P(?:,\d+)?>)/)
 			{
-				my $ouwsa = $1;
-				if($ouwsa)	# 假設 <P> 之前有 <o> 則 XML 要變成 <!-- <o> -->
+				my $tag1 = $1;
+				my $tag2 = $2;
+
+				# 1. <[ouwsa]> => <!-- <[ouwsa]> --> 
+				# ex. <o> => <!-- <o> -->
+
+				if($tag1 =~ /(<[ouwsa]>)/)
 				{
-					$ouwsa = "<!-- $ouwsa -->";
+					$tag1 = "<!-- $1 -->";
 				}
-				if($firstword)
+
+				# 2. 第一個 <I> => <list><item>
+				#    第二個 <I> => </item><item>
+				#    </L> => </item></list>
+
+				if($tag1 eq "<I>")
 				{
-					$tmp = "</p>$ouwsa<p>";
+					if($firstitem)
+					{
+						$tag1 = "<list><item>";
+						$firstitem = 0;
+					}
+					else
+					{
+						$tag1 = "</item><item>";
+					}
 				}
-				else
+				elsif($tag1 eq "</L>")
 				{
-					$tmp = "</p>$ouwsa<p rend=\"inline\">";
+					$tag1 = "</item></list>";
+					$firstitem = 1;
 				}
-			}
-			if($tmp =~ /(<[ouwsa]>)?<P,(\d+)>/)
-			{
-				my $ouwsa = $1;
-				my $tmpnum = $2;
-				if($ouwsa)	# 假設 <P> 之前有 <o> 則 XML 要變成 <!-- <o> -->
+
+				# 3. <P> => <p>
+				#    <P,x> => <p rend="margin-left:xem">
+				#    行中 P 則加上 rend="inline"
+
+				if($tag2 =~ /<P>/)
 				{
-					$ouwsa = "<!-- $ouwsa -->";
+					if($firstword)
+					{
+						$tag2 = "<p>";
+					}
+					else
+					{
+						$tag2 = "<p rend=\"inline\">";
+					}
 				}
-				if($firstword)
+				if($tag2 =~ /<P,(\d+)>/)
 				{
-					$tmp = "</p>$ouwsa<p rend=\"margin-left:${tmpnum}em\">";
+					my $tmpnum = $1;
+					if($firstword)
+					{
+						$tag2 = "<p rend=\"margin-left:${tmpnum}em\">";
+					}
+					else
+					{
+						$tag2 = "<p rend=\"margin-left:${tmpnum}em;inline\">";
+					}
 				}
-				else
-				{
-					$tmp = "</p>$ouwsa<p rend=\"margin-left:${tmpnum}em;inline\">";
-				}
+
+				# 整合
+				$tmp = "</p>" . $tag1 . $tag2;
 			}
 				
 			$hasdot1 .= $tmp;		
-			$lines1[$index1] =~ s/^((?:。)|(?:、)|(?:，)|(?:．)|(?:；)|(?:：)|(?:「)|(?:」)|(?:『)|(?:』)|(?:（)|(?:）)|(?:？)|(?:！)|(?:—)|(?:…)|(?:《)|(?:》)|(?:〈)|(?:〉)|(?:“)|(?:”)|(?:(?:<[ouwsa]>)?<P>)|(?:(?:<[ouwsa]>)?<P,\d+>))//;
+			$lines1[$index1] =~ s/^((?:。)|(?:、)|(?:，)|(?:．)|(?:；)|(?:：)|(?:「)|(?:」)|(?:『)|(?:』)|(?:（)|(?:）)|(?:？)|(?:！)|(?:—)|(?:…)|(?:《)|(?:》)|(?:〈)|(?:〉)|(?:“)|(?:”)|(?:(?:<\/?[ouwsaIL]>)?<P(?:,\d+)?>))//;
 			next;
 		}
 		
@@ -510,6 +571,8 @@ sub get_word1
 		exit;
 	}
 }
+
+# 取回 xml 的一個字
 
 sub get_word2
 {
