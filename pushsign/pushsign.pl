@@ -6,6 +6,7 @@
 # pushsign.pl 簡單標記版.txt 舊的xml.xml 結果檔xml.xml > 記錄檔.txt
 #
 ########################################################
+# 2017/05/27 : 將 </p> 等行首的結束標記移到前一行 (沒有全部, 只有指定的結束標記)
 # 2017/05/27 : 支援 <I><P> 和 </L><P> 標記
 # 2016/05/18 : 修訂某些標點無法置換的錯誤
 # 2016/05/09 : 原來的 XML 也可以是新標檔
@@ -116,22 +117,27 @@ open OUTXml, ">:utf8", "$OutXmlFile" or die "open $OutXmlFile error$!";
 
 my @lines1 = <INTxt>;
 my @lines2 = <INXml>;
+my @lines3 = "";
 
 close INTxt;
 close INXml;
 
 my $index1 = 0;	# 目前在 @lines1 的行位置
 my $index2 = 0;	# 目前在 @lines2 的行位置
+my $index3 = 0;	# 目前在 @lines3 的行位置
 
 # 1. 先將不重要的 XML copy 過去
 
 while(1)
 {
-	print OUTXml "$lines2[$index2]";
+	#print OUTXml "$lines2[$index2]";
+	push(@lines3, "$lines2[$index2]");
 	last if($lines2[$index2] =~ /<body>/);
 	$index2++;
+	$index3++;
 }
 $index2++;
+$index3++;
 
 while(1)
 {
@@ -169,7 +175,8 @@ while(1)
 	if($word1 ne "" and $word2 eq "")
 	{
 		print "Error: $InXmlFile no data\n";
-		print OUTXml "<?>Out of data";
+		#print OUTXml "<?>Out of data";
+		printout("<?>Out of data");
 		last;
 	}
 	
@@ -186,7 +193,8 @@ while(1)
 		
 		if($hasdot1 eq $hasdot2)	# 二邊標點同步
 		{
-			print OUTXml $tagbuff;
+			#print OUTXml $tagbuff;
+			printout($tagbuff);
 		}
 		elsif($hasdot1 ne "" and $hasdot2 ne "")		# 二邊都有標點, 但不同步
 		{
@@ -204,9 +212,11 @@ while(1)
 			}
 			else
 			{
-				print OUTXml "<?><bm:$hasdot1,xml:$hasdot2>";
+				#print OUTXml "<?><bm:$hasdot1,xml:$hasdot2>";
+				printout("<?><bm:$hasdot1,xml:$hasdot2>");
 			}
-			print OUTXml $tagbuff;
+			#print OUTXml $tagbuff;
+			printout($tagbuff);
 		}
 		elsif($hasdot1 ne "" and $hasdot2 eq "")		# xml 沒標點, 所以要加上去
 		{
@@ -218,49 +228,60 @@ while(1)
 			    if($tagbuff =~ /^.*<\/((app)|(cb:tt)|(note))>/)
 			    {
 				    $tagbuff =~ s/^(.*<\/(?:(?:app)|(?:cb:tt)|(?:note))>)/$1$hasdot1/;
-				    print OUTXml "$tagbuff";
+				    #print OUTXml "$tagbuff";
+					printout($tagbuff);
 				}
 				else
 				{
-				    print OUTXml "$hasdot1<<?>:<在 rdg,lem,t,note 之前的句讀應該處理掉>>$tagbuff";
+				    #print OUTXml "$hasdot1<<?>:<在 rdg,lem,t,note 之前的句讀應該處理掉>>$tagbuff";
+					printout("$hasdot1<<?>:<在 rdg,lem,t,note 之前的句讀應該處理掉>>$tagbuff");
 				}
 			}
 			elsif($hasdot1 =~ /(((?:「)|(?:『)|(?:（)|(?:《)|(?:〈)|(?:“))+)/)		# 這些標記要移到後面
 			{
 				my $tmp = $1;
 				$hasdot1 =~ s/(((?:「)|(?:『)|(?:（)|(?:《)|(?:〈)|(?:“))+)//;
-				print OUTXml "$hasdot1$tagbuff$tmp";
+				#print OUTXml "$hasdot1$tagbuff$tmp";
+				printout("$hasdot1$tagbuff$tmp");
 			}
 			elsif($tagbuff =~ /^<foreign.*?>.*?<\/foreign>/)
 			{
 			    $tagbuff =~ s/^(<foreign.*?>.*?<\/foreign>)/$1$hasdot1/;
-				print OUTXml "$tagbuff";
+				#print OUTXml "$tagbuff";
+				printout($tagbuff);
 			}
 			else
 			{
-				print OUTXml "$hasdot1$tagbuff";
+				#print OUTXml "$hasdot1$tagbuff";
+				printout("$hasdot1$tagbuff");
 			}
 		}
 		# xml 有標點, bm 無標點, 則 xml 標點要移除.
 		elsif($hasdot1 eq "" and $hasdot2 ne "")
 		{
 			$tagbuff =~ s/$hasdot2//;
-			print OUTXml "$tagbuff";
+			#print OUTXml "$tagbuff";
+			printout($tagbuff);
 		}
 		else
 		{
-			print OUTXml "<??>$tagbuff";		# 大概用不上了
+			#print OUTXml "<??>$tagbuff";		# 大概用不上了
+			printout("<??>$tagbuff");
 		}
 
-		print OUTXml "$word2";
+		#print OUTXml "$word2";
+		printout("$word2");
 	}
 	# 二邊文字不同步, 印出錯誤訊息
 	else
 	{
-		print OUTXml "<?><bm:$word1,xml:$word2>$tagbuff$word2";
-		print OUTXml $lines2[$index2];
+		#print OUTXml "<?><bm:$word1,xml:$word2>$tagbuff$word2";
+		#print OUTXml $lines2[$index2];
+		printout("<?><bm:$word1,xml:$word2>$tagbuff$word2");
+		printout($lines2[$index2]);
 		$index1++;
 		$index2++;
+		$index3++;
 		#exit;
 	}
 	
@@ -270,6 +291,14 @@ while(1)
 	}
 }
 
+# 將行首的 </p> 移到前一行行尾
+mv_endtag_to_pre_line();
+
+# 輸出結果
+for(my $i=0; $i<=$#lines3; $i++)
+{
+	print OUTXml $lines3[$i];
+}
 close OUTXml;
 
 ########################################################
@@ -1100,4 +1129,35 @@ sub check_2_word
 	}	
 
 	return 0;
+}
+
+# 把傳入的資料推入 @lines , 若有換行就要處理
+sub printout
+{
+	local $_ = shift;
+
+	while(/^(.*?\n)(.*)/s)
+	{
+		$lines3[$index3] .= $1;
+		$index3++;
+		$_ = $2;
+	}
+	$lines3[$index3] .= $_;
+}
+
+# 將行首的 </p> 移到前一行行尾
+
+sub mv_endtag_to_pre_line
+{
+	for(my $i=1; $i<=$#lines3; $i++)
+	{
+		if($lines3[$i] =~ /^<[lp]b[^>]*?>(<\/((p)|(item)|(list)|(cb:div))>)/)
+		{
+			my $tag = $1;
+			$lines3[$i-1] =~ s/\n/$tag\n/;
+			$lines3[$i] =~ s/^(<[lp]b[^>]*?>)(<\/((p)|(item)|(list)|(cb:div))>)/$1/;
+			$i = $i - 2;
+			if($i < 0) {$i = 0;}
+		}
+	}
 }
