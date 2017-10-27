@@ -18,6 +18,7 @@ b5-u8.py
 作者: 周邦信 2009.05.26
 
 Heaven 修改:
+2017/10/28 修改缺字的讀取, 原本讀取 MS Access 資料庫改成讀純文字 csv 檔, 速度快很多
 2013/10/20 修改缺字的讀取, 由逐字查詢資料庫改成一次讀取全部資料庫
 2013/10/16 將日文拼音及 &M 碼轉成日文unicode
 2013/06/09 變數改用設定檔 ../cbwork_bin.ini
@@ -25,7 +26,7 @@ Heaven 修改:
 
 #################################################
 
-import configparser, os, codecs, re, sys
+import configparser, os, codecs, re, sys, csv
 from optparse import OptionParser
 import win32com.client		# 要安裝 PythonWin
 
@@ -439,6 +440,30 @@ def get_roma():
 			rs.MoveNext()
 
 #################################################
+# 讀取純文字版的缺字資料庫 (速度較快)
+#################################################
+def get_des2u8_roma():
+	global des2u8
+	global romas
+	with open(gaiji_txt, encoding='utf8') as infile:
+		reader = csv.DictReader(infile,  delimiter='\t')
+		for row in reader:
+			cb = row['cb']
+			uni = row['unicode']
+			nor = row['nor']
+			des = row['des']
+			uni=uni.upper()
+
+			if cb!=None and len(cb)>0:
+				# 一般組字式缺字
+				if cb<='99999':
+					if uni!=None and len(uni)>0 and des!=None and len(des)>0: 
+						des2u8[des] = chr(int(uni,16))
+			else:
+				if uni!=None and len(uni)>0 and nor!=None and len(nor)>0:
+					# 羅馬轉寫字
+					romas[nor] = chr(int(uni,16))
+#################################################
 # main 主程式
 #################################################
 
@@ -452,6 +477,7 @@ parser.add_option("-o", dest="output", help="輸出資料夾")
 config = configparser.SafeConfigParser()
 config.read('../cbwork_bin.ini')
 gaiji = config.get('default', 'gaiji-m.mdb_file')
+gaiji_txt = gaiji.replace('gaiji-m.mdb', "gaiji-m_u8.txt")
 
 # 準備存取 gaiji-m.mdb
 conn = win32com.client.Dispatch(r'ADODB.Connection')
@@ -461,7 +487,12 @@ conn.Open(DSN)
 # 先讀取羅馬轉寫字
 romas = {}	# 宣告用來放羅馬拼音, ex { '`o' : '00F3' }
 des2u8 = {} # 宣告用來放組字式的 utf8 文字
-get_roma()
-get_des2u8()
+
+# 讀取羅馬拼音
+# get_roma()
+# 讀取缺字資料庫組字式與 unicode
+# get_des2u8()
+# 讀取純文字版的缺字資料庫 (速度較快)
+get_des2u8_roma()
 
 trans_dir(options.source, options.output)

@@ -14,6 +14,7 @@ u8-b5.py
 2009.12.02 Ray: 從 Unicode 網站取得 Unihan.txt, 取出裏面的異寫字資訊 kCompatibilityVariant, 放在 variant
 
 Heaven 修改:
+2017/10/28 修改缺字的讀取, 原本讀取 MS Access 資料庫改成讀純文字 csv 檔, 速度快很多
 2013/11/06 修改缺字的讀取, 由逐字查詢資料庫改成一次讀取全部資料庫.
 2013/08/15 python 3.3.1 處理 ext-b 有問題, 所以改成逐字處理, 不用 error handler 了.
 2013/07/31 使用通用字參數時同時處理通用詞
@@ -22,7 +23,7 @@ Heaven 修改:
 2013/03/05 增加 -n 使用通用字的參數
 '''
 
-import configparser, os, codecs, sys
+import configparser, os, codecs, sys, csv
 from optparse import OptionParser
 import win32com.client # 要安裝 PythonWin
 import re
@@ -1366,6 +1367,29 @@ def get_gaiji_m():
 			rs.MoveNext()
 
 #################################################
+# 讀取純文字版的缺字資料庫 (速度較快)
+#################################################
+def get_gaiji_txt():
+	global uni2b5
+	with open(gaiji_txt, encoding='utf8') as infile:
+		reader = csv.DictReader(infile,  delimiter='\t')
+		for row in reader:
+			cb = row['cb']
+			uni = row['unicode']
+			nor = row['nor']
+			des = row['des']
+			uni=uni.upper()
+
+			if des!=None and len(des)>0 and cb!=None and len(cb)>0:
+				# 一般組字式缺字
+				if options.gaijiNormalize and nor!=None and len(nor)>0:
+					uni2b5[uni] = nor
+				else:
+					uni2b5[uni] = des
+			else:
+				# 羅馬轉寫字
+				uni2b5[uni] = nor
+#################################################
 # main 主程式
 #################################################
 
@@ -1381,6 +1405,7 @@ parser.add_option("-n", action="store_true", dest="gaijiNormalize", default=Fals
 config = configparser.SafeConfigParser()
 config.read('../cbwork_bin.ini')
 gaiji = config.get('default', 'gaiji-m.mdb_file')
+gaiji_txt = gaiji.replace('gaiji-m.mdb', "gaiji-m_u8.txt")
 
 high_word = 0
 # python 3.3.1 處理 ext-b 有問題, 所以改成逐字處理, 不用 error handler 了 -- 2013/08/15
@@ -1393,7 +1418,9 @@ conn.Open(DSN)
 
 uni2b5 = {} 	# 宣告用來放 utf8 對應的組字式或通用字
 # 讀取缺字資料庫
-get_gaiji_m()
+# get_gaiji_m()
+# 讀取純文字版的缺字資料庫 (速度較快)
+get_gaiji_txt()
 
 # log 檔
 f3 = open('u8-b5.log', "w", encoding="utf-8")
