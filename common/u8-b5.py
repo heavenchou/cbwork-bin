@@ -2,18 +2,42 @@
 '''
 u8-b5.py
 功能: 
-	將目錄下(含子目錄)所有 utf-8 檔案轉為 CP950, 
-	若缺字
-		1. 查 cbeta gaiji-m.mdb, 以組字式呈現
-		2. 如果沒有組字式, 例如轉寫字, 就以通用字 nor 欄位呈現
+	將目錄下(含子目錄)所有 utf-8 檔案轉為 CP950
+
 使用說明:
-	執行 u8-b5.py -h 可以查看參數說明.
-需求: PythonWin
+	
+	u8-b5.py [參數]
+
+	參數 :
+	-h 查看參數說明
+	-s 指定來源資料來
+	-o 指定輸出資料來
+	-u 用來處理無法直接轉成 big5 的文字
+
+		-u d : 預設值, 處理順序 1.組字式 2.&#x....; 編碼
+		-u n : 處理順序 1.通用字,通用詞 2.組字式 3.&#x....; 編碼
+		-u x : 直接轉成 &#x....; 編碼
+
+		日文、俄文 在 -u d 和 -u n 都轉成這種格式 【A】【U0424】
+				在 -u x 則轉成 &#x....; 編碼
+
+	-r 用來處理羅馬轉寫字
+
+		-r d : 預設值, 處理順序 1.組字式 2.&#x....; 編碼
+		-r n : 處理順序 1.通用字 2.組字式 3.&#x....; 編碼
+		-r x : 直接轉成 &#x....; 編碼
+
+		以 Ā 為例，組字式則為 [-/A] , 通用字為 AA
+
+		＊＊＊ 羅馬拼音建議儘量不要轉成通用字, 以免和一般英文字混淆
+
+需求: PythonWin (不需要了)
 作者: ray
 2011.06.14 Ray: 改用 Python 3.2, 不過 64bit 版好像不能用
 2009.12.02 Ray: 從 Unicode 網站取得 Unihan.txt, 取出裏面的異寫字資訊 kCompatibilityVariant, 放在 variant
 
 Heaven 修改:
+2017/10/29 取消 -n 參數, 加上 -u [dnx] 和 -r [dnx] 參數, 詳見功能說明
 2017/10/28 修改缺字的讀取, 原本讀取 MS Access 資料庫改成讀純文字 csv 檔, 速度快很多
 2013/11/06 修改缺字的讀取, 由逐字查詢資料庫改成一次讀取全部資料庫.
 2013/08/15 python 3.3.1 處理 ext-b 有問題, 所以改成逐字處理, 不用 error handler 了.
@@ -1107,6 +1131,186 @@ def trans_jep(line):
 	return line
 
 #################################################
+# 處理日文
+#################################################
+def trans_jep_x(line):
+	matchObj = re.search( r'[ぁ-ん]', line, re.UNICODE)
+	if matchObj:
+		line = line.replace('ぁ', "&#X3041;")
+		line = line.replace('あ', "&#X3042;")
+		line = line.replace('ぃ', "&#X3043;")
+		line = line.replace('い', "&#X3044;")
+		line = line.replace('ぅ', "&#X3045;")
+		line = line.replace('う', "&#X3046;")
+		line = line.replace('ぇ', "&#X3047;")
+		line = line.replace('え', "&#X3048;")
+		line = line.replace('ぉ', "&#X3049;")
+		line = line.replace('お', "&#X304A;")
+		line = line.replace('か', "&#X304B;")
+		line = line.replace('が', "&#X304C;")
+		line = line.replace('き', "&#X304D;")
+		line = line.replace('ぎ', "&#X304E;")
+		line = line.replace('く', "&#X304F;")
+		line = line.replace('ぐ', "&#X3050;")
+		line = line.replace('け', "&#X3051;")
+		line = line.replace('げ', "&#X3052;")
+		line = line.replace('こ', "&#X3053;")
+		line = line.replace('ご', "&#X3054;")
+		line = line.replace('さ', "&#X3055;")
+		line = line.replace('ざ', "&#X3056;")
+		line = line.replace('し', "&#X3057;")
+		line = line.replace('じ', "&#X3058;")
+		line = line.replace('す', "&#X3059;")
+		line = line.replace('ず', "&#X305A;")
+		line = line.replace('せ', "&#X305B;")
+		line = line.replace('ぜ', "&#X305C;")
+		line = line.replace('そ', "&#X305D;")
+		line = line.replace('ぞ', "&#X305E;")
+		line = line.replace('た', "&#X305F;")
+		line = line.replace('だ', "&#X3060;")
+		line = line.replace('ち', "&#X3061;")
+		line = line.replace('ぢ', "&#X3062;")
+		line = line.replace('っ', "&#X3063;")
+		line = line.replace('つ', "&#X3064;")
+		line = line.replace('づ', "&#X3065;")
+		line = line.replace('て', "&#X3066;")
+		line = line.replace('で', "&#X3067;")
+		line = line.replace('と', "&#X3068;")
+		line = line.replace('ど', "&#X3069;")
+		line = line.replace('な', "&#X306A;")
+		line = line.replace('に', "&#X306B;")
+		line = line.replace('ぬ', "&#X306C;")
+		line = line.replace('ね', "&#X306D;")
+		line = line.replace('の', "&#X306E;")
+		line = line.replace('は', "&#X306F;")
+		line = line.replace('ば', "&#X3070;")
+		line = line.replace('ぱ', "&#X3071;")
+		line = line.replace('ひ', "&#X3072;")
+		line = line.replace('び', "&#X3073;")
+		line = line.replace('ぴ', "&#X3074;")
+		line = line.replace('ふ', "&#X3075;")
+		line = line.replace('ぶ', "&#X3076;")
+		line = line.replace('ぷ', "&#X3077;")
+		line = line.replace('へ', "&#X3078;")
+		line = line.replace('べ', "&#X3079;")
+		line = line.replace('ぺ', "&#X307A;")
+		line = line.replace('ほ', "&#X307B;")
+		line = line.replace('ぼ', "&#X307C;")
+		line = line.replace('ぽ', "&#X307D;")
+		line = line.replace('ま', "&#X307E;")
+		line = line.replace('み', "&#X307F;")
+		line = line.replace('む', "&#X3080;")
+		line = line.replace('め', "&#X3081;")
+		line = line.replace('も', "&#X3082;")
+		line = line.replace('ゃ', "&#X3083;")
+		line = line.replace('や', "&#X3084;")
+		line = line.replace('ゅ', "&#X3085;")
+		line = line.replace('ゆ', "&#X3086;")
+		line = line.replace('ょ', "&#X3087;")
+		line = line.replace('よ', "&#X3088;")
+		line = line.replace('ら', "&#X3089;")
+		line = line.replace('り', "&#X308A;")
+		line = line.replace('る', "&#X308B;")
+		line = line.replace('れ', "&#X308C;")
+		line = line.replace('ろ', "&#X308D;")
+		line = line.replace('ゎ', "&#X308E;")
+		line = line.replace('わ', "&#X308F;")
+		line = line.replace('ゐ', "&#X3090;")
+		line = line.replace('ゑ', "&#X3091;")
+		line = line.replace('を', "&#X3092;")
+		line = line.replace('ん', "&#X3093;")
+		
+	matchObj = re.search( r'[ァ-ヶ]', line, re.UNICODE)
+	if matchObj:
+		line = line.replace('ァ', "&#X30A1;")
+		line = line.replace('ア', "&#X30A2;")
+		line = line.replace('ィ', "&#X30A3;")
+		line = line.replace('イ', "&#X30A4;")
+		line = line.replace('ゥ', "&#X30A5;")
+		line = line.replace('ウ', "&#X30A6;")
+		line = line.replace('ェ', "&#X30A7;")
+		line = line.replace('エ', "&#X30A8;")
+		line = line.replace('ォ', "&#X30A9;")
+		line = line.replace('オ', "&#X30AA;")
+		line = line.replace('カ', "&#X30AB;")
+		line = line.replace('ガ', "&#X30AC;")
+		line = line.replace('キ', "&#X30AD;")
+		line = line.replace('ギ', "&#X30AE;")
+		line = line.replace('ク', "&#X30AF;")
+		line = line.replace('グ', "&#X30B0;")
+		line = line.replace('ケ', "&#X30B1;")
+		line = line.replace('ゲ', "&#X30B2;")
+		line = line.replace('コ', "&#X30B3;")
+		line = line.replace('ゴ', "&#X30B4;")
+		line = line.replace('サ', "&#X30B5;")
+		line = line.replace('ザ', "&#X30B6;")
+		line = line.replace('シ', "&#X30B7;")
+		line = line.replace('ジ', "&#X30B8;")
+		line = line.replace('ス', "&#X30B9;")
+		line = line.replace('ズ', "&#X30BA;")
+		line = line.replace('セ', "&#X30BB;")
+		line = line.replace('ゼ', "&#X30BC;")
+		line = line.replace('ソ', "&#X30BD;")
+		line = line.replace('ゾ', "&#X30BE;")
+		line = line.replace('タ', "&#X30BF;")
+		line = line.replace('ダ', "&#X30C0;")
+		line = line.replace('チ', "&#X30C1;")
+		line = line.replace('ヂ', "&#X30C2;")
+		line = line.replace('ッ', "&#X30C3;")
+		line = line.replace('ツ', "&#X30C4;")
+		line = line.replace('ヅ', "&#X30C5;")
+		line = line.replace('テ', "&#X30C6;")
+		line = line.replace('デ', "&#X30C7;")
+		line = line.replace('ト', "&#X30C8;")
+		line = line.replace('ド', "&#X30C9;")
+		line = line.replace('ナ', "&#X30CA;")
+		line = line.replace('ニ', "&#X30CB;")
+		line = line.replace('ヌ', "&#X30CC;")
+		line = line.replace('ネ', "&#X30CD;")
+		line = line.replace('ノ', "&#X30CE;")
+		line = line.replace('ハ', "&#X30CF;")
+		line = line.replace('バ', "&#X30D0;")
+		line = line.replace('パ', "&#X30D1;")
+		line = line.replace('ヒ', "&#X30D2;")
+		line = line.replace('ビ', "&#X30D3;")
+		line = line.replace('ピ', "&#X30D4;")
+		line = line.replace('フ', "&#X30D5;")
+		line = line.replace('ブ', "&#X30D6;")
+		line = line.replace('プ', "&#X30D7;")
+		line = line.replace('ヘ', "&#X30D8;")
+		line = line.replace('ベ', "&#X30D9;")
+		line = line.replace('ペ', "&#X30DA;")
+		line = line.replace('ホ', "&#X30DB;")
+		line = line.replace('ボ', "&#X30DC;")
+		line = line.replace('ポ', "&#X30DD;")
+		line = line.replace('マ', "&#X30DE;")
+		line = line.replace('ミ', "&#X30DF;")
+		line = line.replace('ム', "&#X30E0;")
+		line = line.replace('メ', "&#X30E1;")
+		line = line.replace('モ', "&#X30E2;")
+		line = line.replace('ャ', "&#X30E3;")
+		line = line.replace('ヤ', "&#X30E4;")
+		line = line.replace('ュ', "&#X30E5;")
+		line = line.replace('ユ', "&#X30E6;")
+		line = line.replace('ョ', "&#X30E7;")
+		line = line.replace('ヨ', "&#X30E8;")
+		line = line.replace('ラ', "&#X30E9;")
+		line = line.replace('リ', "&#X30EA;")
+		line = line.replace('ル', "&#X30EB;")
+		line = line.replace('レ', "&#X30EC;")
+		line = line.replace('ロ', "&#X30ED;")
+		line = line.replace('ヮ', "&#X30EE;")
+		line = line.replace('ワ', "&#X30EF;")
+		line = line.replace('ヰ', "&#X30F0;")
+		line = line.replace('ヱ', "&#X30F1;")
+		line = line.replace('ヲ', "&#X30F2;")
+		line = line.replace('ン', "&#X30F3;")
+		line = line.replace('ヴ', "&#X30F4;")
+		line = line.replace('ヵ', "&#X30F5;")
+		line = line.replace('ヶ', "&#X30F6;")
+	return line
+
+#################################################
 # 處理通用詞 (有斷行就麻煩了)
 #################################################
 def normal_words(line):
@@ -1155,14 +1359,24 @@ def trans_file(fn1, fn2):
 		#修改版本
 		line = line.replace('(UTF-8) 普及版', '(Big5) 普及版')
 		line = line.replace('(UTF-8) Normalized', '(Big5) Normalized')
-		#處理日文
-		line=trans_jep(line)
-		#處理俄文
-		line = line.replace('Ф', "【U0424】")
-		line = line.replace('Д', "【U0414】")
-		line = line.replace('х', "【U0445】")
+		
+		if options.unicode == "x":
+			#處理日文
+			line=trans_jep_x(line)
+			#處理俄文
+			line = line.replace('Ф', "&#XU0424;")
+			line = line.replace('Д', "&#X0414;")
+			line = line.replace('х', "&#X0445;")  			
+		else:
+			#處理日文
+			line=trans_jep(line)
+			#處理俄文
+			line = line.replace('Ф', "【U0424】")
+			line = line.replace('Д', "【U0414】")
+			line = line.replace('х', "【U0445】")
+
 		#處理通用詞
-		if options.gaijiNormalize:
+		if options.unicode == "n":
 			line=normal_words(line)
 		
 		# python 3.3.1 處理 ext-b 有問題, 所以改成逐字處理, 不用 error handler 了 -- 2013/08/15
@@ -1173,7 +1387,6 @@ def trans_file(fn1, fn2):
 				new += c
 			except:
 				new += u8tob5(c)
-					
 		f2.write(new)
 	f1.close()
 	f2.close()
@@ -1338,8 +1551,9 @@ def my_err_handler(exc):
 	
 #################################################
 # 讀取缺字資料庫
+# 慢, 不用了
 #################################################
-def get_gaiji_m():
+def get_gaiji_m_old():
 	global uni2b5
 	rs = win32com.client.Dispatch(r'ADODB.Recordset')
 	sql = "SELECT cb, des, unicode, nor FROM gaiji WHERE (((cb Is Null) OR (cb<='99999')) AND (unicode Is Not Null))"
@@ -1382,13 +1596,18 @@ def get_gaiji_txt():
 
 			if des!=None and len(des)>0 and cb!=None and len(cb)>0:
 				# 一般組字式缺字
-				if options.gaijiNormalize and nor!=None and len(nor)>0:
+				if options.unicode == "n" and nor!=None and len(nor)>0:
 					uni2b5[uni] = nor
-				else:
+				elif options.unicode != "x":
 					uni2b5[uni] = des
 			else:
 				# 羅馬轉寫字
-				uni2b5[uni] = nor
+				if options.roma == "n" and nor!=None and len(nor)>0:
+					uni2b5[uni] = nor
+				elif options.roma != "x":
+					if des != None and len(des)>0:
+						uni2b5[uni] = des
+
 #################################################
 # main 主程式
 #################################################
@@ -1397,8 +1616,10 @@ def get_gaiji_txt():
 parser = OptionParser()
 parser.add_option("-s", dest="source", help="來源資料夾")
 parser.add_option("-o", dest="output", help="輸出資料夾")
-parser.add_option("-v", action="store_true", dest="convertVariant", default=False, help="異寫轉換")
-parser.add_option("-n", action="store_true", dest="gaijiNormalize", default=False, help="使用通用字")
+#parser.add_option("-v", action="store_true", dest="convertVariant", default=False, help="異寫轉換")
+#parser.add_option("-n", action="store_true", dest="gaijiNormalize", default=False, help="使用通用字")
+parser.add_option("-u", dest="unicode", help="Unicode : -u d 先組字後編碼(預設), -u n 先通用後組字, -u x 編碼", default="d")
+parser.add_option("-r", dest="roma", help="羅馬拼音: -r d 先組字後編碼(預設), -r n 先通用後組字, -r x 編碼", default="d")
 (options, args) = parser.parse_args()
 
 # 讀取設定檔 cbwork_bin.ini
@@ -1412,13 +1633,13 @@ high_word = 0
 #codecs.register_error('cbeta', my_err_handler) 	# 先登記遇到缺字時的 error handler 
 
 # 準備存取 gaiji-m.mdb
-conn = win32com.client.Dispatch(r'ADODB.Connection')
-DSN = 'PROVIDER=Microsoft.JET.OLEDB.4.0;DATA SOURCE=%s;' % gaiji
-conn.Open(DSN)
+#conn = win32com.client.Dispatch(r'ADODB.Connection')
+#DSN = 'PROVIDER=Microsoft.JET.OLEDB.4.0;DATA SOURCE=%s;' % gaiji
+#conn.Open(DSN)
 
 uni2b5 = {} 	# 宣告用來放 utf8 對應的組字式或通用字
 # 讀取缺字資料庫
-# get_gaiji_m()
+# get_gaiji_m_old()
 # 讀取純文字版的缺字資料庫 (速度較快)
 get_gaiji_txt()
 

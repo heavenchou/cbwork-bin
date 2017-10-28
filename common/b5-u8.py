@@ -2,22 +2,33 @@
 '''
 b5-u8.py
 功能: 
-	將目錄下(含子目錄)所有 big5 檔案轉為 utf-8, 
-	若遇組字式, 查 cbeta gaiji-m.mdb, 以 unicode 呈現
-	extension-b 仍然維持組字式
-使用方法:
-	Usage: b5-u8.py [options]
+	將目錄下(含子目錄)所有 big5 檔案轉為 utf-8
 
-	Options:
-	  -h, --help  查看參數說明
-	  -s SOURCE   來源資料夾
-	  -o OUTPUT   輸出資料夾
+使用方法:
+
+	b5-u8.py [參數]
+
+	參數:
+	-h 查看參數說明
+	-s 指定來源資料來
+	-o 指定輸出資料來
+
+	--roma 要處理 ~n 這種羅馬轉寫通用字
+	--nox  不處理 &#x....; 編碼
+	--nod  不處理 組字式
+	--noj  不處理【A】這種日文格式
+	--nor  不處理【U0424】這種俄文格式
+
+	預設是沒有這些 --xxx 參數，也就是會做出和參數相反的動作。
+
 	例: b5-u8.py -s d:/temp/J23 -o d:/temp/J23U8
-需求: Python 3.2, PythonWin
+
+需求: Python 3.2, PythonWin (不需要了)
 2011.6.18 改寫使用 python 3
 作者: 周邦信 2009.05.26
 
 Heaven 修改:
+2017/10/29 增加許多參數 --xxx , 控制轉換的內容, 詳見功能說明
 2017/10/28 修改缺字的讀取, 原本讀取 MS Access 資料庫改成讀純文字 csv 檔, 速度快很多
 2013/10/20 修改缺字的讀取, 由逐字查詢資料庫改成一次讀取全部資料庫
 2013/10/16 將日文拼音及 &M 碼轉成日文unicode
@@ -29,7 +40,6 @@ Heaven 修改:
 import configparser, os, codecs, re, sys, csv
 from optparse import OptionParser
 import win32com.client		# 要安裝 PythonWin
-
 
 #################################################
 # 處理日文
@@ -377,6 +387,14 @@ def trans_roma(line):
 	return line
 
 #################################################
+# 處理其他的 unicode , 例: &#x0424; => Ф
+#################################################
+def trans_uni(mo):
+	uni = mo.group(1)
+	i = int(uni, 16)
+	return '{:c}'.format(i)
+	
+#################################################
 # 處理單檔
 #################################################
 def trans_file(fn1, fn2):
@@ -384,9 +402,22 @@ def trans_file(fn1, fn2):
 	f1=codecs.open(fn1, "r", "cp950")
 	f2=codecs.open(fn2, "w", "utf-8")
 	for line in f1:
-		line=re.sub(r'\[[^>\[]*?\]', trans_des, line)	# 處理組字式 (有先讀入全部的缺字)
-		line=trans_roma(line)	# 處理羅馬轉寫字
-		line=trans_jap(line)	# 處理日文
+		if options.NoXCode != True:
+			# 處理 &#x....; 編碼
+			line=re.sub(r'&#[xX]([0-9A-Fa-f]{4,5});', trans_uni, line)
+		if options.NoDes != True:
+			# 處理組字式 (有先讀入全部的缺字)
+			line=re.sub(r'\[[^>\[]*?\]', trans_des, line)	
+		if options.Roma == True:
+			# 處理羅馬轉寫字通用字
+			line=trans_roma(line)
+		if options.NoJapan != True:
+			# 處理日文
+			line=trans_jap(line)
+		if options.NoRussia != True:
+			line = line.replace("【U0424】",'Ф')
+			line = line.replace("【U0414】",'Д')
+			line = line.replace("【U0445】",'х')
 		f2.write(line)
 	f1.close()
 	f2.close()
@@ -406,7 +437,7 @@ def trans_dir(source, dest):
 #################################################
 # 讀取全部的 組字式與 unicode
 #################################################
-def get_des2u8():
+def get_des2u8_old():
 	global des2u8
 	rs = win32com.client.Dispatch(r'ADODB.Recordset')
 	sql = "SELECT unicode, des FROM gaiji WHERE ((cb Is Not Null) AND (cb<='99999') AND (unicode Is Not Null))"
@@ -424,7 +455,7 @@ def get_des2u8():
 #################################################
 # 讀取全部的羅馬轉寫字
 #################################################
-def get_roma():
+def get_roma_old():
 	global romas
 	rs = win32com.client.Dispatch(r'ADODB.Recordset')
 	sql = "SELECT unicode, nor FROM gaiji WHERE ((cb Is Null) AND (nor Is Not Null) AND (unicode Is Not Null))"
@@ -460,9 +491,11 @@ def get_des2u8_roma():
 					if uni!=None and len(uni)>0 and des!=None and len(des)>0: 
 						des2u8[des] = chr(int(uni,16))
 			else:
+				# 羅馬轉寫字
 				if uni!=None and len(uni)>0 and nor!=None and len(nor)>0:
-					# 羅馬轉寫字
 					romas[nor] = chr(int(uni,16))
+				if uni!=None and len(uni)>0 and des!=None and len(des)>0:
+					des2u8[des] = chr(int(uni,16))
 #################################################
 # main 主程式
 #################################################
@@ -471,6 +504,11 @@ def get_des2u8_roma():
 parser = OptionParser()
 parser.add_option("-s", dest="source", help="來源資料夾")
 parser.add_option("-o", dest="output", help="輸出資料夾")
+parser.add_option("--roma", action="store_true", dest="Roma", help="要處理 ~n 這種羅馬轉寫通用字", default=False)
+parser.add_option("--nox", action="store_true", dest="NoXCode", help="不處理 &#x....; 編碼", default=False)
+parser.add_option("--nod", action="store_true", dest="NoDes", help="不處理 組字式", default=False)
+parser.add_option("--noj", action="store_true", dest="NoJapan", help="不處理【A】這種日文格式", default=False)
+parser.add_option("--nor", action="store_true", dest="NoRussia", help="不處理【U0424】這種俄文格式", default=False)
 (options, args) = parser.parse_args()
 
 # 讀取設定檔 cbwork_bin.ini
@@ -480,19 +518,18 @@ gaiji = config.get('default', 'gaiji-m.mdb_file')
 gaiji_txt = gaiji.replace('gaiji-m.mdb', "gaiji-m_u8.txt")
 
 # 準備存取 gaiji-m.mdb
-conn = win32com.client.Dispatch(r'ADODB.Connection')
-DSN = 'PROVIDER=Microsoft.Jet.OLEDB.4.0;DATA SOURCE=%s;' % gaiji
-conn.Open(DSN)
+#conn = win32com.client.Dispatch(r'ADODB.Connection')
+#DSN = 'PROVIDER=Microsoft.Jet.OLEDB.4.0;DATA SOURCE=%s;' % gaiji
+#conn.Open(DSN)
 
 # 先讀取羅馬轉寫字
 romas = {}	# 宣告用來放羅馬拼音, ex { '`o' : '00F3' }
 des2u8 = {} # 宣告用來放組字式的 utf8 文字
 
 # 讀取羅馬拼音
-# get_roma()
+# get_roma_old()
 # 讀取缺字資料庫組字式與 unicode
-# get_des2u8()
+# get_des2u8_old()
 # 讀取純文字版的缺字資料庫 (速度較快)
 get_des2u8_roma()
-
 trans_dir(options.source, options.output)
