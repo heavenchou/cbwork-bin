@@ -37,6 +37,7 @@ u8-b5.py
 2009.12.02 Ray: 從 Unicode 網站取得 Unihan.txt, 取出裏面的異寫字資訊 kCompatibilityVariant, 放在 variant
 
 Heaven 修改:
+2017/10/29 取消通用詞
 2017/10/29 取消 -n 參數, 加上 -u [dnx] 和 -r [dnx] 參數, 詳見功能說明
 2017/10/28 修改缺字的讀取, 原本讀取 MS Access 資料庫改成讀純文字 csv 檔, 速度快很多
 2013/11/06 修改缺字的讀取, 由逐字查詢資料庫改成一次讀取全部資料庫.
@@ -1376,8 +1377,8 @@ def trans_file(fn1, fn2):
 			line = line.replace('х', "【U0445】")
 
 		#處理通用詞
-		if options.unicode == "n":
-			line=normal_words(line)
+		#if options.unicode == "n":
+		#	line=normal_words(line)
 		
 		# python 3.3.1 處理 ext-b 有問題, 所以改成逐字處理, 不用 error handler 了 -- 2013/08/15
 		new = ''
