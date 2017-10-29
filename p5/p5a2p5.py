@@ -1425,18 +1425,21 @@ def handle_back(t):
 			r += '<cb:div type="ncl-notes">\n'
 			r += '<head>國家圖書館善本佛典 校註</head>\n'
 		#elif k=='Northern Yongle Edition of the Canon':
-		elif k=='Yonglebei':
-			r += '<cb:div type="yongle-notes">\n'
-			r += '<head>永樂北藏 校註</head>\n'
 		elif k=='Taisho':
 			r += '<cb:div type="taisho-notes">\n'
 			r += '<head>大正 校註</head>\n'
 		elif k=='Xuzangjing':
 			r += '<cb:div type="xuzang-notes">\n'
 			r += '<head>卍續藏 校註</head>\n'
+		elif k=='Yonglebei':
+			r += '<cb:div type="yongle-notes">\n'
+			r += '<head>永樂北藏 校註</head>\n'
 		elif k=='ZangWai':
 			r += '<cb:div type="zangwai-notes">\n'
 			r += '<head>方廣錩 校註</head>\n'
+		elif k=='釋印順':
+			r += '<cb:div type="yinshun-notes">\n'
+			r += '<head>印順法師 校註</head>\n'
 		elif k=='equivalent':
 			r += '<cb:div type="equiv-notes">\n'
 			r += '<head>相對應巴利文書名</head>\n'
