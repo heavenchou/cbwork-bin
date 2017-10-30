@@ -109,6 +109,8 @@ sub load_xml_note
 			my $id = $1;
 			if($type eq "add") {$id .= "A";}
 
+			$note =~ s/<.*?>//g;	# 移除標記
+
 			$xml_note{$id} = $note;
 		}
 	}
