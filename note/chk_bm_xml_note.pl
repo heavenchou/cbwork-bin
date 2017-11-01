@@ -47,7 +47,7 @@ sub load_bm_note
 		#p0018
   		#A01 《成唯識論述記》卷9(CBETA, T43, no. 1830, p. 548, b23)
 
-		if(/^p(\d{4})/)
+		if(/^p(.\d{3})/)
 		{
 			$page = $1;
 		}
