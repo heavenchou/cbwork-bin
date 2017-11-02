@@ -3,6 +3,7 @@
 2013.1.4 周邦信 改寫自 cbp4top5.py
 
 Heaven 修改:
+2017/11/03 處理特例字 ȧ , 雖然是 unicode 3.0 , 但直接呈現
 2016/12/04 支援印順法師佛學著作集新增的 : 規範字詞 <choice cb:type="規範字詞">, 行首頁碼有英文字母 _pa001
 2016/11/01 將藏外佛教文獻的藏經代碼 W 改成 ZW , 正史佛教資料類編的 H 改成 ZS
 2016/08/02 原本【？】有特殊意義, 要轉成 type="variantRemark" , 現在不用了, 【？】當成是版本不明的版本.
@@ -427,10 +428,13 @@ class MyTransformer():
 			# if code>0xffff or (code>=0x3400 and code<=0x4DFF) or (code>=0x2E80 and code<=0x2EF3):
 			# if get_unicode_ver(code) != "1.0" and get_unicode_ver(code) != "1.1" and get_unicode_ver(code) != "" :
 			if get_unicode_ver(code) > "2.0" :
-				hex = '{:X}'.format(code)
-				cb = unicode2cb[hex]
-				r += '<g ref="#{}">{}</g>'.format(cb, c)
-				self.gaijis.add(cb)
+				if(code == 0x227):	# 特例 ȧ
+					r += c
+				else:
+					hex = '{:X}'.format(code)
+					cb = unicode2cb[hex]
+					r += '<g ref="#{}">{}</g>'.format(cb, c)
+					self.gaijis.add(cb)
 			else:
 				r += c
 		return r
