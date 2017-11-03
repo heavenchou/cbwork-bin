@@ -7,6 +7,8 @@
 #      perl chk_bm_xml_note.pl c:\cbwork\bm\T\T01 c:\cbwork\p5\T\T01
 ######################################################################################
 
+use lib "..";
+use CBETA;
 use utf8;
 use autodie;
 use strict;
@@ -26,6 +28,9 @@ my $logfile = "chk_bm_xml_note_log.txt";
 #########################################################
 # 主程式
 #########################################################
+
+my $gaiji = new Gaiji();
+$gaiji->load_access_db();
 
 load_bm_note();		# 載入 BM 校註
 load_xmls_note();	# 載入 XML 校註
@@ -109,6 +114,8 @@ sub load_xml_note
 			my $id = $1;
 			if($type eq "add") {$id .= "A";}
 
+			# 把缺字換成組字式 <g ref="#CB04974">󱍮</g>
+			$note =~ s/<g ref="#CB(.{5})">.*?<\/g>/$gaiji->cb2des("$1")/eg;
 			$note =~ s/<.*?>//g;	# 移除標記
 
 			$xml_note{$id} = $note;

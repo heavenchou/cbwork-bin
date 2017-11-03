@@ -11,7 +11,9 @@ use Encode;
 
 缺字物件的說明
 
-宣告 : $gaiji = new Gaiji();
+宣告 :  
+	use CBETA;
+	$gaiji = new Gaiji();
 
 使用法 :
 
