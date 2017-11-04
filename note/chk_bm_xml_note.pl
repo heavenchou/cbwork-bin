@@ -115,7 +115,7 @@ sub load_xml_note
 			if($type eq "add") {$id .= "A";}
 
 			# 把缺字換成組字式 <g ref="#CB04974">󱍮</g>
-			$note =~ s/<g ref="#CB(.{5})">.*?<\/g>/$gaiji->cb2des("$1")/eg;
+			$note =~ s/<g ref="#CB(.{5})">.*?<\/g>/$gaiji->cb2uniword("$1")||$gaiji->cb2des("$1")/eg;
 			$note =~ s/<.*?>//g;	# 移除標記
 
 			$xml_note{$id} = $note;
