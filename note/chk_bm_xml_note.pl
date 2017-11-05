@@ -61,14 +61,16 @@ sub load_bm_note
 			# 新增校註
 			# 01 《成唯識論述記》卷9(CBETA, T43, no. 1830, p. 548, b23)
 			# A01 《成唯識論述記》卷9(CBETA, T43, no. 1830, p. 548, b23)
-			if(/^\s*(A?)(\d{2,3})\s*(.*)/)
+			if(/^\s*(A?)(\d{2,3})(\-\d+)?\s*(.*)/)
 			{
-				my $id = $2 . $1;
-				my $note = $3;
+				my $a = $1;
+				my $id = $2;
+				my $id2 = $3;
+				my $note = $4;
 
-				$id =~ s/^(\d\dA?)$/0$1/;
+				$id =~ s/^(\d\d)$/0$1/;
 
-				$bm_note{$page . $id} = $note;
+				$bm_note{$a . $page . $id . $id2} = $note;
 			}
 		}
 	}
@@ -104,7 +106,7 @@ sub load_xml_note
 		#<note n="0239001" ... type="add"...>.........</note>
 		#<note n="0239001" ... type="orig"...>.........</note>
 
-		if(/^(<note[^>]*type="((?:add)|(?:orig))"[^>]*>)(.*?)<\/note>/)
+		if(/^(<note[^>]*type="((?:add)|(?:orig))"[^>]*>)(.*)<\/note>/)
 		{
 			my $tag = $1;
 			my $type = $2;
@@ -112,7 +114,12 @@ sub load_xml_note
 
 			$tag =~ /n="(.*?)"/;
 			my $id = $1;
-			if($type eq "add") {$id .= "A";}
+			if($type eq "add") {$id = "A" . $id;}
+
+			# 處理修訂文字 
+			# <choice cb:resp="正聞出版社"><corr>二九</corr><sic>二八</sic></choice>
+			$note =~ s/<choice[^>]*><corr>(.*?)<\/corr><sic>(.*?)<\/sic><\/choice>/[$2>$1]/g;
+			$note =~ s/<choice[^>]*><sic>(.*?)<\/sic><corr>(.*?)<\/corr><\/choice>/[$1>$2]/g;
 
 			# 把缺字換成組字式 <g ref="#CB04974">󱍮</g>
 			$note =~ s/<g ref="#CB(.{5})">.*?<\/g>/$gaiji->cb2uniword("$1")||$gaiji->cb2des("$1")/eg;
