@@ -125,6 +125,11 @@ sub load_xml_note
 			$note =~ s/<choice[^>]*><corr>(.*?)<\/corr><sic>(.*?)<\/sic><\/choice>/[$2>$1]/g;
 			$note =~ s/<choice[^>]*><sic>(.*?)<\/sic><corr>(.*?)<\/corr><\/choice>/[$1>$2]/g;
 
+			# 處理規範文字
+			# <choice cb:type="規範字詞"><orig>同[1]</orig><reg>....</reg></choice>
+			$note =~ s/<choice[^>]*><orig>(.*?)<\/orig><reg>(.*?)<\/reg><\/choice>/[$1=$2]/g;
+			$note =~ s/<choice[^>]*><reg>(.*?)<\/reg><orig>(.*?)<\/orig><\/choice>/[$2=$1]/g;
+			
 			# 把缺字換成組字式 <g ref="#CB04974">󱍮</g>
 			$note =~ s/<g ref="#CB(.{5})">.*?<\/g>/$gaiji->cb2uniword("$1")||$gaiji->cb2des("$1")/eg;
 			$note =~ s/<.*?>//g;	# 移除標記
