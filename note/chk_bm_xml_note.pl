@@ -119,6 +119,8 @@ sub load_xml_note
 
 			# 處理 <corr> 裡面的 <note type="cf1">...</note>
 			$note =~ s/<note[^>]*?type="cf\d"[^>]*?>.*?<\/note>//g;
+			# 處理雙行小註 <note place="inline">...</note>
+			$note =~ s/<note[^>]*?place="inline"[^>]*?>(.*?)<\/note>/\($1\)/g;
 
 			# 處理修訂文字 
 			# <choice cb:resp="正聞出版社"><corr>二九</corr><sic>二八</sic></choice>
