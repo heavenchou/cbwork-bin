@@ -116,6 +116,10 @@ sub load_xml_note
 			my $id = $1;
 			if($type eq "add") {$id = "A" . $id;}
 
+
+			# 處理 <corr> 裡面的 <note type="cf1">...</note>
+			$note =~ s/<note[^>]*?type="cf\d"[^>]*?>.*?<\/note>//g;
+
 			# 處理修訂文字 
 			# <choice cb:resp="正聞出版社"><corr>二九</corr><sic>二八</sic></choice>
 			$note =~ s/<choice[^>]*><corr>(.*?)<\/corr><sic>(.*?)<\/sic><\/choice>/[$2>$1]/g;
