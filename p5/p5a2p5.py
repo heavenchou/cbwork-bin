@@ -3,6 +3,7 @@
 2013.1.4 周邦信 改寫自 cbp4top5.py
 
 Heaven 修改:
+2017/11/08 增加缺字版本判斷, 並將預設缺字資料庫由 MS Access 改為 CVS 檔
 2017/11/03 處理特例字 ȧ , 雖然是 unicode 3.0 , 但直接呈現
 2016/12/04 支援印順法師佛學著作集新增的 : 規範字詞 <choice cb:type="規範字詞">, 行首頁碼有英文字母 _pa001
 2016/11/01 將藏外佛教文獻的藏經代碼 W 改成 ZW , 正史佛教資料類編的 H 改成 ZS
@@ -192,6 +193,10 @@ def get_unicode_ver(uni):
 	if(uni >= 0x1E9C and uni <= 0x1E9F) :	return "5.1"     #1E9C～1E9F： (Unicode 5.1)
 	if(uni >= 0x1EA0 and uni <= 0x1EF9) :	return "1.1"     #1EA0～1EF9： (Unicode 1.1)
 	if(uni >= 0x1EFA and uni <= 0x1EFF) :	return "5.1"     #1EFA～1EFF： (Unicode 5.1)
+	if(uni >= 0x2000 and uni <= 0x202E) :	return "1.0"     #2000～202E： (Unicode 1.0)
+	if(uni >= 0x2045 and uni <= 0x2046) :	return "1.1"     #2045～2046： (Unicode 1.1)
+	if(uni == 0x2047) :						return "3.2"     #2047： (Unicode 3.2)
+	if(uni >= 0x2048 and uni <= 0x204F) :	return "3.0"     #2048～204F： (Unicode 3.0)
 	if(uni >= 0x2100 and uni <= 0x2138) :	return "1.0"     #2100～2138： (Unicode 1.0)
 	if(uni >= 0x2153 and uni <= 0x2182) :	return "1.0"     #2153～2182： (Unicode 1.0)
 	if(uni >= 0x2190 and uni <= 0x21EA) :	return "1.0"     #2190～21EA： (Unicode 1.0)
@@ -1086,7 +1091,11 @@ class MyTransformer():
 					# if get_unicode_ver(this_code) == "1.0" or get_unicode_ver(this_code) == "1.1"  or get_unicode_ver(this_code) == "" :
 					if get_unicode_ver(this_code) <= "2.0" :
 						r = chr(this_code)
-						return r
+					else:
+						self.gaijis.add(cb)
+						node = MyNode(e)
+						r = node.open_tag() + chr(this_code) + node.end_tag()
+					return r
 			self.gaijis.add(cb)
 			node = MyNode(e)
 			r = node.open_tag() + chr(cb2pua(cb)) + node.end_tag()
@@ -1704,9 +1713,9 @@ def read_all_gaijis_by_mdb():
 # 讀取 命令列參數
 parser = OptionParser()
 parser.add_option('-c', dest='collection', help='collections (e.g. TXJ...)')
-parser.add_option('-s', dest='vol_start', help='start volumn (e.g. x55)')
-parser.add_option('-v', dest='volumn', help='volumn (e.g. x55)')
-parser.add_option('-g', dest='gaiji_txt', help='use gaiji-m_u8.txt e.g. -g txt (default use gaiji-m.mdb)')
+parser.add_option('-s', dest='vol_start', help='start volumn (e.g. X55)')
+parser.add_option('-v', dest='volumn', help='volumn (e.g. X55)')
+#parser.add_option('-g', dest='gaiji_txt', help='use gaiji-m_u8.txt e.g. -g txt (default use gaiji-m.mdb)')
 (options, args) = parser.parse_args()
 
 if options.collection is not None:
@@ -1726,21 +1735,24 @@ IN_P5a = cbwork_dir + '/xml-p5a' 		# XML P5a 來源資料夾
 
 PHASE1DIR = CBTEMP + '/cbetap5-tmp1'	# 暫存資料夾
 OUT_P5 = CBTEMP + '/cbetap5-ok'			# 最後結果
-GAIJI = cbwork_dir + '/bin/gaiji-m_u8.txt'
+#GAIJI = cbwork_dir + '/bin/gaiji-m_u8.txt'
+GAIJI = gaijiMdb.replace('gaiji-m.mdb', "gaiji-m_u8.txt")
 RNC = cbwork_dir + '/xml-p5/schema/cbeta-p5.rnc'
 
 globals={}
 unicode2cb = {}
 
 # 準備存取 gaiji-m.mdb
-conn = win32com.client.Dispatch(r'ADODB.Connection')
-DSN = 'PROVIDER=Microsoft.Jet.OLEDB.4.0;DATA SOURCE=%s;' % gaijiMdb
-conn.Open(DSN)
+#conn = win32com.client.Dispatch(r'ADODB.Connection')
+#DSN = 'PROVIDER=Microsoft.Jet.OLEDB.4.0;DATA SOURCE=%s;' % gaijiMdb
+#conn.Open(DSN)
 
-if options.gaiji_txt is not None:
-	all_gaijis=read_all_gaijis()	# 開啟 cvs 的資料庫
-else:
-	all_gaijis=read_all_gaijis_by_mdb()	# 開啟 MS Access 的 mdb 資料庫, 不過很慢
+#if options.gaiji_txt is not None:
+#	all_gaijis=read_all_gaijis()	# 開啟 cvs 的資料庫
+#else:
+#	all_gaijis=read_all_gaijis_by_mdb()	# 開啟 MS Access 的 mdb 資料庫, 不過很慢
+
+all_gaijis=read_all_gaijis()	# 預設改為直接開啟 cvs 的資料庫
 
 log=open('p5a2p5.log', 'w', encoding='utf8')
 log.write(now()+'\n')
