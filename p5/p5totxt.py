@@ -7,6 +7,7 @@
 Ray CHOU 周邦信 2011.6.11
 
 Heaven 修改:
+2017/11/07 支援 [xx-1] 這種同一頁有相同數字的校註 及 [A01] 這種新增校註
 2016/12/04 支援印順法師佛學著作集新增的 : 規範字詞 <choice cb:type="規範字詞">, 行首頁碼有英文字母 _pa001
 2016/11/01 將藏外佛教文獻的藏經代碼 W 改成 ZW , 正史佛教資料類編的 H 改成 ZS
 2016/05/15 呈現新的格式的 CBETA 校註. ex. B35n0195.xml => <anchor xml:id="nkr_note_editor_0836001" n="0836001"/>
@@ -119,8 +120,9 @@ def getJKMark(e):
 	if not id.startswith('nkr_note_orig') and not id.startswith('nkr_note_editor') and not id.startswith('nkr_note_add'): return ''	
 	
 	jk = id
-	jk = re.sub("\-n?\d{1,3}$", r"", jk)				# B06n0003.xml : <anchor xml:id="nkr_note_orig_0004003-n01" n="0004003-n01"/>
-	jk = jk[-3:]
+	jk = re.sub("\-n\d{1,3}$", r"", jk)				# B06n0003.xml : <anchor xml:id="nkr_note_orig_0004003-n01" n="0004003-n01"/>
+	# jk = jk[-3:]
+	jk = re.sub(".*(.\d\d-?\d*)$", r"\g<1>", jk)
 	jk = re.sub("0(\d\d)", r"\g<1>", jk)		# 如果有三個數字且<100 , 第一個 0 移除
 	
 	# 處理 kbj => 【科】 【標】 【解】
@@ -129,6 +131,8 @@ def getJKMark(e):
 	elif jk[0] == 'j': jk = '【解' + jk[1:] + '】'
 	else:
 		jk = re.sub("\D(\d\d)", r"\g<1>", jk)		# 如果前面不是數字則移除
+		if id.startswith('nkr_note_add'):
+			jk = 'A' + jk
 		jk = '[' + jk + ']'
 	return jk
 
