@@ -3146,7 +3146,7 @@ sub select_normal_words
 {
 	local $_ = shift;
 	
-	my $loseutf8 = '(?:[^\[\]=; ])';	# 忽略 ; [ ] 及空格, 避免換 [No. 297; cf. 293(Fasc. 40)]
+	my $loseutf8 = '(?:[^\[\]=])';	# 忽略 ; [ ] 及空格, 避免換 [No. 297; cf. 293(Fasc. 40)] . 後來改成 = 之後, 允許 ; 及空格了
 	
 	s/\[($loseutf8+?)\]/:1az1:$1:2az2:/g;
 	#if($no_normal == 0)		# 要換成通用詞
