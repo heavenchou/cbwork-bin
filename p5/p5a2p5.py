@@ -1582,10 +1582,10 @@ def phase2(vol,p):
 	fi.close()
 	
 	# 把 <lg> 下面的文字, 移到第一個 <l> 裏
-	s=re.sub(r'(<lg[^>]*?>(?:<head.*?</head>)?(?:<note.*?</note>)?(?:<cb:tt[^>]*?>)?(?:<cb:t[^>]*?>)?)(.*?)(<l[^>]*?>)', r'\1\3\2', s) 
+	s=re.sub(r'(<lg[^>]*?>(?:<head.*?</head>)?(?:<note.*?</note>)?(?:<note.*?</note>)?(?:<app[^>]*?>)?(?:<lem[^>]*?>)?(?:<cb:tt[^>]*?>)?(?:<cb:t[^>]*?>)?)(.*?)((?:<l [^>]*?>)|(?:<l>))', r'\1\3\2', s) 
 	
 	#s=re.sub(r'(<lg[^>]*?>(?:<head.*?</head>)?)(<l[^>]*?>「)((?:<anchor[^>]*?/>)+)', r'\1\3\2', s)
-	s=re.sub(r'(<lg[^>]*?>(?:<head.*?</head>)?(?:<note.*?</note>)?(?:<cb:tt[^>]*?>)?(?:<cb:t[^>]*?>)?)(.*?)(</lg>)', repl_lg, s, flags=re.DOTALL)
+	s=re.sub(r'(<lg[^>]*?>(?:<head.*?</head>)?(?:<note.*?</note>)?(?:<note.*?</note>)?(?:<app[^>]*?>)?(?:<lem[^>]*?>)?(?:<cb:tt[^>]*?>)?(?:<cb:t[^>]*?>)?)(.*?)(</lg>)', repl_lg, s, flags=re.DOTALL)
 	
 	# 把 <anchor> 前後多餘的換行去掉
 	s=re.sub(r'\n+(<anchor )', r'\1', s)
@@ -1794,7 +1794,7 @@ cbwork_dir = config.get('default', 'cbwork')
 JING = config.get('default', 'jing.jar_file')
 gaijiMdb = config.get('default', 'gaiji-m.mdb_file')
 
-IN_P5a = cbwork_dir + '/xml-p5aa' 		# XML P5a 來源資料夾
+IN_P5a = cbwork_dir + '/xml-p5a' 		# XML P5a 來源資料夾
 if options.P5b_Format == True:
 	PHASE1DIR = CBTEMP + '/cbetap5b-tmp1'	# 暫存資料夾
 	OUT_P5 = CBTEMP + '/cbetap5b-ok'			# 最後結果   
