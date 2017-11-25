@@ -3,9 +3,14 @@
 2013.1.4 周邦信 改寫自 cbp4top5.py
 
 Heaven 修改:
+2017/11/25 增加 -b 參數, 產生 CBReader 專用的 P5b 格式, 特點為:
+           1. 沒有 <back> 區, 校勘等資料都和 p5a 一樣, 不做任何移動.
+		   2. 缺字是單一標記 <g xxx/> , 沒有包含任何文字, 因為 Mac 版不接受有 Ext-B 的 XML.
+           3. 驗證規則和 P5a 一樣.
 2017/11/08 增加缺字版本判斷, 並將預設缺字資料庫由 MS Access 改為 CVS 檔
 2017/11/03 處理特例字 ȧ , 雖然是 unicode 3.0 , 但直接呈現
-2016/12/04 支援印順法師佛學著作集新增的 : 規範字詞 <choice cb:type="規範字詞">, 行首頁碼有英文字母 _pa001
+2016/12/04 支援印順法師佛學著作集新增的 : 規範字詞 <choice cb:type="規範字詞">, 
+           行首頁碼有英文字母 _pa001
 2016/11/01 將藏外佛教文獻的藏經代碼 W 改成 ZW , 正史佛教資料類編的 H 改成 ZS
 2016/08/02 原本【？】有特殊意義, 要轉成 type="variantRemark" , 現在不用了, 【？】當成是版本不明的版本.
 2016/05/20 P5a 轉 P5 的標準由 unicode 1.1 改為 2.0 , 因為韓文是 2.0
@@ -438,7 +443,11 @@ class MyTransformer():
 				else:
 					hex = '{:X}'.format(code)
 					cb = unicode2cb[hex]
-					r += '<g ref="#{}">{}</g>'.format(cb, c)
+					if options.P5b_Format == True:
+						# P5b 版不可以有 unicode 太高的字, 以免 Mac 版 CBR 無法處理
+						r += '<g ref="#{}"/>'.format(cb)
+					else:
+						r += '<g ref="#{}">{}</g>'.format(cb, c)
 					self.gaijis.add(cb)
 			else:
 				r += c
@@ -453,7 +462,7 @@ class MyTransformer():
 		tag=e.tag
 		r += self.handle_text(e.text, mode)
 		for n in e.iterchildren(): 
-			r+=self.handle_node(n, mode)
+			r += self.handle_node(n, mode)
 			r += self.handle_text(n.tail, mode)
 		self.counter['traverse'] -= 1
 		return r
@@ -547,6 +556,13 @@ class MyTransformer():
 		
 	def handle_note(self, e, mode):
 		r=''
+
+		# P5b 不把 note 放在 back 區了
+		if options.P5b_Format == True:
+			node=MyNode(e)
+			r = node.open_tag() + self.traverse(e, mode) + node.end_tag()
+			return r
+		
 		type = e.get('type', '')
 		n=e.get('n')
 		resp=e.get('resp', '')
@@ -720,6 +736,13 @@ class MyTransformer():
 	def handle_app(self, e, mode):
 		self.write_log('handle_app mode:' + str(mode) + ', n:' + e.get('n', ''))
 		r=''
+		
+		# P5b 不把 app 放在 back 區了
+		if options.P5b_Format == True:
+			node=MyNode(e)
+			r = node.open_tag() + self.traverse(e, mode) + node.end_tag()
+			return r
+
 		type=e.get('type')
 		if 'body' in mode:
 			n=e.get('n')
@@ -730,7 +753,7 @@ class MyTransformer():
 				print(node.open_tag())
 				sys.exit()
 			elif n is not None:
-				r=self. handle_app_nor(e, mode)
+				r = self. handle_app_nor(e, mode)
 			else:
 				r = self.handle_app_cb(e, mode)
 		elif 'back' in mode:
@@ -753,6 +776,12 @@ class MyTransformer():
 		return r
 		
 	def handle_choice(self, e, mode):
+    	# P5b 不把 choice 放在 back 區了
+		if options.P5b_Format == True:
+			node=MyNode(e)
+			r = node.open_tag() + self.traverse(e, mode) + node.end_tag()
+			return r
+		
 		if 'body' in mode:
 			id = self.new_anchor_id()
 			r = '<anchor xml:id="beg_{}" type="cb-app"/>'.format(id)
@@ -789,6 +818,11 @@ class MyTransformer():
 	def handle_lem(self, e, mode):
 		self.write_log('handle_lem mode:' + str(mode))
 		r = ''
+		# P5b 不把 lem 放在 back 區了
+		if options.P5b_Format == True:
+			node=MyNode(e)
+			r = node.open_tag() + self.traverse(e, mode) + node.end_tag()
+			return r
 		if 'choice' in mode:
 			node = MyNode()
 			node.tag = 'corr'
@@ -805,6 +839,11 @@ class MyTransformer():
 	def handle_rdg(self, e, mode):
 		self.write_log('handle_rdg mode:' + str(mode) + ', wit:' + e.get('wit', ''))
 		r = ''
+		# P5b 不把 rdg 放在 back 區了
+		if options.P5b_Format == True:
+			node=MyNode(e)
+			r = node.open_tag() + self.traverse(e, mode) + node.end_tag()
+			return r
 		if 'choice' in mode:
 			if 'back' in mode:
 				node = MyNode()
@@ -833,6 +872,11 @@ class MyTransformer():
 		
 	def handle_tt(self, e, mode):
 		r = ''
+		# P5b 不把 tt 放在 back 區了
+		if options.P5b_Format == True:
+			node=MyNode(e)
+			r = node.open_tag() + self.traverse(e, mode) + node.end_tag()
+			return r
 		if 'body' in mode:
 			type=e.get('type', '')
 			if type=='app':
@@ -952,6 +996,11 @@ class MyTransformer():
 		return r
 		
 	def handle_sic(self, e, mode):
+    	# P5b 不把 choice 放在 back 區了
+		if options.P5b_Format == True:
+			node=MyNode(e)
+			r = node.open_tag() + self.traverse(e, mode) + node.end_tag()
+			return r
 		if not 'back' in mode:
 			return ''
 		node = MyNode(e)
@@ -1094,11 +1143,17 @@ class MyTransformer():
 					else:
 						self.gaijis.add(cb)
 						node = MyNode(e)
-						r = node.open_tag() + chr(this_code) + node.end_tag()
+						if options.P5b_Format == True:
+							r = node.open_tag()
+						else:
+							r = node.open_tag() + chr(this_code) + node.end_tag()
 					return r
 			self.gaijis.add(cb)
 			node = MyNode(e)
-			r = node.open_tag() + chr(cb2pua(cb)) + node.end_tag()
+			if options.P5b_Format == True:
+				r = node.open_tag()
+			else:
+				r = node.open_tag() + chr(cb2pua(cb)) + node.end_tag()
 		elif tag=='graphic':
 			node=MyNode(e)
 			r = node.open_tag() + self.traverse(e, mode) + node.end_tag()
@@ -1248,6 +1303,11 @@ class MyTransformer():
 			r = '<formula rend="vertical-align:super">'
 			r += self.traverse(e, mode) + '</formula>'
 		elif tag=='t':
+    		# P5b 不把 t 放在 back 區了
+			if options.P5b_Format == True:
+				node=MyNode(e)
+				r = node.open_tag() + self.traverse(e, mode) + node.end_tag()
+				return r
 			tt = e.getparent()
 			tt_type = tt.get('type')
 			if 'body' in mode:
@@ -1272,7 +1332,9 @@ class MyTransformer():
 		elif tag=='text':
 			node = MyNode(e)
 			r += node.open_tag() + self.traverse(e, mode)
-			r += handle_back(self)
+			if options.P5b_Format == False:
+    			# p5b 不用處理 back
+				r += handle_back(self)
 			r += node.end_tag()
 		elif tag=='todo':
 			r = '<!--CBETA todo type: {}-->'.format(e.get('type'))
@@ -1303,8 +1365,8 @@ class MyNode():
 			self.tag = ''
 			self.attrib = collections.OrderedDict()
 		else:
-			self.tag=e.tag
-			self.attrib=collections.OrderedDict(e.attrib)
+			self.tag = e.tag
+			self.attrib = collections.OrderedDict(e.attrib)
 			
 	def open_tag(self):
 		# 要歸入 cbeta namespace 的元素
@@ -1520,10 +1582,10 @@ def phase2(vol,p):
 	fi.close()
 	
 	# 把 <lg> 下面的文字, 移到第一個 <l> 裏
-	s=re.sub(r'(<lg[^>]*?>(?:<head.*?</head>)?)(.*?)(<l[^>]*?>)', r'\1\3\2', s) 
+	s=re.sub(r'(<lg[^>]*?>(?:<head.*?</head>)?(?:<note.*?</note>)?(?:<cb:tt[^>]*?>)?(?:<cb:t[^>]*?>)?)(.*?)(<l[^>]*?>)', r'\1\3\2', s) 
 	
 	#s=re.sub(r'(<lg[^>]*?>(?:<head.*?</head>)?)(<l[^>]*?>「)((?:<anchor[^>]*?/>)+)', r'\1\3\2', s)
-	s=re.sub(r'(<lg[^>]*?>(?:<head.*?</head>)?)(.*?)(</lg>)', repl_lg, s, flags=re.DOTALL)
+	s=re.sub(r'(<lg[^>]*?>(?:<head.*?</head>)?(?:<note.*?</note>)?(?:<cb:tt[^>]*?>)?(?:<cb:t[^>]*?>)?)(.*?)(</lg>)', repl_lg, s, flags=re.DOTALL)
 	
 	# 把 <anchor> 前後多餘的換行去掉
 	s=re.sub(r'\n+(<anchor )', r'\1', s)
@@ -1715,6 +1777,7 @@ parser = OptionParser()
 parser.add_option('-c', dest='collection', help='collections (e.g. TXJ...)')
 parser.add_option('-s', dest='vol_start', help='start volumn (e.g. X55)')
 parser.add_option('-v', dest='volumn', help='volumn (e.g. X55)')
+parser.add_option("-b", action="store_true", dest="P5b_Format", default=False, help="轉成 P5b 格式 (CBReader 專用)")
 #parser.add_option('-g', dest='gaiji_txt', help='use gaiji-m_u8.txt e.g. -g txt (default use gaiji-m.mdb)')
 (options, args) = parser.parse_args()
 
@@ -1731,13 +1794,21 @@ cbwork_dir = config.get('default', 'cbwork')
 JING = config.get('default', 'jing.jar_file')
 gaijiMdb = config.get('default', 'gaiji-m.mdb_file')
 
-IN_P5a = cbwork_dir + '/xml-p5a' 		# XML P5a 來源資料夾
+IN_P5a = cbwork_dir + '/xml-p5aa' 		# XML P5a 來源資料夾
+if options.P5b_Format == True:
+	PHASE1DIR = CBTEMP + '/cbetap5b-tmp1'	# 暫存資料夾
+	OUT_P5 = CBTEMP + '/cbetap5b-ok'			# 最後結果   
+	EMPTY.append("g");					# P5b 缺字不能有內容, 完全靠屬性處理
+else:
+	PHASE1DIR = CBTEMP + '/cbetap5-tmp1'	# 暫存資料夾
+	OUT_P5 = CBTEMP + '/cbetap5-ok'			# 最後結果
 
-PHASE1DIR = CBTEMP + '/cbetap5-tmp1'	# 暫存資料夾
-OUT_P5 = CBTEMP + '/cbetap5-ok'			# 最後結果
 #GAIJI = cbwork_dir + '/bin/gaiji-m_u8.txt'
 GAIJI = gaijiMdb.replace('gaiji-m.mdb', "gaiji-m_u8.txt")
-RNC = cbwork_dir + '/xml-p5/schema/cbeta-p5.rnc'
+if options.P5b_Format == True:
+	RNC = cbwork_dir + '/xml-p5a/schema/cbeta-p5a.rnc'
+else:
+	RNC = cbwork_dir + '/xml-p5/schema/cbeta-p5.rnc'
 
 globals={}
 unicode2cb = {}
