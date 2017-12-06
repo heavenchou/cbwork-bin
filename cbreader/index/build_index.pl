@@ -627,7 +627,7 @@ sub build_last_index
 	binmode LASTINDEX;
 	
 	my $file_count_bit;
-	$file_count_bit = int ($#head_index + 1) / 32;
+	$file_count_bit = int (($#head_index + 1) / 32);
 	$file_count_bit++ if(($#head_index + 1) % 32);
 
 	@sort_word = sort(keys(%word_index));
