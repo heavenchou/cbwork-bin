@@ -627,9 +627,9 @@ sub build_last_index
 	binmode LASTINDEX;
 	
 	my $file_count_bit;
-	$file_count_bit = int $#head_index / 32;
-	$file_count_bit++ if($#head_index % 32);
-	
+	$file_count_bit = int ($#head_index + 1) / 32;
+	$file_count_bit++ if(($#head_index + 1) % 32);
+
 	@sort_word = sort(keys(%word_index));
 	$total_word_use = $#sort_word + 1;
 	print "\n經文總字數 : $total_word_count , 經文使用字數 : $total_word_use 字\n";
