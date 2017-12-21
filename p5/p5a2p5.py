@@ -354,6 +354,9 @@ def read_all_resp(root):
 def handle_resp(resp):
 	# 將 resp="【甲】【乙】" 這一類的格式插入空格, 【甲】與【乙】才能分離出來 --2013/07/29
 	resp = resp.replace(u'】【','】 【')
+    # P5b 不用轉成 #resp 代碼, 直接傳回
+	if options.P5b_Format == True:
+		return resp
 	resps = resp.split()
 	result = []
 	for r in resps:
@@ -376,6 +379,10 @@ def read_all_wit(root):
 
 def handle_wit(wit):
 	global wit_id
+	# P5b 不用轉成 #wit 代碼, 直接傳回
+	if options.P5b_Format == True:
+		wit = wit.replace(u'】【','】 【')
+		return wit
 	wits = re.findall('【.*?】', wit)
 	if len(wits)==0:
 		sys.exit('error 91: ' + wit)
@@ -1546,8 +1553,10 @@ def phase1(vol,path):
 <TEI xmlns="http://www.tei-c.org/ns/1.0" xmlns:cb="http://www.cbeta.org/ns/1.0" xml:id="{}">'''.format(file_id)
 
 	t=MyTransformer(path)
-	read_all_resp(t.root)
-	read_all_wit(t.root)
+	# P5b 不用轉成 #wit #resp 代碼
+	if options.P5b_Format == False:
+		read_all_resp(t.root)
+		read_all_wit(t.root)
 	text += t.traverse(t.root, mode=set(['body']))	# mode = body , 表示處理的都在 body 區, 若遇到校勘, mode 換成 back , 表示接下來的資料都是在 back 區的
 	text += '</TEI>'
 	
