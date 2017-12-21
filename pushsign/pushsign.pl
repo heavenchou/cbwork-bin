@@ -6,6 +6,7 @@
 # pushsign.pl 簡單標記版.txt 舊的xml.xml 結果檔xml.xml > 記錄檔.txt
 #
 ########################################################
+# 2017/12/22 : 處理 1.</t> 忘了改成 </cb:t> 2.<g> 可能會對應 Unicode , 不一定是組字式
 # 2017/05/29 : 處理有 </L> 沒有接著 <P> 的情況
 # 2017/05/27 : 將 </p> 等行首的結束標記移到前一行 (沒有全部, 只有指定的結束標記)
 # 2017/05/27 : 支援 <I><P> 和 </L><P> 標記
@@ -697,10 +698,10 @@ sub get_word2
 	    
 	    # 過濾 <t lang="san" resp="Taisho" place="foot">D&imacron;rgha-&amacron;gama</t>
 	    #if($lines2[$index2] =~ /^<t[^>]*lang="(?:(?:san)|(?:pli)|(?:unknown))"[^>]*>.*?<\/t>/)			
-	    if($lines2[$index2] =~ /^<cb:t[^>]*place="foot"[^>]*>.*?<\/t>/)	
+	    if($lines2[$index2] =~ /^<cb:t[^>]*place="foot"[^>]*>.*?<\/cb:t>/)	
 	    {
             # $lines2[$index2] =~ s/^(<t[^>]*lang="(?:(?:san)|(?:pli)|(?:unknown))"[^>]*>.*?<\/t>)//;
-            $lines2[$index2] =~ s/^(<cb:t[^>]*place="foot"[^>]*>.*?<\/t>)//;
+            $lines2[$index2] =~ s/^(<cb:t[^>]*place="foot"[^>]*>.*?<\/cb:t>)//;
 			$tagbuff .= $1;
 			next;
 	    }
@@ -1051,7 +1052,10 @@ sub check_2_word
 	{
 		return 1;
 	}	
-	
+	if($word2 =~ /<g ref="#CB\d{5}"\/>/ and $word1 =~ /./)	# BM 可能是unicode
+	{
+		return 1;
+	}
 	if($word2 =~ /&unrec;/ and $word1 =~ /□/)		# 模糊字
 	{
 		return 1;
