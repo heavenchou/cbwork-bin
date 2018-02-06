@@ -12,9 +12,10 @@
 #
 # 設定檔：相關設定由 ../cbwork_bin.ini 取得
 #
-# Copyright (C) 1998-2017 CBETA
-# Copyright (C) 1999-2017 Heaven Chou
+# Copyright (C) 1998-2018 CBETA
+# Copyright (C) 1999-2018 Heaven Chou
 ########################################################################
+# 2018/02/07 V11.3 處理大藏經補編不連續卷
 # 2017/11/07 V11.2 處理 ȧ 這個特殊字, 雖然大於 unicode 2.0 , 但要直接呈現
 # 2017/06/19 V11.1 移除全型英文字母行中標記，新增 <M><R><W> 三個標記
 ##########################################################
@@ -693,6 +694,54 @@ while($line=shift(@all_sutra))	# 取得每一行資料
 				#{
 				#	$jun_num = 40;
 				#}
+			}
+			# B02 1 是 (第10-20卷)
+			if (($T_vol eq "B02") and ($now_sutra eq "0001_"))
+			{
+				if($jun_num == 1)
+				{
+					$jun_num = 10;
+				}
+			}
+			# B04 2 是 (第47-85卷)
+			if (($T_vol eq "B04") and ($now_sutra eq "0002_"))
+			{
+				if($jun_num == 1)
+				{
+					$jun_num = 47;
+				}
+			}
+			# B05 2 是 (第86-120卷)
+			if (($T_vol eq "B05") and ($now_sutra eq "0002_"))
+			{
+				if($jun_num == 1)
+				{
+					$jun_num = 86;
+				}
+			}
+			# B15 88 是 (第55-124卷)
+			if (($T_vol eq "B15") and ($now_sutra eq "0088_"))
+			{
+				if($jun_num == 1)
+				{
+					$jun_num = 55;
+				}
+			}
+			# B16 88 是 (第125-212卷)
+			if (($T_vol eq "B16") and ($now_sutra eq "0088_"))
+			{
+				if($jun_num == 1)
+				{
+					$jun_num = 125;
+				}
+			}
+			# B17 89 是 (第87-134卷)
+			if (($T_vol eq "B17") and ($now_sutra eq "0089_"))
+			{
+				if($jun_num == 1)
+				{
+					$jun_num = 87;
+				}
 			}
 
 			makefile();
