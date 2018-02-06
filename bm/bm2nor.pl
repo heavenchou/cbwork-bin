@@ -743,6 +743,22 @@ while($line=shift(@all_sutra))	# 取得每一行資料
 					$jun_num = 87;
 				}
 			}
+			# B24 141 是 (第1,9,12-19,22)
+			if (($T_vol eq "B24") and ($now_sutra eq "0141_"))
+			{
+				if($jun_num == 2)
+				{
+					$jun_num = 9;
+				}
+				if($jun_num == 10)
+				{
+					$jun_num = 12;
+				}
+				#if($jun_num == 20)
+				#{
+				#	$jun_num = 22;
+				#}
+			}
 
 			makefile();
 			$last_jun = $jun_num;
@@ -891,6 +907,23 @@ while($line=shift(@all_sutra))	# 取得每一行資料
 				{
 					$jun_num = 39;
 					$last_jun = 39;
+				}
+			}
+			# B24 141 是 (第1,9,12-19,22)
+			if (($T_vol eq "B24") and ($now_sutra eq "0141_"))
+			{
+				#if($jun_num == 2)
+				#{
+				#	$jun_num = 9;
+				#}
+				#if($jun_num == 10)
+				#{
+				#	$jun_num = 12;
+				#}
+				if($jun_num == 19)
+				{
+					$jun_num = 21;
+					$last_jun = 21;
 				}
 			}
 			next;
