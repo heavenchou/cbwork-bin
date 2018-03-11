@@ -129,8 +129,8 @@ sub output_mulu
         }
         elsif($level[$i] > $pre_level + 1)
         {
-            $self->errmsg .= $self->book . $self->volnum . "n" . $self->sutra . "\n";
-            $self->errmsg .= "error 目錄跳太多層 : " . $::mulu_tree[$i] . "\n\n";
+            $self->errmsg($self->errmsg . $self->book . $self->volnum . "n" . $self->sutra . "\n");
+            $self->errmsg($self->errmsg . "error 目錄跳太多層 : " . $::mulu_tree[$i] . "\n\n");
         }
 
         # 印出本身
@@ -172,8 +172,8 @@ sub output_jaun
 
     if($#::juan_tree < 0)
     {
-        $self->errmsg .= $self->book . $self->volnum . "n" . $self->sutra . "\n";
-        $self->errmsg .= "error , 沒有卷目錄\n";
+        $self->errmsg($self->errmsg . $self->book . $self->volnum . "n" . $self->sutra . "\n");
+        $self->errmsg($self->errmsg . "error , 沒有卷目錄\n");
         return; # 沒有任何目錄標記, 離開吧
     }
 

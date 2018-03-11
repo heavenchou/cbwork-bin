@@ -276,8 +276,7 @@ sub tag_mulu
 		# 處理卷
 		if($toc->juan != $n)
 		{
-			print "juan not equal : $n vs " . $toc->juan . "\n";
-			<>;
+			print LOG "error juan not equal : $n vs " . $toc->juan . "\n";
 		}
 		my $data = $toc->juan . "," . $toc->get_link();
 		push(@juan_tree, $data);
