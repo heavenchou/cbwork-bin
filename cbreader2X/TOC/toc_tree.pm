@@ -57,6 +57,7 @@ sub output
     $self->output_head();   # 印出前面
     $self->output_mulu();   # 印出目錄
     $self->output_jaun();   # 印出卷目錄
+    print OUT "</body></html>";
     close OUT;
 
     $self->initial();
@@ -172,8 +173,6 @@ sub output_jaun
 
     if($#::juan_tree < 0)
     {
-        $self->errmsg($self->errmsg . $self->book . $self->volnum . "n" . $self->sutra . "\n");
-        $self->errmsg($self->errmsg . "error , 沒有卷目錄\n");
         return; # 沒有任何目錄標記, 離開吧
     }
 
@@ -206,7 +205,8 @@ sub output_jaun
 # 數字換成國字
 sub cNum {
 	my $num = shift;
-	my $i, $str;
+	my $i;
+    my $str;
 	my @char=("","一","二","三","四","五","六","七","八","九");
 
 	$i = int($num/100);

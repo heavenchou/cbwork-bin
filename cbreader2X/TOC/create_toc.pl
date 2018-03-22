@@ -12,12 +12,16 @@ use XML::DOM;
 use lib '.';
 use toc_tree;	# 自己寫的樹狀目錄操作
 
-my $SourcePath = "c:/cbwork/xml-p5a";			# 初始目錄, 最後不用加斜線 /
+my $SourcePath = "c:/cbwork/xml-p5a/J/J15";			# 初始目錄, 最後不用加斜線 /
 my $OutputPath = "c:/release/cbreader2X/TOC";		# 目地初始目錄, 如果有需要的話. 最後不用加斜線 /
 my $logfile = "errlog.txt";				# 錯誤記錄檔
 my $MakeOutputPath = 0;		# 1 : 產生對應的輸出目錄
 my $IsIncludeSubDir = 1;	# 1 : 包含子目錄 0: 不含子目錄
 my $FilePattern = "*.xml";		# 要找的檔案類型
+
+my $book = "";
+my $volnum = "";
+my $sutra = "";
 
 my @all_files = ();		# 記錄所找到的檔案, 先記起來, 最後再處理.
 
@@ -98,7 +102,7 @@ sub run_all_files
     for(my $i=0; $i<=$#all_files; $i++)
     {
         print $all_files[$i] . "\n";
-		my ($book,$volnum,$sutra) = get_vol_sutra($all_files[$i]);
+		($book,$volnum,$sutra) = get_vol_sutra($all_files[$i]);
 
 		if($book eq "T" && $volnum >= 5 && $volnum <= 7)
 		{
@@ -128,6 +132,12 @@ sub run_all_files
 		$pre_book = $book;
 		$pre_sutra = $sutra;
     }
+	$toc->output();
+	if($toc->errmsg)
+	{
+		print LOG $toc->errmsg;
+		$toc->errmsg("");
+	}
 }
 
 sub get_vol_sutra
@@ -231,6 +241,27 @@ sub tag_lb
     my $node = shift;
     
     # 處理標記
+
+    my $att_ed = $node->getAttributeNode("ed");	# 取得屬性
+    if($att_ed)
+    {
+		my $ed = $att_ed->getValue();	# 取得屬性內容
+        if($ed ne $book)
+        {
+            return "";  # 非本藏經
+        }
+    }
+    
+    my $att_type = $node->getAttributeNode("type");	# 取得屬性
+    if($att_type)
+    {
+		my $type = $att_type->getValue();	# 取得屬性內容
+        if($type eq "old")
+        {
+            return "";
+        }
+    }
+
     my $att_n = $node->getAttributeNode("n");	# 取得屬性
     if($att_n)
     {
