@@ -3,6 +3,7 @@
 2013.1.4 周邦信 改寫自 cbp4top5.py
 
 Heaven 修改:
+2018/03/23 校註 resp 加上正聞出版社
 2017/11/25 增加 -b 參數, 產生 CBReader 專用的 P5b 格式, 特點為:
            1. 沒有 <back> 區, 校勘等資料都和 p5a 一樣, 不做任何移動.
 		   2. 缺字是單一標記 <g xxx/> , 沒有包含任何文字, 因為 Mac 版不接受有 Ext-B 的 XML.
@@ -48,7 +49,7 @@ import configparser, collections, csv, datetime, glob, os, re, shutil, sys, time
 from optparse import OptionParser
 from lxml import etree
 import zbxxml, siddam, ranjana
-import win32com.client # 要安裝 PythonWin
+#import win32com.client # 要安裝 PythonWin
 
 # 使用 lxml 3.0.2 的 RelaxNG 在 validate T18n0850 時有問題
 #relaxng_doc = etree.parse('D:/git-repos/ddbc-cbeta/schema/cbeta-p5.rng')
@@ -1522,6 +1523,9 @@ def handle_back(t):
 		elif k=='釋印順':
 			r += '<cb:div type="yinshun-notes">\n'
 			r += '<head>印順法師 校註</head>\n'
+		elif k=='正聞出版社':
+			r += '<cb:div type="zhengwen-notes">\n'
+			r += '<head>正聞出版社 校註</head>\n'
 		elif k=='equivalent':
 			r += '<cb:div type="equiv-notes">\n'
 			r += '<head>相對應巴利文書名</head>\n'
