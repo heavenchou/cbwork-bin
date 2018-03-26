@@ -3,6 +3,7 @@
 2013.1.4 周邦信 改寫自 cbp4top5.py
 
 Heaven 修改:
+2018/03/27 處理屬性中的 & 轉成 &amp; , < 轉成 &lt;
 2018/03/23 校註 resp 加上正聞出版社
 2017/11/25 增加 -b 參數, 產生 CBReader 專用的 P5b 格式, 特點為:
            1. 沒有 <back> 區, 校勘等資料都和 p5a 一樣, 不做任何移動.
@@ -1382,6 +1383,8 @@ class MyNode():
 			self.tag = 'cb:' + self.tag
 		r = '<' + self.tag
 		for k, v in self.attrib.items():
+			v = v.replace('&', '&amp;')
+			v = v.replace('<', '&lt;')
 			if k=='cert':
 				if self.tag in ('foreign'):
 					k = 'cb:' + k
