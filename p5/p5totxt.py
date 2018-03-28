@@ -7,6 +7,7 @@
 Ray CHOU 周邦信 2011.6.11
 
 Heaven 修改:
+2018/03/28 漢字語系由 zh 改成 zh-Hant
 2017/11/07 支援 [xx-1] 這種同一頁有相同數字的校註 及 [A01] 這種新增校註
 2016/12/04 支援印順法師佛學著作集新增的 : 規範字詞 <choice cb:type="規範字詞">, 行首頁碼有英文字母 _pa001
 2016/11/01 將藏外佛教文獻的藏經代碼 W 改成 ZW , 正史佛教資料類編的 H 改成 ZS
@@ -391,7 +392,7 @@ def fileHeader(tree):
 	globals['cFormat']='普及版'
 	#globals['date']=datetime.date.today().strftime('%Y/%m/%d')
 	globals['date']= 'yyyy/mm/dd'				#非正式版不使用日期與版本
-	p=tree.xpath("//projectDesc/p[@lang='zh']")
+	p=tree.xpath("//projectDesc/p[@lang='zh-Hant']")
 	globals['ly_zh']=p[0].text
 	p=tree.xpath("//projectDesc/p[@lang='en']")
 	globals['ly_en']=p[0].text
