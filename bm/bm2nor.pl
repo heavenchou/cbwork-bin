@@ -607,8 +607,8 @@ sub print_jun_head()
 	}
 	elsif($vol_head eq "X")
 	{
-		$sutraver_c = "卍新纂續藏經（新文豐版）";
-		$sutraver_e = "卍 Xuzangjing (Shinwenfeng Edition)";
+		$sutraver_c = "卍新纂大日本續藏經";
+		$sutraver_e = "Manji Shinsan Dainihon Zokuzōkyō";
 	}
 	elsif($vol_head eq "J")
 	{
