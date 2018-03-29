@@ -15,6 +15,7 @@
 # Copyright (C) 1998-2018 CBETA
 # Copyright (C) 1999-2018 Heaven Chou
 ########################################################################
+# 2018/03/29 V12.1 修改藏經中英文名稱
 # 2018/02/09 V12.0 1. <mj> 標記改成 <mj xxx> , xxx 是卷數
 #                  2. 檔名在卷數前一律加上下底線 
 ##########################################################
@@ -602,17 +603,17 @@ sub print_jun_head()
 	if($vol_head eq "T")
 	{
 		$sutraver_c = "大正新脩大藏經";
-		$sutraver_e = "Taisho Tripitaka";
+		$sutraver_e = "Taishō Tripiṭaka";
 	}
 	elsif($vol_head eq "X")
 	{
-		$sutraver_c = "卍新纂續藏經";
-		$sutraver_e = "卍 Xuzangjing";
+		$sutraver_c = "卍新纂續藏經（新文豐版）";
+		$sutraver_e = "卍 Xuzangjing (Shinwenfeng Edition)";
 	}
 	elsif($vol_head eq "J")
 	{
-		$sutraver_c = "嘉興大藏經";
-		$sutraver_e = "Jiaxing Canon";
+		$sutraver_c = "嘉興大藏經（新文豐版）";
+		$sutraver_e = "Jiaxing Canon (Shinwenfeng Edition)";
 	}
 	elsif($vol_head eq "ZS")
 	{
@@ -622,7 +623,7 @@ sub print_jun_head()
 	elsif($vol_head eq "ZW")
 	{
 		$sutraver_c = "藏外佛教文獻";
-		$sutraver_e = "Buddhist Texts not contained in the Tripitaka";
+		$sutraver_e = "Buddhist Texts not contained in the Tripiṭaka";
 	}
 	elsif($vol_head eq "I")
 	{
@@ -631,7 +632,7 @@ sub print_jun_head()
 	}
 	elsif($vol_head eq "A")
 	{
-		$sutraver_c = "金藏";
+		$sutraver_c = "趙城金藏";
 		$sutraver_e = "Jin Edition of the Canon";
 	}
 	elsif($vol_head eq "B")
@@ -641,8 +642,8 @@ sub print_jun_head()
 	}
 	elsif($vol_head eq "C")
 	{
-		$sutraver_c = "中華大藏經";
-		$sutraver_e = "Zhonghua Canon";
+		$sutraver_c = "中華大藏經（中華書局版）";
+		$sutraver_e = "Zhonghua Canon (Chunghwa Book Edition)";
 	}
 	elsif($vol_head eq "D")
 	{
@@ -662,34 +663,34 @@ sub print_jun_head()
 	elsif($vol_head eq "GA")
 	{
 		$sutraver_c = "中國佛寺史志彙刊";
-		$sutraver_e = "Zhongguo Fosi Shizhi Huikan";
+		$sutraver_e = "Chinese Buddhist Temple Gazetteers";
 	}
 	elsif($vol_head eq "GB")
 	{
 		$sutraver_c = "中國佛寺志叢刊";
-		$sutraver_e = "Zhongguo Fosizhi Congkan";
+		$sutraver_e = "Chinese Buddhist Temple Gazetteers";
 	}
 	elsif($vol_head eq "K")
 	{
-		$sutraver_c = "高麗大藏經";
-		$sutraver_e = "Tripitaka Koreana";
+		$sutraver_c = "高麗大藏經（新文豐版）";
+		$sutraver_e = "Tripiṭaka Koreana (Shinwenfeng Edition)";
 	}
 	elsif($vol_head eq "L")
 	{
-		$sutraver_c = "乾隆大藏經";
-		$sutraver_e = "Qianlong Edition of the Canon";
+		$sutraver_c = "乾隆大藏經（新文豐版）";
+		$sutraver_e = "Qianlong Edition of the Canon (Shinwenfeng Edition)";
 	}
 	elsif($vol_head eq "M")
 	{
-		$sutraver_c = "卍正藏經";
-		$sutraver_e = "Manji Daizokyo";
+		$sutraver_c = "卍正藏經（新文豐版）";
+		$sutraver_e = "Manji Daizokyo (Shinwenfeng Edition)";
 	}
 	elsif($vol_head eq "N")
 	{
 		#$sutraver_c = "永樂南藏";
 		#$sutraver_e = "Southern Yongle Edition of the Canon";
-		$sutraver_c = "漢譯南傳大藏經";
-		$sutraver_e = "Chinese Translation of the Pali Tipiṭaka";
+		$sutraver_c = "漢譯南傳大藏經（元亨寺版）";
+		$sutraver_e = "Chinese Translation of the Pali Tipiṭaka (Yuan Heng Temple Edition)";
 	}
 	elsif($vol_head eq "P")
 	{
@@ -698,13 +699,13 @@ sub print_jun_head()
 	}
 	elsif($vol_head eq "Q")
 	{
-		$sutraver_c = "磧砂大藏經";
-		$sutraver_e = "Qisha Edition of the Canon";
+		$sutraver_c = "磧砂大藏經（新文豐版）";
+		$sutraver_e = "Qisha Edition of the Canon (Shinwenfeng Edition)";
 	}
 	elsif($vol_head eq "S")
 	{
-		$sutraver_c = "宋藏遺珍";
-		$sutraver_e = "Songzang yizhen";
+		$sutraver_c = "宋藏遺珍（新文豐版）";
+		$sutraver_e = "Songzang yizhen (Shinwenfeng Edition)";
 	}
 	elsif($vol_head eq "ZY")
 	{
