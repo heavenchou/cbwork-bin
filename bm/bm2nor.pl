@@ -15,6 +15,7 @@
 # Copyright (C) 1998-2018 CBETA
 # Copyright (C) 1999-2018 Heaven Chou
 ########################################################################
+# 2018/04/01 V12.2 修改藏經中英文名稱 (by maha)
 # 2018/03/29 V12.1 修改藏經中英文名稱
 # 2018/02/09 V12.0 1. <mj> 標記改成 <mj xxx> , xxx 是卷數
 #                  2. 檔名在卷數前一律加上下底線 
@@ -663,12 +664,12 @@ sub print_jun_head()
 	elsif($vol_head eq "GA")
 	{
 		$sutraver_c = "中國佛寺史志彙刊";
-		$sutraver_e = "Chinese Buddhist Temple Gazetteers";
+		$sutraver_e = "Zhongguo Fosi Shizhi Huikan";
 	}
 	elsif($vol_head eq "GB")
 	{
 		$sutraver_c = "中國佛寺志叢刊";
-		$sutraver_e = "Chinese Buddhist Temple Gazetteers";
+		$sutraver_e = "Zhongguo fosizhi congkan";
 	}
 	elsif($vol_head eq "K")
 	{
@@ -683,14 +684,14 @@ sub print_jun_head()
 	elsif($vol_head eq "M")
 	{
 		$sutraver_c = "卍正藏經（新文豐版）";
-		$sutraver_e = "Manji Daizokyo (Shinwenfeng Edition)";
+		$sutraver_e = "Manji Daizōkyō (Shinwenfeng Edition)";
 	}
 	elsif($vol_head eq "N")
 	{
 		#$sutraver_c = "永樂南藏";
 		#$sutraver_e = "Southern Yongle Edition of the Canon";
 		$sutraver_c = "漢譯南傳大藏經（元亨寺版）";
-		$sutraver_e = "Chinese Translation of the Pali Tipiṭaka (Yuan Heng Temple Edition)";
+		$sutraver_e = "Chinese Translation of the Pāḷi Tipiṭaka (Yuan Heng Temple Edition)";
 	}
 	elsif($vol_head eq "P")
 	{
