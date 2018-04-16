@@ -1597,11 +1597,13 @@ def phase2(vol,p):
 	s=fi.read()
 	fi.close()
 	
-	# 把 <lg> 下面的文字, 移到第一個 <l> 裏
-	s=re.sub(r'(<lg[^>]*?>(?:<head.*?</head>)?(?:<note.*?</note>)?(?:<note.*?</note>)?(?:<app[^>]*?>)?(?:<lem[^>]*?>)?(?:<cb:tt[^>]*?>)?(?:<cb:t[^>]*?>)?)(.*?)((?:<l [^>]*?>)|(?:<l>))', r'\1\3\2', s) 
-	
-	#s=re.sub(r'(<lg[^>]*?>(?:<head.*?</head>)?)(<l[^>]*?>「)((?:<anchor[^>]*?/>)+)', r'\1\3\2', s)
-	s=re.sub(r'(<lg[^>]*?>(?:<head.*?</head>)?(?:<note.*?</note>)?(?:<note.*?</note>)?(?:<app[^>]*?>)?(?:<lem[^>]*?>)?(?:<cb:tt[^>]*?>)?(?:<cb:t[^>]*?>)?)(.*?)(</lg>)', repl_lg, s, flags=re.DOTALL)
+	# P5b 不要移到 <l> 裡, 不然會有巢狀錯誤
+	if options.P5b_Format == False:
+		# 把 <lg> 下面的文字, 移到第一個 <l> 裏
+		s=re.sub(r'(<lg[^>]*?>(?:<head.*?</head>)?(?:<note.*?</note>)?(?:<note.*?</note>)?(?:<app[^>]*?>)?(?:<lem[^>]*?>)?(?:<cb:tt[^>]*?>)?(?:<cb:t[^>]*?>)?)(.*?)((?:<l [^>]*?>)|(?:<l>))', r'\1\3\2', s) 
+		
+		#s=re.sub(r'(<lg[^>]*?>(?:<head.*?</head>)?)(<l[^>]*?>「)((?:<anchor[^>]*?/>)+)', r'\1\3\2', s)
+		s=re.sub(r'(<lg[^>]*?>(?:<head.*?</head>)?(?:<note.*?</note>)?(?:<note.*?</note>)?(?:<app[^>]*?>)?(?:<lem[^>]*?>)?(?:<cb:tt[^>]*?>)?(?:<cb:t[^>]*?>)?)(.*?)(</lg>)', repl_lg, s, flags=re.DOTALL)
 	
 	# 把 <anchor> 前後多餘的換行去掉
 	s=re.sub(r'\n+(<anchor )', r'\1', s)

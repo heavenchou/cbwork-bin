@@ -359,7 +359,8 @@ Unicode 6.3：2013年9月30日
 #20000～2A6D6：CJK Unified Ideographs Extension B 中日韓統一表意文字擴展 B 區 (42711 字, Unicode 3.1 , 2001)
 #2A700～2B734：CJK Unified Ideographs Extension C 中日韓統一表意文字擴展 C 區 (4149 字, Unicode 5.2 , 2009)
 #2B740～2B81D：CJK Unified Ideographs Extension D 中日韓統一表意文字擴展 D 區 (222 字, Unicode 6.0 , 2010)
-#2B820～2F7FF：CJK Unified Ideographs Extension E 中日韓統一表意文字擴展 E 區 (Unicode 8.0)
+#2B820～2CEAF：CJK Unified Ideographs Extension E 中日韓統一表意文字擴展 E 區 (Unicode 8.0)
+#2CEB0～2EBEF：CJK Unified Ideographs Extension E 中日韓統一表意文字擴展 F 區 (Unicode 10.0)
 #2F800～2FA1D：CJK Compatibility Ideographs Supplement 相容表意字補充 - 台灣的相容漢字 (542 字, Unicode 3.1 , 2001)
   
 =cut
@@ -506,7 +507,8 @@ sub get_unicode_ver
 	#return "3.1" if($uni >= 0x20000 and $uni <= 0x2A6D6);	#20000～2A6D6：CJK Unified Ideographs Extension B 中日韓統一表意文字擴展 B 區 (42711 字, Unicode 3.1 , 2001)
 	return "5.2" if($uni >= 0x2A700 and $uni <= 0x2B734);	#2A700～2B734：CJK Unified Ideographs Extension C 中日韓統一表意文字擴展 C 區 (4149 字, Unicode 5.2 , 2009)
 	return "6.0" if($uni >= 0x2B740 and $uni <= 0x2B81D);	#2B740～2B81D：CJK Unified Ideographs Extension D 中日韓統一表意文字擴展 D 區 (222 字, Unicode 6.0 , 2010)
-	return "8.0" if($uni >= 0x2B820 and $uni <= 0x2F7FF);	#2B820～2F7FF：CJK Unified Ideographs Extension E 中日韓統一表意文字擴展 E 區 (Unicode 8.0)
+	return "8.0" if($uni >= 0x2B820 and $uni <= 0x2CEAF);	#2B820～2CEAF：CJK Unified Ideographs Extension E 中日韓統一表意文字擴展 E 區 (Unicode 8.0)
+	return "10.0" if($uni >= 0x2CEB0 and $uni <= 0x2EBEF);	#2CEB0～2EBEF：CJK Unified Ideographs Extension E 中日韓統一表意文字擴展 F 區 (Unicode 10.0)
 	return "3.1" if($uni >= 0x2F800 and $uni <= 0x2FA1D);	#2F800～2FA1D：CJK Compatibility Ideographs Supplement 相容表意字補充 - 台灣的相容漢字 (542 字, Unicode 3.1 , 2001)
 
 	return "";

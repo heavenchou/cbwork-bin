@@ -7,8 +7,8 @@ use strict;
 use XML::DOM;
 my $parser = new XML::DOM::Parser;
 
-my $SourcePath = "c:/cbwork/xml-p5a/J/J15";			# 初始目錄, 最後不用加斜線 /
-my $OutputPath = "c:/cbwork/xml-p5a/";		# 目地初始目錄, 如果有需要的話. 最後不用加斜線 /
+my $SourcePath = "c:/cbwork/xml-p5b";			# 初始目錄, 最後不用加斜線 /
+my $OutputPath = "c:/cbwork/xml-p5b/";		# 目地初始目錄, 如果有需要的話. 最後不用加斜線 /
 my $MakeOutputPath = 0;		# 1 : 產生對應的輸出目錄
 my $IsIncludeSubDir = 1;	# 1 : 包含子目錄 0: 不含子目錄
 my $FilePattern = "*.xml";		# 要找的檔案類型
@@ -21,9 +21,16 @@ my $sutra = "";     # 0001
 
 my $lb = "";    #
 
-open OUT, ">>:utf8", "spineX.txt";
+# 處理藏經的順序
+my @book_order = ("T","X","A","K","S","F","C","D","U","P","J","L","G","M","N","ZS","I","ZW","B","GA","GB","Y");
+
+open OUT, ">:utf8", "spine.txt";
 open LOG, ">:utf8", "error.txt";
-SearchDir($SourcePath, $OutputPath);
+for(my $i=0; $i<=$#book_order; $i++)
+{
+	my $source = $SourcePath . "/" . $book_order[$i];
+	SearchDir($source, $OutputPath);
+}
 run_all_files();    # 處理所有檔案
 close OUT;
 close LOG;
@@ -84,8 +91,11 @@ sub run_all_files
     {
         print $all_files[$i] . "\n";
 		($book,$volnum,$sutra) = get_vol_sutra($all_files[$i]);
-		my $text = ParserXML($all_files[$i]);
-        print OUT $text;
+		if($book eq "T" && $volnum >=5 && $volnum <= 7)
+		{
+			my $text = ParserXML($all_files[$i]);
+        	print OUT $text;
+		}
     }
 }
 
@@ -217,7 +227,12 @@ sub tag_milestone
 			if($att_n)
 			{
 				$n = $att_n->getValue();	# 取得屬性內容
-                $text = "XML/$book/$book$volnum/$book$volnum" . "n$sutra" . "_";
+				my $newsutra = $sutra;
+				if($book eq "T" && $volnum >= 5 && $volnum <= 7)
+				{
+					$newsutra =~ s/0220./0220/;
+				}
+                $text = "XML/$book/$book$volnum/$book$volnum" . "n$newsutra" . "_";
                 $text .= sprintf("%03d",$n) . ".xml , $lb\n";
 			}
 			else

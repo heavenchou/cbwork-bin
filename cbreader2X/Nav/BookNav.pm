@@ -70,14 +70,9 @@ sub initial
     for(my $i=0; $i<=$#datas; $i++)
     {
         $types[$i] = "";    # 初值化
-        if($i == $#datas || $levels[$i] > $levels[$i+1])
+        if($i == $#datas || $levels[$i] >= $levels[$i+1])
         {
             $types[$i] = "L";   # 表示這一筆要進一步找出 SutraList 中的資料
-        }
-        elsif($levels[$i] == $levels[$i+1])
-        {
-            print "error , 不應該出現同一層的結構 : 行數 : $i\n";
-            <>;
         }
     }
 }

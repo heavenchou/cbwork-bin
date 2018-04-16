@@ -16,6 +16,9 @@ $book_nav->initial("book_nav.txt");
 
 my $pre_level = 0;
 
+# 這是用來判斷是否是第一組的 <li> ... </li> , 是的話就不要呈現 
+my $IsFirstLi = 1;
+
 open OUT, ">:utf8", "book_nav.xhtml";
 my $xhtml = "";
 create_head();
@@ -36,7 +39,7 @@ sub create_head
 	</head>
 <body>
 <nav type=\"catalog\">
-<h1>CBETA 漢文電子佛典</h1>";
+";
 }
 
 # 印出中間的身體
@@ -85,8 +88,11 @@ sub create_body
                 my $index = $sutralist->index_by_id->{$key};
                 my $link = $sutralist->link->[$index];
                 my $name = $sutralist->name->[$index];
+                $name =~ s/\(第.*?卷\)$//;  # 去除卷數
+                $name =~ s/雜阿含經論會編（上）/雜阿含經論會編/;
+                $link =~ s/T05n0220a_001/T05n0220_001/; # 特例
                 $link = "XML/" . $link;
-                $xhtml .= "<cblink href=\"" . $link . "\">" . $name . "</cblink>";
+                $xhtml .= "<cblink href=\"" . $link . "\">" . $key . " " . $name . "</cblink>";
             
                 if($k != $#keys)
                 {
@@ -111,7 +117,7 @@ sub create_foot
 {
     my $gap = get_level_gap($pre_level,1,"end");
     $xhtml .= $gap;
-    $xhtml .= "</ol>\n";
+    #$xhtml .= "</ol>\n";
     $xhtml .= "</nav>\n";
     $xhtml .= "</body>\n";
     $xhtml .= "</html>\n";
@@ -137,11 +143,18 @@ sub get_level_gap
     # 如果我是上一筆的母層, 要結束上一筆的結構
     if($this == $pre + 1)
     {
-        # 我是上一筆的子層, 要先印出 <ol>
-        $text .= "\n" . "\t" x $pre;     # <ol> 前的空白
-        $text .= "<ol>\n";
-        $text .= "\t" x $this;    # <li> 前的空白
-        $text .= "<li>";
+        if($this != 1 || $IsFirstLi == 0)   # 只有第一組的 li 不用印
+        {
+            # 我是上一筆的子層, 要先印出 <ol>
+            $text .= "\n" . "\t" x $pre;     # <ol> 前的空白
+            $text .= "<ol>\n";
+            $text .= "\t" x $this;    # <li> 前的空白
+            $text .= "<li>";
+        }
+        else
+        {
+            $text .= "\t" x $this;    # <li> 前的空白
+        }
     }
     elsif($this < $pre)
     {
@@ -151,8 +164,15 @@ sub get_level_gap
         {
             $text .= "\t" x $i;
             $text .= "</ol>\n";
-            $text .= "\t" x $i;
-            $text .= "</li>\n";
+            if($i != 1 || $IsFirstLi == 0)   # 只有第一組 li 不用印
+            {
+                $text .= "\t" x $i;
+                $text .= "</li>\n";
+            }
+            if($i == 1 && $IsFirstLi > 0) 
+            {
+                $IsFirstLi = 0; # 第一組結束了
+            }
         }
         # 最後就不用印 <li>
         if($last eq "")
@@ -188,7 +208,8 @@ sub unique_list
 
     for(my $i=0; $i<=$#{$array}; $i++)
     {
-        if($array->[$i] ne $pre)
+        # 大般若經要過濾掉
+        if($array->[$i] ne $pre &&  $array->[$i] !~ /T0220[b-z]/)
         {
             push(@tmp, $array->[$i]);
             $pre = $array->[$i];

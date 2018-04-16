@@ -39,6 +39,7 @@ $xml_head					=> 1. <?xml> 至 <body> 之前的內容
 $xml_body					=> 2. 全部內容
 	@xml_juan				=> 2-1. 各卷內容
 	@xml_juan_id			=> 2-1. 各卷 id , $xml_juan_id[1]->{"beg0001002"} = 1 , 表示第一卷有 "beg0001002" 這個 id
+	@xml_juan_num			=> 2-1. 各卷的卷數, 由 milestone 取得
 $xml_back					=> 3. 校勘區 (僅 </body> 那一行, 最後也會推入 @xml_back_line 的最前面)
 @xml_back_line				=> 4. 校勘區 (</body> 之後都放在此陣列)
 	@xml_back				=> 4-1. 各卷校勘區
@@ -61,11 +62,12 @@ use utf8;
 use autodie;
 use Config::IniFiles;
 use Cwd;
+use XML::DOM;
 
 ###############################################################################
 # 取得參數
 ###############################################################################
-local $vol;
+my $vol;
 my $P5b_Format = shift;
 
 if($P5b_Format eq "-b")
@@ -115,7 +117,7 @@ unless($vol)
 my $errlog = "cutxml_${vol}_err.txt";
 
 my $sourcePath;
-if(P5b_Format)
+if($P5b_Format)
 {
 	$sourcePath = $cbwork_dir . "/xml-p5b/$edit/$vol";	# xml-p5b 經文的位置
 }
@@ -124,7 +126,10 @@ else
 	$sourcePath = $cbwork_dir . "/xml-p5/$edit/$vol";	# xml-p5 經文的位置
 }
 #$sourcePath = "C:/Temp/cbetap5-ok" . "/$edit/$vol";
+$output_dir = $output_dir . "/$edit";					# 輸出的目錄
+mkdir($output_dir) if(not -d $output_dir);
 $output_dir = $output_dir . "/$vol";					# 輸出的目錄
+mkdir($output_dir) if(not -d $output_dir);
 
 my $myPath = cwd();										# 目前目錄
 
@@ -133,12 +138,9 @@ my $myPath = cwd();										# 目前目錄
 ###############################################################################
 
 opendir (INDIR, $sourcePath);
-@allfiles = grep(/\.xml$/i, readdir(INDIR));
+my @allfiles = grep(/\.xml$/i, readdir(INDIR));
 die "No files to process\n" unless @allfiles;
 
-mkdir($output_dir) if(not -d $output_dir);
-
-use XML::DOM;
 my $parser = new XML::DOM::Parser;
 
 if ($inputFile eq "") 
@@ -147,12 +149,12 @@ if ($inputFile eq "")
 	
 	my $killfile = "$output_dir/*.*";
 	$killfile =~ s/\//\\/g;
-	$rmfile = unlink <${killfile}>;
+	my $rmfile = unlink <${killfile}>;
 	print "remove $killfile ($rmfile files removed)\n";
 
 	open ERRLOG, ">$errlog" || die "open error log $errlog error!";
 	close ERRLOG;
-	for $file (sort(@allfiles)) 
+	for my $file (sort(@allfiles)) 
 	{
 		print "\n$file   ";
 		#$file =~ /(?:[TXJHWIABCDFGKLMNPSU])(\d*)n(.{4,5})/;
@@ -168,7 +170,7 @@ else
 	my $killfile = "$output_dir/$inputFile";
 	$killfile =~ s/\//\\/g;
 	$killfile =~ s/\.xml$/*.*/;
-	$rmfile = unlink <${killfile}>;
+	my $rmfile = unlink <${killfile}>;
 	print "remove $killfile ($rmfile files removed)\n";
 
 	$file = $inputFile;
@@ -206,7 +208,8 @@ sub do1file
 	local $xml_body = "";	# body 內容
 	local @xml_juan = ();	# 各卷的內容
 	local @xml_juan_id = ();	# 各卷裡面的標記 : $xml_juan_id[1]->{"beg0001002"} = 1 , 表示第一卷有 "beg0001002" 這個 id
-	
+	local @xml_juan_num = ();	# 各卷的卷數, 由 milestone 取得
+
 	local $xml_back = "";	# 校勘區
 	local @xml_back = ();	# 各卷的校勘區
 	local @xml_back_line = ();	# 校勘逐行放入此陣列中
@@ -420,7 +423,7 @@ sub get_lbn
 {	
 	for(my $i=1; $i<=$total_juannum; $i++)
 	{
-		$xml_juan[$i] =~ /<lb.*?n="(\d\d\d\d.\d\d)"/;
+		$xml_juan[$i] =~ /<lb.*?n="(.\d\d\d.\d\d)"/;
 		$lbn[$i] = $1;
 	}
 }
@@ -469,6 +472,13 @@ sub start_handler
 	
 	local $el = $node->getTagName;
 	
+	# 處理<milestone n="1" unit="juan"/> 標記
+	if ($el eq "milestone")
+	{
+		my $n = $node->getAttributeNode("n")->getValue;	# 取得 n 屬性
+		push(@xml_juan_num, $n);
+	}
+
 	# 處理 <lb> 標記
 	if ($el eq "lb")
 	{
@@ -818,6 +828,16 @@ sub get_backs
 			{
 				$back .= $1;
 			}
+			# </body>
+			elsif(/^(<\/body>\n?)/)
+			{
+				$back .= $1;
+			}
+			# </text>
+			elsif(/^(<\/text>\n?)/)
+			{
+				$back .= $1;
+			}
 			# </TEI>
 			elsif(/^(<\/TEI>\n?)/)
 			{
@@ -885,7 +905,10 @@ sub output_all
 	print "total juans : $total_juannum\n";
 	for(my $i=1; $i<= $total_juannum; $i++)
 	{
-		my $ii = get_real_juan_num($file , $i);	# 取得真實卷數
+		# my $ii = get_real_juan_num($file , $i);	# 取得真實卷數
+		# 上面是舊方法, 新版直接用 @xml_juan_num 的數字
+		my $ii = sprintf("%03d",$xml_juan_num[$i-1]);
+
 		# 處理特殊檔名 ###########################################
 		$outfile = "$output_dir/$file";	# 輸出檔
 		$outfile =~ s/\.xml$/_$ii.xml/;	# 檔名變成 T01n0001_001.xml
@@ -906,1060 +929,6 @@ sub output_all
 		
 		close OUT;
 	}
-}
-
-###################################################
-# 取得真正的卷數
-###################################################
-
-sub get_real_juan_num()
-{
-	my $file = shift;
-	my $i = shift;
-
-	my $ii = sprintf("%03d",$i);
-	
-	#處理特殊檔名 ###########################################
-	#不連續卷要處理
-	
-	if($file eq "T06n0220b.xml")
-	{
-		$ii = sprintf("%03d",$i+200);
-	}
-	if($file eq "T07n0220c.xml")
-	{
-		$ii = sprintf("%03d",$i+400);
-	}
-	if($file eq "T07n0220d.xml")
-	{
-		$ii = sprintf("%03d",$i+537);
-	}
-	if($file eq "T07n0220e.xml")
-	{
-		$ii = sprintf("%03d",$i+565);
-	}
-	if($file eq "T07n0220f.xml")
-	{
-		$ii = sprintf("%03d",$i+573);
-	}
-	if($file eq "T07n0220g.xml")
-	{
-		$ii = sprintf("%03d",$i+575);
-	}
-	if($file eq "T07n0220h.xml")
-	{
-		$ii = sprintf("%03d",$i+576);
-	}
-	if($file eq "T07n0220i.xml")
-	{
-		$ii = sprintf("%03d",$i+577);
-	}
-	if($file eq "T07n0220j.xml")
-	{
-		$ii = sprintf("%03d",$i+578);
-	}
-	if($file eq "T07n0220k.xml")
-	{
-		$ii = sprintf("%03d",$i+583);
-	}
-	if($file eq "T07n0220l.xml")
-	{
-		$ii = sprintf("%03d",$i+588);
-	}
-	if($file eq "T07n0220m.xml")
-	{
-		$ii = sprintf("%03d",$i+589);
-	}
-	if($file eq "T07n0220n.xml")
-	{
-		$ii = sprintf("%03d",$i+590);
-	}
-	if($file eq "T07n0220o.xml")
-	{
-		$ii = sprintf("%03d",$i+592);
-	}
-	#T19n0946.xml 沒有第三卷, 只有 1, 2, 4, 5 卷
-	if($file eq "T19n0946.xml")
-	{
-		$ii = sprintf("%03d",$i+1) if($i>2);
-	}
-	# T54
-	if($file eq "T54n2139.xml")
-	{
-		$ii = "010" if($i==2);
-	}
-	# T85
-	if($file eq "T85n2742.xml")
-	{
-		$ii = "002" if($i==1);
-	}
-	if($file eq "T85n2744.xml")
-	{
-		$ii = "002" if($i==1);
-	}
-	if($file eq "T85n2748.xml")
-	{
-		$ii = "003" if($i==1);
-	}
-	if($file eq "T85n2754.xml")
-	{
-		$ii = "003" if($i==1);
-	}
-	if($file eq "T85n2757.xml")
-	{
-		$ii = "003" if($i==1);
-	}
-	if($file eq "T85n2764B.xml")
-	{
-		$ii = "004" if($i==1);
-	}
-	if($file eq "T85n2769.xml")
-	{
-		$ii = "004" if($i==1);
-	}
-	if($file eq "T85n2772.xml")
-	{
-		$ii = "003" if($i==1);
-	}
-	if($file eq "T85n2772.xml")
-	{
-		$ii = "006" if($i==2);
-	}
-	if($file eq "T85n2799.xml")
-	{
-		$ii = "003" if($i==2);
-	}
-	if($file eq "T85n2803.xml")
-	{
-		$ii = "004" if($i==1);
-	}
-	if($file eq "T85n2805.xml")
-	{
-		$ii = "005" if($i==1);
-	}
-	if($file eq "T85n2805.xml")
-	{
-		$ii = "007" if($i==2);
-	}
-	if($file eq "T85n2809.xml")
-	{
-		$ii = "004" if($i==1);
-	}
-	if($file eq "T85n2814.xml")
-	{
-		$ii = sprintf("%03d",$i+2);
-	}
-	if($file eq "T85n2820.xml")
-	{
-		$ii = "012" if($i==1);
-	}
-	if($file eq "T85n2825.xml")
-	{
-		$ii = "003" if($i==2);
-	}
-	if($file eq "T85n2827.xml")
-	{
-		$ii = sprintf("%03d",$i+1);
-	}
-	if($file eq "T85n2880.xml")
-	{
-		$ii = sprintf("%03d",$i+1);
-	}
-	########################################
-	#處理特殊的卷
-	
-	# X03n0208.xml 只有卷10
-	if($file eq "X03n0208.xml")
-	{
-		$ii = "010" if($i==1);
-	}
-	# X03n0211.xml 只有卷6
-	if($file eq "X03n0211.xml")
-	{
-		$ii = "006" if($i==1);
-	}
-	# X03n0221.xml 由卷 1~5,8~15, 不是 6~13 (沒有 6,7)
-	if($file eq "X03n0221.xml")
-	{
-		$ii = sprintf("%03d",$i+2) if($i>5);
-	}
-	#X07n0234.xml 華嚴經疏注,(百二十卷但欠卷21~70、91~100及111~112)
-	#01~20,71~90,101~110,113~120 (實際卷數)
-	#01~20,21~40, 41~ 50, 51~ 58 (流水卷數)
-	if($file eq "X07n0234.xml")
-	{
-		$ii = sprintf("%03d",$i+50) if($i>20);
-		$ii = sprintf("%03d",$i+60) if($i>40);
-		$ii = sprintf("%03d",$i+62) if($i>50);
-	}
-	# X08n0235.xml 華嚴經談玄抉擇,(六卷但初卷不傳),
-	if($file eq "X08n0235.xml")
-	{
-		$ii = sprintf("%03d",$i+1);
-	}
-	# X09n0240 由卷 45 開始
-	if($file eq "X09n0240.xml")
-	{
-		$ii = sprintf("%03d",$i+44);
-	}
-	# X09n0244 由是 2,3 , 沒有卷1
-	if($file eq "X09n0244.xml")
-	{
-		$ii = sprintf("%03d",$i+1);
-	}
-	# X17n0321.xml 由卷 1,2,5 不是 1~3 (沒有 3,4)
-	if($file eq "X17n0321.xml")
-	{
-		$ii = "005" if($i == 3);
-	}
-	# X19n0345.xml 由卷 4,5 不是 1~2 (沒有 1~3)
-	if($file eq "X19n0345.xml")
-	{
-		$ii = sprintf("%03d",$i+3);
-	}
-	# X21n0367.xml 由卷 4~8 不是 1~5 (沒有 1~3)
-	if($file eq "X21n0367.xml")
-	{
-		$ii = sprintf("%03d",$i+3);
-	}
-	# X21n0368.xml 由卷 2~4 不是 1~3 (沒有 1)
-	if($file eq "X21n0368.xml")
-	{
-		$ii = sprintf("%03d",$i+1);
-	}
-	# X24n0451.xml 由卷 1,3~10, 不是 1~9 (沒有 2)
-	if($file eq "X24n0451.xml")
-	{
-		$ii = sprintf("%03d",$i+1) if($i > 1);
-	}
-	# X26n0560.xml 只有卷 2 不是 1 (沒有 1)
-	if($file eq "X26n0560.xml")
-	{
-		$ii = sprintf("%03d",$i+1);
-	}
-	# X34n0638.xml 由卷 1~21,24~29,31,33~35 , 不是 1~31 (沒有 22,23,30.32)
-	if($file eq "X34n0638.xml")
-	{
-		$ii = sprintf("%03d",$i+2) if($i > 21);
-		$ii = sprintf("%03d",$i+3) if($i > 27);
-		$ii = sprintf("%03d",$i+4) if($i > 28);
-	}
-	# X37n0662.xml 由卷 1~14,16~20, 不是 1~19 (沒有 15)
-	if($file eq "X37n0662.xml")
-	{
-		$ii = sprintf("%03d",$i+1) if($i > 14);
-	}
-	# X38n0687.xml 由卷 2,4 , 不是 1,2 (沒有 1,3)
-	if($file eq "X38n0687.xml")
-	{
-		$ii = "002" if($i == 1);
-		$ii = "004" if($i == 2);
-	}
-	# X39n0704.xml 由卷 3~5, 不是 1~3 (沒有 1,2)
-	if($file eq "X39n0704.xml")
-	{
-		$ii = sprintf("%03d",$i+2);
-	}
-	# X39n0705.xml 由卷 2 不是 1 (沒有 1)
-	if($file eq "X39n0705.xml")
-	{
-		$ii = sprintf("%03d",$i+1);
-	}
-	# X39n0712.xml 由卷 3 不是 1 (沒有 1,2)
-	if($file eq "X39n0712.xml")
-	{
-		$ii = sprintf("%03d",$i+2);
-	}
-	# X40n0714.xml 由卷 3,4 不是 1,2 (沒有 1,2)
-	if($file eq "X40n0714.xml")
-	{
-		$ii = sprintf("%03d",$i+2);
-	}
-	# X42n0733.xml 由卷 2~8,10 不是 1~8 (沒有 1,9)
-	if($file eq "X42n0733.xml")
-	{
-		$ii = sprintf("%03d",$i+1);
-		$ii = "010" if($i == 8);
-	}
-	# X42n0734.xml 由卷 9 不是 1 (沒有 1~8)
-	if($file eq "X42n0734.xml")
-	{
-		$ii = "009";
-	}
-	# X46n0784.xml 由卷 2,5~10 不是 1~7 (沒有 1,3,4)
-	if($file eq "X46n0784.xml")
-	{
-		$ii = "002" if($i == 1);
-		$ii = sprintf("%03d",$i+3) if($i > 1);
-	}
-	# X46n0791.xml 由卷 1,6,14,15,17,21,24 不是 1~7 (沒有 ...)
-	if($file eq "X46n0791.xml")
-	{
-		$ii = "006" if($i == 2);
-		$ii = "014" if($i == 3);
-		$ii = "015" if($i == 4);
-		$ii = "017" if($i == 5);
-		$ii = "021" if($i == 6);
-		$ii = "024" if($i == 7);
-	}
-	# X48n0797.xml 由卷 3 不是 1 (沒有 1,2)
-	if($file eq "X48n0797.xml")
-	{
-		$ii = "003";
-	}
-	# X48n0799.xml 由卷 1,2,7 不是 1~3 (沒有 3~6)
-	if($file eq "X48n0799.xml")
-	{
-		$ii = "007" if($i == 3);
-	}
-	# X48n0808.xml 由卷 1,5,9,10 不是 1~4 (沒有 2,3,4,6,7,8)
-	if($file eq "X48n0808.xml")
-	{
-		$ii = "005" if($i == 2);
-		$ii = "009" if($i == 3);
-		$ii = "010" if($i == 4);
-	}
-	# X49n0812.xml 由卷 2 不是 1 (沒有 1)
-	if($file eq "X49n0812.xml")
-	{
-		$ii = "002";
-	}
-	# X49n0815.xml 由卷 1~8,10~13 不是 1~12 (沒有 9)
-	if($file eq "X49n0815.xml")
-	{
-		$ii = sprintf("%03d",$i+1) if($i > 8);
-	}
-	# X50n0817.xml 由卷 17 不是 1 (沒有 1~16)
-	if($file eq "X50n0817.xml")
-	{
-		$ii = "017";
-	}
-	# X50n0819.xml 由卷 1~14,16,18 不是 1~16 (沒有 15,17)
-	if($file eq "X50n0819.xml")
-	{
-		$ii = "016" if($i == 15);
-		$ii = "018" if($i == 16);
-	}
-	# X51n0822.xml 由卷 4~10 不是 1~7 (沒有 1~3)
-	if($file eq "X51n0822.xml")
-	{
-		$ii = sprintf("%03d",$i+3);
-	}
-	# X53n0836.xml 由卷 1,2,4~7,17 不是 1~7 (沒有 3,8~16)
-	if($file eq "X53n0836.xml")
-	{
-		$ii = sprintf("%03d",$i+1) if($i > 2);
-		$ii = "017" if($i == 7);
-	}
-	# X53n0842.xml 由卷 29,30 不是 1,2 (沒有 1~28)
-	if($file eq "X53n0842.xml")
-	{
-		$ii = "029" if($i == 1);
-		$ii = "030" if($i == 2);
-	}
-	# X53n0843.xml 由卷 9,18 不是 1,2 (沒有 1~8,10~17)
-	if($file eq "X53n0843.xml")
-	{
-		$ii = "009" if($i == 1);
-		$ii = "018" if($i == 2);
-	} 
-	# X55n0882.xml 有三卷, 分別為 4,7,8
-	if($file eq "X55n0882.xml")
-	{
-		$ii = "004" if($i == 1);
-		$ii = "007" if($i == 2);
-		$ii = "008" if($i == 3);
-	} 
-	# X57n0952.xml 只有卷 10
-	if($file eq "X57n0952.xml")
-	{
-		$ii = "010" if($i == 1);
-	} 
-	# X57n0966.xml 由卷 2 開始 (2,3,4,5)
-	if($file eq "X57n0966.xml")
-	{
-		$ii = sprintf("%03d",$i+1);
-	}
-	# X57n0967.xml 由卷 3 開始 (3,4)
-	if($file eq "X57n0967.xml")
-	{
-		$ii = sprintf("%03d",$i+2);
-	}
-	# X58n1015.xml 只有二卷, 分別為 14,22
-	if($file eq "X58n1015.xml")
-	{
-		$ii = "014" if($i == 1);
-		$ii = "022" if($i == 2);
-	}
-	# X72n1435.xml 由卷13 接著卷 16
-	if($file eq "X72n1435.xml" and $i > 13)
-	{
-		$ii = sprintf("%03d",$i+2);
-	}
-	# X73n1456.xml 由卷44~55, 不是 41~52 (沒有 41,42,43)
-	if($file eq "X73n1456.xml" and $i > 40)
-	{
-		$ii = sprintf("%03d",$i+3);
-	}
-	# X81n1568.xml 由卷10~卷25, 不是1~16
-	if($file eq "X81n1568.xml")
-	{
-		$ii = sprintf("%03d",$i+9);
-	}
-	# X82n1571.xml 由卷 34~120 不是 1~ 87
-	if($file eq "X82n1571.xml")
-	{
-		$ii = sprintf("%03d",$i+33);
-	}
-	# X85n1587.xml 由卷 2~16 不是 1~ 15
-	if($file eq "X85n1587.xml")
-	{
-		$ii = sprintf("%03d",$i+1);
-	}
-	# J25nB165.xml 共 1 卷, 只有卷 6
-	if($file eq "J25nB165.xml")
-	{
-		$ii = "006" if($i==1);
-	}
-	# J25nB166.xml 共 1 卷, 只有卷 7
-	if($file eq "J25nB166.xml")
-	{
-		$ii = "007" if($i==1);
-	}
-	# J25nB167.xml 共 1 卷, 只有卷 8
-	if($file eq "J25nB167.xml")
-	{
-		$ii = "008" if($i==1);
-	}
-	# J32nB271.xml 由卷 6~44 不是 1~39
-	if($file eq "J32nB271.xml")
-	{
-		$ii = sprintf("%03d",$i+5);
-	}
-	# J33nB277.xml 由卷 12~25 不是 1~14
-	if($file eq "J33nB277.xml")
-	{
-		$ii = sprintf("%03d",$i+11);
-	}
-	# W01n0007.xml 共 1 卷, 只有卷 3
-	if($file eq "W01n0007.xml")
-	{
-		$ii = "003" if($i==1);
-	}
-	# W03n0025.xml 共 1 卷, 只有卷 2
-	if($file eq "W03n0025.xml")
-	{
-		$ii = "002" if($i==1);
-	}
-	# W03n0030.xml 共 1 卷, 只有卷 14
-	if($file eq "W03n0030.xml")
-	{
-		$ii = "014" if($i==1);
-	}
-	# A097n1276      大唐開元釋教廣品歷章(第3卷-第4卷)
-	if($file eq "A097n1276.xml")
-	{
-		$ii = sprintf("%03d",$i+2);
-	}
-	# A098n1276      大唐開元釋教廣品歷章(第5-10,12-20卷)
-	if($file eq "A098n1276.xml")
-	{
-		if($i<=6) {	$ii = sprintf("%03d",$i+4); }
-		else { $ii = sprintf("%03d",$i+5); }
-	}
-	# A111n1501      大中祥符法寶錄 (3-8,10-12)
-	if($file eq "A111n1501.xml")
-	{
-		if($i<=6) {	$ii = sprintf("%03d",$i+2); }
-		else { $ii = sprintf("%03d",$i+3); }
-	}
-	# A112n1501      大中祥符法寶錄 (13-18,20)
-	if($file eq "A112n1501.xml")
-	{
-		if($i<=6) {	$ii = sprintf("%03d",$i+12); }
-		else { $ii = sprintf("%03d",$i+13); }
-	}
-	# A114n1510      佛說大乘僧伽吒法義經 (2,6,7卷)
-	if($file eq "A114n1510.xml")
-	{
-		$ii = "002" if($i==1);
-		$ii = "006" if($i==2);
-		$ii = "007" if($i==3);
-	}
-	# A120n1565      瑜伽師地論義演(第1,4,6-8,11-12,15,17,19-20,22,26,28-32卷)
-	if($file eq "A120n1565.xml")
-	{
-		$ii = "001" if($i==1);
-		$ii = "004" if($i==2);
-		$ii = "006" if($i==3);
-		$ii = "007" if($i==4);
-		$ii = "008" if($i==5);
-		$ii = "011" if($i==6);
-		$ii = "012" if($i==7);
-		$ii = "015" if($i==8);
-		$ii = "017" if($i==9);
-		$ii = "019" if($i==10);
-		$ii = "020" if($i==11);
-		$ii = "022" if($i==12);
-		$ii = "026" if($i==13);
-		$ii = sprintf("%03d",$i+14) if($i > 13);
-	}
-	# A121n1565      瑜伽師地論義演(第33-35,38,40卷)
-	if($file eq "A121n1565.xml")
-	{
-		$ii = "033" if($i==1);
-		$ii = "034" if($i==2);
-		$ii = "035" if($i==3);
-		$ii = "038" if($i==4);
-		$ii = "040" if($i==5);
-	}
-	# 補編		B02n0001	均如大師華嚴學全書(第10卷-第20卷)               11 ,【均如著　金知見編】
-	if($file eq "B02n0001.xml")
-	{
-		$ii = sprintf("%03d",$i+9);
-	}
-	# 補編		B04n0002	華嚴經疏論纂要(第47卷-第85卷)                   39 ,【道霈編】
-	if($file eq "B04n0002.xml")
-	{
-		$ii = sprintf("%03d",$i+46);
-	}
-	# 補編		B05n0002	華嚴經疏論纂要(第86卷-第120卷)                  35 ,【道霈編】
-	if($file eq "B05n0002.xml")
-	{
-		$ii = sprintf("%03d",$i+85);
-	}
-	# 補編		B15n0088	古今圖書集成選輯（上）(第55卷-第124卷)              70     ,【】
-	if($file eq "B15n0088.xml")
-	{
-		$ii = sprintf("%03d",$i+54);
-	}
-	# 補編		B16n0088	古今圖書集成選輯（下）(第125卷-第212卷)             88     ,【】
-	if($file eq "B16n0088.xml")
-	{
-		$ii = sprintf("%03d",$i+124);
-	}
-	# 補編		B17n0089	太平廣記選輯（卷八十七～一三四）(第87卷-第134卷)    48     ,【李昉等編纂】
-	if($file eq "B17n0089.xml")
-	{
-		$ii = sprintf("%03d",$i+86);
-	}
-	# 補編		B24n0141    嵩山少林寺輯志(第1,9,12-19,22)                      11     ,【輯自傅梅撰《嵩書》】
-	if($file eq "B24n0141.xml")
-	{
-		$ii = "001" if($i==1);
-		$ii = "009" if($i==2);
-		$ii = sprintf("%03d",$i+9) if($i>=3 || $i<=10);
-		$ii = "022" if($i==11);
-	}
-	# C056n1163      一切經音義(第1卷-第15卷)
-	# C057n1163      一切經音義(第16卷-第25卷)
-	if($file eq "C057n1163.xml")
-	{
-		$ii = sprintf("%03d",$i+15);
-	}
-	# 佛寺志		GA012n0010		明州阿育王山志(第9卷-第10卷)              2     ,【明 郭子章撰】
-	if($file eq "GA012n0010.xml")
-	{
-		$ii = sprintf("%03d",$i+8);
-	}
-	# 佛寺志		GA012n0011		明州阿育王山續志(第11卷-第16卷)           6     ,【清 釋畹荃撰】
-	if($file eq "GA012n0011.xml")
-	{
-		$ii = sprintf("%03d",$i+10);
-	}
-	# 佛寺志		GA032n0032		徑山志(第6卷-第14卷)                      9     ,【明 宋奎光撰】
-	if($file eq "GA032n0032.xml")
-	{
-		$ii = sprintf("%03d",$i+5);
-	}
-	# 佛寺志		GA082n0084		雞足山寺志(第7卷-第10卷)                  4     ,【明 錢邦纂　清 茫承勳增修】
-	if($file eq "GA082n0084.xml")
-	{
-		$ii = sprintf("%03d",$i+6);
-	}
-	# 佛寺志		GA089n0089		天台山方外志(第8卷-第18卷)               11     ,【】
-	if($file eq "GA089n0089.xml")
-	{
-		$ii = sprintf("%03d",$i+7);
-	}
-	# 佛寺志		GA090n0089		天台山方外志(第19卷-第30卷)              12     ,【】
-	if($file eq "GA090n0089.xml")
-	{
-		$ii = sprintf("%03d",$i+18);
-	}
-	# K34n1257       新集藏經音義隨函錄(第1卷-第12)
-	# K35n1257       新集藏經音義隨函錄(第13卷-第30)
-	if($file eq "K35n1257.xml")
-	{
-		$ii = sprintf("%03d",$i+12);
-	}
-	# K41n1482       大乘中觀釋論(第10卷-第18卷)
-	if($file eq "K41n1482.xml")
-	{
-		$ii = sprintf("%03d",$i+9);
-	}
-	# L115n1490      妙法蓮華經玄義釋籤(第1卷-第3卷)
-	# L116n1490      妙法蓮華經玄義釋籤(第4卷-第40卷)
-	if($file eq "L116n1490.xml")
-	{
-		$ii = sprintf("%03d",$i+3);
-	}
-	# L130n1557      大方廣佛華嚴經疏鈔會本(第1卷-第17卷)
-	# L131n1557      大方廣佛華嚴經疏鈔會本(第17卷-第34卷)
-	if($file eq "L131n1557.xml")
-	{
-		$ii = sprintf("%03d",$i+16);
-	}
-	# L132n1557      大方廣佛華嚴經疏鈔會本(第34卷-第51卷)
-	if($file eq "L132n1557.xml")
-	{
-		$ii = sprintf("%03d",$i+33);
-	}
-	# L133n1557      大方廣佛華嚴經疏鈔會本(第51卷-第80卷)
-	if($file eq "L133n1557.xml")
-	{
-		$ii = sprintf("%03d",$i+50);
-	}
-	# L153n1638      雪嶠信禪師語錄(第1卷-第6卷)
-	# L154n1638      雪嶠信禪師語錄(第7卷-第10卷)
-	if($file eq "L154n1638.xml")
-	{
-		$ii = sprintf("%03d",$i+6);
-	}
-	# P154n1519      宗門統要正續集(第1卷-第12卷)
-	# P155n1519      宗門統要正續集(第13卷-第20卷)
-	if($file eq "P155n1519.xml")
-	{
-		$ii = sprintf("%03d",$i+12);
-	}
-	# P178n1611      諸佛世尊如來菩薩尊者神僧名經(第1卷-第29卷)
-	# P179n1611      諸佛世尊如來菩薩尊者神僧名經(第30卷-第40卷)
-	if($file eq "P179n1611.xml")
-	{
-		$ii = sprintf("%03d",$i+29);
-	}
-	# P179n1612      諸佛世尊如來菩薩尊者名稱歌曲(第1卷-第18卷)
-	# P180n1612      諸佛世尊如來菩薩尊者名稱歌曲(第19卷-第50卷)
-	if($file eq "P180n1612.xml")
-	{
-		$ii = sprintf("%03d",$i+18);
-	}
-	# P181n1612      諸佛世尊如來菩薩尊者名稱歌曲(第51卷)
-	if($file eq "P181n1612.xml")
-	{
-		$ii = "051" if($i==1);
-	}
-	# P181n1615      大明三藏法數(第1卷-第13卷)
-	# P182n1615      大明三藏法數(第14卷-第35卷)
-	if($file eq "P182n1615.xml")
-	{
-		$ii = sprintf("%03d",$i+13);
-	}
-	# P183n1615      大明三藏法數(第36卷-第38卷)
-	if($file eq "P183n1615.xml")
-	{
-		$ii = sprintf("%03d",$i+35);
-	}
-	# P184n1617      妙法蓮華經要解(第1卷-第12卷)
-	# P185n1617      妙法蓮華經要解(第13卷-第19卷)
-	if($file eq "P185n1617.xml")
-	{
-		$ii = sprintf("%03d",$i+12);
-	}
-	# P189n1629      天台四教儀集註(第2卷-第10卷)
-	if($file eq "P189n1629.xml")
-	{
-		$ii = sprintf("%03d",$i+1);
-	}
-	# S06n0046       上生經會古通今新抄(第2,4卷)
-	if($file eq "S06n0046.xml")
-	{
-		$ii = "002" if($i==1);
-		$ii = "004" if($i==2);
-	}
-	# U222n1418      華嚴經疏科(第1卷-第3卷)
-	# U223n1418      華嚴經疏科(第4-5,7-20卷)
-	if($file eq "U223n1418.xml")
-	{
-		$ii = "004" if($i==1);
-		$ii = "005" if($i==2);
-		$ii = sprintf("%03d",$i+4) if($i > 2);
-	}
-	# N,02,      ,0001,  11 ,經分別(第5卷-第15卷)              ,【通妙譯】
-	if($file eq "N02n0001.xml")
-	{
-		$ii = sprintf("%03d",$i+4);
-	}
-
-	# N,04,      ,0002,  12 ,犍度(第11卷-第22卷)             ,【通妙譯】
-	if($file eq "N04n0002.xml")
-	{
-		$ii = sprintf("%03d",$i+10);
-	}
-
-	# N,07,      ,0004,   9 ,長部經典(第15卷-第23卷)         ,【通妙譯】
-	if($file eq "N07n0004.xml")
-	{
-		$ii = sprintf("%03d",$i+14);
-	}
-
-	# N,08,      ,0004,  11 ,長部經典(第24卷-第34卷)         ,【通妙譯】
-	if($file eq "N08n0004.xml")
-	{
-		$ii = sprintf("%03d",$i+23);
-	}
-
-	# N,10,      ,0005,   4 ,中部經典(第5卷-第8卷)           ,【通妙譯】
-	if($file eq "N10n0005.xml")
-	{
-		$ii = sprintf("%03d",$i+4);
-	}
-
-	# N,11,      ,0005,   4 ,中部經典(第9卷-第12卷)          ,【通妙譯】
-	if($file eq "N11n0005.xml")
-	{
-		$ii = sprintf("%03d",$i+8);
-	}
-
-	# N,12,      ,0005,   4 ,中部經典(第13卷-第16卷)         ,【通妙譯】
-	if($file eq "N12n0005.xml")
-	{
-		$ii = sprintf("%03d",$i+12);
-	}
-
-	# N,14,      ,0006,  10 ,相應部經典(第12卷-第21卷)       ,【雲庵譯】
-	if($file eq "N14n0006.xml")
-	{
-		$ii = sprintf("%03d",$i+11);
-	}
-
-	# N,15,      ,0006,  13 ,相應部經典(第22卷-第34卷)       ,【雲庵譯】
-	if($file eq "N15n0006.xml")
-	{
-		$ii = sprintf("%03d",$i+21);
-	}
-
-	# N,16,      ,0006,   7 ,相應部經典(第35卷-第41卷)       ,【雲庵譯】
-	if($file eq "N16n0006.xml")
-	{
-		$ii = sprintf("%03d",$i+34);
-	}
-
-	# N,17,      ,0006,   6 ,相應部經典(第42卷-第47卷)       ,【雲庵譯】
-	if($file eq "N17n0006.xml")
-	{
-		$ii = sprintf("%03d",$i+41);
-	}
-
-	# N,18,      ,0006,   9 ,相應部經典(第48卷-第56卷)       ,【雲庵譯】
-	if($file eq "N18n0006.xml")
-	{
-		$ii = sprintf("%03d",$i+47);
-	}
-
-	# N,20,      ,0007,   1 ,增支部經典(第4卷)               ,【關世謙譯】
-	if($file eq "N20n0007.xml")
-	{
-		$ii = sprintf("%03d",$i+3);
-	}
-
-	# N,21,      ,0007,   1 ,增支部經典(第5卷)               ,【郭哲彰譯】
-	if($file eq "N21n0007.xml")
-	{
-		$ii = sprintf("%03d",$i+4);
-	}
-
-	# N,22,      ,0007,   2 ,增支部經典(第6卷-第7卷)         ,【郭哲彰譯】
-	if($file eq "N22n0007.xml")
-	{
-		$ii = sprintf("%03d",$i+5);
-	}
-
-	# N,23,      ,0007,   1 ,增支部經典(第8卷)               ,【郭哲彰譯】
-	if($file eq "N23n0007.xml")
-	{
-		$ii = sprintf("%03d",$i+7);
-	}
-
-	# N,24,      ,0007,   2 ,增支部經典(第9卷-第10卷)        ,【郭哲彰譯】
-	if($file eq "N24n0007.xml")
-	{
-		$ii = sprintf("%03d",$i+8);
-	}
-
-	# N,25,      ,0007,   2 ,增支部經典(第11卷-第12卷)       ,【郭哲彰譯】
-	if($file eq "N25n0007.xml")
-	{
-		$ii = sprintf("%03d",$i+10);
-	}
-
-	# N,30,      ,0017,  20 ,譬喻經(第40卷-第59卷)           ,【悟醒譯】
-	if($file eq "N30n0017.xml")
-	{
-		$ii = sprintf("%03d",$i+39);
-	}
-
-	# N,32,      ,0018,   1 ,本生經(第3卷)                   ,【悟醒譯】
-	if($file eq "N32n0018.xml")
-	{
-		$ii = sprintf("%03d",$i+2);
-	}
-
-	# N,33,      ,0018,   1 ,本生經(第4卷)                   ,【悟醒譯】
-	if($file eq "N33n0018.xml")
-	{
-		$ii = sprintf("%03d",$i+3);
-	}
-
-	# N,34,      ,0018,   2 ,本生經(第5卷-第6卷)             ,【悟醒譯】
-	if($file eq "N34n0018.xml")
-	{
-		$ii = sprintf("%03d",$i+4);
-	}
-
-	# N,35,      ,0018,   3 ,本生經(第7卷-第9卷)             ,【悟醒譯】
-	if($file eq "N35n0018.xml")
-	{
-		$ii = sprintf("%03d",$i+6);
-	}
-
-	# N,36,      ,0018,   4 ,本生經(第10卷-第13卷)           ,【悟醒譯】
-	if($file eq "N36n0018.xml")
-	{
-		$ii = sprintf("%03d",$i+9);
-	}
-
-	# N,37,      ,0018,   3 ,本生經(第14卷-第16卷)           ,【悟醒譯】
-	if($file eq "N37n0018.xml")
-	{
-		$ii = sprintf("%03d",$i+13);
-	}
-
-	# N,38,      ,0018,   2 ,本生經(第17卷-第18卷)           ,【悟醒譯】
-	if($file eq "N38n0018.xml")
-	{
-		$ii = sprintf("%03d",$i+16);
-	}
-
-	# N,39,      ,0018,   4 ,本生經(第19卷-第22卷)           ,【悟醒譯】
-	if($file eq "N39n0018.xml")
-	{
-		$ii = sprintf("%03d",$i+18);
-	}
-
-	# N,40,      ,0018,   2 ,本生經(第23卷-第24卷)           ,【悟醒譯】
-	if($file eq "N40n0018.xml")
-	{
-		$ii = sprintf("%03d",$i+22);
-	}
-
-	# N,41,      ,0018,   1 ,本生經(第25卷)                  ,【悟醒譯】
-	if($file eq "N41n0018.xml")
-	{
-		$ii = sprintf("%03d",$i+24);
-	}
-
-	# N,42,      ,0018,   1 ,本生經(第26卷)                  ,【悟醒譯】
-	if($file eq "N42n0018.xml")
-	{
-		$ii = sprintf("%03d",$i+25);
-	}
-
-	# N,44,      ,0019,   2 ,無礙解道(第3卷-第4卷)           ,【悟醒譯】
-	if($file eq "N44n0019.xml")
-	{
-		$ii = sprintf("%03d",$i+2);
-	}
-
-	# N,46,      ,0022,   6 ,大義釋(第11卷-第16卷)           ,【悟醒譯】
-	if($file eq "N46n0022.xml")
-	{
-		$ii = sprintf("%03d",$i+10);
-	}
-
-	# N,50,      ,0025,   3 ,分別論(第16卷-第18卷)           ,【郭哲彰譯】
-	if($file eq "N50n0025.xml")
-	{
-		$ii = sprintf("%03d",$i+15);
-	}
-
-	# N,52,      ,0028,   1 ,雙論(第7卷)                     ,【郭哲彰譯】
-	if($file eq "N52n0028.xml")
-	{
-		$ii = sprintf("%03d",$i+6);
-	}
-
-	# N,53,      ,0028,   3 ,雙論(第8卷-第10卷)              ,【郭哲彰譯】
-	if($file eq "N53n0028.xml")
-	{
-		$ii = sprintf("%03d",$i+7);
-	}
-
-	# N,55,      ,0029,   2 ,發趣論(第3卷-第4卷)             ,【郭哲彰譯】
-	if($file eq "N55n0029.xml")
-	{
-		$ii = sprintf("%03d",$i+2);
-	}
-
-	# N,56,      ,0029,   2 ,發趣論(第5卷-第6卷)             ,【郭哲彰譯】
-	if($file eq "N56n0029.xml")
-	{
-		$ii = sprintf("%03d",$i+4);
-	}
-
-	# N,57,      ,0029,   1 ,發趣論(第7卷)                   ,【郭哲彰譯】
-	if($file eq "N57n0029.xml")
-	{
-		$ii = sprintf("%03d",$i+6);
-	}
-
-	# N,58,      ,0029,   2 ,發趣論(第8卷-第9卷)             ,【郭哲彰譯】
-	if($file eq "N58n0029.xml")
-	{
-		$ii = sprintf("%03d",$i+7);
-	}
-
-	# N,59,      ,0029,   1 ,發趣論(第10卷)                  ,【郭哲彰譯】
-	if($file eq "N59n0029.xml")
-	{
-		$ii = sprintf("%03d",$i+9);
-	}
-
-	# N,60,      ,0029,   2 ,發趣論(第11卷-第12卷)           ,【郭哲彰譯】
-	if($file eq "N60n0029.xml")
-	{
-		$ii = sprintf("%03d",$i+10);
-	}
-
-	# N,62,      ,0030,  18 ,論事(第6卷-第23卷)              ,【郭哲彰譯】
-	if($file eq "N62n0030.xml")
-	{
-		$ii = sprintf("%03d",$i+5);
-	}
-
-	# N,64,      ,0031,  12 ,彌蘭王問經(第14卷-第25卷)       ,【郭哲彰譯】
-	if($file eq "N64n0031.xml")
-	{
-		$ii = sprintf("%03d",$i+13);
-	}
-
-	# N,68,      ,0035,   6 ,清淨道論(第8卷-第13卷)          ,【佛音撰　悟醒譯】
-	if($file eq "N68n0035.xml")
-	{
-		$ii = sprintf("%03d",$i+7);
-	}
-
-	# N,69,      ,0035,  10 ,清淨道論(第14卷-第23卷)         ,【佛音撰　悟醒譯】
-	if($file eq "N69n0035.xml")
-	{
-		$ii = sprintf("%03d",$i+13);
-	}
-
-	# D01, 8679,    1  佛說佛名經（存卷四）        只有卷 4
-	if($file eq "D01n8679.xml")
-	{
-		$ii = sprintf("%03d",$i+3);
-	}
-
-	# D02, 8680,    1  佛說佛名經（存卷七）        只有卷 7
-	if($file eq "D02n8680.xml")
-	{
-		$ii = sprintf("%03d",$i+6);
-	}
-
-	# D20, 8869,    1  惟教三昧（存卷下　前殘）    只有卷 2
-	if($file eq "D20n8869.xml")
-	{
-		$ii = sprintf("%03d",$i+1);
-	}
-
-	# D22, 8874,    1  成實論義記（存卷中　前殘）  只有卷 2
-	if($file eq "D22n8874.xml")
-	{
-		$ii = sprintf("%03d",$i+1);
-	}
-	# ZY,03,   ,0005, 1,華嚴一乘十玄門修學記（上）                    ,【智諭老和尚指導】
-	# ZY,04,   ,0005, 1,華嚴一乘十玄門修學記（中）                    ,【智諭老和尚指導】
-	# ZY,05,   ,0005, 1,華嚴一乘十玄門修學記（下）                    ,【智諭老和尚指導】
-	if($file eq "ZY04n0005.xml")
-	{
-		$ii = "002";
-	}
-	if($file eq "ZY05n0005.xml")
-	{
-		$ii = "003";
-	}
-	# ZY,17,   ,0022, 2,維摩詰所說經講記（上）                        ,【智諭老和尚講述】
-	# ZY,18,   ,0022, 2,維摩詰所說經講記（下）                        ,【智諭老和尚講述】
-	if($file eq "ZY18n0022.xml")
-	{
-		$ii = sprintf("%03d",$i+2);
-	}
-	# ZY,19,   ,0023, 1,大方廣圓覺修多羅了義經修學記（上）            ,【智諭老和尚指導】
-	# ZY,20,   ,0023, 1,大方廣圓覺修多羅了義經修學記（下）            ,【智諭老和尚指導】
-	if($file eq "ZY20n0023.xml")
-	{
-		$ii = "002";
-	}
-	# ZY,36,   ,0047, 1,佛七講話（一）                                ,【智諭老和尚講述】
-	# ZY,37,   ,0047, 2,佛七講話（二、三）                            ,【智諭老和尚講述】
-	# ZY,38,   ,0047, 2,佛七講話（四、五）                            ,【智諭老和尚講述】
-	# ZY,39,   ,0047, 3,佛七講話（六、七、八）                        ,【智諭老和尚講述】
-	if($file eq "ZY37n0047.xml")
-	{
-		$ii = sprintf("%03d",$i+1);
-	}
-	if($file eq "ZY38n0047.xml")
-	{
-		$ii = sprintf("%03d",$i+3);
-	}
-	if($file eq "ZY39n0047.xml")
-	{
-		$ii = sprintf("%03d",$i+5);
-	}
-	# DA,04,   ,0004, 1,二力室文集（上）                              ,【道安法師撰述】
-	# DA,05,   ,0004, 1,二力室文集（下）                              ,【道安法師撰述】
-	if($file eq "DA05n0004.xml")
-	{
-		$ii = sprintf("%03d",$i+1);
-	}
-	# DA,06,   ,0005, 4,日記（一）                                    ,【道安法師撰述】
-	# DA,07,   ,0005, 2,日記（二）                                    ,【道安法師撰述】
-	# DA,08,   ,0005, 3,日記（三）                                    ,【道安法師撰述】
-	# DA,09,   ,0005, 5,日記（四）                                    ,【道安法師撰述】
-	# DA,10,   ,0005, 5,日記（五）                                    ,【道安法師撰述】
-	# DA,11,   ,0005, 4,日記（六）                                    ,【道安法師撰述】
-	# DA,12,   ,0005, 5,日記（七）                                    ,【道安法師撰述】
-	# DA,13,   ,0005, 3,日記（八）（含墨蹟、函札、法語、編後贅語）    ,【道安法師撰述】
-	if($file eq "DA07n0005.xml")
-	{
-		$ii = sprintf("%03d",$i+4);
-	}
-	if($file eq "DA08n0005.xml")
-	{
-		$ii = sprintf("%03d",$i+6);
-	}
-	if($file eq "DA09n0005.xml")
-	{
-		$ii = sprintf("%03d",$i+9);
-	}
-	if($file eq "DA10n0005.xml")
-	{
-		$ii = sprintf("%03d",$i+14);
-	}
-	if($file eq "DA11n0005.xml")
-	{
-		$ii = sprintf("%03d",$i+19);
-	}
-	if($file eq "DA12n0005.xml")
-	{
-		$ii = sprintf("%03d",$i+23);
-	}
-	if($file eq "DA13n0005.xml")
-	{
-		$ii = sprintf("%03d",$i+28);
-	}
-	return $ii;
 }
 
 ####################################################################
