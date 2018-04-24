@@ -115,7 +115,7 @@ sub initial
                 $bulei_hash{$datas[$i]} = $bulei_id;    # $bulei_hash{"T0001"} = 0
             }
             # xxx.html , xxx.htm
-            elsif($datas[$i] =~ /^(\S+\.html?)\s+(.*)$/i)
+            elsif($datas[$i] =~ /^(\S+\.html?)[ \t]+(.*)$/i) # [ \t]+ 不能用 \s+ 因為可能有全型空格
             {
                 $links[$i] = $1;
                 $datas[$i] = $2;
