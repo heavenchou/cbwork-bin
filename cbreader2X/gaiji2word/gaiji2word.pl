@@ -9,21 +9,28 @@ use CBETA;
 
 # 參數
 
+my $argv = shift;   # 參數有二種 nav 則處理目錄, catlog 則處理 catlog
+
 my $infile = "";
 my $outfile = "";
 my $gaiji = new Gaiji();
 $gaiji->load_access_db();
 
-$infile = "c:/cbwork/bin/cbreader2x/nav/book_nav_gaiji.xhtml";
-$outfile = "c:/cbwork/bin/cbreader2x/nav/book_nav.xhtml"; 
-runfile();
-$infile = "c:/cbwork/bin/cbreader2x/nav/bulei_nav_gaiji.xhtml";
-$outfile = "c:/cbwork/bin/cbreader2x/nav/bulei_nav.xhtml"; 
-runfile();
-$infile = "c:/cbwork/bin/cbreader2x/catalog/catalog_gaiji.txt";
-$outfile = "c:/cbwork/bin/cbreader2x/catalog/catalogw.txt"; 
-runfile();
-
+if($argv eq "nav")
+{
+    $infile = "c:/cbwork/bin/cbreader2x/nav/book_nav_gaiji.xhtml";
+    $outfile = "c:/cbwork/bin/cbreader2x/nav/book_nav.xhtml"; 
+    runfile();
+    $infile = "c:/cbwork/bin/cbreader2x/nav/bulei_nav_gaiji.xhtml";
+    $outfile = "c:/cbwork/bin/cbreader2x/nav/bulei_nav.xhtml"; 
+    runfile();
+}
+elsif($argv eq "catalog")
+{
+    $infile = "c:/cbwork/bin/cbreader2x/catalog/catalog_gaiji.txt";
+    $outfile = "c:/cbwork/bin/cbreader2x/catalog/catalogw.txt"; 
+    runfile();
+}
 
 sub runfile
 {
@@ -65,7 +72,7 @@ sub change_gaiji
             }
             else
             {
-                print " $CB : $uni : $univer \n";
+                #print " $CB : $uni : $univer \n";
             }
         }
         # nor unicode
@@ -82,7 +89,7 @@ sub change_gaiji
                 }
                 else
                 {
-                    print " $CB : $uni : $univer \n";
+                    #print " $CB : $uni : $univer \n";
                 }
             }
         }
