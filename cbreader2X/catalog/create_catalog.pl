@@ -24,7 +24,7 @@ my $bulei = Bulei->new;
 $sutralist->initial("../sutralist/sutralist.txt");  # 初始化, 要傳入 sutralist.txt 的位置
 $bulei->initial("../bulei/bulei.txt");
 
-open OUT, ">:utf8", "catalog.txt";
+open OUT, ">:utf8", "catalog_gaiji.txt";
 
 for(my $i=0; $i<=$#{$sutralist->book}; $i++)
 {

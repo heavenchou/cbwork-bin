@@ -22,7 +22,7 @@ my $pre_level = 0;
 # 這是用來判斷是否是第一組的 <li> ... </li> , 是的話就不要呈現 
 my $IsFirstLi = 1;
 
-open OUT, ">:utf8", "bulei_nav.xhtml";
+open OUT, ">:utf8", "bulei_nav_gaiji.xhtml";
 my $xhtml = "";
 create_head();
 create_body();

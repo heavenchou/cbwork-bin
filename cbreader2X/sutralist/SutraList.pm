@@ -150,7 +150,7 @@ sub get_keys
             # T 全藏
             $self->get_keys_by_book($keys,$from);
         }
-        elsif($from =~ /^\D+\d{2,3}$/)
+        elsif($from =~ /^\D+\d{2,3}$/ && $from !~ /^J[AB]\d{3}$/)
         {
             # T01 全冊
             $self->get_keys_by_vol($keys,$from);
@@ -163,7 +163,7 @@ sub get_keys
     }
     else
     {
-        if($from =~ /^\D+\d{2,3}$/)
+        if($from =~ /^\D+\d{2,3}$/ && $from !~ /^J[AB]\d{3}$/)
         {
             # T01,T02 冊範圍
             $self->get_keys_by_vols($keys,$from,$to);

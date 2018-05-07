@@ -19,7 +19,7 @@ my $pre_level = 0;
 # 這是用來判斷是否是第一組的 <li> ... </li> , 是的話就不要呈現 
 my $IsFirstLi = 1;
 
-open OUT, ">:utf8", "book_nav.xhtml";
+open OUT, ">:utf8", "book_nav_gaiji.xhtml";
 my $xhtml = "";
 create_head();
 create_body();
@@ -65,40 +65,56 @@ sub create_body
         }
         elsif($book_nav->type->[$i] eq "L")
         {
-            # 一般連結
-            #$xhtml .= "待處理 : " . $book_nav->data->[$i];
-
-            my @keys = ();
-            # 傳入範圍, 例如 T01,T02 or T0001,T0005, 傳回所有符合的 sutraid 
-            # 放在 keys 陣列中
-            $sutralist->get_keys(\@keys, $book_nav->data->[$i]);
-            
-            if($#keys < 0)
+            # 網頁連結
+            # XXX.htm 說明檔
+            if($book_nav->data->[$i] =~ /^(.+\.[0-9A-Za-z]+) +(.+)$/i)    # 空格不可以用 \s , 因為有全型空格會在文字中
             {
-                print "error " . $book_nav->data->[$i] . " 沒傳回範圍";
-                <>;
+                my $link = $1;
+                my $name = $2;
+                $xhtml .= "<a href=\"" . $link . "\">" . $name . "</a>";
             }
-            
-            # @keys 可能會有重複的 (跨冊經文), 要過濾掉
-            unique_list(\@keys);
-
-            for(my $k=0; $k<=$#keys; $k++)
+            else
             {
-                my $key = $keys[$k];
-                my $index = $sutralist->index_by_id->{$key};
-                my $link = $sutralist->link->[$index];
-                my $name = $sutralist->name->[$index];
-                $name =~ s/\(第.*?卷\)$//;  # 去除卷數
-                $name =~ s/雜阿含經論會編（上）/雜阿含經論會編/;
-                $link =~ s/T05n0220a_001/T05n0220_001/; # 特例
-                $link = "XML/" . $link;
-                $xhtml .= "<cblink href=\"" . $link . "\">" . $key . " " . $name . "</cblink>";
-            
-                if($k != $#keys)
+                # 經文連結
+                # 有一種是有經名的, 要移除
+                # T0001 長阿含 => T0001
+                if($book_nav->data->[$i] =~ /^(\S+)\s/)
                 {
-                    $xhtml .= "</li>\n";
-                    $xhtml .= "\t" x $book_nav->level->[$i];
-                    $xhtml .= "<li>";
+                    $book_nav->data->[$i] = $1;
+                }
+
+                my @keys = ();
+                # 傳入範圍, 例如 T01,T02 or T0001,T0005, 傳回所有符合的 sutraid 
+                # 放在 keys 陣列中
+                $sutralist->get_keys(\@keys, $book_nav->data->[$i]);
+                
+                if($#keys < 0)
+                {
+                    print "error " . $book_nav->data->[$i] . " 沒傳回範圍";
+                    <>;
+                }
+                
+                # @keys 可能會有重複的 (跨冊經文), 要過濾掉
+                unique_list(\@keys);
+
+                for(my $k=0; $k<=$#keys; $k++)
+                {
+                    my $key = $keys[$k];
+                    my $index = $sutralist->index_by_id->{$key};
+                    my $link = $sutralist->link->[$index];
+                    my $name = $sutralist->name->[$index];
+                    $name =~ s/\(第.*?卷\)$//;  # 去除卷數
+                    $name =~ s/雜阿含經論會編（上）/雜阿含經論會編/;
+                    $link =~ s/T05n0220a_001/T05n0220_001/; # 特例
+                    $link = "XML/" . $link;
+                    $xhtml .= "<cblink href=\"" . $link . "\">" . $key . " " . $name . "</cblink>";
+                
+                    if($k != $#keys)
+                    {
+                        $xhtml .= "</li>\n";
+                        $xhtml .= "\t" x $book_nav->level->[$i];
+                        $xhtml .= "<li>";
+                    }
                 }
             }
         }
