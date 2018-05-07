@@ -18,17 +18,17 @@ $gaiji->load_access_db();
 
 if($argv eq "nav")
 {
-    $infile = "c:/cbwork/bin/cbreader2x/nav/book_nav_gaiji.xhtml";
-    $outfile = "c:/cbwork/bin/cbreader2x/nav/book_nav.xhtml"; 
+    $infile = "/cbwork/bin/cbreader2x/nav/book_nav_gaiji.xhtml";
+    $outfile = "/cbwork/bin/cbreader2x/nav/book_nav.xhtml"; 
     runfile();
-    $infile = "c:/cbwork/bin/cbreader2x/nav/bulei_nav_gaiji.xhtml";
-    $outfile = "c:/cbwork/bin/cbreader2x/nav/bulei_nav.xhtml"; 
+    $infile = "/cbwork/bin/cbreader2x/nav/bulei_nav_gaiji.xhtml";
+    $outfile = "/cbwork/bin/cbreader2x/nav/bulei_nav.xhtml"; 
     runfile();
 }
 elsif($argv eq "catalog")
 {
-    $infile = "c:/cbwork/bin/cbreader2x/catalog/catalog_gaiji.txt";
-    $outfile = "c:/cbwork/bin/cbreader2x/catalog/catalogw.txt"; 
+    $infile = "/cbwork/bin/cbreader2x/catalog/catalog_gaiji.txt";
+    $outfile = "/cbwork/bin/cbreader2x/catalog/catalogw.txt"; 
     runfile();
 }
 
