@@ -3,6 +3,7 @@
 2013.1.4 周邦信 改寫自 cbp4top5.py
 
 Heaven 修改:
+2018/06/06 P5b 格式將 </row>...<row><cell> 轉成 </row><row><cell>... 以利 cbreader 處理
 2018/03/27 處理屬性中的 & 轉成 &amp; , < 轉成 &lt;
 2018/03/23 校註 resp 加上正聞出版社
 2017/11/25 增加 -b 參數, 產生 CBReader 專用的 P5b 格式, 特點為:
@@ -1337,7 +1338,12 @@ class MyTransformer():
 			if 'border' in node.attrib:
 				node.attrib['rend'] = 'border:' + node.attrib['border']
 				del node.attrib['border']
-			r += node.open_tag() + self.traverse(e, mode) + node.end_tag()
+			tbody = self.traverse(e, mode)
+			# 把 </row>....<row><cell> 改成 </row><row><cell>....
+			# P5b 才要改的
+			if options.P5b_Format == True:
+				tbody = re.sub(r"(<\/row>)(.*?)(<row[^>]*><cell[^>]*>)", r"\1\3\2", tbody,0,re.DOTALL)
+			r += node.open_tag() + tbody + node.end_tag()
 		elif tag=='text':
 			node = MyNode(e)
 			r += node.open_tag() + self.traverse(e, mode)

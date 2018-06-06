@@ -159,7 +159,12 @@ def handleNode(e):
 		ref = e.get('ref')
 		ref = ref[1:]
 		if ref.startswith('SD') or ref.startswith('RJ'):
-			if options.siddham==0: r+=globals['siddham'][ref]	# 沒有羅馬轉寫的字怎麼辦? 這裡會有錯誤 , T54n2132.xml 的 SD-CFC3 ??????
+			if options.siddham==0: 
+				# 沒有羅馬轉寫的字只好用 &SDxxxx; 表示
+				if ref in globals['siddham']:
+					r+=globals['siddham'][ref]
+				else:
+					r+='&'+ref+';'
 			elif options.siddham==1: r+='&'+ref+';'
 			else: 
 				#if ref in globals['siddham-big5']:		#有一種悉曇字是有 big5 字的 -- 2013/08/01
