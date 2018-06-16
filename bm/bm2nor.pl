@@ -2685,7 +2685,7 @@ sub select_normal
 				}
 				
 				my $uni = sprintf("%04X",ord($word));
-				if($gaiji->get_unicode_ver($uni) le $show_uni_ver)
+				if($gaiji->get_unicode_ver($uni) <= $show_uni_ver)
 				{
 					$out .= $word;		# 直接呈現 $word
 					next;
@@ -2737,7 +2737,7 @@ sub select_normal
 				#	else { 使用 [組字式] }
 				# }
 				
-				if($uni && $gaiji->get_unicode_ver($uni) le $show_uni_ver)
+				if($uni && $gaiji->get_unicode_ver($uni) <= $show_uni_ver)
 				{
 					# 此字其實有可以呈現的 unicode , 所以還是呈現 unicode
 					$out .= chr(hex($uni));
