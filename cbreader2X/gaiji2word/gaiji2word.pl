@@ -18,8 +18,11 @@ $gaiji->load_access_db();
 
 if($argv eq "nav")
 {
-    $infile = "/cbwork/bin/cbreader2x/nav/book_nav_gaiji.xhtml";
-    $outfile = "/cbwork/bin/cbreader2x/nav/book_nav.xhtml"; 
+    $infile = "/cbwork/bin/cbreader2x/nav/simple_nav_gaiji.xhtml";
+    $outfile = "/cbwork/bin/cbreader2x/nav/simple_nav.xhtml"; 
+    runfile();
+    $infile = "/cbwork/bin/cbreader2x/nav/advance_nav_gaiji.xhtml";
+    $outfile = "/cbwork/bin/cbreader2x/nav/advance_nav.xhtml"; 
     runfile();
     $infile = "/cbwork/bin/cbreader2x/nav/bulei_nav_gaiji.xhtml";
     $outfile = "/cbwork/bin/cbreader2x/nav/bulei_nav.xhtml"; 

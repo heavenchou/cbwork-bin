@@ -8,18 +8,28 @@ use SutraList;
 use lib ".";
 use BookNav;   # 原書結構樹狀目錄
 
+my $infile = shift;     # 來源檔
+my $outfile = $infile;  # 輸出檔
+
+if($infile eq "")
+{
+    print "perl create_book_nav.pl xxx.txt\n";
+    exit;
+}
+$outfile =~ s/\.txt/_gaiji.xhtml/;
+
 my $sutralist = SutraList->new;
 my $book_nav = BookNav->new;
 
 $sutralist->initial("../sutralist/sutralist.txt");
-$book_nav->initial("book_nav.txt");
+$book_nav->initial($infile);
 
 my $pre_level = 0;
 
 # 這是用來判斷是否是第一組的 <li> ... </li> , 是的話就不要呈現 
 my $IsFirstLi = 1;
 
-open OUT, ">:utf8", "book_nav_gaiji.xhtml";
+open OUT, ">:utf8", $outfile;
 my $xhtml = "";
 create_head();
 create_body();

@@ -27,29 +27,37 @@ catalog 雖然有多份, 但都連結到同一卷嗎? 例 點 A121n1565 經, 要到 33 卷嗎?
 
 ■ sutralist
 
-執行 sutralist.pl
+	執行 sutralist.pl
 
-產生所有經文的冊、經號、經名、卷數、第一卷、起始頁行欄
+	產生所有經文的冊、經號、經名、卷數、第一卷、起始頁行欄
 
-這是重要的基礎目錄
+	這是重要的基礎目錄
 
 ■ bulie
 
-部類資料
+	部類資料
 
 ■ 產生導覽目錄 nav
 
-1. bulei_nav.xhtml
+	1. bulei_nav.xhtml
 
-以部類為主的經目樹狀列表
+	以部類為主的經目樹狀列表
 
-由 bulei_nav.pl 產生, 需要讀取 sutralist.txt 和部類資料 bulei.txt
+	由 bulei_nav.pl 產生, 需要讀取 sutralist.txt 和部類資料 bulei.txt
 
-2. book_nav.xhtml
+	2. book_nav.xhtml
 
-以原書結構為主的經目樹狀列表
+	以原書結構為主的經目樹狀列表
 
 ■ 產生各經的目錄 toc
+
+	執行 perl create_toc.pl 在 toc 目錄產生目次檔
+
+	至 ../gaiji2word 執行
+
+	perl gaiji2word_toc.pl 
+	
+	會在 toc 的目錄下產生 toc_new , 這是有處理過缺字的結果
 
 ■ 產生經目列表 catalog
 
