@@ -122,15 +122,17 @@ def getJKMark(e):
 	if not id.startswith('nkr_note_orig') and not id.startswith('nkr_note_editor') and not id.startswith('nkr_note_add'): return ''	
 	
 	jk = id
-	jk = re.sub("\-n\d{1,3}$", r"", jk)				# B06n0003.xml : <anchor xml:id="nkr_note_orig_0004003-n01" n="0004003-n01"/>
+	jk = re.sub("\-n\d{1,3}$", r"", jk)		# B06n0003.xml : <anchor xml:id="nkr_note_orig_0004003-n01" n="0004003-n01"/>
+	jk = re.sub("\-\d{1,3}$", r"", jk)		# 0561001-1  (B13n0080_p0561a14)
 	# jk = jk[-3:]
-	jk = re.sub(".*(.\d\d-?\d*)$", r"\g<1>", jk)
+	# note_orig 也會有 ABC... , 原書有同樣的校勘數字, 所以要大寫英文區分 : X18n0338_p0700a14
+	jk = re.sub(".*(.\d\d[A-Z]?-?\d*)$", r"\g<1>", jk)	# -\d* 上一行先移除了, 
 	jk = re.sub("0(\d\d)", r"\g<1>", jk)		# 如果有三個數字且<100 , 第一個 0 移除
 	
 	# 處理 kbj => 【科】 【標】 【解】
-	if jk[0] == 'k': jk = '【科' + jk[1:] + '】'
-	elif jk[0] == 'b': jk = '【標' + jk[1:] + '】'
-	elif jk[0] == 'j': jk = '【解' + jk[1:] + '】'
+	if jk[0] == 'k': jk = '[科' + jk[1:] + ']'
+	elif jk[0] == 'b': jk = '[標' + jk[1:] + ']'
+	elif jk[0] == 'j': jk = '[解' + jk[1:] + ']'
 	else:
 		jk = re.sub("\D(\d\d)", r"\g<1>", jk)		# 如果前面不是數字則移除
 		if id.startswith('nkr_note_add'):

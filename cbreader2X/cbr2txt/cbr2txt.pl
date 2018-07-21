@@ -73,7 +73,7 @@ sub h2t()
 	
 	while(<IN>)
 	{
-		next unless (/^name="p/);
+		next unless (/^name=['"]p/);
 		if(/<div[^>]*id=.CollationList./)
 		{
 			$end = 1;
@@ -103,12 +103,9 @@ sub h2t()
 		# 移除沒有內容的 [＊]
 		#s/<span class=["']note_star["']>\[＊\]<\/span>//g;
 
-
 		# 段首資訊
 		# <span class="parahead">[0001a10] </span>
-		s/<span class=['"]parahead['"]>\[.{7}\] <\/span>//g;
-
-
+		s/<span [^>]*?class=['"]parahead['"][^>]*>\[.{7}\] <\/span>//g;
 
 		#s/＆lac；//g;
 		#s/<p>　<span class="lg">/\n\n　/g;

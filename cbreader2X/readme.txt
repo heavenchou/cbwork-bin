@@ -8,7 +8,7 @@
 	1. P5a 轉 P5b
     2. 準備基本資料 sutralist , bulei (sutralist 採用 p5b 的版本, 經名才不會有 unicode ext-b)
     3. P5b 切卷
-    4. 產生二份主要導覽文件 bulei_nav.xhtml , book_nav.xhtml -----> 要處理 <g> 缺字
+    4. 產生二份主要導覽文件 bulei_nav.xhtml , book_nav.xhtml -----> 要處理 <g> 缺字 , 手動改 古今圖書集成 ..（上）移除
     5. 產生各經文的目錄 toc -----> 要處理 <g> 缺字
     6. 產生經文目錄 catalog  ----> 手動處理大般若經, 部別, <g> 缺字
     7. 產生經文流水順序 spine
