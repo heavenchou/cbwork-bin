@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2018/07/24 新增 <border>..</border> 轉成 <seg rend="border">..</seg>
 2018/07/21 版本加上 HM，惠敏法師著作集
 2017/05/01 支援 <Q3=> 這類標記, 表示延續上一行的 <Q3> 標記
 2016/12/04 支援印順法師佛學著作集新增的 : 規範字詞 [A=B], 行首頁碼有英文字母 _pa001
@@ -658,6 +659,10 @@ def inline_tag(tag):
 		close_annals(tag)
 	elif re.match(r'<[ABCEY]>', tag):
 		start_inline_byline(tag)
+	elif tag=='<border>':
+		out('<seg rend="border">')
+	elif tag=='</border>':
+		out('</seg>')
 	elif re.match(r'<c[\d\s>]', tag):
 		start_inline_c(tag)
 	elif tag=='<corr>':
@@ -808,6 +813,8 @@ def inline_tag(tag):
 		closeTags('p')
 	elif re.match(r'&((SD)|(RJ))\-\w{4};', tag):	# 悉曇字或蘭札字
 		start_inline_SDRJ(tag)
+	elif tag=='&':
+		out2("&")
 	else:
 		print(old_pb+line_num+'未處理的標記: ' + tag)
 
