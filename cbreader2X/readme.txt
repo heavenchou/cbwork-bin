@@ -5,7 +5,7 @@
 
 資料準備流程
 
-	1. P5a 轉 P5b
+	1. P5a 轉 P5b，此動作要先做，因為底下有些資料是由 P5b 產生的。
     2. 準備基本資料 sutralist , bulei (sutralist 採用 p5b 的版本, 經名才不會有 unicode ext-b)
     3. P5b 切卷
     4. 產生二份主要導覽文件 bulei_nav.xhtml , book_nav.xhtml -----> 要處理 <g> 缺字 , 手動改 古今圖書集成 ..（上）移除
