@@ -9,7 +9,7 @@ use CBETA;
 
 # 參數
 
-my $argv = shift;   # 參數有二種 nav 則處理目錄, catlog 則處理 catlog
+my $argv = shift;   # 參數有二種 nav , slreader_nav 則處理目錄, catlog,slreader_catlog 則處理 catlog
 
 my $infile = "";
 my $outfile = "";
@@ -28,10 +28,22 @@ if($argv eq "nav")
     $outfile = "/cbwork/bin/cbreader2x/nav/bulei_nav.xhtml"; 
     runfile();
 }
+elsif($argv eq "slreader_nav")
+{
+    $infile = "/cbwork/bin/cbreader2x/nav/slreader_nav_gaiji.xhtml";
+    $outfile = "/cbwork/bin/cbreader2x/nav/slreader_nav.xhtml"; 
+    runfile();
+}
 elsif($argv eq "catalog")
 {
     $infile = "/cbwork/bin/cbreader2x/catalog/catalog_gaiji.txt";
-    $outfile = "/cbwork/bin/cbreader2x/catalog/catalogw.txt"; 
+    $outfile = "/cbwork/bin/cbreader2x/catalog/catalog.txt"; 
+    runfile();
+}
+elsif($argv eq "slreader_catalog")
+{
+    $infile = "/cbwork/bin/cbreader2x/catalog/slreader_catalog_gaiji.txt";
+    $outfile = "/cbwork/bin/cbreader2x/catalog/slreader_catalog.txt"; 
     runfile();
 }
 

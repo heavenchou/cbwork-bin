@@ -114,7 +114,8 @@ sub create_body
                     my $link = $sutralist->link->[$index];
                     my $name = $sutralist->name->[$index];
                     $name =~ s/\(第.*?卷\)$//;  # 去除卷數
-                    $name =~ s/雜阿含經論會編（上）/雜阿含經論會編/;
+                    $name =~ s/（上）$//;
+                    $name =~ s/（一）$//;
                     $link =~ s/T05n0220a_001/T05n0220_001/; # 特例
                     $link = "XML/" . $link;
                     $xhtml .= "<cblink href=\"" . $link . "\">" . $key . " " . $name . "</cblink>";

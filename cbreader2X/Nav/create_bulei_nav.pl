@@ -92,7 +92,8 @@ sub create_body
                 $link = "XML/" . $link;
             }
             $name =~ s/\(第.*?卷\)$//;  # 去除卷數
-            $name =~ s/雜阿含經論會編（上）/雜阿含經論會編/;
+            $name =~ s/（上）$//;
+            $name =~ s/（一）$//;
             $link =~ s/(T0[567]n0220)[a-z]/$1/; # 特例
             $xhtml .= "<cblink href=\"" . $link . "\">" . $sutraid . " " . $name . "</cblink>";
         }

@@ -22,7 +22,8 @@ my $sutra = "";     # 0001
 my $lb = "";    #
 
 # 處理藏經的順序
-my @book_order = ("T","X","A","K","S","F","C","D","U","P","J","L","G","M","N","ZS","I","ZW","B","GA","GB","Y");
+#my @book_order = ("T","X","A","K","S","F","C","D","U","P","J","L","G","M","N","ZS","I","ZW","B","GA","GB","Y");
+my @book_order = ("DA","ZY","HM");
 
 open OUT, ">:utf8", "spine.txt";
 open LOG, ">:utf8", "error.txt";
@@ -91,7 +92,7 @@ sub run_all_files
     {
         print $all_files[$i] . "\n";
 		($book,$volnum,$sutra) = get_vol_sutra($all_files[$i]);
-		if($book eq "T" && $volnum >=5 && $volnum <= 7)
+		#if($book eq "T" && $volnum >=5 && $volnum <= 7)
 		{
 			my $text = ParserXML($all_files[$i]);
         	print OUT $text;
