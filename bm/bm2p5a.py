@@ -10,6 +10,8 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2018/08/18 1.XML 大改版, 原本許多 rend 的屬性分布到 style 和其他, 同時修改 rend 規範
+           2.缺字由 Access 資料庫改成 csv 格式的缺字資料檔案
 2018/07/24 新增 <border>..</border> 轉成 <seg rend="border">..</seg>
 2018/07/21 版本加上 HM，惠敏法師著作集
 2017/05/01 支援 <Q3=> 這類標記, 表示延續上一行的 <Q3> 標記
@@ -94,9 +96,9 @@ Heaven 修改:
 2013/06/09 將設定檔改為 ../cbwork_bin.ini
 '''
 
-import collections, configparser, datetime, os, re, struct, sys
+import collections, configparser, datetime, os, re, struct, sys, csv
 from optparse import OptionParser
-import win32com.client # 要安裝 PythonWin
+#import win32com.client # 要安裝 PythonWin
 
 wits={
 'A': '【金藏】',
@@ -219,18 +221,18 @@ def start_i(tag):
 	if level>opens['list']:
 		record_open('list')
 		if L_type == 'simple':
-			out('<list rendition="simple">')
+			out('<list rend="no-marker">')
 		else:
 			out('<list>')
 	s = '<item xml:id="item{}p{}{}{:02d}">'.format(vol, old_pb, line_num, char_count)
 	out(s)
 	opens['item'] += 1
 
-# 處理 PTS 標記 BM版:<PTS.Vin.1.101> => XML:<ref target="PTS.Vin.1.101"/>
+# 處理 PTS 標記 BM版:<PTS.Vin.1.101> => XML:<ref cRef="PTS.Vin.1.101"/>
 def start_PTS(tag):
 	global buf
 	mo = re.search(r'<(PTS.*?)>', tag)
-	s = '<ref target="%s"/>' % mo.groups()
+	s = '<ref cRef="%s"/>' % mo.groups()
 	buf += s 
 	
 	''' 
@@ -239,10 +241,10 @@ def start_PTS(tag):
 	
 	out(s) 會先印出 buf 中的 <lb> 等標記, 會有如下結果
 	<lb ed="N" n="0009a06"/>久住，拘樓孫佛、拘那含牟尼佛、迦葉佛之梵行久住也。」
-	<lb ed="N" n="0009a07"/><ref target="PTS.Vin.8.8"/></p></cb:div><cb:div type="other">
+	<lb ed="N" n="0009a07"/><ref cRef="PTS.Vin.8.8"/></p></cb:div><cb:div type="other">
 	
 	out1(s) 直接加入 buf1 中, 會有如下結果
-	<lb ed="N" n="0009a06"/>久住，拘樓孫佛、拘那含牟尼佛、迦葉佛之梵行久住也。」<ref target="PTS.Vin.8.8"/></p></cb:div>
+	<lb ed="N" n="0009a06"/>久住，拘樓孫佛、拘那含牟尼佛、迦葉佛之梵行久住也。」<ref cRef="PTS.Vin.8.8"/></p></cb:div>
 	<lb ed="N" n="0009a07"/><cb:div type="other">（二）
 	##################################################################
 	'''
@@ -264,7 +266,7 @@ def start_p(tag):
 	if 'Z' in head_tag:
 		out(' cb:type="dharani"')
 	if r!='':
-		out(' rend="margin-left:%sem"' % r)
+		out(' style="margin-left:%sem"' % r)
 	out('>')
 	opens['p']=1
 
@@ -283,21 +285,24 @@ def start_inline_p(tag):
 	# 處理 <p,1,2> 這種格式
 	mo = re.search(r'<[pz],(\-?[\d\.]+),(\-?[\d\.]+)>', tag)
 	if mo!=None:
-		s += ' rend="margin-left:%sem;text-indent:%sem' % mo.groups()
-		if char_count>1: s += ';inline'		# 若是行中段落, 則加上 inline
-		s += '"'
+		s += ' style="margin-left:%sem;text-indent:%sem"' % mo.groups()
+		#if char_count>1: s += ';inline'		# 若是行中段落, 則加上 inline
+		#s += '"'
 	
 	# 處理 <p,1> 這種格式
 	mo = re.search(r'<[pz],(\-?[\d\.]+)>', tag)
 	if mo!=None:
-		s += ' rend="margin-left:%sem' % mo.group(1)
-		if char_count>1: s += ';inline'		# 若是行中段落, 則加上 inline
-		s += '"'
+		s += ' style="margin-left:%sem"' % mo.group(1)
+		#if char_count>1: s += ';inline'		# 若是行中段落, 則加上 inline
+		#s += '"'
 	
 	# 若都沒有 <p,1 這種格式, 又是在行中, 則用 rend="inline"
-	mo = re.search(r'<[pz],(\-?[\d\.]+)', tag)
-	if mo==None:
-		if char_count>1: s += ' rend="inline"'
+	#mo = re.search(r'<[pz],(\-?[\d\.]+)', tag)
+	#if mo==None:
+	#	if char_count>1: s += ' rend="inline"'
+	
+	if char_count>1: s += ' cb:place="inline"'
+
 	
 	# 處理 <p=h1> 這種格式	- 2013/09/11
 	mo = re.search(r'<p=h(\d+)>', tag)
@@ -551,7 +556,7 @@ def close_h(tag):
 def start_inline_Lsp(tag):
 	global L_type
 	close_head()
-	L_type = "simple"
+	L_type = 'simple'
 
 def start_inline_n(tag):
 	global div_type_note
@@ -596,15 +601,15 @@ def start_inline_T(tag):
 	mo = re.search(r'<T,(\-?[\d\.]+),(\-?[\d\.]+)>', tag)
 	if mo!=None:
 		if(mo.group(1) == '0'):
-			out('<l rend="text-indent:%sem">' % mo.group(2))
+			out('<l style="text-indent:%sem">' % mo.group(2))
 		elif(mo.group(2) == '0'):
-			out('<l rend="margin-left:%sem">' % mo.group(1))
+			out('<l style="margin-left:%sem">' % mo.group(1))
 		else:
-			out('<l rend="margin-left:%sem;text-indent:%sem">' % mo.groups())
+			out('<l style="margin-left:%sem;text-indent:%sem">' % mo.groups())
 	else:
 		mo = re.search(r'\-?[\d\.]+', tag)
 		if mo!=None:
-			out('<l rend="margin-left:%sem">' % mo.group())
+			out('<l style="margin-left:%sem">' % mo.group())
 	record_open('l')
 
 def start_inline_u(tag):
@@ -727,7 +732,7 @@ def inline_tag(tag):
 		# 原本<cb:mulu type="卷" n="{}"/>是在 <J> 或 Ｊ卷標記處理, 只有南傳在 <mj> 處理, 現在全部移到 <mj> 處理, 因為有卷沒有卷標記
 		buf += '<cb:mulu type="卷" n="{}"/>'.format(globals['juan_num'])
 	elif tag=='<no_chg>':
-		out('<term rend="no_nor">')
+		out('<term cb:behaviour="no-norm">')
 	elif tag=='</no_chg>':
 		out('</term>')
 	elif tag.startswith('<n'):
@@ -822,6 +827,14 @@ def gaiji(zuzi):
 	print('gaiji()', zuzi, file=log)
 	if zuzi=='[＊]': return zuzi
 	if re.match(r'\[\d+\]', zuzi): return zuzi
+	
+	if(zuzi in des2cb):
+		return '<g ref="#CB{}"/>'.format(des2cb[zuzi])
+	else:
+		print('組字式找不到: ' + zuzi)
+		return ''
+
+	''' 不使用 Access 了
 	rs = win32com.client.Dispatch(r'ADODB.Recordset')
 	sql = "SELECT cb, unicode, nor_uni FROM gaiji WHERE des='%s'" % zuzi
 	rs.Open(sql, conn, 1, 3)
@@ -835,16 +848,17 @@ def gaiji(zuzi):
 		if u is not None and u!='':
 			return chr(int(u,16))
 		else:
-			''' here we add an appropriate PUA character to the g element 
-			(strictly speaking, we could then eliminate the g, iff the PUA value is defined in the header) 
-			on the other hand, P5 explicitly says, these PUA chars should be removed for exchange. 
-			'''
+			# here we add an appropriate PUA character to the g element 
+			# (strictly speaking, we could then eliminate the g, iff the PUA value is defined in the header) 
+			# on the other hand, P5 explicitly says, these PUA chars should be removed for exchange. 
+			
 			#c=chr(0xF0000+int(cb))
 			#return '<g ref="#CB{}">{}</g>'.format(cb, c)	# 不使用 PUA 了, # 也要移除, 因為無此 id
 			return '<g ref="#CB{}"/>'.format(cb)
 	else:
 		print('組字式找不到: ' + zuzi)
 		return ''
+	'''
 		
 # 處理經文中的文字
 def do_chars(s):
@@ -1151,7 +1165,7 @@ def do_line_head(tag, text):
 
 # 結束一部經, 全部印出來
 def close_sutra(num):
-	global buf1, gaijis
+	global buf1
 	today=datetime.date.today().strftime('%Y-%m-%d')
 	out_path = dir_out+'/'+vol+num+'.xml'
 	print('out_path:', out_path)
@@ -1242,8 +1256,8 @@ $Log:'''.format(today=today)
 	out('')		# 處理最後的 <lb> , 因為 BM 版經文最後可能會有空白行, 也要轉出 XML 來
 	
 	#最後的要處理一些特例
-	#移除 <head></head> 及將 <ref target="PTS.Vin.3.110"/></head> 換成 <ref target="PTS.Vin.3.110"/>
-	buf1 = re.sub('<head>((?:<ref target="PTS.[^>]*>)?)</head>',r'\1',buf1)
+	#移除 <head></head> 及將 <ref cRef="PTS.Vin.3.110"/></head> 換成 <ref cRef="PTS.Vin.3.110"/>
+	buf1 = re.sub('<head>((?:<ref cRef="PTS.[^>]*>)?)</head>',r'\1',buf1)
 	
 	buf1 = buf1.replace('&', '&amp;')	# 把 & 換成 &amp;  - 2013/09/24
 	buf1 = buf1.replace('&amp;SD-', '&SD-')	# 把 &amp;SD- 換成 &SD-
@@ -1266,7 +1280,7 @@ $Log:'''.format(today=today)
 #	fo.write('</text></TEI>')
 ##############################################
 	fo.close()
-	gaijis = {}
+	#gaijis = {}
 	
 # 初值化
 def sutraInit(newSutraNumber):
@@ -1399,7 +1413,34 @@ def read_source():
 			sutras[n]['laiyuan_c'] = c.rstrip('，')
 			sutras[n]['laiyuan_e'] = e.rstrip(', ')
 	fi.close()
-	
+
+
+def read_all_gaijis():
+	r = {}
+	with open(GAIJI, encoding='utf8') as infile:
+		reader = csv.DictReader(infile,  delimiter='\t')
+		for row in reader:
+			cb = row['cb']
+			uni = row['unicode']
+			# print (cb)
+			if cb != '':
+				cb = 'CB' + cb
+				r[cb] = {}
+				if row['des'] != '':
+					des = row['des']
+					r[cb]['des'] = des
+					des2cb[des] = cb
+				if row['nor'] != '':
+					r[cb]['nor'] = row['nor']
+				if row['nor_unicode'] != '':
+					r[cb]['nor_unicode'] = row['nor_unicode']
+				if uni != '':
+					r[cb]['unicode'] = uni
+			if uni != '':
+				unicode2cb[uni] = cb
+	return r
+
+
 # main
 # 讀取 命令列參數
 parser = OptionParser()
@@ -1421,15 +1462,10 @@ BMJingWen = cbwork_dir + '/bm/{ed}/{vol}/new.txt'.format(vol=vol, ed=ed)
 
 log=open('bm2p5a.log', 'w', encoding='utf8')
 
-# 準備存取 gaiji-m.mdb
-conn = win32com.client.Dispatch(r'ADODB.Connection')
-DSN = 'PROVIDER=Microsoft.Jet.OLEDB.4.0;DATA SOURCE=%s;' % gaijiMdb
-conn.Open(DSN)
-
 dir_out = os.path.join(options.output, ed, vol)
 if not os.path.exists(dir_out): os.makedirs(dir_out)
 
-EditionDate = datetime.date.today();
+EditionDate = datetime.date.today()
 
 wit = wits[ed]
 
@@ -1442,7 +1478,9 @@ fo = ''
 head_tag = ''
 hold = False
 div_head = ''
-gaijis = {}
+#gaijis = {}
+des2cb = {}
+unicode2cb = {}
 line_num = ''
 opens = {}			# 記錄每一個標記的層次
 opens['div'] = 0
@@ -1451,6 +1489,16 @@ sutras = {}
 globals={}
 L_type = ""		# 記錄 <L> 的type , 若是 <L_sp> 則 L_type="simple"
 div_type_note = 0 # 記錄是否有在 <cb:div type="note"> 之中
+
+# 準備存取 gaiji-m.mdb
+''' 不用 Access 了
+conn = win32com.client.Dispatch(r'ADODB.Connection')
+DSN = 'PROVIDER=Microsoft.Jet.OLEDB.4.0;DATA SOURCE=%s;' % gaijiMdb
+conn.Open(DSN)
+'''
+
+GAIJI = gaijiMdb.replace('gaiji-m.mdb', "gaiji-m_u8.txt")
+all_gaijis=read_all_gaijis()	# 預設改為直接開啟 cvs 的資料庫
 
 read_source()
 convert()
