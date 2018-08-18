@@ -7,6 +7,7 @@
 Ray CHOU 周邦信 2011.6.11
 
 Heaven 修改:
+2018/08/18 rend 大修改之後的新版本, 主要處理 "梵漢隔行對照" 和 "南傳 PTS 頁碼"
 2018/04/01 修改藏經名稱 (by maha)
 2018/03/28 漢字語系由 zh 改成 zh-Hant
 2017/11/07 支援 [xx-1] 這種同一頁有相同數字的校註 及 [A01] 這種新增校註
@@ -220,10 +221,11 @@ def handleNode(e):
 	elif e.tag=='sg': r='('+traverse(e)+')'
 	elif e.tag=='t':
 		# <cb:tt> 裏面的第一個 <cb:t> 在第一行, 第2個 <cb:t> 要顯示在下一行.
-		# <cb:tt rend='inline'> <cb:tt rend='normal'> 則不做隔行處理
+		# <cb:tt rend='inline'> <cb:tt rend='normal'> 則不做隔行處理 (舊版)
+		# <cb:tt place='inline'> <cb:tt type='single-line'> 則不做隔行處理 (舊版)
 		if position==0: r=traverse(e)
 		else: 
-			if e.getparent().get('rend')=='inline' or e.getparent().get('rend')=='normal' :
+			if e.getparent().get('place')=='inline' or e.getparent().get('type')=='single-line' :
 				r=traverse(e)
 			else:
 				globals['nextLineBuf']+=traverse(e)
@@ -235,11 +237,12 @@ def handleNode(e):
 		if cert : r += traverse(e)
 		else : r = '▆'
 	elif e.tag=='ref':
-		# 漢譯南傳大藏經 : <ref target="#PTS.Vin.3.2"></ref>
+		# 漢譯南傳大藏經 : <ref target="#PTS.Vin.3.2"></ref> (舊版)
+		# 漢譯南傳大藏經 : <ref cRef="PTS.Vin.3.2"></ref> (新版 2018/08/18)
 		# T42n1828.xml : <ref rend="margin-left:2em" target="../T30/T30n1579.xml#xpath2(//0279a03)">論本卷第一</ref>
 		# T49n2035.xml : <ref target="list4">天台智者禪師○</ref>
-		target = e.get('target')
-		mo=re.match('#PTS\..*\.(\d+)', target)
+		cref = e.get('cRef')
+		mo=re.match('PTS\..*\.(\d+)', cref)
 		if mo is not None:
 			r = ' ' + mo.group(1) + ' '
 		r += traverse(e)

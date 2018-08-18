@@ -3,6 +3,8 @@
 2013.1.4 周邦信 改寫自 cbp4top5.py
 
 Heaven 修改:
+2018/08/17 1. place="inline" 不用再移到 rend 中.
+		   2. 支援 <term cb:behaviour="no-norm"> 標記 
 2018/07/24 加入惠敏法師著作 HM
 2018/06/06 P5b 格式將 </row>...<row><cell> 轉成 </row><row><cell>... 以利 cbreader 處理
 2018/03/27 處理屬性中的 & 轉成 &amp; , < 轉成 &lt;
@@ -926,12 +928,15 @@ class MyTransformer():
 				self.back['tt'] += back + '\n'
 			else:
 				node = MyNode(e)
+				'''
+				2018/08/17 inline 改放在 place , 所以不用移到 rend 了
 				if e.get('place')=='inline':
 					if e.get('rend') is None:
 						node.attrib['rend'] = 'inline'
 						del node.attrib['place']
 					else:
 						sys.exit('error 441')
+				'''
 				r = node.open_tag() + self.traverse(e, mode) + node.end_tag()
 		else:
 			node = MyNode(e)
@@ -957,6 +962,8 @@ class MyTransformer():
 			del node.attrib['rend']
 			node.attrib['rend'] = e.get('rend')
 		if 'place' in node.attrib:
+			# old , place 不用移到 rend 了 - 2018/08/17
+			'''
 			if place=='inline':
 				if 'rend' in node.attrib:
 					node.attrib['rend'] += ';' + node.attrib['place']
@@ -966,6 +973,10 @@ class MyTransformer():
 			else:
 				node.attrib['cb:type'] = place
 				del node.attrib['place']
+			'''
+			# new
+			node.attrib['cb:place'] = place
+			del node.attrib['place']
 		if 'body' in mode:
 			r = node.open_tag() + self.traverse(e, mode) + node.end_tag()
 			'''
@@ -1393,7 +1404,10 @@ class MyNode():
 		for k, v in self.attrib.items():
 			v = v.replace('&', '&amp;')
 			v = v.replace('<', '&lt;')
-			if k=='cert':
+			if k=='behaviour':
+				if self.tag in ('term'):
+					k = 'cb:' + k
+			elif k=='cert':
 				if self.tag in ('foreign'):
 					k = 'cb:' + k
 			elif k=='id':
@@ -1509,6 +1523,9 @@ def handle_back(t):
 		elif k=='Dudoucheng':
 			r += '<cb:div type="dudoucheng-notes">\n'
 			r += '<head>正史佛教資料類编 校註</head>\n'
+		elif k=='Huimin':
+			r += '<cb:div type="huimin-notes">\n'
+			r += '<head>惠敏法師 校註</head>\n'
 		elif k=='ihp':
 			r += '<cb:div type="ihp-notes">\n'
 			r += '<head>中央研究院歷史語言研究所 校註</head>\n'
@@ -1718,7 +1735,7 @@ def do1dir(dir):
 	colls=os.listdir(dir)
 	colls.sort()
 	for coll in colls:
-		if coll in ('.git', 'schema', '.gitignore'): continue
+		if coll in ('.git', 'schema', '.gitignore', 'README.md'): continue
 		if (options.collection is None) or coll.startswith(options.collection): 
 			path = os.path.join(dir, coll)
 			vols = os.listdir(path)
