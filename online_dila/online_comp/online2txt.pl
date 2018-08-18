@@ -129,6 +129,10 @@ sub h2t()
 		s/<span[^>]*class=['"]siddam['"][^>]*char=['"](.+?)['"][^>]*>/$1/g;
 		s/<span[^>]*class=['"]ranja['"][^>]*char=['"](.+?)['"][^>]*>/$1/g;
 
+		# 南傳頁碼
+		# <span class="hint" data-label="P.1" data-text="PTS.Vin.3.1"></span>
+		s/<span class=['"]hint['"] data\-label=['"]P.(\d+)['"][^>]*><\/span>/ $1 /g;
+
 		s/&#x12B;/ī/g;
 		s/&#x1E25;/ḥ/g;
 		s/&#x1E6D;/ṭ/g;
