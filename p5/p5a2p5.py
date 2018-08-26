@@ -961,6 +961,9 @@ class MyTransformer():
 		if 'rend' in node.attrib: # 為了讓 rend 屬性出現在 xml:id 之後
 			del node.attrib['rend']
 			node.attrib['rend'] = e.get('rend')
+		if 'style' in node.attrib:
+			del node.attrib['style']
+			node.attrib['style'] = e.get('style')
 		if 'place' in node.attrib:
 			# old , place 不用移到 rend 了 - 2018/08/17
 			'''

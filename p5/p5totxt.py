@@ -207,7 +207,7 @@ def handleNode(e):
 		else: r=traverse(e)
 	elif e.tag=='milestone':
 		if e.get('unit')=='juan' and options.splitByJuan: 
-			r='juan {}\n'.format(e.get('n'))
+			r='\njuan {}'.format(e.get('n'))
 	elif e.tag=='mulu': pass
 	elif e.tag=='note':
 		place=e.get('place')
@@ -242,9 +242,10 @@ def handleNode(e):
 		# T42n1828.xml : <ref rend="margin-left:2em" target="../T30/T30n1579.xml#xpath2(//0279a03)">論本卷第一</ref>
 		# T49n2035.xml : <ref target="list4">天台智者禪師○</ref>
 		cref = e.get('cRef')
-		mo=re.match('PTS\..*\.(\d+)', cref)
-		if mo is not None:
-			r = ' ' + mo.group(1) + ' '
+		if cref is not None:
+			mo=re.match('PTS\..*\.(\d+)', cref)
+			if mo is not None:
+				r = ' ' + mo.group(1) + ' '
 		r += traverse(e)
 	elif e.tag=='term':
 		# <term rend="no_nor"> , 這種的就不要使用通用字
@@ -307,11 +308,12 @@ def splitByJuan(source, folder_out):
 	juan_pre = ''		# 上一卷的卷數
 	juan_txt = ''		# 記錄每一卷的內文
 	for line in fi:
-		mo=re.match('(.*?║)juan (\d+)', line)
+		#mo=re.match('(.*?║)juan (\d+)', line)
+		mo=re.match('juan (\d+)', line)
 		if mo is not None:
-			juan='{:03d}'.format(int(mo.group(2)))
+			juan='{:03d}'.format(int(mo.group(1)))
 			if juan_pre == '': 
-				juan_txt += mo.group(1)
+				#juan_txt += mo.group(1)
 				juan_pre = juan
 				continue
 			
@@ -324,9 +326,10 @@ def splitByJuan(source, folder_out):
 			juan_pre = juan
 			# 新的一卷的起始內容
 			juan_txt = header
-			juan_txt += mo.group(1)
+			#juan_txt += mo.group(1)
 			line=line.rstrip()
-		else: juan_txt += line
+		else:
+			if(line != '\n'): juan_txt += line
 	
 	# 寫入最後一卷
 	path_out=fn_template.substitute(juan=juan)

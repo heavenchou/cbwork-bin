@@ -726,9 +726,23 @@ def inline_tag(tag):
 	elif tag.startswith('<mj'):
 		closeTags('cb:jhead', 'cb:juan')
 		#n=get_number(tag)
-		globals['juan_num']+=1
+		mo = re.search(r'\d+', tag)
+		if mo!=None: globals['juan_num'] = int(mo.group())
+		else: globals['juan_num']+=1
 		#out('<milestone unit="juan" n="{}"/>'.format(globals['juan_num']))		# 若用 out() , 會有一堆 </p></cb:div> 標記出現在 <milestone> 後面
-		buf += '<milestone unit="juan" n="{}"/>'.format(globals['juan_num'])
+
+		# <milestone> 要移到 <pb><lb> 之前
+
+		mo = re.search(r'(<pb [^>]*>\n?)?<lb [^>]*>\n?$', buf)
+		if mo!=None:
+			pblb = mo.group()
+			buf = re.sub(r'(<pb [^>]*>\n?)?<lb [^>]*>\n?$', r'', buf)
+			buf += '<milestone unit="juan" n="{}"/>\n'.format(globals['juan_num'])
+			buf += pblb
+		else:
+			print("milestone must after <pb><lb>")
+			print(tag)
+			sys.exit()
 		# 原本<cb:mulu type="卷" n="{}"/>是在 <J> 或 Ｊ卷標記處理, 只有南傳在 <mj> 處理, 現在全部移到 <mj> 處理, 因為有卷沒有卷標記
 		buf += '<cb:mulu type="卷" n="{}"/>'.format(globals['juan_num'])
 	elif tag=='<no_chg>':
