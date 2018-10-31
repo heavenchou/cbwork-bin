@@ -3,6 +3,7 @@
 2013.1.4 周邦信 改寫自 cbp4top5.py
 
 Heaven 修改:
+2018/10/31 支援 <text cb:behaviour="no-norm"> 標記 
 2018/08/17 1. place="inline" 不用再移到 rend 中.
 		   2. 支援 <term cb:behaviour="no-norm"> 標記 
 2018/07/24 加入惠敏法師著作 HM
@@ -1408,7 +1409,7 @@ class MyNode():
 			v = v.replace('&', '&amp;')
 			v = v.replace('<', '&lt;')
 			if k=='behaviour':
-				if self.tag in ('term'):
+				if self.tag in ('term','text'):
 					k = 'cb:' + k
 			elif k=='cert':
 				if self.tag in ('foreign'):
