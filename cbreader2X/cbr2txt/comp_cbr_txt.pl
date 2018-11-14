@@ -35,7 +35,14 @@ else
 my $output = "";
 my $runningpath = "";
 find(\&findfile, $path);	# 處理所有檔案
-open OUT, ">:utf8", "comp_result.txt";
+if($vol)
+{
+	open OUT, ">:utf8", "comp_result_${vol}.txt";
+}
+else
+{
+	open OUT, ">:utf8", "comp_result.txt";	
+}
 print OUT $output;
 close OUT;
 
@@ -166,7 +173,6 @@ sub getfile
 		s/&RJ\-E042;/觢/g;
 		s/&RJ\-E044;/触/g;
 		s/&SD\-E4A1;/銦/g;
-
 
 		push(@$lines, $_);
 	}

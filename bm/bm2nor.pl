@@ -15,6 +15,7 @@
 # Copyright (C) 1998-2018 CBETA
 # Copyright (C) 1999-2018 Heaven Chou
 ########################################################################
+# 2018/11/04 V12.3 輸出的目錄加一層藏經名
 # 2018/04/01 V12.2 修改藏經中英文名稱 (by maha)
 # 2018/03/29 V12.1 修改藏經中英文名稱
 # 2018/02/09 V12.0 1. <mj> 標記改成 <mj xxx> , xxx 是卷數
@@ -361,9 +362,9 @@ sub reinitial()
 sub mv_old_file
 {
 	# 待清除舊的檔案
-	if(-d "$outdir$format/$T_vol")
+	if(-d "$outdir$format/$vol_head/$T_vol")
 	{
-		my $del_files = "$outdir$format/$T_vol/*.*";
+		my $del_files = "$outdir$format/$vol_head/$T_vol/*.*";
 		unlink <${del_files}>;
 	}
 }
@@ -377,7 +378,7 @@ sub mv_old_file
 my $gaiji = new Gaiji();
 $gaiji->load_access_db();
 
-open ERR, ">:utf8", "bm2nor_err.txt";	# 錯誤檔的輸出
+open ERR, ">>:utf8", "bm2nor_err.txt";	# 錯誤檔的輸出
 
 check_format();	# 由參數判斷要輸出何種版本經文
 mv_old_file();	# 清除舊檔案
@@ -457,9 +458,10 @@ sub makefile()
 	$filename = getfilename();
 	mkdir ("$outdir", "0777") if (not -d $outdir);
 	mkdir ("$outdir$format", "0777") if (not -d "$outdir$format");
-	mkdir ("$outdir$format/$T_vol", "0777") if (not -d "$outdir$format/$T_vol");
+	mkdir ("$outdir$format/$vol_head", "0777") if (not -d "$outdir$format/$vol_head");
+	mkdir ("$outdir$format/$vol_head/$T_vol", "0777") if (not -d "$outdir$format/$vol_head/$T_vol");
 	
-	open OUT, ">:utf8", "$outdir$format/$T_vol/$filename";
+	open OUT, ">:utf8", "$outdir$format/$vol_head/$T_vol/$filename";
 
 	if($sutra_num ne $prefile_sutra)
 	{

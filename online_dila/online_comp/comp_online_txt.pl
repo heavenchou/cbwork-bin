@@ -117,6 +117,12 @@ sub comp_file
 			}
 			next if($a eq $b);
 
+			#$a =~ s/\(//g;
+			#$a =~ s/\)//g;
+			#$b =~ s/\(//g;
+			#$b =~ s/\)//g;
+			#next if($a eq $b);
+
 			$output .= $cbr_lines[$i] . "\n" . $txt_lines[$i] . "\n";
 			$output .= $a . "\n" . $b . "\n\n";
 		}
@@ -219,10 +225,10 @@ sub getfile
 
 		if($ed eq "N")
 		{
-			#s/║ \d+ ?/║/;	# 移除 PTS 頁碼
+			s/║ \d+ ?/║/;	# 移除 PTS 頁碼
 		}
 
-		next if(/\D+.*?║$/);
+		#next if(/\D+.*?║$/);
 
 		push(@$lines, $_);
 	}

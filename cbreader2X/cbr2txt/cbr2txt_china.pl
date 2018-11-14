@@ -14,7 +14,7 @@ use File::Find;
 use strict;
 
 # 來源目錄, 也就是 cbreader 產生的 html 檔目錄
-my $source_path = "c:/Users/Heaven/AppData/Local/Temp/CBReader/Debug/";
+my $source_path = "c:/temp/cbr_htm/";
 my $outpath_base = "c:/temp/cbr_out_txt_china/";
 
 my $vol = shift;	# T01

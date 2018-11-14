@@ -13,7 +13,7 @@ use File::Find;
 use strict;
 
 # 來源目錄, 也就是 cbreader 產生的 html 檔目錄
-my $source_path = "c:/Users/Heaven/AppData/Local/Temp/CBReader/Debug/";
+my $source_path = "c:/temp/cbr_htm/";
 my $outpath_base = "c:/temp/cbr_out_txt/";
 
 my $vol = shift;	# T01
@@ -69,15 +69,14 @@ foreach my $file (sort(@files))
 sub h2t()
 {
 	local $_;
-	my $end = 0;
 	
 	while(<IN>)
 	{
-		next unless (/^name=['"]p/);
 		if(/<div[^>]*id=.CollationList./)
 		{
-			$end = 1;
+			last;
 		}
+		next unless (/^name=['"]p/);
 
 		#s/彞/彝/g;	# perl 在處理 big5 轉 u8 會錯誤的地方, 一開始就要先處理
 		#s/〹/卄/g;	# perl 在處理 big5 轉 u8 會錯誤的地方, 一開始就要先處理
@@ -116,9 +115,10 @@ sub h2t()
 		s/<img src=['"][^>]*\\([^>]*gif)['"]>/【圖】/g; 	# <img src="C:\cbeta\CBReader\Figures\T\T18014601.gif">
 		
 		# <font face="siddam">扣</font>(<span class="nonhan">hā</span>)
+		# <font face="siddam">扣</font>(<span class="foreign">hā</span>)
 		# 悉曇字只留下羅馬轉寫字
-		s/<font face=['"]siddam['"]>[^<]*?<\/font>\(<span class=['"]nonhan['"]>([^<]*?)<\/span>\) ?/$1/g;
-		s/<font face=['"]Ranjana['"]>[^<]*?<\/font>\(<span class=['"]nonhan['"]>([^<]*?)<\/span>\) ?/$1/g;
+		s/<font face=['"]siddam['"]>[^<]*?<\/font>\(<span class=['"]foreign['"]>([^<]*?)<\/span>\) ?/$1/g;
+		s/<font face=['"]Ranjana['"]>[^<]*?<\/font>\(<span class=['"]foreign['"]>([^<]*?)<\/span>\) ?/$1/g;
 
 		s/<[^<]*?>//g;		# 去標記
 		#s/<[^<]*?>//g;		# 去標記
@@ -143,7 +143,5 @@ sub h2t()
 		s/\[(\d[A-Z]?)\]/[0$1]/g;	# 校勘
 		s/\[([科標解])(\d)\]/[${1}0${2}]/g;	# 校勘
 		print OUT;
-
-		last if($end);
 	}
 }
