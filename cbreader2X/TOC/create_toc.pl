@@ -309,7 +309,20 @@ sub tag_mulu
 		{
 			print LOG "error juan not equal : $n vs " . $toc->juan . "\n";
 		}
-		my $data = $toc->juan . "," . $toc->get_link();
+		my $data;
+
+		if($text eq "")
+		{
+			# 標準卷數, 就存入 
+			# 1,T01n0001_001.xml#p0001a01
+			$data = $toc->juan . "," . $toc->get_link();
+		}
+		else
+		{
+			# 特殊卷數, 就存入 
+			# 卷上之一,T01n0001_001.xml#p0001a01
+			$data = $text . "," . $toc->get_link();
+		}
 		push(@juan_tree, $data);
 	}
 	elsif($level ne "") # && $type ne "" 

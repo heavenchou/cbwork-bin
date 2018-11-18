@@ -11,6 +11,8 @@ package toc_tree;
 # 另一個是卷 @::juan_tree , 裡面每一筆有 卷數, 連結位置 , 例 :
 # 1,T01n0001_001.xml#p0001a01
 # 2,T01n0001_002.xml#p0010a01
+# 也有非數字的特殊卷數
+# 卷上之一,T01n0001_001.xml#p0001a01
 
 use Class::Tiny qw( book volnum sutra juan lb outpath errmsg);
 
@@ -195,7 +197,16 @@ sub output_jaun
     for(my $i=0; $i<=$#text; $i++)
     {
         # 印出本身
-        print OUT "\t<li><cblink href=\"" . $link[$i] . "\">第" . cNum($text[$i]) . "</cblink></li>\n";
+        if($text[$i] =~ /\D/)
+        {
+            # 非標準卷就直接印內容, 例如 "卷上之一"
+            print OUT "\t<li><cblink href=\"" . $link[$i] . "\">" . $text[$i] . "</cblink></li>\n";
+        }
+        else
+        {
+            # 標準卷就印 "第一" 這種格式
+            print OUT "\t<li><cblink href=\"" . $link[$i] . "\">第" . cNum($text[$i]) . "</cblink></li>\n";
+        }
     }
 
     print OUT "</ol>\n";
