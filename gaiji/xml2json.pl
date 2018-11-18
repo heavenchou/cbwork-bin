@@ -2,7 +2,8 @@
 
 use utf8;
 my $count = 0;
-open IN, "<:utf8", "../../cbeta_gaiji/cbeta_gaiji.xml";
+my $item_count = 0; # 每一筆的欄位數
+open IN, "<:utf8", "../../cbeta_gaiji/cbeta_gaiji_orig.xml";
 open OUT, ">:utf8", "../../cbeta_gaiji/cbeta_gaiji.json";
 print OUT "{\n";
 while(<IN>)
@@ -21,14 +22,16 @@ while(<IN>)
         }
         $count++;
         print OUT "  \"$1\": {\n";
+        $item_count = 0; # 每一筆的欄位數
     }
-    elsif(/^<unicode>(.*?)<\/unicode>/)
+    elsif(/^<([^>]*)>(.+?)<\/\1>/)
     {
-        print OUT "    \"unicode\": \"$1\"";
-    }
-    elsif(/^<([^>]*)>(.*?)<\/\1>/)
-    {
-        print OUT ",\n    \"$1\": \"$2\"";
+        if($item_count > 0)
+        {
+            print OUT ",\n";
+        }
+        print OUT "    \"$1\": \"$2\"";
+        $item_count++;
     }
     elsif(/^<\/cbeta_gaiji>/)
     {
