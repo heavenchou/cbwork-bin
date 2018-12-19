@@ -5,7 +5,7 @@
   a.原書格式
   b.加上行首
   c.CBETA 校勘 (原書校勘 不易和 P5totxt 比對)
-  d.使用 組字式 (不使用 unicode , 免得無法比對)
+  d.使用 組字式 (不使用 unicode ext 和通用字, 免得無法比對)
   
   並輸出至 c:\temp\cbr_htm\ (old c:\Users\Heaven\AppData\Local\Temp\CBReader\Debug\)
 

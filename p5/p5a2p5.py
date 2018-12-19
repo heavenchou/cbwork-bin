@@ -3,6 +3,7 @@
 2013.1.4 周邦信 改寫自 cbp4top5.py
 
 Heaven 修改:
+2018/12/19 支援在 note, lem, rdg 的 cb:provider="xxx" 屬性
 2018/10/31 支援 <text cb:behaviour="no-norm"> 標記 
 2018/08/17 1. place="inline" 不用再移到 rend 中.
 		   2. 支援 <term cb:behaviour="no-norm"> 標記 
@@ -1421,6 +1422,9 @@ class MyNode():
 			elif k=='place':
 				if self.tag in ('entry', 'foreign', 'lg'):
 					k = 'cb:place'
+			elif k=='provider':
+				if self.tag in ('note', 'lem', 'rdg'):
+					k = 'cb:provider'
 			elif k=='resp':
 				v = handle_resp(v)
 				if self.tag in ('choice', 'foreign'):
