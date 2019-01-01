@@ -20,10 +20,11 @@ my $volnum = "";    # 01
 my $sutra = "";     # 0001
 
 my $lb = "";    #
+my $filename = "";    #
 
 # 處理藏經的順序
-#my @book_order = ("T","X","A","K","S","F","C","D","U","P","J","L","G","M","N","ZS","I","ZW","B","GA","GB","Y");
-my @book_order = ("DA","ZY","HM");
+my @book_order = ("T","X","A","K","S","F","C","D","U","P","J","L","G","M","N","ZS","I","ZW","B","GA","GB","Y");
+#my @book_order = ("DA","ZY","HM");
 
 open OUT, ">:utf8", "spine.txt";
 open LOG, ">:utf8", "error.txt";
@@ -178,7 +179,7 @@ sub tag_default
 sub tag_lb
 {
     my $node = shift;
-    
+    my $text = "";
     # 處理標記
     
     my $att_ed = $node->getAttributeNode("ed");	# 取得屬性
@@ -206,8 +207,14 @@ sub tag_lb
     {
 		my $n = $att_n->getValue();	# 取得屬性內容
         $lb = $n;
+
+		if($filename ne "")
+		{
+			$text = $filename . $lb . "\n";
+			$filename = "";
+		}
     }
-    return "";
+    return $text;
 }
 
 # <milestone n="8" unit="juan"/>
@@ -233,8 +240,9 @@ sub tag_milestone
 				{
 					$newsutra =~ s/0220./0220/;
 				}
-                $text = "XML/$book/$book$volnum/$book$volnum" . "n$newsutra" . "_";
-                $text .= sprintf("%03d",$n) . ".xml , $lb\n";
+				# 先記錄檔名的部份
+                $filename = "XML/$book/$book$volnum/$book$volnum" . "n$newsutra" . "_";
+                $filename .= sprintf("%03d",$n) . ".xml , ";
 			}
 			else
 			{
@@ -253,6 +261,6 @@ sub tag_milestone
 		print "error milestone no unit \n";
         <>;
 	}
-    return $text;
+    return "";
 }
 
