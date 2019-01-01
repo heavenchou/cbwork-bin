@@ -1530,7 +1530,7 @@ def handle_back(t):
 			r += '<head>法鼓文理學院 校註</head>\n'
 		elif k=='Dudoucheng':
 			r += '<cb:div type="dudoucheng-notes">\n'
-			r += '<head>正史佛教資料類编 校註</head>\n'
+			r += '<head>正史佛教資料類編 校註</head>\n'
 		elif k=='Huimin':
 			r += '<cb:div type="huimin-notes">\n'
 			r += '<head>惠敏法師 校註</head>\n'

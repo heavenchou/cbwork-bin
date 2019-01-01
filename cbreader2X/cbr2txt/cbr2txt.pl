@@ -1,7 +1,7 @@
 #############################################
 # 將 cbr 產生的 html 檔轉成文字檔
-# CBETA校勘, 有行首, 依原書, 悉曇及蘭札用 unicode
-# 缺字順序: 組字
+# 依原書, 有行首, CBETA校勘, 悉曇及蘭札用 unicode
+# 缺字順序: 組字, 不使用 Unicode Ext 和通用字
 # 執行方式
 # perl cb2txt.pl T01		T01 冊
 # perl cb2txt.pl T			T 全部
