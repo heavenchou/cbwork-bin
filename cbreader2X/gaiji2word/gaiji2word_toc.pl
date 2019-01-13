@@ -90,6 +90,10 @@ sub runfile
     {
         if(/<g/)
         {
+            # 在 <cbline ..> 後面加空格, 以避免標記後第一個字是 ext-b, Mac parser 會錯誤
+            $_ =~ s/(<cblink[^>]*?>)(<g)/$1 $2/g;   
+            $_ =~ s/(<span>)(<g)/$1 $2/g;
+
             $_ = change_gaiji($_);
         }
         print OUT $_;
@@ -118,10 +122,11 @@ sub change_gaiji
             if($univer > 3.1)
             {
                 $word = "";
+                print " $CB : $uni : $univer \n";
             }
             else
             {
-                print " $CB : $uni : $univer \n";
+                #print " $CB : $uni : $univer \n";
             }
         }
         # nor unicode
@@ -135,10 +140,11 @@ sub change_gaiji
                 if($univer > 3.1)
                 {
                     $word = "";
+                    print " $CB : $uni : $univer \n";
                 }
                 else
                 {
-                    print " $CB : $uni : $univer \n";
+                    #print " $CB : $uni : $univer \n";
                 }
             }
         }

@@ -27,18 +27,26 @@ catalog 雖然有多份, 但都連結到同一卷嗎? 例 點 A121n1565 經, 要到 33 卷嗎?
 
 ■ sutralist
 
-	執行 sutralist.pl
+	執行 perl sutralist.pl
 
 	產生所有經文的冊、經號、經名、卷數、第一卷、起始頁行欄
 
 	這是重要的基礎目錄
 
+■ 切卷程式 cutxml
+
+	執行 cutxml.bat 可看參數
+	執行 cutxml.bat -a 處理 CBETA 全部資料
+	執行 cutxml.bat -see 處理西蓮全部資料
+	
 ■ bulie
 
 	部類資料
 
 ■ 產生導覽目錄 nav
 
+	執行 create_nav.bat , 西蓮版執行 create_nav_slreader.bat
+	
 	1. bulei_nav.xhtml
 
 	以部類為主的經目樹狀列表
@@ -51,6 +59,9 @@ catalog 雖然有多份, 但都連結到同一卷嗎? 例 點 A121n1565 經, 要到 33 卷嗎?
 
 ■ 產生各經的目錄 toc
 
+	重要 : 因為 mac 在 parser XML 時, 標記中的第一個字不能是 unicode ext-b 的字, 
+	因此最好全部空一格. 目前這是在 gaiji2word 步驟遇缺字才處理, 未來應該在產生時全部統一處理.
+
 	執行 perl create_toc.pl 在 toc 目錄產生目次檔
 
 	至 ../gaiji2word 執行
@@ -61,11 +72,15 @@ catalog 雖然有多份, 但都連結到同一卷嗎? 例 點 A121n1565 經, 要到 33 卷嗎?
 
 ■ 產生經目列表 catalog
 
+	執行 create_catalog.bat (還沒細分 CBETA 和西蓮版)
+	
+	＊ 這一版結果不盡理想, 還要考慮單經多部類問題, 以及 T0220x , 要記得和上一個正式版比對。
+
 ■ 產生循序各卷卷名列表檔案 Spine
 
-Spine.txt 是提供全文檢索用的檔案列表
+	執行 perl create_spine.pl
 
-■ 切卷程式 cutxml
+	Spine.txt 是提供全文檢索用的檔案列表
 
 ■ 把缺字 g 標記換成 unicode 或組字式
 

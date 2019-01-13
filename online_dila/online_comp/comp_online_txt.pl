@@ -86,15 +86,21 @@ sub comp_file
 		{
 			my $a = $cbr_lines[$i];
 			my $b = $txt_lines[$i];
+
+			#$a =~ s/㲉 /㲉/g;
 			
 			# 把組字式換成 unicode
 			if($b =~ /\[/)
 			{
 				$b =~ s/(\[.*?\])/des2uni($1)/ge;
 			}
+			if($a =~ /\[/)
+			{
+				$a =~ s/(\[.*?\])/des2uni($1)/ge;
+			}
 			next if($a eq $b);
 			#next if($b =~ /\[解\d/);
-			
+
 			# 移除 ) 符號, 因為 HTML 版判斷雙行小註不精準
 
 			$a =~ s/\)//g;
@@ -102,7 +108,7 @@ sub comp_file
 			#$a =~ s/\(//g;
 			#$b =~ s/\(//g;
 			next if($a eq $b);
-
+			
 			#$b =~ s/║（[一二三四五六七八九〇]+）/║/;
 			if($ed eq "N")
 			{
@@ -116,12 +122,6 @@ sub comp_file
 				$a =~ s/◇◇+/【◇】/g;
 			}
 			next if($a eq $b);
-
-			#$a =~ s/\(//g;
-			#$a =~ s/\)//g;
-			#$b =~ s/\(//g;
-			#$b =~ s/\)//g;
-			#next if($a eq $b);
 
 			$output .= $cbr_lines[$i] . "\n" . $txt_lines[$i] . "\n";
 			$output .= $a . "\n" . $b . "\n\n";

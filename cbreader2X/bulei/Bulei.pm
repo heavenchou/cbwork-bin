@@ -112,7 +112,11 @@ sub initial
                 $datas[$i] = $1;
                 $types[$i] = "C";   # 表示這一筆是 CBETA 經文
                 $links[$i] = "";
-                $bulei_hash{$datas[$i]} = $bulei_id;    # $bulei_hash{"T0001"} = 0
+                # 部類名會重複, 以第一筆為主
+                if(not defined($bulei_hash{$datas[$i]}))
+                {
+                    $bulei_hash{$datas[$i]} = $bulei_id;    # $bulei_hash{"T0001"} = 0
+                }
             }
             # xxx.html , xxx.htm
             elsif($datas[$i] =~ /^(\S+\.html?)[ \t]+(.*)$/i) # [ \t]+ 不能用 \s+ 因為可能有全型空格

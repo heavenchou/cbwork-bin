@@ -39,7 +39,7 @@ Heaven 修改:
 
 import configparser, os, codecs, re, sys, csv
 from optparse import OptionParser
-import win32com.client		# 要安裝 PythonWin
+#import win32com.client		# 要安裝 PythonWin
 
 #################################################
 # 處理日文

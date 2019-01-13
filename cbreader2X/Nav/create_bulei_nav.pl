@@ -93,7 +93,8 @@ sub create_body
             }
             $name =~ s/\(第.*?卷\)$//;  # 去除卷數
             $name =~ s/（上）$//;
-            $name =~ s/（一）$//;
+            $name =~ s/（一）$// if($name !~ /華雨集（一）/); # 特例
+            #$sutraid =~ s/^T0220a$/T0220/; # 部類的版本不取消 a
             $link =~ s/(T0[567]n0220)[a-z]/$1/; # 特例
             $xhtml .= "<cblink href=\"" . $link . "\">" . $sutraid . " " . $name . "</cblink>";
         }
