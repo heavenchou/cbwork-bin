@@ -637,5 +637,107 @@ sub intag
 	return 0;
 }
 
+package SutraID;
+use Moo;
+use utf8;
+
+=BEGIN
+
+傳入經號 ID , 有二種
+
+T01n0001
+T01n0001_001
+
+使用法:
+	my $id = SutraID->new();
+	$id->init("T01n0001");
+
+成功的話 $id->ok = 1
+取得屬性 $id->ed
+
+相關屬性
+
+ed : T
+vol : T01
+vol_num : 01
+sutra_id : T01n0001 , T02n0128a
+sutra_id_ : T01n0001_ , T02n0128a
+sutra_num : 0001 , 0128a
+sutra_num_ : 0001 , 0128a
+juan : 001
+
+=END
+=cut
+has 'source' => (is => 'rw');
+has 'ok' => (is => 'rw');
+
+has 'ed' => (is => 'rw');
+has 'vol' => (is => 'rw');
+has 'vol_num' => (is => 'rw');
+has 'sutra_id' => (is => 'rw');
+has 'sutra_id_' => (is => 'rw');
+has 'sutra_num' => (is => 'rw');
+has 'sutra_num_' => (is => 'rw');
+has 'juan' => (is => 'rw');
+
+sub init
+{
+    my $self = shift;
+    local $_ = shift;
+
+	$self->source($_);
+
+	#T01n0001_ , T02n0128a
+	#T01n0001_001 , T02n0128a_001
+
+	if(/^(\D+)(\d+)n([^_]{4,5})(?:_(\d{3}))?$/)
+	{
+		$self->ed($1);
+		$self->vol_num($2);
+		$self->sutra_num($3);
+		$self->juan($4);
+
+		$self->vol($1 . $2);
+		$self->sutra_num_($3);
+		if(length($self->sutra_num) == 4)
+		{
+			$self->sutra_num_($self->sutra_num . "_");
+		}
+		else
+		{
+			$self->sutra_num_($self->sutra_num);	
+		}
+		$self->sutra_id_($1.$2."n".$self->sutra_num_);
+		$self->sutra_id($1.$2."n".$self->sutra_num);
+		if(!defined($self->juan)) {$self->juan("");}
+		$self->ok(1);
+	}
+	else
+	{
+		$self->ok(0);
+	}
+}
+
+# 測試結果
+sub show_all
+{
+    my $self = shift;
+
+	if($self->ok == 0)
+	{
+		print "source : " . $self->source . "\n";
+		print "format error\n";
+		return;
+	}
+	print "source : " . $self->source . "\n";
+	print "ed : " . $self->ed . "\n";
+	print "vol : " . $self->vol . "\n";
+	print "vol_num : " . $self->vol_num . "\n";
+	print "sutra_num_ : " . $self->sutra_num_ . "\n";
+	print "sutra_num : " . $self->sutra_num . "\n";
+	print "sutra_id_ : " . $self->sutra_id_ . "\n";
+	print "sutra_id : " . $self->sutra_id . "\n";
+	print "juan : " . $self->juan . "\n";
+}
 
 1;
