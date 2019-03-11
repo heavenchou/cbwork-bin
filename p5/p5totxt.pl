@@ -483,6 +483,9 @@ sub text_handler
 #<lb n="0030a13" ed="T"/>
 #<lb n="0030a13" ed="R"/>				不是同一個版本的 ed 不處理
 #<lb n="0030a13" ed="T" type="old"/>	type="old" 不處理
+#<lb ed="X" n="0070b01" type="honorific"/> 強迫切行
+#???? 隔行對照待處理
+
 sub tag_lb
 {
     my $node = shift;
@@ -498,6 +501,13 @@ sub tag_lb
 		return "" if($att_ed ne $ID->ed);
 
 		$text = "\n" . $ID->sutra_id_ . "p" . $att_n . "║";
+	}
+	elsif($file_type eq "para")
+	{
+		if($att_type eq "honorific")	#強迫切行
+		{
+			$text = "\n";
+		}
 	}
     return $text;
 }

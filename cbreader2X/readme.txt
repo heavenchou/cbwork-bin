@@ -80,7 +80,7 @@ catalog 雖然有多份, 但都連結到同一卷嗎? 例 點 A121n1565 經, 要到 33 卷嗎?
 
 	執行 perl create_spine.pl
 
-	Spine.txt 是提供全文檢索用的檔案列表
+	spine.txt 是提供全文檢索用的檔案列表
 
 ■ 把缺字 g 標記換成 unicode 或組字式
 

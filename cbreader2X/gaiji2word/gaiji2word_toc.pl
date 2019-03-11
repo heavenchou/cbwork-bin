@@ -10,8 +10,8 @@ use CBETA;
 my $gaiji = new Gaiji();
 $gaiji->load_access_db();
 
-my $SourcePath = "/cbwork/bin/cbreader2X/toc/toc";			# 初始目錄, 最後不用加斜線 /
-my $OutputPath = "/cbwork/bin/cbreader2X/toc/toc_new";		# 目地初始目錄, 如果有需要的話. 最後不用加斜線 /
+my $SourcePath = "/cbwork/bin/cbreader2X/toc/toc/Y";			# 初始目錄, 最後不用加斜線 /
+my $OutputPath = "/cbwork/bin/cbreader2X/toc/toc_new/Y";		# 目地初始目錄, 如果有需要的話. 最後不用加斜線 /
 
 my $MakeOutputPath = 1;		# 1 : 產生對應的輸出目錄
 my $IsIncludeSubDir = 1;	# 1 : 包含子目錄 0: 不含子目錄
