@@ -427,8 +427,24 @@ sub get_lbn
 {	
 	for(my $i=1; $i<=$total_juannum; $i++)
 	{
-		$xml_juan[$i] =~ /<lb.*?n="(.\d\d\d.\d\d)"/;
-		$lbn[$i] = $1;
+		#$xml_juan[$i] =~ /<lb.*?n="(.\d\d\d.\d\d)"/;
+		#$lbn[$i] = $1;
+
+		while($xml_juan[$i] =~ /(<lb[^>]*n="(.\d\d\d.\d\d)"[^>]*>)/g)
+		{
+			my $tag = $1;
+			my $n = $2;
+			# 不可以有 type="old"
+			if($tag !~ /type\s*=\s*['"]old['"]/)
+			{
+				# ed="T" 版本要符合
+				if($tag =~ /ed\s*=\s*['"]$edit['"]/ )
+				{
+					$lbn[$i] = $n;
+					last;
+				}
+			}
+		}
 	}
 }
 
@@ -488,9 +504,15 @@ sub start_handler
 	{
 		my $att_ed = $node->getAttributeNode("ed")->getValue;	# 取得 ed 屬性
 		my $att_n = $node->getAttributeNode("n")->getValue;		# 取得 n 屬性
-		
+		my $att_type = $node->getAttributeNode("type");		# 取得 type 屬性 
+		my $att_type_v = "";
+
+		if($att_type)
+		{
+			$att_type_v = $att_type->getValue;
+		}
 		#n = 某卷第一行及 ed = 大藏經, 表示找到卷首了. (卍續藏有二個 <lb> 所以要檢查 ed 屬性)
-     	return if($att_n ne $lbn[$milestoneNum+1] || $att_ed ne $edit);	
+     	return if($att_n ne $lbn[$milestoneNum+1] || $att_ed ne $edit || $att_type_v eq "old");	
      			
 		# 至此, 表示找到另一卷的開頭處, 所以要記錄上卷未結束的各種標記, 才符合 XML 的原則.
 
