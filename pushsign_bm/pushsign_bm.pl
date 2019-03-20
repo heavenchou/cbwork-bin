@@ -186,9 +186,9 @@ while(1)
 		#print OUTBM $lines_bm[$index_bm];
 		printout("<?><txt:$word_txt,bm:$word_bm>$tagbuff$word_bm");
 		printout($lines_bm[$index_bm]);
-		$index_txt++;
-		$index_bm++;
-		$index_out++;
+		#$index_txt++;
+		#$index_bm++;
+		#$index_out++;
 	}
 	
 	if($word_txt eq "" and $word_bm eq "")
@@ -296,6 +296,16 @@ sub get_word_bm
 		{
 			$lines_bm[$index_bm] =~ s/^((<.*?>)|(\[＊\])|(\[A?\d+[a-zA-Z]?\]))//;
 			$tagbuff .= $1;
+			next;
+		}
+		
+		# [[01]>] [>[＊]] 這類要處理掉
+		
+		if($lines_bm[$index_bm] =~ /^((\[>?\[＊\]>?\])|(\[>?\[A?\d+[a-zA-Z]?\]>?\]))/s)
+		{
+			$lines_bm[$index_bm] =~ s/^((\[>?\[＊\]>?\])|(\[>?\[A?\d+[a-zA-Z]?\]>?\]))//s;
+			$tagbuff .= $1;
+			
 			next;
 		}
 
