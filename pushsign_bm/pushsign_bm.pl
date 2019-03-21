@@ -36,6 +36,14 @@ if($#ARGV != 2)
 # 主參數
 ########################################################
 
+# 等同 <p> 標記的符號
+# <P>遇到 <p 或 P#，則保留 bm 的 <p 或 P#。
+# <P>遇到 A# 或 <A>，則保留 bm 的 A# 或 <A>。
+# <P>遇到 S# 或 s# 或 <S>，則保留 bm 的 S# 或 s# 或 <S>。
+# <P>遇到 T# 或 t# 或 <T，則保留 bm 的 <T。
+# <P>沒遇到 bm 標記，則將<P>置入 bm。
+my @p_tag = ("<p ", "<p>", "P#", "<A>", "A#", "<S>", "S#", "s#", "<T", "T#", "t#");
+
 my $InTxtFile = shift;
 my $InBMFile = shift;
 my $OutBMFile = shift;
@@ -113,6 +121,27 @@ while(1)
 			print Encode::encode("big5","hasdot_txt : $hasdot_txt  hasdot_bm : $hasdot_bm\n");
 		}
 		
+		############ 處理 <P> 標記
+		if($hasdot_txt =~ /<P>/)
+		{
+			# <P>遇到 <p 或 P#，則保留 bm 的 <p 或 P#。
+			# <P>遇到 A# 或 <A>，則保留 bm 的 A# 或 <A>。
+			# <P>遇到 S# 或 s# 或 <S>，則保留 bm 的 S# 或 s# 或 <S>。
+			# <P>遇到 T# 或 t# 或 <T，則保留 bm 的 <T。
+			# <P>沒遇到 bm 標記，則將<P>置入 bm。
+			
+			foreach my $tag (@p_tag)
+			{
+				if($tagbuff =~ /$tag/)
+				{
+					$hasdot_txt =~ s/<P>//sg;
+					last;
+				}
+			}
+		}
+		
+		############
+
 		if($hasdot_txt eq $hasdot_bm)	# 二邊標點同步
 		{
 			#print OUTBM $tagbuff;
@@ -130,7 +159,7 @@ while(1)
 			if($tagbuff =~ /^(.*)$hasdot_bm/)
 			{
 				$tagbuff =~ s/^(.*)$hasdot_bm/$1$hasdot_txt/;
-				$tagbuff =~ s/((?:「)|(?:『)|(?:（)|(?:《)|(?:〈)|(?:“))(<.*>)/$2$1/;	# 有點暴力了...要改...
+				$tagbuff =~ s/((?:(?:「)|(?:『)|(?:（)|(?:《)|(?:〈)|(?:“)|(?:<[p]>))+)(<.*>)/$2$1/;	# 有點暴力了...要改...
 			}
 			else
 			{
@@ -142,10 +171,10 @@ while(1)
 		}
 		elsif($hasdot_txt ne "" and $hasdot_bm eq "")		# xml 沒標點, 所以要加上去
 		{
-			if($hasdot_txt =~ /(((?:「)|(?:『)|(?:（)|(?:《)|(?:〈)|(?:“))+)/)		# 這些標記要移到後面
+			if($hasdot_txt =~ /(((?:「)|(?:『)|(?:（)|(?:《)|(?:〈)|(?:“)|(<P>))+)/)		# 這些標記要移到後面
 			{
 				my $tmp = $1;
-				$hasdot_txt =~ s/(((?:「)|(?:『)|(?:（)|(?:《)|(?:〈)|(?:“))+)//;
+				$hasdot_txt =~ s/(((?:「)|(?:『)|(?:（)|(?:《)|(?:〈)|(?:“)|(<P>))+)//;
 				#print OUTBM "$hasdot_txt$tagbuff$tmp";
 				printout("$hasdot_txt$tagbuff$tmp");
 			}
@@ -177,7 +206,7 @@ while(1)
 		}
 
 		#print OUTBM "$word_bm";
-		printout("$word_bm");
+		printout($word_bm);
 	}
 	# 二邊文字不同步, 印出錯誤訊息
 	else
@@ -185,7 +214,7 @@ while(1)
 		#print OUTBM "<?><bm:$word_txt,xml:$word_bm>$tagbuff$word_bm";
 		#print OUTBM $lines_bm[$index_bm];
 		printout("<?><txt:$word_txt,bm:$word_bm>$tagbuff$word_bm");
-		printout($lines_bm[$index_bm]);
+		#printout($lines_bm[$index_bm]);
 		#$index_txt++;
 		#$index_bm++;
 		#$index_out++;
@@ -234,6 +263,12 @@ sub get_word_txt
 			$lines_txt[$index_txt] =~ s/^([。、，．；：「」『』（）？！—…《》〈〉“”])//;
 			next;
 		}
+		if($lines_txt[$index_txt] =~ /^(<P>)/)
+		{
+			$hasdot_txt .= $1;		
+			$lines_txt[$index_txt] =~ s/^(<P>)//;
+			next;
+		}
 				
 		last;
 	}
@@ -243,19 +278,19 @@ sub get_word_txt
 	if(/^\[($loseutf8+?)\]/)	# 缺字
 	{
 		$lines_txt[$index_txt] =~ s/^(\[($loseutf8+?)\])//;
-		return "$1";
+		return $1;
 	}
 	
 	if(/^\[[^>\d]*?>[^>\d]*?\]/)	# 修訂 [A>B]
 	{
 		$lines_txt[$index_txt] =~ s/^(\[[^>\d]*?>[^>\d]*?\])//;
-		return "$1";	# 特殊修訂格式
+		return $1;	# 特殊修訂格式
 	}
 
 	if(/^$utf8/)     # 一般字
 	{
 		$lines_txt[$index_txt] =~ s/^($utf8)//;
-		return "$1";
+		return $1;
 	}
 }
 
@@ -333,19 +368,19 @@ sub get_word_bm
 	if(/^\[($loseutf8+?)\]/)			# 組字式
 	{
 		$lines_bm[$index_bm] =~ s/^(\[($loseutf8+?)\])//;
-		return "$1";
+		return $1;
 	}
 	
 	if(/^\[[^>\d]*?>[^>\d]*?\]/)	# 修訂 [A>B]
 	{
 		$lines_bm[$index_bm] =~ s/^(\[[^>\d]*?>[^>\d]*?\])//;
-		return "$1";	# 特殊修訂格式
+		return $1;	# 特殊修訂格式
 	}
 
 	if(/^$utf8/)			# 一般字
 	{
 		$lines_bm[$index_bm] =~ s/^($utf8)//;
-		return "$1";
+		return $1;
 	}
 }
 

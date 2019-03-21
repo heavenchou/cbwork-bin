@@ -122,6 +122,8 @@ my $all_out = "";
 while(<INTxt>) { $all_txt .= $_; }
 while(<INBM>) { $all_bm .= $_;}
 
+$all_txt =~ s/\n{2,}/\n<P>\n/sg;	# 二行以上的段落插入 <p>
+
 close INTxt;
 close INBM;
 
@@ -211,6 +213,12 @@ sub get_word_txt
 		{
 			$hasdot_txt .= $1;		
 			$all_txt =~ s/^([\n　。、，．；：「」『』（）？！—…《》〈〉“”])//s;
+			next;
+		}
+		if($all_txt =~ /^(<P>)/s)
+		{
+			$hasdot_txt .= $1;		
+			$all_txt =~ s/^(<P>)//s;
 			next;
 		}
 				
