@@ -20,10 +20,10 @@ sub findfile
 	local $_ = $_;
 	#print $_ . "\n";				# 檔名
 	#print $File::Find::dir . "\n";	# 目錄
-	print $File::Find::name . "\n";	# 完整檔名
 
     return if(-d $File::Find::name);
     return if($File::Find::name !~ /\.xml$/);
+	print $File::Find::name . "\n";	# 完整檔名
     runfile($File::Find::name);
 }
 

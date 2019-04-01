@@ -89,6 +89,7 @@ my $inputFile = shift;
 my $cfg = Config::IniFiles->new( -file => "../../cbwork_bin.ini" );
 my $cbwork_dir = $cfg->val('default', 'cbwork', '/cbwork');			# 讀取 cbwork 目錄
 my $output_dir = $cfg->val('cutxml', 'output_dir', '/temp/cutxml');	# 讀取輸出目錄
+mkdir($output_dir) unless(-d $output_dir);
 
 ###############################################################################
 # 分析傳入的參數

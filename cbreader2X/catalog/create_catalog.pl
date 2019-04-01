@@ -18,6 +18,8 @@ use lib "../sutralist";
 use SutraList;
 use lib "../bulei";
 use Bulei;
+use lib "../..";
+use CBETA;
 
 my $sutralist = SutraList->new;     # 宣告
 my $bulei = Bulei->new;
@@ -31,8 +33,30 @@ for(my $i=0; $i<=$#{$sutralist->book}; $i++)
     my $key = $sutralist->sutraid->[$i];
     my $bulei_name = $bulei->bulei_name_by_sutraid($key);
 
+    # 處理大般若經
+    if($sutralist->book->[$i] eq "T")
+    {
+        if($sutralist->volnum->[$i] >=5 && $sutralist->volnum->[$i] <=7)
+        {
+            if($sutralist->sutranum->[$i] =~ /0220[d-o]/)
+            {
+                next;
+            }
+            $sutralist->sutranum->[$i] = "0220";
+            $sutralist->juan->[$i] = 200;
+        }
+    }
+
     print OUT $sutralist->book->[$i] . " , ";
-    print OUT $bulei_name . " , , ";
+    # 處理大正藏的部別
+    if($sutralist->book->[$i] eq "T")
+    {
+        print OUT $bulei_name . " , " . Taisho::get_part_by_sutranum($sutralist->sutranum->[$i]) . " , ";
+    }
+    else
+    {
+        print OUT $bulei_name . " , , ";
+    }
     print OUT $sutralist->volnum->[$i] . " , ";
     print OUT $sutralist->sutranum->[$i] . " , ";
     print OUT $sutralist->juan->[$i] . " , ";
