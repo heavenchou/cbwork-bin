@@ -6,6 +6,7 @@
 # pushsign.pl 簡單標記版.txt 舊的xml.xml 結果檔xml.xml > 記錄檔.txt
 #
 ########################################################
+# 2019/05/14 : 因為修訂的標記已經換成 app 校勘標記, 所以BM的 [A>B] 只處理 B 了。
 # 2018/01/14 : 因為校勘可能有重覆的 <lb> 標記, 第二次以上就忽略.
 # 2017/12/22 : 處理 1.</t> 忘了改成 </cb:t> 2.<g> 可能會對應 Unicode , 不一定是組字式
 # 2017/05/29 : 處理有 </L> 沒有接著 <P> 的情況
@@ -350,7 +351,7 @@ sub make_tt
         	    $line3 =~ s/^($utf8*?)\[($loseutf8+?)\]/$1:1:$2:2:/;
 	        }
 	        $line3 =~ s/\[($loseutf8*?)>>($loseutf8*?)\]/$2/g;
-	        $line3 =~ s/\[($loseutf8*?)>($loseutf8*?)\]/$2$1/g;
+	        $line3 =~ s/\[($loseutf8*?)>($loseutf8*?)\]/$2/g;
 	        $line3 =~ s/:1:/\[/g;
 	        $line3 =~ s/:2:/\]/g;
 	    }
@@ -360,7 +361,7 @@ sub make_tt
     	    $line2 =~ s/^($utf8*?)\[($loseutf8+?)\]/$1:1:$2:2:/;
 	    }
 	    $line2 =~ s/\[($loseutf8*?)>>($loseutf8*?)\]/$2/g;
-	    $line2 =~ s/\[($loseutf8*?)>($loseutf8*?)\]/$2$1/g;
+	    $line2 =~ s/\[($loseutf8*?)>($loseutf8*?)\]/$2/g;
 	    $line2 =~ s/:1:/\[/g;
 	    $line2 =~ s/:2:/\]/g;
 	}
@@ -517,7 +518,7 @@ sub get_word1
 			s/^($utf8*?)\[($loseutf8+?)\]/$1:1:$2:2:/;
 		}
 		s/\[($loseutf8*?)>>($loseutf8*?)\]/$2$1/g;
-		s/\[($loseutf8*?)>($loseutf8*?)\]/$2$1/g;
+		s/\[($loseutf8*?)>($loseutf8*?)\]/$2/g;
 		s/:1:/\[/g;
 		s/:2:/\]/g;
 		
