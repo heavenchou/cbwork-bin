@@ -6,6 +6,8 @@
 # pushsign.pl 簡單標記版.txt 舊的xml.xml 結果檔xml.xml > 記錄檔.txt
 #
 ########################################################
+# 2019/05/20 : 處理 note 中包含 note 的誤判
+# 2019/05/18 : 原本大正藏的修訂還有比對, 現在連大正藏也不比對了, [A>B] 全部都只比對 B。
 # 2019/05/14 : 因為修訂的標記已經換成 app 校勘標記, 所以BM的 [A>B] 只處理 B 了。
 # 2018/01/14 : 因為校勘可能有重覆的 <lb> 標記, 第二次以上就忽略.
 # 2017/12/22 : 處理 1.</t> 忘了改成 </cb:t> 2.<g> 可能會對應 Unicode , 不一定是組字式
@@ -405,7 +407,7 @@ sub get_word1
 		#   第一個 <I><P> 要轉成 </p><list><item><p>
 		#   第二個 <I><P> 要轉成 </p></item><item><p> 
 		#   最後的 </L><P> 要轉成 </p></item></list><p>
-		if($lines1[$index1] =~ /^((?:。)|(?:、)|(?:，)|(?:．)|(?:；)|(?:：)|(?:「)|(?:」)|(?:『)|(?:』)|(?:（)|(?:）)|(?:？)|(?:！)|(?:—)|(?:…)|(?:《)|(?:》)|(?:〈)|(?:〉)|(?:“)|(?:”)|(?:(?:<\/?[ouwsaIL]>)?<P(?:,\d+)?>))/)
+		if($lines1[$index1] =~ /^((?:。)|(?:、)|(?:，)|(?:．)|(?:；)|(?:：)|(?:「)|(?:」)|(?:『)|(?:』)|(?:（)|(?:）)|(?:？)|(?:！)|(?:—)|(?:…)|(?:《)|(?:》)|(?:〈)|(?:〉)|(?:“)|(?:”)|(?:★)|(?:(?:<\/?[ouwsaIL]>)?<P(?:,\d+)?>))/)
 		{
 			my $tmp = $1;
 			if($tmp =~ /(<\/?[ouwsaIL]>)?(<P(?:,\d+)?>)/)
@@ -476,7 +478,7 @@ sub get_word1
 			}
 				
 			$hasdot1 .= $tmp;		
-			$lines1[$index1] =~ s/^((?:。)|(?:、)|(?:，)|(?:．)|(?:；)|(?:：)|(?:「)|(?:」)|(?:『)|(?:』)|(?:（)|(?:）)|(?:？)|(?:！)|(?:—)|(?:…)|(?:《)|(?:》)|(?:〈)|(?:〉)|(?:“)|(?:”)|(?:(?:<\/?[ouwsaIL]>)?<P(?:,\d+)?>))//;
+			$lines1[$index1] =~ s/^((?:。)|(?:、)|(?:，)|(?:．)|(?:；)|(?:：)|(?:「)|(?:」)|(?:『)|(?:』)|(?:（)|(?:）)|(?:？)|(?:！)|(?:—)|(?:…)|(?:《)|(?:》)|(?:〈)|(?:〉)|(?:“)|(?:”)|(?:★)|(?:(?:<\/?[ouwsaIL]>)?<P(?:,\d+)?>))//;
 			next;
 		}
 		elsif($lines1[$index1] =~ /^(<\/L>)/)
@@ -682,27 +684,29 @@ sub get_word2
 			next;
 		}
 
-        # rdg 有二種, 一種要過濾(校勘), 一種要通過(修訂)
+        # rdg 有二種, 一種要過濾(校勘), 一種要通過(修訂) (修訂也不要通過了 2019/05/18)
 		# 還有一種雖然有 wit="【大】" , 還是要過濾, 就是
 		# <rdg resp="Taisho" wit="【大】" type="correctionRemark">之因</rdg>
 		# <rdg resp="Taisho" wit="【大】" type="variantRemark">之因</rdg>
 
 
 		# <rdg resp="Taisho" wit="【大】" type="correctionRemark">之因</rdg> (correctionRemark)
-	    if($lines2[$index2] =~ /^<rdg[^>]*wit="【大】"[^>]*>/ && $lines2[$index2] =~ /^<rdg[^>]*type="(correction)|(variant)Remark"[^>]*>/)
-		{
-		    $lines2[$index2] =~ s/^(<rdg.*?>.*?<\/rdg>)//;
-			$tagbuff .= $1;
-			next;
-	    }
+		# 不用了, 修訂都不檢查了 2019/05/18
+	    #if($lines2[$index2] =~ /^<rdg[^>]*wit="【大】"[^>]*>/ && $lines2[$index2] =~ /^<rdg[^>]*type="(correction)|(variant)Remark"[^>]*>/)
+		#{
+		#    $lines2[$index2] =~ s/^(<rdg.*?>.*?<\/rdg>)//;
+		#	$tagbuff .= $1;
+		#	next;
+	    #}
 
-	    # <rdg wit="【大】">叟</rdg>(修訂)
-	    if($lines2[$index2] =~ /^<rdg[^>]*wit="【大】"[^>]*>/)
-		{
-			$lines2[$index2] =~ s/^(<rdg[^>]*wit="【大】"[^>]*>)//;
-			$tagbuff .= $1;
-			next;
-		}
+	    # <rdg wit="【大】">叟</rdg>(修訂) 
+		# 2019/05/18 修訂都不要檢查了, 因為版本太多, 不易處理
+	    #if($lines2[$index2] =~ /^<rdg[^>]*wit="【大】"[^>]*>/)
+		#{
+		#	$lines2[$index2] =~ s/^(<rdg[^>]*wit="【大】"[^>]*>)//;
+		#	$tagbuff .= $1;
+		#	next;
+		#}
 		
 	    # 過濾(校勘)
 	    if($lines2[$index2] =~ /^<rdg.*?>.*?<\/rdg>/)			
@@ -722,17 +726,28 @@ sub get_word2
 			next;
 	    }
 	    #<note n="0011004" place="foot" type="equivalent">遊行經...</note>
-	    if($lines2[$index2] =~ /^<note[^>]*?type="equivalent"[^>]*?>.*?<\/note>/)			
+	    if($lines2[$index2] =~ /^<note[^>]*?type="equivalent"[^>]*?>.*?<\/note>/)
 	    {
-		    $lines2[$index2] =~ s/^(<note[^>]*?type="equivalent"[^>]*?>.*?<\/note>)//;
-			$tagbuff .= $1;
+		    #$lines2[$index2] =~ s/^(<note[^>]*?type="equivalent"[^>]*?>.*?<\/note>)//;
+			#$tagbuff .= $1;
+			
+			my $note = "";
+			($lines2[$index2], $note) = get_all_note($lines2[$index2]);
+			$tagbuff .= $note;
+
 			next;
+			
 	    }
 	    #<note n="0578006" place="foot" type="rest">品末題在卷末題前行【宋】【元】【明】</note>
 	    if($lines2[$index2] =~ /^<note[^>]*?type="rest"[^>]*?>.*?<\/note>/)			
 	    {
-		    $lines2[$index2] =~ s/^(<note[^>]*?type="rest"[^>]*?>.*?<\/note>)//;
-			$tagbuff .= $1;
+		    #$lines2[$index2] =~ s/^(<note[^>]*?type="rest"[^>]*?>.*?<\/note>)//;
+			#$tagbuff .= $1;
+			
+			my $note = "";
+			($lines2[$index2], $note) = get_all_note($lines2[$index2]);
+			$tagbuff .= $note;
+
 			next;
 	    }
 	    
@@ -746,30 +761,49 @@ sub get_word2
 	    #<note n="0030012" place="foot" type="cf.">
 	    if($lines2[$index2] =~ /^<note[^>]*?type="cf\."[^>]*?>.*?<\/note>/)			
 	    {
-		    $lines2[$index2] =~ s/^(<note[^>]*?type="cf\."[^>]*?>.*?<\/note>)//;
-			$tagbuff .= $1;
+		    #$lines2[$index2] =~ s/^(<note[^>]*?type="cf\."[^>]*?>.*?<\/note>)//;
+			#$tagbuff .= $1;
+			
+			my $note = "";
+			($lines2[$index2], $note) = get_all_note($lines2[$index2]);
+			$tagbuff .= $note;
+
 			next;
 	    }
 	    
 	    # <note n="0150002" resp="CBETA" type="mod">傳＝明【宋】【元】【明】</note>
-	    if($lines2[$index2] =~ /^<note[^>]*?resp="CBETA"[^>]*?>.*?<\/note>/)			
+	    if($lines2[$index2] =~ /^<note[^>]*?resp="CBETA"[^>]*?>.*?<\/note>/)
 	    {
-		    $lines2[$index2] =~ s/^(<note[^>]*?resp="CBETA"[^>]*?>.*?<\/note>)//;
-			$tagbuff .= $1;
+		    #$lines2[$index2] =~ s/^(<note[^>]*?resp="CBETA"[^>]*?>.*?<\/note>)//;
+			#$tagbuff .= $1;
+			
+			my $note = "";
+			($lines2[$index2], $note) = get_all_note($lines2[$index2]);
+			$tagbuff .= $note;
 			next;
 	    }
 	    # <note resp="CBETA.say">CBET 的說明</note> # 05/20
 	    if($lines2[$index2] =~ /^<note resp="CBETA\S*?">.*?<\/note>/)			
 	    {
-		    $lines2[$index2] =~ s/^(^<note resp="CBETA\S*?">.*?<\/note>)//;
-			$tagbuff .= $1;
+		    #$lines2[$index2] =~ s/^(^<note resp="CBETA\S*?">.*?<\/note>)//;
+			#$tagbuff .= $1;
+			
+			my $note = "";
+			($lines2[$index2], $note) = get_all_note($lines2[$index2]);
+			$tagbuff .= $note;
+
 			next;
 	    }
 	    # <note type="cf1">K19n0652_p0175c15</note>
 	    if($lines2[$index2] =~ /^<note type="cf\d">.*?<\/note>/)			
 	    {
-		    $lines2[$index2] =~ s/^(^<note type="cf\d">.*?<\/note>)//;
-			$tagbuff .= $1;
+		    #$lines2[$index2] =~ s/^(^<note type="cf\d">.*?<\/note>)//;
+			#$tagbuff .= $1;
+			
+			my $note = "";
+			($lines2[$index2], $note) = get_all_note($lines2[$index2]);
+			$tagbuff .= $note;
+
 			next;
 	    }
 		# <cb:mulu level="1" n="3" type="品">2 方便品</cb:mulu>
@@ -906,9 +940,9 @@ sub get_word2
 		}
 		
 		# 上面是只處理舊標的版本, 底下是新標也要處理
-		if($lines2[$index2] =~ /^((?:。)|(?:、)|(?:，)|(?:．)|(?:；)|(?:：)|(?:「)|(?:」)|(?:『)|(?:』)|(?:（)|(?:）)|(?:？)|(?:！)|(?:—)|(?:…)|(?:《)|(?:》)|(?:〈)|(?:〉)|(?:“)|(?:”))/)
+		if($lines2[$index2] =~ /^((?:。)|(?:、)|(?:，)|(?:．)|(?:；)|(?:：)|(?:「)|(?:」)|(?:『)|(?:』)|(?:（)|(?:）)|(?:？)|(?:！)|(?:—)|(?:…)|(?:《)|(?:》)|(?:〈)|(?:〉)|(?:“)|(?:”)|(?:★))/)
 		{
-			$lines2[$index2] =~ s/^((?:。)|(?:、)|(?:，)|(?:．)|(?:；)|(?:：)|(?:「)|(?:」)|(?:『)|(?:』)|(?:（)|(?:）)|(?:？)|(?:！)|(?:—)|(?:…)|(?:《)|(?:》)|(?:〈)|(?:〉)|(?:“)|(?:”))//;
+			$lines2[$index2] =~ s/^((?:。)|(?:、)|(?:，)|(?:．)|(?:；)|(?:：)|(?:「)|(?:」)|(?:『)|(?:』)|(?:（)|(?:）)|(?:？)|(?:！)|(?:—)|(?:…)|(?:《)|(?:》)|(?:〈)|(?:〉)|(?:“)|(?:”)|(?:★))//;
 			$tagbuff .= $1;
 			$hasdot2 .= $1;
 			next;
@@ -945,31 +979,35 @@ sub get_word2
 	# <note n="0150001" resp="Taisho" type="orig" place="foot text">西天譯經三藏＝宋【明】</note>
 	# if(/^<note[^>]*?resp="Taisho"[^>]*?>[^<]*?<\/note>/)
 	# 不能用上面的, 因為 <note> 標記中會有 <g ref..> 這種缺字標記, 要改用如下:
-	if(/^<note[^>]*?resp="Taisho"[^>]*?>.*?<\/note>/)			
+	if(/^<note[^>]*?type="orig"[^>]*?>.*?<\/note>/)			
 	{
-		$lines2[$index2] =~ s/^(<note[^>]*?resp="Taisho"[^>]*?>.*?<\/note>)//;
-		return "$1";
+		#$lines2[$index2] =~ s/^(<note[^>]*?type="orig"[^>]*?>.*?<\/note>)//;
+		
+		my $note = "";
+		($lines2[$index2], $note) = get_all_note($lines2[$index2]);
+
+		return $note;
 	}
 
 	if(/^<note.*?>/)			# <note place="inline">...</note>
 	{
 		$lines2[$index2] =~ s/^(<note.*?>)//;
-		return "$1";
+		return $1;
 	}
 	if(/^<\/note>/)				# <note place="inline">...</note>
 	{
 		$lines2[$index2] =~ s/^(<\/note>)//;
-		return "$1";
+		return $1;
 	}
 	if(/^<anchor.*?>/)
 	{
 		$lines2[$index2] =~ s/^(<anchor.*?>)//;
-		return "$1";
+		return $1;
 	}
 	if(/^<app[^>]*type="star"[^>]*>/)
 	{
 		$lines2[$index2] =~ s/^(<app[^>]*type="star"[^>]*>)//;
-		return "$1";
+		return $1;
 	}
 	
 	#if(/^<p[^>]*?place="inline"[^>]*?>/)
@@ -1199,4 +1237,48 @@ sub mv_endtag_to_pre_line
 			if($i < 0) {$i = 0;}
 		}
 	}
+}
+
+# 傳入字串, 把全部的 note 取出, 尤其是中間會包 note
+# <note n="0603c2001" resp="CBETA" type="add"><note place="inline">誦三遍</note>【CB】，誦三遍【大】</note>
+
+sub get_all_note
+{
+	local $_ = shift;
+	my $note = "";
+	my $notecount = 0;
+
+	while($_)
+	{
+		if(/^<note [^>]*>/)
+		{
+			s/^(<note [^>]*>)//;
+			$note .= $1;
+			$notecount++;
+		}
+		elsif(/^<\/note>/)
+		{
+			s/^(<\/note>)//;
+			$note .= $1;
+			$notecount--;
+			last if($notecount == 0);
+		}
+		elsif(/^<.*?>/)
+		{
+			s/^(<[^>]*>)//;
+			$note .= $1;
+		}
+		elsif(/^[^<]*/)
+		{
+			s/^([^<]*)//;
+			$note .= $1;
+		}
+		else
+		{
+			$note .= $_;
+			$_ = "";
+		}
+	}
+
+	return ($_, $note);
 }
