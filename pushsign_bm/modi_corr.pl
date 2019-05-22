@@ -59,7 +59,24 @@ local *INBM;
 local *OUT;
 
 my $utf8='(?:.)';
-my $loseutf8='(?:[^\[\]> ])';
+my $loseutf8='(?:[^\[\]> \d])';
+
+=begin
+	為了避免組字式與模糊字 <□> 的干擾, 尤其是二者混用 [<□>>[羽*惠]]
+	所以要用 unicode U+D0000 字面來取代
+	U+D0000 = <□>
+	其他組字式就陸續推入 @gaiji 陣列
+
+	$word = get_word("[羽*惠]"); # 將組字式推入, 並傳回對應的 unicode
+	$des = get_des($word);	# 傳入文字, 傳回原來的組字式
+=end
+=cut
+
+my @des = ();	# 遇到組字式就放入
+my %des_hash = ();	# 如果此字存在, 就有 $des_hash{"[xxx]"} = 3 , 表示此字為 U+D0003 
+
+$des[0] = "<□>";
+$des_hash{"<□>"} = 0;
 
 ########################################################
 # 判斷參數
@@ -68,7 +85,7 @@ my $loseutf8='(?:[^\[\]> ])';
 if($#ARGV != 2)
 {
 	print "Usage :\n";
-	print "    perl pushsign_bm.pl new_sign.txt old_bm.txt new_sign_out.txt\n";
+	print "    perl modi_corr.pl new_sign.txt old_bm.txt new_sign_out.txt\n";
 	exit;
 }
 
@@ -119,8 +136,18 @@ my $all_txt = "";
 my $all_bm = "";
 my $all_out = "";
 
-while(<INTxt>) { $all_txt .= $_; }
-while(<INBM>) { $all_bm .= $_;}
+while(<INTxt>) 
+{
+	s/(\[$loseutf8+?\])/get_word($1)/ge;
+	$all_txt .= $_; 
+}
+while(<INBM>) 
+{
+	# 先把 <□> 換成 \x{D0000} , 最後再換回來
+	s/<□>/\x{D0000}/g;
+	s/(\[$loseutf8+?\])/get_word($1)/ge;
+	$all_bm .= $_;
+}
 
 $all_txt =~ s/\n{2,}/\n<P>\n/sg;	# 二行以上的段落插入 <p>
 
@@ -189,6 +216,13 @@ while(1)
 }
 
 # 輸出結果
+
+if($#des >= 0)
+{
+	my $patten = "[\x{D0000}" . "-" . chr(0xD0000+$#des) . "]";
+	$all_out =~ s/($patten)/get_des($1)/ge;
+}
+
 print OUT $all_out;
 close OUT;
 
@@ -563,4 +597,40 @@ sub comp_2_string
 	{
 		return 0;
 	}
+}
+
+#############################
+
+=begin
+	為了避免組字式與模糊字 <□> 的干擾, 尤其是二者混用 [<□>>[羽*惠]]
+	所以要用 unicode U+D0000 字面來取代
+	U+D0000 = <□>
+	其他組字式就陸續推入 @gaiji 陣列
+
+	$word = get_word("[羽*惠]"); # 將組字式推入, 並傳回對應的 unicode
+	$des = get_des($word);	# 傳入文字, 傳回原來的組字式
+
+my @des = ();	# 遇到組字式就放入
+my %des_hash = ();	# 如果此字存在, 就有 $des_hash{"[xxx]"} = 3 , 表示此字為 U+D0003 
+=end
+=cut
+
+# 傳入組字式, 傳回對應的 unicode 文字
+sub get_word
+{
+	local $_ = shift;
+	if(!$des_hash{$_})
+	{
+		push(@des, $_);
+		$des_hash{$_} = $#des;
+	}
+	return chr(0xD0000 + $des_hash{$_});
+}
+
+# 傳入 unicode 文字, 傳回組字式
+sub get_des
+{
+	local $_ = shift;
+	my $i = ord($_) - 0xD0000;
+	return $des[$i];
 }
