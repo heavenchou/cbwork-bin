@@ -327,9 +327,9 @@ sub get_word_bm
 
 		# ----- 需要處理的標記在放在此之前
 
-		if($lines_bm[$index_bm] =~ /^((<.*?>)|(\[＊\])|(\[A?\d+[a-zA-Z]?\]))/)
+		if($lines_bm[$index_bm] =~ /^((<[^□]*?>)|(\[＊\])|(\[A?\d+[a-zA-Z]?\]))/)
 		{
-			$lines_bm[$index_bm] =~ s/^((<.*?>)|(\[＊\])|(\[A?\d+[a-zA-Z]?\]))//;
+			$lines_bm[$index_bm] =~ s/^((<[^□]*?>)|(\[＊\])|(\[A?\d+[a-zA-Z]?\]))//;
 			$tagbuff .= $1;
 			next;
 		}
