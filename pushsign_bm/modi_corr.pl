@@ -190,7 +190,7 @@ while(1)
 		}
 		
 		printout($hasdot_txt);
-		printout($word_txt);
+		printout($word_bm);
 	}
 	# 有修訂
 	elsif($word_bm =~ /\[.*?>.*?\]/)
@@ -388,6 +388,13 @@ sub check_2_word
 	{
 		return 1;
 	}
+
+	# 模糊字過關
+	if($word_txt eq "▆" && $word_bm eq "\x{D0000}")
+	{
+		return 1;
+	}
+	
 
 	# 組字式算過關
 	if(($word_txt =~ /^\[[^>]*?\]/) || ($word_bm =~ /^\[[^>]*?\]/))
