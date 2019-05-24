@@ -69,7 +69,7 @@ J20nB098_p0527c06P#7黃岡弟子樊志張法名常燈述，
 =end
 =cut
 
-my @p_tag = ("<A>", "<B>", "<J>", "<p ", "<p>", "<Q2", "<S>", "<T", "A#", "B#", "I#", "j#", "P#", "Q2#", "S#", "s#", "T#", "t#", "WPr");
+my @p_tag = ('<A>', '<B>', '<J>', '<p ', '<p>', '<Q', '<S>', '<T', 'A#', 'B#', 'I#', 'j#', 'P#', 'Q\d#', 'S#', 's#', 'T#', 't#', 'WPr');
 
 my $InTxtFile = shift;
 my $InBMFile = shift;
@@ -108,6 +108,17 @@ open OUTBM, ">:utf8", "$OutBMFile" or die "open $OutBMFile error$!";
 my @lines_txt = <INTxt>;
 my @lines_bm = <INBM>;
 my @lines_out = "";
+
+# 判斷 txt 最後一行是不是 <P>? 若是就要移除
+if($lines_txt[$#lines_txt] =~ /^<P>\n?$/)
+{
+	$lines_txt[$#lines_txt] = "";
+}
+if($lines_txt[$#lines_txt-1] =~ /^<P>\n?$/ && $lines_txt[$#lines_txt] =~ /^\n?$/ )
+{
+	$lines_txt[$#lines_txt-1] = "\n";
+	$lines_txt[$#lines_txt-1] = "";
+}
 
 close INTxt;
 close INBM;
