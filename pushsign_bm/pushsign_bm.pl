@@ -69,7 +69,7 @@ J20nB098_p0527c06P#7黃岡弟子樊志張法名常燈述，
 =end
 =cut
 
-my @p_tag = ('<A>', '<B>', '<J>', '<p ', '<p>', '<Q', '<S>', '<T', 'A#', 'B#', 'I#', 'j#', 'P#', 'Q\d#', 'S#', 's#', 'T#', 't#', 'WPr');
+my @p_tag = ('<A>', '<B>', '<J>', '<p ', '<p=', '<p>', '<Q', '<S>', '<T', 'A#', 'B#', 'I#', 'j#', 'P#', 'Q\d#', 'S#', 's#', 'T#', 't#', 'WPr');
 
 my $InTxtFile = shift;
 my $InBMFile = shift;
