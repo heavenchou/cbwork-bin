@@ -19,43 +19,63 @@
 
 use utf8;
 
-$vol = shift;
-$inputFile = shift;
+# 各標記屬性希望出現的順序
+my %tag_att = (
+	"app" => ["n", "type", "corresp"],
+	"cb:juan" => ["n", "fun"],
+	"cb:mulu" => ["n", "level", "type"],
+	"cb:t" => ["resp", "xml:lang", "place"],
+	"cb:tt" => ["n", "type"],
+	"lb" => ["n", "ed"],
+	"lem" => ["resp", "wit"],
+	"lg" => ["xml:id", "style"],
+	"milestone" => ["n", "unit"],
+	"note" => ["n", "resp", "type", "place"],
+	"p" => ["xml:id", "xml:lang", "cb:type", "cb:place"],
+	"pb" => ["n", "ed", "xml:id"],
+	"rdg" => ["resp", "wit"],
+	"space" => ["quantity", "unit"],
+	"TEI" => ["xmlns", "xmlns:cb", "xml:id"],
+);
+
+
+my $vol = shift;
+my $inputFile = shift;
 
 my $result = "";
 
-$dir = "/release/add-id/";  # 輸出目錄
+my $dir = "/release/add-id/";  # 輸出目錄
 
-$chm;
-$nid=0; 
-$debug = 0;
+#$chm;
+my $nid=0; 
+my $debug = 0;
 $vol = uc($vol);
-$vol = substr($vol,0,3);
+#$vol = substr($vol,0,3);
 
-mkdir($dir . $vol, MODE);
+mkdir($dir . $vol);
 
 opendir (INDIR, ".");
-@allfiles = grep(/\.xml$/i, readdir(INDIR));
+my @allfiles = grep(/\.xml$/i, readdir(INDIR));
 
 die "No files to process\n" unless @allfiles;
 
 print STDERR "Initialising....\n";
 
 #utf8 pattern
-	$pattern = '&[^;]*;|\<[^\>]*\>|.';
+my $pattern = '&[^;]*;|\<[^\>]*\>|.';
 #	$big5 = '[\x00-\x7f]|[\x80-\xff][\x00-\xff]';
 
-($path, $name) = split(/\//, $0);
+my ($path, $name) = split(/\//, $0);
 push (@INC, $path);
 
-require "utf8b5o.plx";
-require "sub.pl";
+#require "utf8b5o.plx";
+#require "sub.pl";
 #$utf8out{"\xe2\x97\x8e"} = '';
 
 use XML::Parser;
 
 my %Entities = ();        
-%wits = ();
+my %wits = ();
 
 my $parser = new XML::Parser(NoExpand => True);
 $parser->setHandlers(
@@ -80,26 +100,44 @@ if ($debug) {
 	open LOG, ">:utf8", "add_id.txt";
 }
 
-if ($inputFile eq "") {
-	for $file (sort(@allfiles)) { process1file($file); }
-} else {
-	$file = $inputFile;
+if ($inputFile eq "") 
+{
+	for my $file (sort(@allfiles)) 
+	{
+		 process1file($file); 
+	}
+}
+else 
+{
+	my $file = $inputFile;
 	process1file($file);
 }       
         
 print STDERR "Ok!!\n"; 
         
 sub process1file {
-	$file = shift;
+	my $file = shift;
 	$file =~ s/^t/T/;
 	print STDERR "$file\n";
 	$parser1->parsefile($file);
 	open O, ">:utf8", "${dir}$vol/$file";
 	$result = "";
 	$parser->parsefile($file);
-	$result =~ s/(<cb:mulu [^>]*)><\/cb:mulu>/\1\/>/g;	# 把空的 <cb:mulu> 標記換成單一的封閉標記
+	# 把空的 <cb:mulu> 標記換成單一的封閉標記
+	close_tag();
 	print O $result;
 	close O;
+}
+
+# 把空的 <cb:mulu> 標記換成單一的封閉標記
+sub close_tag
+{
+	$result =~ s/(<cb:mulu [^>]*)><\/cb:mulu>/$1\/>/g;
+	$result =~ s/(<figure [^>]*)><\/figure>/$1\/>/g;
+	$result =~ s/(<g [^>]*)><\/g>/$1\/>/g;
+	$result =~ s/(<graphic [^>]*)><\/graphic>/$1\/>/g;
+	$result =~ s/(<space [^>]*)><\/space>/$1\/>/g;
+	$result =~ s/(<unclear)><\/unclear>/$1\/>/g;
 }
 
 
@@ -234,14 +272,34 @@ sub start_handler
 		if ($att{"place"} eq "foot") { $pass = 0; }
 	}
 	$result .= "<$el";
-	while (($key,$value) = each %att) {
-		#$value = myDecode($value);	# P5 不用了
-		$result .= " $key=\"$value\"";
+
+	# 把指定順序的屬性先印出來
+	print_att(\%att);
+	# 剩下的依字母順序印出來
+	for my $key (sort(keys(%att)))
+	{
+		$result .= " $key=\"" . $att{$key} . "\"";
 	}
-	if ($el =~ /^(anchor)|(figure)|(lb)|(milestone)|(pb)|(todo)$/) { $result .= "/"; }
+	if ($el =~ /^(anchor)|(lb)|(milestone)|(pb)|(todo)$/) { $result .= "/"; }
 	$result .= ">";
 }
-        
+
+# 把指定順序的屬性先印出來
+sub print_att
+{
+	my $att = shift;
+	if($tag_att{$el})
+	{
+		for my $attname (@{$tag_att{$el}})
+		{
+			if($att->{$attname})
+			{
+				$result .= " $attname=\"" . $att->{$attname} . "\"";
+				delete $att->{$attname};
+			}
+		}
+	}
+}
         
         
 sub end_handler 
@@ -251,7 +309,7 @@ sub end_handler
 	my $att = pop(@saveatt);
 	pop @elements;
 	my $parent = lc($p->current_element);
-	if ($el !~ /^(anchor)|(figure)|(lb)|(milestone)|(pb)|(todo)$/) { $result .= "</$el>"; }
+	if ($el !~ /^(anchor)|(lb)|(milestone)|(pb)|(todo)$/) { $result .= "</$el>"; }
 	if ($el eq 'app') {
 		pop @appstack;
 	}  elsif ($el eq 'note') {
