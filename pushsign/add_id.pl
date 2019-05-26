@@ -38,32 +38,37 @@ my %tag_att = (
 	"TEI" => ["xmlns", "xmlns:cb", "xml:id"],
 );
 
-
 my $vol = shift;
 my $inputFile = shift;
-
 my $result = "";
-
 my $dir = "/release/add-id/";  # 輸出目錄
 
-#$chm;
-my $nid=0; 
+my $lb="";
+my $ent_declare = '';
+my $para_ent = "";
+my %ids = ();
+my $pass = 1;	# $pass 為 0 就表示這個範圍不計算字數
+my @appstack = ();
+my $note_type = '';
+my $el = "";
+my @saveatt = ();
+my @elements = ();
+my @savepass = ();
+my $app_count = 0;
+my $char_count = 0;
+my $app_id = "";
+my $id = "";
+my $wit = "";
 my $debug = 0;
+
 $vol = uc($vol);
-#$vol = substr($vol,0,3);
-
 mkdir($dir . $vol);
-
 opendir (INDIR, ".");
 my @allfiles = grep(/\.xml$/i, readdir(INDIR));
 
 die "No files to process\n" unless @allfiles;
 
 print STDERR "Initialising....\n";
-
-#utf8 pattern
-my $pattern = '&[^;]*;|\<[^\>]*\>|.';
-#	$big5 = '[\x00-\x7f]|[\x80-\xff][\x00-\xff]';
 
 my ($path, $name) = split(/\//, $0);
 push (@INC, $path);
@@ -77,7 +82,7 @@ use XML::Parser;
 my %Entities = ();        
 my %wits = ();
 
-my $parser = new XML::Parser(NoExpand => True);
+my $parser = new XML::Parser(NoExpand => 1);
 $parser->setHandlers(
 	Start => \&start_handler,
 	Init => \&init_handler,
@@ -89,7 +94,7 @@ $parser->setHandlers(
 	Default => \&default
 );
 
-my $parser1 = new XML::Parser(NoExpand => True);
+my $parser1 = new XML::Parser(NoExpand => 1);
 $parser1->setHandlers(
 	Start => \&start_handler1,
 	Init => \&init_handler1,
@@ -117,19 +122,18 @@ print STDERR "Ok!!\n";
         
 sub process1file {
 	my $file = shift;
-	$file =~ s/^t/T/;
 	print STDERR "$file\n";
 	$parser1->parsefile($file);
 	open O, ">:utf8", "${dir}$vol/$file";
 	$result = "";
 	$parser->parsefile($file);
-	# 把空的 <cb:mulu> 標記換成單一的封閉標記
+	# 把空的標記換成單一的封閉標記
 	close_tag();
 	print O $result;
 	close O;
 }
 
-# 把空的 <cb:mulu> 標記換成單一的封閉標記
+# 把空的標記換成單一的封閉標記
 sub close_tag
 {
 	$result =~ s/(<cb:mulu [^>]*)><\/cb:mulu>/$1\/>/g;
@@ -139,7 +143,6 @@ sub close_tag
 	$result =~ s/(<space [^>]*)><\/space>/$1\/>/g;
 	$result =~ s/(<unclear)><\/unclear>/$1\/>/g;
 }
-
 
 sub default {
 	my $p = shift;
@@ -157,7 +160,7 @@ sub default {
         
 sub init_handler
 {       
-	$result .= "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n";
+	$result .= "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
 	$lb="";
 	$ent_declare = '';
 	$para_ent = "";
@@ -168,8 +171,8 @@ sub init_handler
 }
         
 sub doctype {
-	my $s = $file;
-	$result .= "\n<?xml-stylesheet type=\"text/xsl\" href=\"../dtd/cbeta.xsl\" ?>\n";
+	#my $s = $file;
+	$result .= "\n<?xml-stylesheet type=\"text/xsl\" href=\"../dtd/cbeta.xsl\"?>\n";
 	$result .= "<!DOCTYPE TEI.2 SYSTEM \"../dtd/cbetaxml.dtd\"\n";
 	$result .= "[$ent_declare";
 	$result .= "$para_ent]>\n";
@@ -217,26 +220,26 @@ sub start_handler
 		$lb = $att{"n"};
 		$char_count = 1;
 		$app_count = 0;
-		if (not exists$att{"ed"}) { $att{"ed"}="T"; }
+		#if (not exists $att{"ed"}) { $att{"ed"}="T"; }
 	}
 	
 	# <lem>
 	if ($el eq "lem") {
 		if ($note_type ne 'mod' and not exists $att{'wit'}) {
-			$i = scalar @appstack;
+			my $i = scalar @appstack;
 			
 			$app_id = $appstack[$i-1];
 			$wit = $wits{$app_id}; 
 			print LOG "\n201 $app_id $wit\n";
 			if ($wit =~ /【大】/) {
-				$w =  "【CBETA】";
+				my $w = "【CBETA】";
 				if (exists $att{'cf1'}) {
 					$w = wit($w, $att{'cf1'});
 				}
 				if (exists $att{'cf2'}) {
 					$w = wit($w, $att{'cf2'});
 				}
-				$att{"wit"} =  $w;
+				$att{"wit"} = $w;
 			}  else {
 				$att{'wit'} = "【大】";
 			}
@@ -328,28 +331,14 @@ sub char_handler
 	if ($pass) {
 		$char_count += myLength($char)
 	}
-	#$char =~ s/($pattern)/&rep($1)/eg;
 	$result .= $char;
-}
-
-sub rep{
-	local $x = shift;
-	
-	if ($x eq "&") {
-		return "&amp;";
-	} elsif ($x eq "<") {
-		return "&lt;";
-	}
-	return $x;
 }
        
 sub comment {       
 	my $expat = shift;
 	my $data = shift;
-	#$data =~ s/($pattern)/$utf8out{$1}/g;
 	$result .= "<!--$data-->";
 }
-
 
 sub entity{
 	my $p = shift;
@@ -369,14 +358,7 @@ sub entity{
 	$ent_declare .= ">\n";
 	&openent($sysid);
 	return 1;
-}       
-        
-        
-#sub myDecode {
-#	my $s = shift;
-#	$s =~ s/($pattern)/$utf8out{$1}/g;
-#	return $s;
-#}
+}
 
 # 算字數
 sub myLength {
@@ -392,17 +374,11 @@ sub myLength {
 	$str =~ s/(◎|。|，|、|；|：|「|」|『|』|（|）|？|！|—|…|《|》|〈|〉|．|“|”|　|〔|〕|【|】|\(|\))//g;
 	$str =~ s/\n//g;
 
-	#my $pattern = '(?:&.*?;|[\x80-\xff][\x00-\xff]|[\x00-\x7F])';
-	#utf8 pattern
-	# P4
-	#$utf8 = '(?:&[^;]*?;|[\xe0-\xef][\x80-\xbf][\x80-\xbf]|[\xc2-\xdf][\x80-\xbf]|[\x0-\x7f])';
-	# P5
-	$utf8 = '(?:&[^;]*?;|.)';
+	my $utf8 = '(?:&[^;]*?;|.)';
 	my @a=();
-	#push(@a, $str =~ /$pattern/g);
 	push(@a, $str =~ /$utf8/g);
-	foreach $s (@a) {
- 
+	foreach my $s (@a) 
+	{
 		$n++;
 		if ($s =~ /^&CI/) {
 			$n++;
@@ -435,7 +411,7 @@ sub start_handler1
 		$lb = $att{'n'};
 		$app_count = 0;
 	} elsif ($el eq 'rdg') {
-		$i = scalar @appstack;
+		my $i = scalar @appstack;
 		$app_id = $appstack[$i-1]; 
 		if (exists  $wits{$app_id} ) {
 			print LOG "388 $app_id " .  $wits{$app_id} . "\n"; 
