@@ -97,7 +97,7 @@ my $InTxtFile = shift;
 my $InBMFile = shift;
 my $OutBMFile = shift;
 
-my $hasdot_txt = "";		# 用來判斷是否有 dot , 0: 沒有, 1:句讀, 2:小黑點 , 新式標點版直接用該符號
+my $hasdot_txt = "";	# 用來判斷是否有 dot , 0: 沒有, 1:句讀, 2:小黑點 , 新式標點版直接用該符號
 my $hasdot_bm = "";		# 用來判斷是否有 dot , 0: 沒有, 1:句讀, 2:小黑點 , 新式標點版直接用該符號
 my $tagbuff = "";		# 暫存讀取 BM 遇到的 tag 的 buff
 
@@ -127,10 +127,12 @@ open INTxt, "<:utf8", "$InTxtFile" or die "open $InTxtFile error$!";
 open INBM, "<:utf8", "$InBMFile" or die "open $InBMFile error$!";
 open OUT, ">:utf8", "$OutBMFile" or die "open $OutBMFile error$!";
 
-# 不用陣列, 全部接成一行
-#my @lines_txt = <INTxt>;
-#my @lines_bm = <INBM>;
-#my @lines_out = "";
+# 原本不用陣列, 全部接成一行
+# 為了效率, 還是用陣列, 但取出前 500 字當成一行來處理, 
+# 文字不夠時, 再由陣列取出文字補足
+my @lines_txt = ();
+my @lines_bm = ();
+#my @lines_out = ();
 
 my $all_txt = "";
 my $all_bm = "";
@@ -139,17 +141,30 @@ my $all_out = "";
 while(<INTxt>) 
 {
 	s/(\[$loseutf8+?\])/get_word($1)/ge;
-	$all_txt .= $_; 
+	# 二行以上的段落插入 <P>
+	if($_ eq "\n")
+	{
+		if($lines_txt[$#lines_txt] eq "<P>\n")
+		{
+			next;
+		}
+		else
+		{
+			$_ = "<P>\n";
+		}
+	}
+	push(@lines_txt, $_);
 }
 while(<INBM>) 
 {
 	# 先把 <□> 換成 \x{D0000} , 最後再換回來
 	s/<□>/\x{D0000}/g;
 	s/(\[$loseutf8+?\])/get_word($1)/ge;
-	$all_bm .= $_;
+	push(@lines_bm, $_);
 }
 
-$all_txt =~ s/\n{2,}/\n<P>\n/sg;	# 二行以上的段落插入 <p>
+# 移除最後一個 <P>
+if($lines_txt[$#lines_txt] eq "<P>\n") { pop(@lines_txt); }
 
 close INTxt;
 close INBM;
@@ -237,7 +252,15 @@ sub get_word_txt
 	$hasdot_txt = "";		# 用來判斷是否有 dot
 
 	while(1)
-	{
+	{		
+		# 如果 $all_txt 不夠長, 就補足長度
+		while(length($all_txt) < 500)
+		{
+			my $line = shift(@lines_txt);
+			$all_txt .= $line;
+			if($#lines_txt < 0) { last; }	# 沒資料了
+		}
+
 		if($all_txt eq "")		# 結束了
 		{
 			return "";
@@ -258,11 +281,13 @@ sub get_word_txt
 				
 		last;
 	}
-	
-	if($all_txt =~ /^\[($loseutf8+?)\]/s)	# 缺字
+
+	# 如果 $all_txt 不夠長, 就補足長度
+	while(length($all_txt) < 500)
 	{
-		$all_txt =~ s/^(\[($loseutf8+?)\])//s;
-		return $1;
+		my $line = shift(@lines_txt);
+		$all_txt .= $line;
+		if($#lines_txt < 0) { last; }	# 沒資料了
 	}
 	
 	if($all_txt =~ /^\[[^>\d]*?>[^>\d]*?\]/s)	# 修訂 [A>B]
@@ -291,6 +316,14 @@ sub get_word_bm
 
 	while(1)
 	{
+		# 如果 $all_txt 不夠長, 就補足長度
+		while(length($all_bm) < 500)
+		{
+			my $line = shift(@lines_bm);
+			$all_bm .= $line;
+			if($#lines_bm < 0) { last; }	# 沒資料了
+		}
+
 		if($all_bm eq "")		# 結束了
 		{
 			return "";
@@ -344,18 +377,14 @@ sub get_word_bm
 
 		last;
 	}
-		
-	if($all_bm =~ /^\[($loseutf8+?)\]/s)			# 組字式
-	{
-		$all_bm =~ s/^(\[($loseutf8+?)\])//s;
-		return $1;
-	}
 	
-	#if(/^\[[^>\d]*?>[^>\d]*?\]/)	# 修訂 [A>B]
-	#{
-	#	$lines_bm[$index_bm] =~ s/^(\[[^>\d]*?>[^>\d]*?\])//;
-	#	return "$1";	# 特殊修訂格式
-	#}
+	# 如果 $all_txt 不夠長, 就補足長度
+	while(length($all_bm) < 500)
+	{
+		my $line = shift(@lines_bm);
+		$all_bm .= $line;
+		if($#lines_bm < 0) { last; }	# 沒資料了
+	}
 
 	if($all_bm =~ /^\[[^>\d]*?>[^>\d]*?\]/s)	# 修訂 [A>B]
 	{
@@ -395,12 +424,11 @@ sub check_2_word
 		return 1;
 	}
 	
-
 	# 組字式算過關
-	if(($word_txt =~ /^\[[^>]*?\]/) || ($word_bm =~ /^\[[^>]*?\]/))
-	{
-		return 1;
-	}
+	#if(($word_txt =~ /^\[[^>]*?\]/) || ($word_bm =~ /^\[[^>]*?\]/))
+	#{
+	#	return 1;
+	#}
 
 	# 修訂格式
 
