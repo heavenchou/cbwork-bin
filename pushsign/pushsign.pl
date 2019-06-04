@@ -6,6 +6,9 @@
 # pushsign.pl 簡單標記版.txt 舊的xml.xml 結果檔xml.xml > 記錄檔.txt
 #
 ########################################################
+# 2019/06/04 : 1.處理模糊字比對
+#              2.p 的 rend=inline 改成 cb:place=inline, 
+#              3.rend=margin-left 改成 style=margin-left
 # 2019/05/20 : 處理 note 中包含 note 的誤判
 # 2019/05/18 : 原本大正藏的修訂還有比對, 現在連大正藏也不比對了, [A>B] 全部都只比對 B。
 # 2019/05/14 : 因為修訂的標記已經換成 app 校勘標記, 所以BM的 [A>B] 只處理 B 了。
@@ -126,6 +129,11 @@ open OUTXml, ">:utf8", "$OutXmlFile" or die "open $OutXmlFile error$!";
 my @lines1 = <INTxt>;
 my @lines2 = <INXml>;
 my @lines3 = "";
+
+for my $line (@lines1)
+{
+	$line =~ s/<□>/<unclear\/>/g;
+}
 
 close INTxt;
 close INXml;
@@ -446,8 +454,8 @@ sub get_word1
 				}
 
 				# 3. <P> => <p>
-				#    <P,x> => <p rend="margin-left:xem">
-				#    行中 P 則加上 rend="inline"
+				#    <P,x> => <p style="margin-left:xem">
+				#    行中 P 則加上 cb:place="inline"
 
 				if($tag2 =~ /<P>/)
 				{
@@ -457,7 +465,7 @@ sub get_word1
 					}
 					else
 					{
-						$tag2 = "<p rend=\"inline\">";
+						$tag2 = "<p cb:place=\"inline\">";
 					}
 				}
 				if($tag2 =~ /<P,(\d+)>/)
@@ -465,11 +473,11 @@ sub get_word1
 					my $tmpnum = $1;
 					if($firstword)
 					{
-						$tag2 = "<p rend=\"margin-left:${tmpnum}em\">";
+						$tag2 = "<p style=\"margin-left:${tmpnum}em\">";
 					}
 					else
 					{
-						$tag2 = "<p rend=\"margin-left:${tmpnum}em;inline\">";
+						$tag2 = "<p style=\"margin-left:${tmpnum}em;\" cb:place=\"inline\">";
 					}
 				}
 
@@ -497,7 +505,10 @@ sub get_word1
 			$lines1[$index1] =~ s/^((?:　)|(?:Ｐ)|(?:Ｓ)|(?:ｓ)|(?:Ｗ)|(?:Ｚ)|(?:Ｉ)|(?:Ｍ)|(?:Ｒ)|(?:ｊ)|(?:Ｔ)|(?:Ｄ)|(?:Ｑ)|(?:Ａ)|(?:Ｙ)|(?:Ｂ)|(?:Ｅ))//;
 			next;
 		}
-		
+		if($lines1[$index1] =~ /^<unclear\/>/)
+		{
+			last;
+		}
 		if($lines1[$index1] =~ /^<.*?>/)
 		{
 			$lines1[$index1] =~ s/^<.*?>//;
@@ -519,10 +530,12 @@ sub get_word1
 		{
 			s/^($utf8*?)\[($loseutf8+?)\]/$1:1:$2:2:/;
 		}
+		s/<unclear\/>/:=3=:/g;
 		s/\[($loseutf8*?)>>($loseutf8*?)\]/$2$1/g;
 		s/\[($loseutf8*?)>($loseutf8*?)\]/$2/g;
 		s/:1:/\[/g;
 		s/:2:/\]/g;
+		s/:=3=:/<unclear\/>/g;
 		
 		# 處理通用詞
 		
@@ -609,6 +622,11 @@ sub get_word1
 	{
 		$lines1[$index1] =~ s/^【RA】//;
 		return "&M062473;";
+	}
+	elsif(/^<unclear\/>/)     # 模糊字
+	{
+		$lines1[$index1] =~ s/^(<unclear\/>)//;
+		return "$1";
 	}
 	elsif(/^$utf8/)     # 一般字
 	{
@@ -827,7 +845,7 @@ sub get_word2
 			last;
 		}
 		
-		#if($lines2[$index2] =~ /^<p[^>]*?place="inline"[^>]*?>/)
+		#if($lines2[$index2] =~ /^<p[^>]*?cb:place="inline"[^>]*?>/)
 		#{
 		#	last;
 		#}
@@ -882,6 +900,11 @@ sub get_word2
 		    $lines2[$index2] =~ s/^(<!\-\- <[ouwsa]> \-\->)//;
 			$tagbuff .= $1;
 			next;
+		}
+
+		if($lines2[$index2] =~ /^<unclear\/>/)
+		{
+			last;
 		}
 		
 		# ----- 需要處理的標記在放在此之前
@@ -948,8 +971,6 @@ sub get_word2
 			next;
 		}		
 		
-		
-
 		if($lines2[$index2] =~ /^\xd/)
 		{
 			$lines2[$index2] =~ s/^(\xd)//;
@@ -1010,9 +1031,9 @@ sub get_word2
 		return $1;
 	}
 	
-	#if(/^<p[^>]*?place="inline"[^>]*?>/)
+	#if(/^<p[^>]*?cb:place="inline"[^>]*?>/)
 	#{
-	#	$lines2[$index2] =~ s/^(<p[^>]*?place="inline"[^>]*?>)//;
+	#	$lines2[$index2] =~ s/^(<p[^>]*?cb:place="inline"[^>]*?>)//;
 	#	return "$1";
 	#}
 	# p4 版缺字
@@ -1064,7 +1085,11 @@ sub get_word2
 		$lines2[$index2] =~ s/^(\[\d+[A-Za-z]?\])//;
 		return "$1";
 	}
-
+	if(/^<unclear\/>/)     # 模糊字
+	{
+		$lines2[$index2] =~ s/^(<unclear\/>)//;
+		return "$1";
+	}
 	if(/^$utf8/)			# 一般字
 	{
 		$lines2[$index2] =~ s/^($utf8)//;
@@ -1195,7 +1220,7 @@ sub check_2_word
 		return 1;
 	}
 	
-	#if($word2 =~ /<p[^>]*?place="inline"[^>]*?>/ and $word1 eq "Ｐ")
+	#if($word2 =~ /<p[^>]*?cb:place="inline"[^>]*?>/ and $word1 eq "Ｐ")
 	#{
 	#	return 1;
 	#}
