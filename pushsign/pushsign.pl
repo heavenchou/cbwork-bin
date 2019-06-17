@@ -6,6 +6,8 @@
 # pushsign.pl 簡單標記版.txt 舊的xml.xml 結果檔xml.xml > 記錄檔.txt
 #
 ########################################################
+# 2019/06/17 : 1.修改有 </L> 沒有接著 <P> 的情況
+#              2.note type=org,mod,add 標記之後的標點要移到 note 之前
 # 2019/06/04 : 1.處理模糊字比對
 #              2.p 的 rend=inline 改成 cb:place=inline, 
 #              3.rend=margin-left 改成 style=margin-left
@@ -205,6 +207,7 @@ while(1)
 		if($debug)
 		{
 			print Encode::encode("big5","hasdot1 : $hasdot1  hasdot2 : $hasdot2\n");
+			print Encode::encode("big5","tagbuff : $tagbuff\n");
 		}
 		
 		if($hasdot1 eq $hasdot2)	# 二邊標點同步
@@ -236,10 +239,14 @@ while(1)
 		}
 		elsif($hasdot1 ne "" and $hasdot2 eq "")		# xml 沒標點, 所以要加上去
 		{
+			if($debug)
+			{
+				print Encode::encode("big5","hasdot1 : $hasdot1  hasdot2 : $hasdot2\n");
+				print Encode::encode("big5","tagbuff : $tagbuff\n");
+			}
 			# $tagbuff =~ s/((。)|(．))//;
 			# <rdg wit="【大】">阿。</rdg></app> ==> <rdg wit="【大】">阿</rdg></app>。
-
-			if($tagbuff =~ /^<((\/rdg)|(\/lem)|(\/t)|(note[^>]*resp="CBETA".*?)|(app.*?))>/)
+			if($tagbuff =~ /^<((\/rdg)|(\/lem)|(\/t)|(note\s+resp="CBETA[^"]*">)|(app.*?))>/)
 			{
 			    if($tagbuff =~ /^.*<\/((app)|(cb:tt)|(note))>/)
 			    {
@@ -310,13 +317,6 @@ while(1)
 # 將行首的 </p> 移到前一行行尾
 mv_endtag_to_pre_line();
 
-# 把 </p></item></list><<>></p> 換成 </p></item></list>
-# 再把 <<>> 移除
-for(my $i=0; $i<=$#lines3; $i++)
-{
-	$lines3[$i] =~ s/<\/p><\/item><\/list><<>><\/p>/<\/p><\/item><\/list>/g;
-	$lines3[$i] =~ s/<\/list><<>>/<\/list><\?>這裡原本應該要有<\/p>/g;
-}
 
 # 輸出結果
 for(my $i=0; $i<=$#lines3; $i++)
@@ -492,10 +492,8 @@ sub get_word1
 		elsif($lines1[$index1] =~ /^(<\/L>)/)
 		{
 			# 單獨處理 </L>	
-			# 最後的 </L> 要轉成 </p></item></list><<>>
 			$firstitem = 1;
-			# 先加上 <<>>, 未來如果有 </p></item></list><<>></p> , 最後面的 </p> 就要移除
-			$hasdot1 .= "</p></item></list><<>>";	# 先加上 <<>>, 
+			$hasdot1 .= "</item></list>";
 			$lines1[$index1] =~ s/^(<\/L>)//;
 			next;
 		}
