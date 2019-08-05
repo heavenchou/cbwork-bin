@@ -13,6 +13,7 @@ $gaiji->load_access_db();
 
 check_same_des();   # 檢查有沒有重複的組字式
 check_same_uni();   # 檢查有沒有重複的unicode
+check_uni_and_uniword();   # 檢查 unicode 和文字有沒有匹配
 print "any key to exit";
 <>;
 
@@ -57,3 +58,37 @@ sub check_same_uni()
     }
 }
 
+# 檢查 unicode 和文字有沒有匹配
+sub check_uni_and_uniword()
+{
+    local $_;
+    open IN, "<:utf8", "../../cbeta_gaiji/cbeta_gaiji.csv";
+    <IN>;
+    while(<IN>)
+    {
+        my @items = split(/\t/,$_);
+        my $uni = $items[1];
+        my $word = $items[2];
+        my $nor_uni = $items[3];
+        my $nor_word = $items[4];
+        if($uni ne "" || $word ne "")
+        {
+            my $w = chr(hex($uni));
+            if($w ne $word)
+            {
+                # uniword 不等於 uni 的轉換
+                print $items[0] . " : uni != uniword\n";
+            }
+        }
+        if($nor_uni ne "" || $nor_word ne "")
+        {
+            my $w = chr(hex($nor_uni));
+            if($w ne $nor_word)
+            {
+                # uniword 不等於 uni 的轉換
+                print $items[0] . " : nor_uni != nor_uniword\n";
+            }
+        }
+    }
+    close IN;
+}
