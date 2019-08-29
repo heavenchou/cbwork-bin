@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2019/08/29 加入LC【呂澂】相關訊息
 2018/08/18 1.XML 大改版, 原本許多 rend 的屬性分布到 style 和其他, 同時修改 rend 規範
            2.缺字由 Access 資料庫改成 csv 格式的缺字資料檔案
 2018/07/24 新增 <border>..</border> 轉成 <seg rend="border">..</seg>
@@ -112,9 +113,11 @@ wits={
 'GB': '【志叢】',
 'H': '【正史】',
 'HM': '【惠敏】',
+'I': '【佛拓】',
 'J': '【嘉興】',
 'K': '【麗】',
 'L': '【龍】',
+'LC': '【呂澂】',
 'M': '【卍正】',
 'N': '【南傳】',
 'P': '【北藏】',
@@ -141,15 +144,16 @@ collectionEng={
 'H': 'Passages concerning Buddhism from the Official Histories',
 'HM': 'the Complete Works of Ven Huimin',
 'I': 'Selections of Buddhist Stone Rubbings from the Northern Dynasties',
-'J': 'Jiaxing Canon - Xinwenfeng Edition',
-'K': 'Tripiṭaka Koreana - Xinwenfeng Edition',
-'L': 'Qianlong Edition of the Canon - Xinwenfeng Edition',
-'M': 'Manji Daizōkyō - Xinwenfeng Edition',
-'N': 'Chinese Translation of the Pali Tipiṭaka',
+'J': 'Jiaxing Canon (Shinwenfeng Edition)',
+'K': 'Tripiṭaka Koreana (Shinwenfeng Edition)',
+'L': 'Qianlong Edition of the Canon (Shinwenfeng Edition)',
+'LC': 'Corpus of Lü Cheng\'s Buddhist Studies',
+'M': 'Manji Daizōkyō (Shinwenfeng Edition)',
+'N': 'Chinese Translation of the Pāḷi Tipiṭaka (Yuan Heng Temple Edition)',
 'P': 'Northern Yongle Edition of the Canon',
-'Q': 'Qisha Edition of the Canon - Xinwenfeng Edition',
-'R': 'Manji Zokuzōkyō - Xinwenfeng Edition',
-'S': 'Songzang yizhen - Xinwenfeng Edition',
+'Q': 'Qisha Edition of the Canon (Shinwenfeng Edition)',
+'R': 'Manji Zokuzōkyō (Shinwenfeng Edition)',
+'S': 'Songzang yizhen (Shinwenfeng Edition)',
 'T': 'Taishō Tripiṭaka',
 'U': 'Southern Hongwu Edition of the Canon',
 'W': 'Buddhist Texts not contained in the Tripiṭaka',
