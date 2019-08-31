@@ -217,9 +217,12 @@ sub start_handler
 	}
 
 	if ($el eq "lb") {
-		$lb = $att{"n"};
-		$char_count = 1;
-		$app_count = 0;
+		if($att{"type"} ne "old")
+		{
+			$lb = $att{"n"};
+			$char_count = 1;
+			$app_count = 0;
+		}
 		#if (not exists $att{"ed"}) { $att{"ed"}="T"; }
 	}
 	
