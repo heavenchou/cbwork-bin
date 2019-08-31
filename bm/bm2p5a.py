@@ -10,6 +10,8 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2019/08/31 1.修訂符號[A>B]由 <choice><corr><sic> 格式改成 <note><app><lem><rdg> 格式
+           2.調整 XML 檔首的資訊
 2019/08/29 加入LC【呂澂】相關訊息
 2018/08/18 1.XML 大改版, 原本許多 rend 的屬性分布到 style 和其他, 同時修改 rend 規範
            2.缺字由 Access 資料庫改成 csv 格式的缺字資料檔案
@@ -129,6 +131,10 @@ wits={
 'X': '【卍續】', 
 'Y': '【印順】', 
 'ZY': '【智諭】',
+}
+
+collectionChi={
+'LC': '呂澂佛學著作集'
 }
 
 collectionEng={
@@ -666,6 +672,10 @@ def inline_tag(tag):
 		start_inline_annals(tag)
 	elif tag=='</annals>':
 		close_annals(tag)
+	elif tag.startswith('<app'):
+		out(tag)
+	elif tag=='</app>':
+		out(tag)
 	elif re.match(r'<[ABCEY]>', tag):
 		start_inline_byline(tag)
 	elif tag=='<border>':
@@ -721,6 +731,11 @@ def inline_tag(tag):
 	elif tag =='<l>':
 		out('<l>')	# 行首標記有 S 及 s 時, 會在行中自動將空格變成 <l></l></lg> 等標記
 	elif tag =='</l>':	out('</l>')	# 行首標記有 S 及 s 時, 會在行中自動將空格變成 <l></l></lg> 等標記
+		
+	elif tag.startswith('<lem'):
+		out(tag)
+	elif tag=='</lem>':
+		out(tag)
 	elif tag =='</lg>':	out('</lg>')	# 行首標記有 S 及 s 時, 會在行中自動將空格變成 <l></l></lg> 等標記
 	elif tag =='</L>':
 		closeTags('p')
@@ -753,6 +768,10 @@ def inline_tag(tag):
 		out('<term cb:behaviour="no-norm">')
 	elif tag=='</no_chg>':
 		out('</term>')
+	elif tag.startswith('<note'):
+		out(tag)
+	elif tag=='</note>':
+		out(tag)
 	elif tag.startswith('<n'):
 		start_inline_n(tag)
 	elif tag=='</n>':
@@ -786,6 +805,10 @@ def inline_tag(tag):
 		start_inline_q(tag)
 	elif tag.startswith('</Q'):
 		close_q(tag)
+	elif tag.startswith('<rdg'):
+		out(tag)
+	elif tag=='</rdg>':
+		out(tag)
 	elif tag=='<reg>':
 		out(tag)
 	elif tag=='</reg>':
@@ -886,11 +909,82 @@ def do_chars(s):
 	char_count += myLength(s)
 	out2(s)
 
+
 '''
-先把 [Ａ>Ｂ] 換成 <choice cb:resp="CBETA.maha"><corr>Ｂ</corr><sic>Ａ</sic></choice>
+先把 [Ａ>Ｂ] 換成
+<note n="0001b0201" resp="CBETA.maha" type="add">念【CB】，忘【大】</note><app n="0001b0201"><lem wit="【CB】" resp="CBETA">念</lem><rdg wit="【大】">忘</rdg></app>
 因為 Ａ 與 B 也有可能是組字式或校勘數字, 例如 [[金*本]>[口*兄]] , [[01]>]
 '''
 def do_corr(text):
+	global ed, old_pb, line_num, wit
+	'''
+	先把 [xxx] 組字或校勘數字變成 :gaiji1:xxx:gaiji2:
+	先把 <xxx> 組字或校勘數字變成 :gaiji3:xxx:gaiji4:
+
+	resp 預設為 CBETA.maha
+	如果是佛寺志版本 (ed = GA or GB) 則 resp = "DILA"
+	[Ａ>Ｂ]<resp="xxx"> 則 resp = "xxx"
+
+	把[Ａ>Ｂ](<resp="xxx">)?換成 
+	
+	<note n="...." resp="CBETA" type="add">B【CB】，A【xx】</note>
+	<app n="...."><lem wit="【CB】" resp="xxx">B</lem><rdg wit="【xx】">A</rdg></app>
+	
+	再把:gaiji1:xxx:gaiji2: 換回 [xxx]
+
+	再把 <lem ..>[01]</lem> 這一類換成 <lem ..><[01]></lem> , 而 <[01]> 之後會換成 [01], 如不這樣處理, [01] 會被變成一般的校勘數字標記, note 和 rdg 比照處理.
+
+	再把:gaiji3:xxx:gaiji4: 換回 <xxx>
+	再把 <lem ..></lem> 換成 <lem ..><space quantity="0"/></lem>, <rdg> 比照處理.
+	'''
+	resp = 'CBETA'
+	if(ed == 'GA' or ed == 'GB'): resp = 'DILA'
+
+	# 換掉 []<> 符號
+	text = re.sub(r"\[([^>\[\]]+?)\]", r":gaiji1:\1:gaiji2:", text)
+	text = re.sub(r"<([^<>]+?)>", r":gaiji3:\1:gaiji4:", text)
+
+	# 每次處理一個校註
+	note_count = 1
+	FindCorr = True
+	while(FindCorr):
+		mo = re.search(r"\[(?:[^\]]*?)>(?:[^\]]*?)\](:gaiji3:resp=\"(.*?)\":gaiji4:)?",text)
+		if(mo != None):
+			if mo.group(2) != None:
+				resp = mo.group(2)
+			text = re.sub(r"\[([^\]]*?)>([^\]]*?)\](:gaiji3:resp=\"(.*?)\":gaiji4:)?", r'<note n="{p}{l}{n:02d}" resp="CBETA" type="add">\2【CB】，\1{ed}</note><app n="{p}{l}{n:02d}"><lem wit="【CB】" resp="{r}">\2</lem><rdg wit="{ed}">\1</rdg></app>'.format(p=old_pb, l=line_num, ed=wit, r=resp, n=note_count), text, count=1)
+			note_count = note_count + 1
+		else:
+			FindCorr = False
+	
+	# 換回 [] 符號
+	text = re.sub(":gaiji1:", "[", text)
+	text = re.sub(":gaiji2:", "]", text)
+	
+	# 校勘數字或星號換成 <[01]> , <[＊]>
+	# <note...>[01]【CB】 改成 <note...><[01]>【CB】
+	text = re.sub(r"(<note[^>]*>)(\[(([\da-zA-Z]{2,3})|＊)\])【CB】", r'\1<\2>【CB】', text)
+	# ，[01]【xx】 改成 ，<[01]>【xx】
+	text = re.sub(r"，(\[(?:(?:[\da-zA-Z]{2,3})|＊)\])(【.*?】)", r'，<\1>\2', text)
+	
+	text = re.sub(r"(<lem[^>]*>)(\[(([\da-zA-Z]{2,3})|＊)\])<\/lem>", r'\1<\2></lem>', text)
+	text = re.sub(r"(<rdg[^>]*>)(\[(([\da-zA-Z]{2,3})|＊)\])<\/rdg>", r'\1<\2></rdg>', text)
+	# 沒文字換成 <space quantity="0"/>
+	text = re.sub(r"(<lem[^>]*>)<\/lem>", r'\1<space quantity="0"/></lem>', text)
+	text = re.sub(r"(<rdg[^>]*>)<\/rdg>", r'\1<space quantity="0"/></rdg>', text)
+
+	# 換回 <> 符號
+	text = re.sub(":gaiji3:", "<", text)
+	text = re.sub(":gaiji4:", ">", text)
+
+	return text
+
+'''
+舊版的, 修訂是處理成 choice , 新版的如上, 使用 note
+先把 [Ａ>Ｂ] 換成 <choice cb:resp="CBETA.maha"><corr>Ｂ</corr><sic>Ａ</sic></choice>
+因為 Ａ 與 B 也有可能是組字式或校勘數字, 例如 [[金*本]>[口*兄]] , [[01]>]
+'''
+def do_corr_choice(text):
 	global ed
 	'''
 	先把 [xxx] 組字或校勘數字變成 :gaiji1:xxx:gaiji2:
@@ -1195,6 +1289,7 @@ def close_sutra(num):
 	<fileDesc>
 		<titleStmt>
 			<title>{col}, Electronic version, No. {n} {t}</title>\n'''.format(col=collectionEng[ed], n=n, t=sutras[n]['title'])
+	s += '\t\t\t<title xml:lang="zh-Hant">{col}數位版, No. {n} {t}</title>\n'''.format(col=collectionChi[ed], n=n, t=sutras[n]['title'])
 	s += '\t\t\t<author>%s</author>\n' % sutras[n]['author']
 	s += '''\t\t\t<respStmt>
 				<resp>Electronic Version by</resp>
@@ -1204,7 +1299,7 @@ def close_sutra(num):
 		<editionStmt>
 			<edition>$Revision:'''
 	s += '''$<date>$Date:'''
-	s += '''$</date></edition>
+	s += '''$</date>新式標點版</edition>
 		</editionStmt>
 		<extent>{juan}卷</extent>\n'''.format(juan=sutras[n]['juan'])
 	mo = re.search(r'\D+(\d+)', vol)
@@ -1232,7 +1327,7 @@ def close_sutra(num):
 	<encodingDesc>
 		<projectDesc>
 			<p xml:lang="en" cb:type="ly">%s</p>
-			<p xml:lang="zh" cb:type="ly">%s</p>
+			<p xml:lang="zh-Hant" cb:type="ly">%s</p>
 		</projectDesc>
 	</encodingDesc>''' % (sutras[n]['laiyuan_e'], sutras[n]['laiyuan_c'])
 	
@@ -1259,15 +1354,11 @@ def close_sutra(num):
 	</profileDesc>
 	<revisionDesc>
 		<change when="{today}">
-			<name>Ray Chou 周邦信</name> Created initial TEI XML P5a version with bm2p5a.py
+			<name>Ray Chou 周邦信</name>Created initial TEI XML P5a version with bm2p5a.py
 		</change>
-<!--
-$Log:'''.format(today=today)
-	s += '''$
--->
 	</revisionDesc>
 </teiHeader>
-<text><body>'''
+<text><body>'''.format(today = datetime.date.today().strftime('%Y-%m-%d'))
 	fo.write(s)
 	closeTags('l','lg','cb:jhead','p')		# 加上 l, lg  -- 2013/09/30 # 加上 cb:jhead 2014/06/06
 	close_div(1)
