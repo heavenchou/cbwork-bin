@@ -23,7 +23,7 @@ my $lb = "";    #
 my $filename = "";    #
 
 # 處理藏經的順序
-my @book_order = ("T","X","A","K","S","F","C","D","U","P","J","L","G","M","N","ZS","I","ZW","B","GA","GB","Y");
+my @book_order = ("T","X","A","K","S","F","C","D","U","P","J","L","G","M","N","ZS","I","ZW","B","GA","GB","Y","LC");
 #my @book_order = ("DA","ZY","HM");
 
 open OUT, ">:utf8", "spine.txt";

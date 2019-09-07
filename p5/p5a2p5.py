@@ -81,6 +81,7 @@ WITS = {
 	'J' : '【嘉興】',
 	'K' : '【麗】',
 	'L' : '【龍】',
+	'LC' : '【呂澂】',
 	'M' : '【卍正】',
 	'N' : '【南傳】',
 	'P' : '【北藏】',
@@ -98,11 +99,11 @@ WITS = {
 RESPS = {
 	'B' : 'BuBian',
 	'D' : 'NCLRareBook',
-	'ZS' : 'Dudoucheng',
 	'J' : 'Jiaxing',
 	'T' : 'Taisho',
-	'ZW' : 'ZangWai',
 	'X' : 'Xuzangjing',
+	'ZS' : 'Dudoucheng',
+	'ZW' : 'ZangWai',
 }
 
 RESP2WIT = {
@@ -300,9 +301,9 @@ def get_unicode_ver(uni):
 	#if(uni >= 0x20000 and uni <= 0x2A6D6) : return "3.1"    #20000～2A6D6：CJK Unified Ideographs Extension B 中日韓統一表意文字擴展 B 區 (42711 字, Unicode 3.1 , 2001)
 	if(uni >= 0x2A700 and uni <= 0x2B734) :	return "5.2"     #2A700～2B734：CJK Unified Ideographs Extension C 中日韓統一表意文字擴展 C 區 (4149 字, Unicode 5.2 , 2009)
 	if(uni >= 0x2B740 and uni <= 0x2B81D) :	return "6.0"	 #2B740～2B81D：CJK Unified Ideographs Extension D 中日韓統一表意文字擴展 D 區 (222 字, Unicode 6.0 , 2010)
-	if(uni >= 0x2B820 and uni <= 0x2F7FF) :	return "8.0"	 #2B820～2F7FF：CJK Unified Ideographs Extension E 中日韓統一表意文字擴展 E 區 (Unicode 8.0)
+	if(uni >= 0x2B820 and uni <= 0x2CEAF) :	return "8.0"	 #2B820～2CEAF：CJK Unified Ideographs Extension E 中日韓統一表意文字擴展 E 區 (Unicode 8.0)
+	if(uni >= 0x2CEB0 and uni <= 0x2EBEF) :	return "10.0"	 #2CEB0～2EBEF：CJK Unified Ideographs Extension E 中日韓統一表意文字擴展 F 區 (Unicode 10.0)
 	if(uni >= 0x2F800 and uni <= 0x2FA1D) :	return "3.1"	 #2F800～2FA1D：CJK Compatibility Ideographs Supplement 相容表意字補充 - 台灣的相容漢字 (542 字, Unicode 3.1 , 2001)
-	
 	
 	return ""
 	

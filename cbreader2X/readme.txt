@@ -27,7 +27,7 @@ catalog 雖然有多份, 但都連結到同一卷嗎? 例 點 A121n1565 經, 要到 33 卷嗎?
 
 ■ sutralist
 
-	執行 perl sutralist.pl
+	執行 perl create_sutralist.pl
 
 	產生所有經文的冊、經號、經名、卷數、第一卷、起始頁行欄
 
