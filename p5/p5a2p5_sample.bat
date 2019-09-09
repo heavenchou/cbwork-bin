@@ -37,6 +37,7 @@ p5a2p5.py -c I
 p5a2p5.py -c J
 p5a2p5.py -c K
 p5a2p5.py -c L
+p5a2p5.py -c LC
 p5a2p5.py -c M
 p5a2p5.py -c N
 p5a2p5.py -c P

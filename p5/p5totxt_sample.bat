@@ -46,6 +46,7 @@ call :run_coll I
 call :run_coll J
 call :run_coll K
 call :run_coll L
+call :run_coll LC
 call :run_coll M
 call :run_coll N
 call :run_coll P

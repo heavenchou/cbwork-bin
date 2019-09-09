@@ -53,6 +53,7 @@ call :run_coll I
 call :run_coll J
 call :run_coll K
 call :run_coll L
+call :run_coll LC
 call :run_coll M
 call :run_coll N
 call :run_coll P
@@ -92,13 +93,14 @@ exit /B
 :get_vol
 set p1=%1
 set vol=%p1:~0,2%
+if "%vol%"=="DA" exit /B
 if "%vol%"=="GA" exit /B
 if "%vol%"=="GB" exit /B
+if "%vol%"=="HM" exit /B
+if "%vol%"=="LC" exit /B
 if "%vol%"=="ZS" exit /B
 if "%vol%"=="ZW" exit /B
-if "%vol%"=="HM" exit /B
 if "%vol%"=="ZY" exit /B
-if "%vol%"=="DA" exit /B
 set vol=%p1:~0,1%
 exit /B
 
