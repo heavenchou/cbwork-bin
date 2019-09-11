@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2019/09/12 配合 XML 檔頭大改版, 修改檔頭呈現的格式.
 2019/08/31 1.修訂符號[A>B]由 <choice><corr><sic> 格式改成 <note><app><lem><rdg> 格式
            2.調整 XML 檔首的資訊
 2019/08/29 加入LC【呂澂】相關訊息
@@ -133,7 +134,7 @@ wits={
 'ZY': '【智諭】',
 }
 
-collectionChi={
+collectionZh={
 'LC': '呂澂佛學著作集'
 }
 
@@ -1285,11 +1286,12 @@ def close_sutra(num):
 	s = """<?xml version="1.0" encoding="UTF-8"?>
 <TEI xmlns="http://www.tei-c.org/ns/1.0" xmlns:cb="http://www.cbeta.org/ns/1.0" xml:id="%s%s">\n""" % (vol, num)
 	n = num[1:]
+	n0 = n.lstrip('0')
 	s += '''<teiHeader>
 	<fileDesc>
 		<titleStmt>
-			<title>{col}, Electronic version, No. {n} {t}</title>\n'''.format(col=collectionEng[ed], n=n, t=sutras[n]['title'])
-	s += '\t\t\t<title xml:lang="zh-Hant">{col}數位版, No. {n} {t}</title>\n'''.format(col=collectionChi[ed], n=n, t=sutras[n]['title'])
+			<title>{col}, Electronic version, No. {n0} {t}</title>
+			<title xml:lang="zh-Hant">{colzh}數位版, No. {n0} {t}</title>\n'''.format(col=collectionEng[ed], colzh=collectionZh[ed], n0=n0, t=sutras[n]['title'])
 	s += '\t\t\t<author>%s</author>\n' % sutras[n]['author']
 	s += '''\t\t\t<respStmt>
 				<resp>Electronic Version by</resp>
@@ -1297,39 +1299,55 @@ def close_sutra(num):
 			</respStmt>
 		</titleStmt>
 		<editionStmt>
-			<edition>$Revision:'''
-	s += '''$<date>$Date:'''
-	s += '''$</date>新式標點版</edition>
+			<edition>XML TEI P5a</edition>
 		</editionStmt>
 		<extent>{juan}卷</extent>\n'''.format(juan=sutras[n]['juan'])
 	mo = re.search(r'\D+(\d+)', vol)
 	v = mo.group(1)
 	v = v.lstrip('0')
 	s += '''\t\t<publicationStmt>
+			<idno type="CBETA">
+				<idno type="canon">{ed}</idno>.<idno type="vol">{v}</idno>.<idno type="no">{n}</idno>
+			</idno>
 			<distributor>
 				<name>中華電子佛典協會 (CBETA)</name>
 				<address>
-					<addrLine>service@cbeta.org</addrLine>
+					<addrLine><email>service@cbeta.org</email></addrLine>
 				</address>
 			</distributor>
 			<availability>
 				<p>Available for non-commercial use when distributed with this header intact.</p>
 			</availability>
-			<date>$Date:'''
-	s += '''$</date>
 		</publicationStmt>
 		<sourceDesc>
-			<bibl>{col} Vol. {v}, No. {n} </bibl>
+			<bibl>
+				<title level="s">{col}</title>
+				<title level="s" xml:lang="zh-Hant">{colzh}</title>
+				<title level="m" xml:lang="zh-Hant">{sn}</title>
+			</bibl>
 		</sourceDesc>
-	</fileDesc>'''.format(col=collectionEng[ed], v=v, n=n)
+	</fileDesc>'''.format(col=collectionEng[ed], colzh=collectionZh[ed], v=v, n=n0, ed=ed, sn=sutras[n]['title'])
 
 	s += '''
 	<encodingDesc>
 		<projectDesc>
-			<p xml:lang="en" cb:type="ly">%s</p>
-			<p xml:lang="zh-Hant" cb:type="ly">%s</p>
+			<p xml:lang="en" cb:type="ly">{lyen}</p>
+			<p xml:lang="zh-Hant" cb:type="ly">{lyzh}</p>
 		</projectDesc>
-	</encodingDesc>''' % (sutras[n]['laiyuan_e'], sutras[n]['laiyuan_c'])
+		<editorialDecl>
+			<punctuation resp="orig"><p>原書標點</p></punctuation>
+		</editorialDecl>
+		<tagsDecl>
+			<namespace name="http://www.tei-c.org/ns/1.0">
+				<tagUsage gi="rdg">
+					<listWit>
+						<witness xml:id="wit.orig">{wit}</witness>
+						<witness xml:id="wit.cbeta">【CB】</witness>
+					</listWit>
+				</tagUsage>
+			</namespace>
+		</tagsDecl>
+	</encodingDesc>'''.format(lyen=sutras[n]['laiyuan_e'], lyzh=sutras[n]['laiyuan_c'], wit=wits[ed])
 	
 	'''
 	# P5a 不需要 <charDecl> 缺字資訊
@@ -1345,11 +1363,11 @@ def close_sutra(num):
 	s += '\t\t</charDecl>\n'
 	'''
 	
-	s += '''\t
+	s += '''
 	<profileDesc>
 		<langUsage>
 			<language ident="en">English</language>
-			<language ident="zh">Chinese</language>
+			<language ident="zh-Hant">Chinese (Traditional)</language>
 		</langUsage>
 	</profileDesc>
 	<revisionDesc>
