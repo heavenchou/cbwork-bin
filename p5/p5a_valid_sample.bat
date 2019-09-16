@@ -73,13 +73,13 @@ call :run_coll ZY
 exit /B
 
 :run_coll
-FOR /R %p5adir%\%1 %%f IN (*.xml) DO call :valid_one %%f
+FOR /R "%p5adir%\%1" %%f IN (*.xml) DO call :valid_one "%%f"
 exit /B
 
 :run_vol
 set vol=
 call :get_vol %1
-FOR /R %p5adir%\%vol%\%1 %%f IN (*.xml) DO call :valid_one %%f
+FOR /R "%p5adir%\%vol%\%1" %%f IN (*.xml) DO call :valid_one "%%f"
 exit /B
 
 :valid_one
