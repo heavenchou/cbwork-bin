@@ -4,8 +4,9 @@
 package Gaiji;
 use utf8;
 use Carp;
-use Win32::ODBC;
+#use Win32::ODBC;
 use Encode;
+use Config::IniFiles;
 
 =BEGIN
 
@@ -121,13 +122,104 @@ sub AUTOLOAD
 sub load_access_db
 {
 	my $self = shift;
-	my $cb,$des,$nor,$uni,$uniword,$noruni,$noruniword;
+
+	my $cfg = Config::IniFiles->new( -file => "/cbwork/bin/cbwork_bin.ini" );
+	my $gaiji_file = $cfg->val('default', 'gaiji-m.mdb_file', '');
+	$gaiji_file =~ s/gaiji\-m\.mdb/gaiji-m_u8.txt/;
+
+	my $cb;
+	my $des;
+	my $nor;
+	my $uni;
+	my $uniword;
+	my $noruni;
+	my $noruniword;
+	my $err = 0;
+
+	open IN, "<:utf8", $gaiji_file || die "open $gaiji_file fail!";
+	print "read gaiji ... ";
+	while(<IN>)
+	{
+		# cb	mojikyo	entity	uni_flag	unicode	nor_unicode	des	nor	cx
+		# 00001	M016085	M016085	1	6B35		[肄-聿+欠]	款
+		# 00042	M001494	M001494	1		517E	[八/異]	冀	
+		my @gaiji = split(/\t/,$_);
+
+		$cb      = $gaiji[0];		# cbeta code
+		$des     = $gaiji[6];		# 組字式
+		$nor     = $gaiji[7];		# 通用字
+		$uni     = $gaiji[4];		# unicode 字碼
+		$noruni  = $gaiji[5];		# 通用 unicode 字碼
+		
+		next if ($cb !~ /^\d/);		# 先過濾掉羅馬轉寫字及非標準的缺字
+
+		#1. 彝(B+C255) 用 perl 轉成 utf8 會有錯誤轉成 彞(U+5F5E), 要換回 彝(U+5F5D)
+		#2. 彝(U+5F5D) 用 perl 轉成 big5 會錯誤, 要自行處理成 彝(B+C255) .
+		#3. 卄(B+A2CD) 用 perl 轉成 utf8 會有錯誤轉成 〹(U+3039), 要換回 卄(U+5344)
+		#4. 卄(U+5344) 用 perl 轉成 big5 會錯誤, 要自行處理成 卄(B+A2CD)
+
+		#$des =~ s/彞/彝/g;
+		#$nor =~ s/彞/彝/;
+		
+		#$des =~ s/〹/卄/g;
+		#$nor =~ s/〹/卄/;
+
+		$self->{"cb2des"}{$cb} = $des;
+		$self->{"des2cb"}{$des} = $cb;
+		$self->{"cb2nor"}{$cb} = $nor if($nor);
+		if($uni)
+		{
+			$self->{"cb2uni"}{$cb} = $uni;
+			$self->{"uni2cb"}{$uni} = $cb;
+			$self->{"cb2uniword"}{$cb} = chr(hex($uni));
+			if(not $self->get_unicode_ver($uni))
+			{
+				print "\nerror : unicode out of version! => cb: $cb , uni: $uni.";
+				$err = 1;
+			}
+		}
+		if($noruni and $uni eq "")
+		{
+			$self->{"cb2noruni"}{$cb} = $noruni;
+			$self->{"cb2noruniword"}{$cb} = chr(hex($noruni));
+			if(not $self->get_unicode_ver($noruni))
+			{
+				print "\nerror : unicode out of version! => cb: $cb , nor_uni: $noruni.";
+				$err = 1;
+			}
+		}
+	}
+	
+	if($err)
+	{
+		print "\n\nError : please call 'Heaven Chou' to add Unicode version.\n";
+		exit;
+	}
+	else
+	{
+		print "ok\n";
+	}
+}
+
+# 這是用 Access 的版本, 已經取消了, 用 csv 的版本比較快
+# 一般的成員函數
+# 讀入資料庫
+sub load_access_db_old
+{
+	my $self = shift;
+	my $cb;
+	my $des;
+	my $nor;
+	my $uni;
+	my $uniword;
+	my $noruni;
+	my $noruniword;
 	my $err = 0;
 	my $db = new Win32::ODBC("gaiji-m");
 	if ($db->Sql("SELECT * FROM gaiji")) { die "gaiji-m.mdb SQL failure"; }
 	print "read gaiji ... ";
 	while($db->FetchRow()){
-		undef %row;
+		my %row = ();
 		%row = $db->DataHash();
 		
 		$cb      = Encode::decode("big5", $row{"cb"});		# cbeta code
