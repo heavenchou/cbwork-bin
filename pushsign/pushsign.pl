@@ -6,6 +6,7 @@
 # pushsign.pl 簡單標記版.txt 舊的xml.xml 結果檔xml.xml > 記錄檔.txt
 #
 ########################################################
+# 2019/09/25 : 處理 <item n="..."..> 的情況, 先前沒考慮標記中有其他屬性
 # 2019/06/17 : 1.修改有 </L> 沒有接著 <P> 的情況
 #              2.note type=org,mod,add 標記之後的標點要移到 note 之前
 # 2019/06/04 : 1.處理模糊字比對
@@ -691,11 +692,11 @@ sub get_word2
 		
 		# XML : <item n="（一）">....
 		# SM  : （一）
-		if($lines2[$index2] =~ /^<item n="(.*?)">/)
+		if($lines2[$index2] =~ /^<item [^>]*?n="(.*?)"[^>]*>/)
 		{
 		    my $tmp = $1;
 		    $lines1[$index1] =~ s/^\Q${tmp}\E//;
-			$lines2[$index2] =~ s/^(<item n="(.*?)">)//;
+			$lines2[$index2] =~ s/^(<item [^>]*?n="(.*?)"[^>]*>)//;
 			$tagbuff .= $1;
 			next;
 		}
