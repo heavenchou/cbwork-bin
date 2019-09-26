@@ -6,6 +6,11 @@
 # pushsign.pl 簡單標記版.txt 舊的xml.xml 結果檔xml.xml > 記錄檔.txt
 #
 ########################################################
+# 2019/09/26 : 部份悉曇標記要當成標點處理：
+# 				<g ref="#SD-D953"/> = …
+# 				<g ref="#SD-E35A"/> = （
+# 				<g ref="#SD-E35B"/> = ）
+# 				<g ref="#SD-E347"/> = □
 # 2019/09/25 : 處理 <item n="..."..> 的情況, 先前沒考慮標記中有其他屬性
 # 2019/06/17 : 1.修改有 </L> 沒有接著 <P> 的情況
 #              2.note type=org,mod,add 標記之後的標點要移到 note 之前
@@ -214,6 +219,18 @@ while(1)
 		if($hasdot1 eq $hasdot2)	# 二邊標點同步
 		{
 			#print OUTXml $tagbuff;
+			printout($tagbuff);
+		}
+		# 悉曇特有標點
+		elsif(($hasdot2 eq "<g ref=\"#SD-D953\"/>" && $hasdot2 eq "…") ||
+			($hasdot2 eq "<g ref=\"#SD-E35A\"/>" && $hasdot2 eq "（") ||
+			($hasdot2 eq "<g ref=\"#SD-E35B\"/>" && $hasdot2 eq "）") ||
+			($hasdot2 eq "<g ref=\"#SD-E347\"/>" && $hasdot2 eq "□"))
+		{
+			# <g ref="#SD-D953"/> = …
+			# <g ref="#SD-E35A"/> = （
+			# <g ref="#SD-E35B"/> = ）
+			# <g ref="#SD-E347"/> = □
 			printout($tagbuff);
 		}
 		elsif($hasdot1 ne "" and $hasdot2 ne "")		# 二邊都有標點, 但不同步
@@ -853,7 +870,21 @@ sub get_word2
 		{
 			last;
 		}
+		# 某些 <g> 是標點, 要先處理
 		
+		# <g ref="#SD-D953"/> = …
+		# <g ref="#SD-E35A"/> = （
+		# <g ref="#SD-E35B"/> = ）
+		# <g ref="#SD-E347"/> = □
+		
+		if($lines2[$index2] =~ /^<g ref="#SD\-(D953|E35A|E35B|E347)"\/>/)
+		{
+			$lines2[$index2] =~ s/^(<g ref="#SD\-(D953|E35A|E35B|E347)"\/>)//;
+			$tagbuff .= $1;
+			$hasdot2 .= $1;
+			next;
+		}
+
 		if($lines2[$index2] =~ /^<g .*?>/)
 		{
 			last;
