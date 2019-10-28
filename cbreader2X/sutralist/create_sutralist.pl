@@ -80,6 +80,7 @@ sub SearchFile
 	my $juan = 0;	# 卷數
 	my $first_juan = 0;	# 第一卷的卷數
 	my $first_lb = "";	# 
+	my $new_xml_head_count = 0;
 	local $_;
 
 	if($file =~ /([A-Z]+)(\d+)n(.{4,5})\.xml/)
@@ -134,9 +135,65 @@ sub SearchFile
 			{
 				$findbody = 1;
 			}
+			# 新版檔頭的額外檢查
+			# <idno type="canon">T</idno>
+			# <idno type="vol">1</idno>
+			# <idno type="no">6</idno>
+			if(/<idno type="canon">(.*?)<\/idno>/)
+			{
+				my $ed = $1;
+				if($book ne $ed)
+				{
+					print STDERR "error : book ne ed : $book $ed\n";
+					<>;
+				}
+				$new_xml_head_count++;
+			}
+			if(/<idno type="vol">(.*?)<\/idno>/)
+			{
+				my $v = $1;
+				if($volnum != $v)
+				{
+					print STDERR "error : vol ne v : $volnum $v\n";
+					<>;
+				}
+				$new_xml_head_count++;
+			}
+			if(/<idno type="no">(.*?)<\/idno>/)
+			{
+				my $n = $1;
+
+				if(length($n)<5 && $n !~ /^[AB]\d{3}$/)
+				{
+					$n = "00000" . $n;
+					$n =~ s/^.*?(\d{4}\D?)$/$1/;
+				}
+				if($num ne $n)
+				{
+					print STDERR "error : num ne n : $num $n\n";
+					<>;
+				}
+				$new_xml_head_count++;
+			}
+			# <title level="m" xml:lang="zh-Hant">般泥洹經</title>
+			if(/<title level="m" xml:lang="zh-Hant">(.*?)<\/title>/)
+			{
+				my $n = $1;
+				if($name ne $n)
+				{
+					print STDERR "error : name ne n : $name $n\n";
+					<>;
+				}
+				$new_xml_head_count++;
+			}
 		}
 		if($findbody == 1)
 		{
+			if($new_xml_head_count != 4)
+			{
+				print STDERR "new XML head error, count != 4: $new_xml_head_count\n";
+				<>;
+			}
 			if($first_lb eq "")
 			{
 				s/<lb[^>]*"old"[^>]*>//g;	# 先把 type="old" 去掉不算

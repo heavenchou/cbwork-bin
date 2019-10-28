@@ -346,6 +346,10 @@ sub cut_head_to_3blocks
 		# 沒有缺字
 		$xml_head1 = $xml_head;
 	}
+
+	# 把版本 <edition>...XML TEI P5[ab]?</edition> 
+	# 換成   <edition>...單卷版 XML TEI P5[ab]?</edition>
+	$xml_head1 =~ s/(XML TEI P5[ab]?)<\/edition>/單卷版 $1<\/edition>/;
 }
 
 ##############################################
@@ -364,7 +368,7 @@ sub get_gaijis
 		if($char =~ /<char xml:id="(.*?)">/)
 		{
 			my $key = $1;
-			$xml_gaiji{$key} = $char;
+			$xml_gaiji{$key} = "\t\t\t$char";
 		}
 		else
 		{
@@ -915,7 +919,7 @@ sub make_gaiji
 			# 若該卷有缺字, 則要加上 <charDecl> 標記
 			if($xml_gaiji[$i])
 			{
-				$xml_gaiji[$i] = "<charDecl>\n". $xml_gaiji[$i] . "</charDecl>\n";
+				$xml_gaiji[$i] = "<charDecl>\n". $xml_gaiji[$i] . "\t\t</charDecl>\n";
 			}
 		}
 	}

@@ -1,15 +1,15 @@
-# 由 p5a 產生 spine.txt 檔案        ~ by heaven 2018/03/15
+# 由 BM 產生 spine.txt 檔案        ~ by heaven 2018/03/15
 #
 
 use utf8;
 use Cwd;
 use strict;
 
-my $SourcePath = "c:/cbwork/xml-p5b";			# 初始目錄, 最後不用加斜線 /
-my $OutputPath = "c:/cbwork/xml-p5b/";		# 目地初始目錄, 如果有需要的話. 最後不用加斜線 /
+my $SourcePath = "c:/cbwork/bm";			# 初始目錄, 最後不用加斜線 /
+my $OutputPath = "c:/cbwork/bm";		# 目地初始目錄, 如果有需要的話. 最後不用加斜線 /
 my $MakeOutputPath = 0;		# 1 : 產生對應的輸出目錄
 my $IsIncludeSubDir = 1;	# 1 : 包含子目錄 0: 不含子目錄
-my $FilePattern = "*.xml";		# 要找的檔案類型
+my $FilePattern = "new.txt";		# 要找的檔案類型
 
 my @all_files = ();		# 記錄所找到的檔案, 先記起來, 最後再處理.
 
@@ -17,8 +17,8 @@ my @all_files = ();		# 記錄所找到的檔案, 先記起來, 最後再處理.
 my @book_order = ("T","X","A","K","S","F","C","D","U","P","J","L","G","M","N","ZS","I","ZW","B","GA","GB","Y","LC");
 #my @book_order = ("DA","ZY","HM");
 
-open OUT, ">:utf8", "spine.txt";
-open LOG, ">:utf8", "error.txt";
+open OUT, ">:utf8", "spine_by_bm.txt";
+open LOG, ">:utf8", "error_by_bm.txt";
 for(my $i=0; $i<=$#book_order; $i++)
 {
 	my $source = $SourcePath . "/" . $book_order[$i];
@@ -92,21 +92,6 @@ sub run_all_files
     }
 }
 
-sub get_vol_sutra
-{
-	local $_ = shift;
-	if(/([A-Z]+)(\d+)n(.*?)\.xml/)
-	{
-		return ($1,$2,$3);
-	}
-	else
-	{
-		print LOG "error 檔名格式有問題 : $_\n";
-		return ("","","");
-	}
-}
-
-
 ##########################################################################
 # 處理 XML
 sub ParserXML
@@ -119,73 +104,38 @@ sub ParserXML
 	my $book = "";      # T
 	my $volnum = "";    # 01
 	my $sutra = "";     # 0001
+	my $pageline = "";	# 0001a01
 
-	($book,$volnum,$sutra) = get_vol_sutra($file);
-	
 	open IN, "<:utf8", $file;
 	while(<IN>)
 	{
 		# 處理 milestone
-		#<milestone n="1" unit="juan"/>
-		if(/(<milestone[^>]*>)/)
+		# T01n0001_p0001a01_##<mj 001><N>No. 1
+		if(/<mj (\d+)>/)
 		{
-			my $ms = $1;
-			s/<milestone[^>]*>//;
-			if($ms !~ /unit\s*=\s*"juan"/)
+			my $juan = $1;
+
+			if(/^(\D+)(\d+)n(.\d+[a-zA-Z]?)_?p(.\d{3}[a-z]\d\d)/)
 			{
-				print "error: milestone no unit=juan : $ms\n";
-				<>;
-			}
-			if($ms =~ /n\s*=\s*"(\d+)"/)
-			{
-				my $n = $1;
+				$book = $1;
+				$volnum = $2;
+				$sutra = $3;
+				$pageline = $4;
+
 				my $newsutra = $sutra;
 				if($book eq "T" && $volnum >= 5 && $volnum <= 7)
 				{
 					$newsutra =~ s/0220./0220/;
 				}
-				# 先記錄檔名的部份
-				if($filename ne "")
-				{
-					print "error: why filename not empty: $filename\n";
-					<>;
-				}
+
                 $filename = "XML/$book/$book$volnum/$book$volnum" . "n$newsutra" . "_";
-                $filename .= sprintf("%03d",$n) . ".xml , ";
+                $filename .= sprintf("%03d",$juan) . ".xml , $pageline\n";
+				$text .= $filename;
 			}
 			else
 			{
-				print "error: milestone no n : $ms\n";
+				print "error: linehead error : $_\n";
 				<>;
-			}
-		}
-
-		# 處理 lb
-		# <lb n="0922b01" ed="T"/>
-
-		if($filename ne "")
-		{
-			while(/<lb [^>]*>/)
-			{
-				s/(<lb [^>]*>)//;
-				my $lb = $1;
-
-				# 先檢查 ed 和 type 是否符合要求
-				if($lb =~ /ed\s*=\s*"$book"/ && $lb !~ /type\s*=\s*"old"/)
-				{
-					if($lb =~ /n\s*=\s*"(\S\d{3}[a-z]\d\d)"/)
-					{
-						my $n = $1;
-						$text .= $filename . $n . "\n";
-						$filename = "";
-						last;
-					}
-					else
-					{
-						print "error: lb n format bad : $lb\n";
-						<>;
-					}
-				}
 			}
 		}
 	}

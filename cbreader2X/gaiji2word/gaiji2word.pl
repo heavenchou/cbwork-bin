@@ -84,7 +84,7 @@ sub change_gaiji
             if($univer > 3.1)
             {
                 $word = "";
-                print " $CB : $uni : $univer \n";
+                #print " $CB : $uni : $univer \n";
             }
             else
             {
@@ -102,7 +102,7 @@ sub change_gaiji
                 if($univer > 3.1)
                 {
                     $word = "";
-                    print " $CB : $uni : $univer \n";
+                    #print " $CB : $uni : $univer \n";
                 }
                 else
                 {

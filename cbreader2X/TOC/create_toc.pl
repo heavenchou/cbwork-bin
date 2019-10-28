@@ -2,6 +2,9 @@
 #
 # 程式說明：產生 CBReader 2X 版所使用的各經目錄
 # 使用方法：自行修改前幾個變數
+# 或傳入參數
+#			perl create_toc.pl T	只處理大正藏 T
+#			perl create_toc.pl T01	只處理 T01 , 不過若有跨冊的經文要小心
 #############################################################################
 
 use utf8;
@@ -12,8 +15,22 @@ use XML::DOM;
 use lib '.';
 use toc_tree;	# 自己寫的樹狀目錄操作
 
-my $SourcePath = "c:/cbwork/xml-p5b";			# 初始目錄, 最後不用加斜線 /
-my $OutputPath = "c:/cbwork/bin/cbreader2X/toc/toc";		# 目地初始目錄, 如果有需要的話. 最後不用加斜線 /
+my $input_vol = shift;	# 傳入的參數, 可能有二種 1. T 2. T01
+if($input_vol =~ /^(\D+)(\d+)$/)
+{
+	$input_vol = "/" . $1 . "/" . $input_vol;
+}
+elsif($input_vol =~ /^\D+$/)
+{
+	$input_vol = "/" . $input_vol;
+}
+else
+{
+	$input_vol = "";
+}
+
+my $SourcePath = "c:/cbwork/xml-p5b" . $input_vol;		# 初始目錄, 最後不用加斜線 /
+my $OutputPath = "c:/cbwork/bin/cbreader2X/toc/toc_gaiji";		# 目地初始目錄, 如果有需要的話. 最後不用加斜線 /
 my $logfile = "errlog.txt";				# 錯誤記錄檔
 my $MakeOutputPath = 0;		# 1 : 產生對應的輸出目錄
 my $IsIncludeSubDir = 1;	# 1 : 包含子目錄 0: 不含子目錄

@@ -8,6 +8,8 @@
   d.使用 組字式 (不使用 unicode ext 和通用字, 免得無法比對)
   
   並輸出至 c:\temp\cbr_htm\ (old c:\Users\Heaven\AppData\Local\Temp\CBReader\Debug\)
+  
+  或手動移到　c:\temp\cbr_htm\
 
 2.cbr2txt.pl 將上面 CBR 的 HTML 轉成 TXT , 放在 c:\release\cbr_out_txt_xxxxxx\
 
