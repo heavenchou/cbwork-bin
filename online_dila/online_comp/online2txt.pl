@@ -109,6 +109,12 @@ sub h2t()
 		# <a class='noteAnchor add' href='#cb_note_1'></a>
 		s/<a class=['"]noteAnchor add['"][^>]*><\/a>/[A]/g;
 
+		# 圖
+		# <p class='figure'>
+		s/<p class=['"]figure['"]>/【圖】/g;
+		# 2019Q3 改成 <span imgsrc='B04p1381_01.gif' class='graphic'></span>
+		s/<span [^>]*class=['"]graphic['"][^>]*><\/span>/【圖】/g;
+		
 		# 雙行小註
 		# <span class='doube-line-note'>闍尼沙秦言勝結使</span>
 		# <span class='interlinear-note'>
@@ -116,9 +122,6 @@ sub h2t()
 		s/<span[^>]*class=['"]interlinear\-note['"][^>]*>(.*?)<\/span>/($1)/g;
 		s/<span[^>]*class=['"]doube\-line\-note['"][^>]*>/(/g;
 		s/<span[^>]*class=['"]interlinear\-note['"][^>]*>/(/g;
-		# 圖
-		# <p class='figure'>
-		s/<p class=['"]figure['"]>/【圖】/g;
 
 		# 悉曇
 		# <span class='siddam' roman='na' code='SD-A5A9' char=''/>

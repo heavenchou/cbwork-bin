@@ -1,0 +1,29 @@
+@namespace h "http://www.w3.org/1999/xhtml";
+body {background:#DDF1DC; font-weight: normal; line-height:1.6em; color:#000000; margin-left:1em; margin-right:1em;}
+.SearchWord1 {color:#0000ff; background: #ffff66;}
+.SearchWord2 {color:#0000ff; background: #a0ffff;}
+.SearchWord3 {color:#0000ff; background: #99ff99;}
+.SearchWord4 {color:#0000ff; background: #ff9999;}
+.SearchWord5 {color:#0000ff; background: #ff66ff;}
+.guess1 {background: #fff0a0;}
+.guess2 {background: #ffd080;}
+.guess3 {background: #ffb060;}
+.guess4 {background: #ff9040;}
+
+a:link    { color: #0000ff;text-decoration:none; }
+a:visited { color: #0000ff;text-decoration:none; }
+a:active  { color: #0000ff;text-decoration:none; }
+a:hover   { color: #ff0000;text-decoration:underline; }
+
+.juannum {color:#008000; font-weight: normal; margin-left:2em;}
+.juanname {color:#0000FF; font-weight: bold; font-size:1.2em;}
+.xu {color:#0000A0; font-weight: normal;}
+.w {color:#800080; font-weight: normal;}
+.byline {color:#408080; font-weight: normal; margin-left:4em;}
+.headname {color:#0000A0; font-weight: bold; font-size:1.2em; margin-left:2em;}
+.linehead {color:#0000A0; font-weight: normal;}
+.lg {color:#008040; font-weight: normal;}
+.corr {color:#FF0000; font-weight: normal; }
+.gaiji { font-family: 新細明體, SimSun, Arial Unicode MS;}
+.note {color:#800080; font-weight: normal; font-size:0.8em;}
+.toc_label {text-align: center;}

@@ -1,0 +1,506 @@
+
+rem #######################  先刪除記錄檔 ###############
+
+del 1.make_epub-err.txt
+
+REM 這些是要執行的 ============
+
+goto start
+
+rem ==== 大正冊 ========
+perl 1.make_epub.pl T 1 1
+perl 1.make_epub.pl T 2 1
+perl 1.make_epub.pl T 3 1
+perl 1.make_epub.pl T 4 1
+perl 1.make_epub.pl T 5 1
+perl 1.make_epub.pl T 6 1
+perl 1.make_epub.pl T 7 1
+perl 1.make_epub.pl T 8 1
+perl 1.make_epub.pl T 9a 1
+perl 1.make_epub.pl T 9b 1
+perl 1.make_epub.pl T 10 1
+perl 1.make_epub.pl T 11 1
+perl 1.make_epub.pl T 12a 1
+perl 1.make_epub.pl T 12b 1
+perl 1.make_epub.pl T 13 1
+perl 1.make_epub.pl T 14 1
+perl 1.make_epub.pl T 15 1
+perl 1.make_epub.pl T 16 1
+perl 1.make_epub.pl T 17 1
+perl 1.make_epub.pl T 18 1
+perl 1.make_epub.pl T 19 1
+perl 1.make_epub.pl T 20 1
+perl 1.make_epub.pl T 21 1
+perl 1.make_epub.pl T 22 1
+perl 1.make_epub.pl T 23 1
+perl 1.make_epub.pl T 24 1
+perl 1.make_epub.pl T 25 1
+perl 1.make_epub.pl T 26a 1
+perl 1.make_epub.pl T 26b 1
+perl 1.make_epub.pl T 27 1
+perl 1.make_epub.pl T 28 1
+perl 1.make_epub.pl T 29 1
+perl 1.make_epub.pl T 30a 1
+perl 1.make_epub.pl T 30b 1
+perl 1.make_epub.pl T 31 1
+perl 1.make_epub.pl T 32 1
+perl 1.make_epub.pl T 33 1
+perl 1.make_epub.pl T 34 1
+perl 1.make_epub.pl T 35 1
+perl 1.make_epub.pl T 36 1
+perl 1.make_epub.pl T 37 1
+perl 1.make_epub.pl T 38 1
+perl 1.make_epub.pl T 39 1
+perl 1.make_epub.pl T 40a 1
+perl 1.make_epub.pl T 40b 1
+perl 1.make_epub.pl T 41 1
+perl 1.make_epub.pl T 42 1
+perl 1.make_epub.pl T 43 1
+perl 1.make_epub.pl T 44a 1
+perl 1.make_epub.pl T 44b 1
+perl 1.make_epub.pl T 45 1
+perl 1.make_epub.pl T 46 1
+perl 1.make_epub.pl T 47 1
+perl 1.make_epub.pl T 48 1
+perl 1.make_epub.pl T 49 1
+perl 1.make_epub.pl T 50 1
+perl 1.make_epub.pl T 51 1
+perl 1.make_epub.pl T 52 1
+perl 1.make_epub.pl T 53 1
+perl 1.make_epub.pl T 54a 1
+perl 1.make_epub.pl T 54b 1
+perl 1.make_epub.pl T 55 1
+perl 1.make_epub.pl T 85a 1
+perl 1.make_epub.pl T 85b 1
+
+rem ==== 卍續冊 ========
+perl 1.make_epub.pl X 1 1
+perl 1.make_epub.pl X 2 1
+perl 1.make_epub.pl X 3 1
+perl 1.make_epub.pl X 4 1
+perl 1.make_epub.pl X 5 1
+perl 1.make_epub.pl X 6 1
+perl 1.make_epub.pl X 7 1
+perl 1.make_epub.pl X 8 1
+perl 1.make_epub.pl X 9 1
+perl 1.make_epub.pl X 10 1
+perl 1.make_epub.pl X 11 1
+perl 1.make_epub.pl X 12 1
+perl 1.make_epub.pl X 13 1
+perl 1.make_epub.pl X 14 1
+perl 1.make_epub.pl X 15 1
+perl 1.make_epub.pl X 16 1
+perl 1.make_epub.pl X 17 1
+perl 1.make_epub.pl X 18 1
+perl 1.make_epub.pl X 19 1
+perl 1.make_epub.pl X 20 1
+perl 1.make_epub.pl X 21 1
+perl 1.make_epub.pl X 22 1
+perl 1.make_epub.pl X 23 1
+perl 1.make_epub.pl X 24 1
+perl 1.make_epub.pl X 25 1
+perl 1.make_epub.pl X 26 1
+perl 1.make_epub.pl X 27 1
+perl 1.make_epub.pl X 28 1
+perl 1.make_epub.pl X 29 1
+perl 1.make_epub.pl X 30 1
+perl 1.make_epub.pl X 31 1
+perl 1.make_epub.pl X 32 1
+perl 1.make_epub.pl X 33 1
+perl 1.make_epub.pl X 34 1
+perl 1.make_epub.pl X 35 1
+perl 1.make_epub.pl X 36 1
+perl 1.make_epub.pl X 37 1
+perl 1.make_epub.pl X 38 1
+perl 1.make_epub.pl X 39 1
+perl 1.make_epub.pl X 40 1
+perl 1.make_epub.pl X 41 1
+perl 1.make_epub.pl X 42 1
+perl 1.make_epub.pl X 43 1
+perl 1.make_epub.pl X 44 1
+perl 1.make_epub.pl X 45 1
+perl 1.make_epub.pl X 46 1
+perl 1.make_epub.pl X 47 1
+perl 1.make_epub.pl X 48 1
+perl 1.make_epub.pl X 49 1
+perl 1.make_epub.pl X 50 1
+perl 1.make_epub.pl X 51 1
+perl 1.make_epub.pl X 52 1
+perl 1.make_epub.pl X 53 1
+perl 1.make_epub.pl X 54 1
+perl 1.make_epub.pl X 55 1
+perl 1.make_epub.pl X 56 1
+perl 1.make_epub.pl X 57 1
+perl 1.make_epub.pl X 58 1
+perl 1.make_epub.pl X 59 1
+perl 1.make_epub.pl X 60 1
+perl 1.make_epub.pl X 61 1
+perl 1.make_epub.pl X 62 1
+perl 1.make_epub.pl X 63 1
+perl 1.make_epub.pl X 64 1
+perl 1.make_epub.pl X 65 1
+perl 1.make_epub.pl X 66 1
+perl 1.make_epub.pl X 67 1
+perl 1.make_epub.pl X 68 1
+perl 1.make_epub.pl X 69 1
+perl 1.make_epub.pl X 70 1
+perl 1.make_epub.pl X 71 1
+perl 1.make_epub.pl X 72 1
+perl 1.make_epub.pl X 73 1
+perl 1.make_epub.pl X 74 1
+perl 1.make_epub.pl X 75 1
+perl 1.make_epub.pl X 76 1
+perl 1.make_epub.pl X 77 1
+perl 1.make_epub.pl X 78 1
+perl 1.make_epub.pl X 79 1
+perl 1.make_epub.pl X 80 1
+perl 1.make_epub.pl X 81 1
+perl 1.make_epub.pl X 82 1
+perl 1.make_epub.pl X 83 1
+perl 1.make_epub.pl X 84 1
+perl 1.make_epub.pl X 85 1
+perl 1.make_epub.pl X 86 1
+perl 1.make_epub.pl X 87 1
+perl 1.make_epub.pl X 88 1
+
+rem ==== 嘉興冊 ========
+perl 1.make_epub.pl J 1 1
+perl 1.make_epub.pl J 2 1
+perl 1.make_epub.pl J 3 1
+perl 1.make_epub.pl J 4 1
+perl 1.make_epub.pl J 5 1
+perl 1.make_epub.pl J 6 1
+perl 1.make_epub.pl J 7 1
+perl 1.make_epub.pl J 8 1
+perl 1.make_epub.pl J 9 1
+perl 1.make_epub.pl J 10 1
+perl 1.make_epub.pl J 11 1
+perl 1.make_epub.pl J 12 1
+perl 1.make_epub.pl J 13 1
+perl 1.make_epub.pl J 14 1
+perl 1.make_epub.pl J 15 1
+perl 1.make_epub.pl J 16 1
+perl 1.make_epub.pl J 17 1
+perl 1.make_epub.pl J 18 1
+perl 1.make_epub.pl J 19 1
+perl 1.make_epub.pl J 20 1
+perl 1.make_epub.pl J 21 1
+perl 1.make_epub.pl J 22 1
+perl 1.make_epub.pl J 23 1
+perl 1.make_epub.pl J 24 1
+perl 1.make_epub.pl J 25 1
+perl 1.make_epub.pl J 26 1
+perl 1.make_epub.pl J 27 1
+perl 1.make_epub.pl J 28 1
+perl 1.make_epub.pl J 29 1
+perl 1.make_epub.pl J 30 1
+perl 1.make_epub.pl J 31 1
+perl 1.make_epub.pl J 32 1
+perl 1.make_epub.pl J 33 1
+perl 1.make_epub.pl J 34 1
+perl 1.make_epub.pl J 35 1
+perl 1.make_epub.pl J 36 1
+perl 1.make_epub.pl J 37 1
+perl 1.make_epub.pl J 38 1
+perl 1.make_epub.pl J 39 1
+perl 1.make_epub.pl J 40 1
+
+rem ==== 正史冊 ========
+perl 1.make_epub.pl H 1 1
+
+rem ==== 藏外冊 ========
+perl 1.make_epub.pl W 1 1
+perl 1.make_epub.pl W 2 1
+perl 1.make_epub.pl W 3 1
+perl 1.make_epub.pl W 4 1
+perl 1.make_epub.pl W 5 1
+perl 1.make_epub.pl W 6 1
+perl 1.make_epub.pl W 7 1
+perl 1.make_epub.pl W 8 1
+perl 1.make_epub.pl W 9 1
+
+rem ==== 百品冊 ========
+perl 1.make_epub.pl I 1 1
+
+rem ==== 金藏冊 ========
+perl 1.make_epub.pl A 091 1
+perl 1.make_epub.pl A 097 1
+perl 1.make_epub.pl A 098 1
+perl 1.make_epub.pl A 110 1
+perl 1.make_epub.pl A 111 1
+perl 1.make_epub.pl A 112 1
+perl 1.make_epub.pl A 114 1
+perl 1.make_epub.pl A 119 1
+perl 1.make_epub.pl A 120 1
+perl 1.make_epub.pl A 121 1
+
+rem ==== 中華藏冊 ========
+perl 1.make_epub.pl C 056 1
+perl 1.make_epub.pl C 057 1
+perl 1.make_epub.pl C 059 1
+perl 1.make_epub.pl C 071 1
+perl 1.make_epub.pl C 073 1
+perl 1.make_epub.pl C 077 1
+perl 1.make_epub.pl C 078 1
+perl 1.make_epub.pl C 097 1
+perl 1.make_epub.pl C 106 1
+
+rem ==== 國圖 冊 ========  
+perl 1.make_epub.pl D 001 1
+perl 1.make_epub.pl D 002 1
+perl 1.make_epub.pl D 003 1
+perl 1.make_epub.pl D 004 1
+perl 1.make_epub.pl D 005 1
+perl 1.make_epub.pl D 006 1
+perl 1.make_epub.pl D 007 1
+perl 1.make_epub.pl D 008 1
+perl 1.make_epub.pl D 009 1
+perl 1.make_epub.pl D 010 1
+perl 1.make_epub.pl D 011 1
+perl 1.make_epub.pl D 012 1
+perl 1.make_epub.pl D 013 1
+perl 1.make_epub.pl D 014 1
+perl 1.make_epub.pl D 015 1
+perl 1.make_epub.pl D 016 1
+perl 1.make_epub.pl D 017 1
+perl 1.make_epub.pl D 018 1
+perl 1.make_epub.pl D 019 1
+perl 1.make_epub.pl D 020 1
+perl 1.make_epub.pl D 021 1
+perl 1.make_epub.pl D 022 1
+perl 1.make_epub.pl D 023 1
+perl 1.make_epub.pl D 024 1
+perl 1.make_epub.pl D 025 1
+perl 1.make_epub.pl D 026 1
+perl 1.make_epub.pl D 027 1
+perl 1.make_epub.pl D 028 1
+perl 1.make_epub.pl D 029 1
+perl 1.make_epub.pl D 030 1
+perl 1.make_epub.pl D 031 1
+perl 1.make_epub.pl D 032 1
+perl 1.make_epub.pl D 033 1
+perl 1.make_epub.pl D 034 1
+perl 1.make_epub.pl D 035 1
+perl 1.make_epub.pl D 036 1
+perl 1.make_epub.pl D 037 1
+perl 1.make_epub.pl D 038 1
+perl 1.make_epub.pl D 039 1
+perl 1.make_epub.pl D 040 1
+perl 1.make_epub.pl D 041 1
+perl 1.make_epub.pl D 042 1
+perl 1.make_epub.pl D 043 1
+perl 1.make_epub.pl D 044 1
+perl 1.make_epub.pl D 045 1
+perl 1.make_epub.pl D 046 1
+perl 1.make_epub.pl D 047 1
+perl 1.make_epub.pl D 048 1
+perl 1.make_epub.pl D 049 1
+perl 1.make_epub.pl D 050 1
+perl 1.make_epub.pl D 051 1
+perl 1.make_epub.pl D 052 1
+perl 1.make_epub.pl D 053 1
+perl 1.make_epub.pl D 054 1
+perl 1.make_epub.pl D 055 1
+perl 1.make_epub.pl D 056 1
+perl 1.make_epub.pl D 057 1
+perl 1.make_epub.pl D 058 1
+perl 1.make_epub.pl D 059 1
+perl 1.make_epub.pl D 060 1
+perl 1.make_epub.pl D 061 1
+perl 1.make_epub.pl D 062 1
+perl 1.make_epub.pl D 063 1
+perl 1.make_epub.pl D 064 1
+
+rem ==== 房山石經冊 ========      
+perl 1.make_epub.pl F 001 1
+perl 1.make_epub.pl F 002 1
+perl 1.make_epub.pl F 003 1
+perl 1.make_epub.pl F 012 1
+perl 1.make_epub.pl F 024 1
+perl 1.make_epub.pl F 027 1
+perl 1.make_epub.pl F 028 1
+perl 1.make_epub.pl F 029 1
+
+rem ==== 佛教大藏經冊  ========  
+perl 1.make_epub.pl G 052 1
+perl 1.make_epub.pl G 069 1
+perl 1.make_epub.pl G 083 1
+perl 1.make_epub.pl G 084 1
+
+rem ==== 高麗藏冊 ========  
+perl 1.make_epub.pl K 005 1
+perl 1.make_epub.pl K 032 1
+perl 1.make_epub.pl K 034 1
+perl 1.make_epub.pl K 035 1
+perl 1.make_epub.pl K 038 1
+perl 1.make_epub.pl K 041 1
+
+rem ==== 乾隆藏冊 ========  
+perl 1.make_epub.pl L 115 1
+perl 1.make_epub.pl L 116 1
+perl 1.make_epub.pl L 130 1
+perl 1.make_epub.pl L 131 1
+perl 1.make_epub.pl L 132 1
+perl 1.make_epub.pl L 133 1
+perl 1.make_epub.pl L 135 1
+perl 1.make_epub.pl L 141 1
+perl 1.make_epub.pl L 143 1
+perl 1.make_epub.pl L 149 1
+perl 1.make_epub.pl L 153 1
+perl 1.make_epub.pl L 154 1
+perl 1.make_epub.pl L 155 1
+perl 1.make_epub.pl L 157 1
+perl 1.make_epub.pl L 158 1
+perl 1.make_epub.pl L 162 1
+perl 1.make_epub.pl L 164 1
+
+rem ==== 卍正藏冊 ========
+perl 1.make_epub.pl M 059 1
+
+rem ==== 南傳 冊 ========  
+perl 1.make_epub.pl N 001 1
+perl 1.make_epub.pl N 002 1
+perl 1.make_epub.pl N 003 1
+perl 1.make_epub.pl N 004 1
+perl 1.make_epub.pl N 005 1
+perl 1.make_epub.pl N 006 1
+perl 1.make_epub.pl N 007 1
+perl 1.make_epub.pl N 008 1
+perl 1.make_epub.pl N 009 1
+perl 1.make_epub.pl N 010 1
+perl 1.make_epub.pl N 011 1
+perl 1.make_epub.pl N 012 1
+perl 1.make_epub.pl N 013 1
+perl 1.make_epub.pl N 014 1
+perl 1.make_epub.pl N 015 1
+perl 1.make_epub.pl N 016 1
+perl 1.make_epub.pl N 017 1
+perl 1.make_epub.pl N 018 1
+perl 1.make_epub.pl N 019 1
+perl 1.make_epub.pl N 020 1
+perl 1.make_epub.pl N 021 1
+perl 1.make_epub.pl N 022 1
+perl 1.make_epub.pl N 023 1
+perl 1.make_epub.pl N 024 1
+perl 1.make_epub.pl N 025 1
+perl 1.make_epub.pl N 026 1
+perl 1.make_epub.pl N 027 1
+perl 1.make_epub.pl N 028 1
+perl 1.make_epub.pl N 029 1
+perl 1.make_epub.pl N 030 1
+perl 1.make_epub.pl N 031 1
+perl 1.make_epub.pl N 032 1
+perl 1.make_epub.pl N 033 1
+perl 1.make_epub.pl N 034 1
+perl 1.make_epub.pl N 035 1
+perl 1.make_epub.pl N 036 1
+perl 1.make_epub.pl N 037 1
+perl 1.make_epub.pl N 038 1
+perl 1.make_epub.pl N 039 1
+perl 1.make_epub.pl N 040 1
+perl 1.make_epub.pl N 041 1
+perl 1.make_epub.pl N 042 1
+perl 1.make_epub.pl N 043 1
+perl 1.make_epub.pl N 044 1
+perl 1.make_epub.pl N 045 1
+perl 1.make_epub.pl N 046 1
+perl 1.make_epub.pl N 047 1
+perl 1.make_epub.pl N 048 1
+perl 1.make_epub.pl N 049 1
+perl 1.make_epub.pl N 050 1
+perl 1.make_epub.pl N 051 1
+perl 1.make_epub.pl N 052 1
+perl 1.make_epub.pl N 053 1
+perl 1.make_epub.pl N 054 1
+perl 1.make_epub.pl N 055 1
+perl 1.make_epub.pl N 056 1
+perl 1.make_epub.pl N 057 1
+perl 1.make_epub.pl N 058 1
+perl 1.make_epub.pl N 059 1
+perl 1.make_epub.pl N 060 1
+perl 1.make_epub.pl N 061 1
+perl 1.make_epub.pl N 062 1
+perl 1.make_epub.pl N 063 1
+perl 1.make_epub.pl N 064 1
+perl 1.make_epub.pl N 065 1
+perl 1.make_epub.pl N 066 1
+perl 1.make_epub.pl N 067 1
+perl 1.make_epub.pl N 068 1
+perl 1.make_epub.pl N 069 1
+perl 1.make_epub.pl N 070 1
+
+rem ==== 永樂北藏冊 ========
+perl 1.make_epub.pl P 154 1
+perl 1.make_epub.pl P 155 1
+perl 1.make_epub.pl P 167 1
+perl 1.make_epub.pl P 168 1
+perl 1.make_epub.pl P 174 1
+perl 1.make_epub.pl P 178 1
+perl 1.make_epub.pl P 179 1
+perl 1.make_epub.pl P 180 1
+perl 1.make_epub.pl P 181 1
+perl 1.make_epub.pl P 182 1
+perl 1.make_epub.pl P 183 1
+perl 1.make_epub.pl P 184 1
+perl 1.make_epub.pl P 185 1
+perl 1.make_epub.pl P 187 1
+perl 1.make_epub.pl P 189 1
+
+rem ==== 宋藏遺珍冊 ========
+perl 1.make_epub.pl S 006 1
+
+rem ==== 洪武南藏冊 ========
+perl 1.make_epub.pl U 205 1
+perl 1.make_epub.pl U 222 1
+perl 1.make_epub.pl U 223 1
+
+:start
+
+rem ==== 西蓮淨苑 ========
+perl 1.make_epub.pl ZY 001 1
+perl 1.make_epub.pl ZY 002 1
+perl 1.make_epub.pl ZY 003 1
+perl 1.make_epub.pl ZY 004 1
+perl 1.make_epub.pl ZY 005 1
+perl 1.make_epub.pl ZY 006 1
+perl 1.make_epub.pl ZY 007 1
+perl 1.make_epub.pl ZY 008 1
+perl 1.make_epub.pl ZY 009 1
+perl 1.make_epub.pl ZY 010 1
+perl 1.make_epub.pl ZY 011 1
+perl 1.make_epub.pl ZY 012 1
+perl 1.make_epub.pl ZY 013 1
+perl 1.make_epub.pl ZY 014 1
+perl 1.make_epub.pl ZY 015 1
+perl 1.make_epub.pl ZY 016 1
+perl 1.make_epub.pl ZY 017 1
+perl 1.make_epub.pl ZY 018 1
+perl 1.make_epub.pl ZY 019 1
+perl 1.make_epub.pl ZY 020 1
+perl 1.make_epub.pl ZY 021 1
+perl 1.make_epub.pl ZY 022 1
+perl 1.make_epub.pl ZY 023 1
+perl 1.make_epub.pl ZY 024 1
+perl 1.make_epub.pl ZY 025 1
+perl 1.make_epub.pl ZY 026 1
+perl 1.make_epub.pl ZY 027 1
+perl 1.make_epub.pl ZY 028 1
+perl 1.make_epub.pl ZY 029 1
+perl 1.make_epub.pl ZY 030 1
+perl 1.make_epub.pl ZY 031 1
+perl 1.make_epub.pl ZY 032 1
+perl 1.make_epub.pl ZY 033 1
+perl 1.make_epub.pl ZY 034 1
+perl 1.make_epub.pl ZY 035 1
+perl 1.make_epub.pl ZY 036 1
+perl 1.make_epub.pl ZY 037 1
+perl 1.make_epub.pl ZY 038 1
+perl 1.make_epub.pl ZY 039 1
+perl 1.make_epub.pl ZY 040 1
+perl 1.make_epub.pl ZY 041 1
+perl 1.make_epub.pl ZY 042 1
+perl 1.make_epub.pl ZY 043 1
+perl 1.make_epub.pl ZY 044 1
+
+goto end
+:end
