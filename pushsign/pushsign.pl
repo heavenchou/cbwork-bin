@@ -6,6 +6,8 @@
 # pushsign.pl 簡單標記版.txt 舊的xml.xml 結果檔xml.xml > 記錄檔.txt
 #
 ########################################################
+# 2019/12/20 : 圖形的處理標記由 <figure> 擴大為 <figure>...</figure>
+# 2019/12/19 : 處理 6/27 </L> 的後遺症，若沒有出現 <I><P>，就不處理沒有接著 <P> 的 </L>
 # 2019/09/26 : 部份悉曇標記要當成標點處理：
 # 				<g ref="#SD-D953"/> = …
 # 				<g ref="#SD-E35A"/> = （
@@ -161,6 +163,8 @@ while(1)
 }
 $index2++;
 $index3++;
+
+my $hasIP = 0;	# 如果有出現 <I><P> 這類的標記, 單獨的 </L> 才要處理, 以免和舊標記 </L> 重複
 
 while(1)
 {
@@ -452,6 +456,7 @@ sub get_word1
 
 				if($tag1 eq "<I>")
 				{
+					$hasIP = 1;
 					if($firstitem)
 					{
 						$tag1 = "<list><item>";
@@ -504,7 +509,7 @@ sub get_word1
 			$lines1[$index1] =~ s/^((?:。)|(?:、)|(?:，)|(?:．)|(?:；)|(?:：)|(?:「)|(?:」)|(?:『)|(?:』)|(?:（)|(?:）)|(?:？)|(?:！)|(?:—)|(?:…)|(?:《)|(?:》)|(?:〈)|(?:〉)|(?:“)|(?:”)|(?:★)|(?:(?:<\/?[ouwsaIL]>)?<P(?:,\d+)?>))//;
 			next;
 		}
-		elsif($lines1[$index1] =~ /^(<\/L>)/)
+		elsif($lines1[$index1] =~ /^(<\/L>)/ and $hasIP == 1)
 		{
 			# 單獨處理 </L>	
 			$firstitem = 1;
@@ -863,7 +868,7 @@ sub get_word2
 		#	last;
 		#}
 		
-		if($lines2[$index2] =~ /^<figure.*?>/)
+		if($lines2[$index2] =~ /^<figure.*?>.*?<\/figure>/)
 		{
 			last;
 		}
@@ -1085,9 +1090,9 @@ sub get_word2
 		$lines2[$index2] =~ s/^(&.((macron)|(dotblw)|(dotabv)|(tilde)|(acute));)//;
 		return "$1";
 	}
-	if(/^<figure.*?>/)		# 圖
+	if(/^<figure.*?>.*?<\/figure>/)		# 圖
 	{
-		$lines2[$index2] =~ s/^(<figure.*?>)//;
+		$lines2[$index2] =~ s/^(<figure.*?>.*?<\/figure>)//;
 		return "$1";
 	}
 	if(/^<sg.*?>/)		# <sg>
@@ -1251,7 +1256,7 @@ sub check_2_word
 	#	return 1;
 	#}
 
-	if($word2 =~ /<figure.*?>/ and $word1 eq "【圖】")
+	if($word2 =~ /<figure.*?>.*?<\/figure>/ and $word1 eq "【圖】")
 	{
 		return 1;
 	}	
