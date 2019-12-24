@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2019/12/24 規範符號[A=B]由 <choice><reg><orig> 格式改成 <note><app><lem><rdg> 格式
 2019/09/12 配合 XML 檔頭大改版, 修改檔頭呈現的格式.
 2019/08/31 1.修訂符號[A>B]由 <choice><corr><sic> 格式改成 <note><app><lem><rdg> 格式
            2.調整 XML 檔首的資訊
@@ -470,22 +471,6 @@ def start_inline_SDRJ(tag):
 		out2('<g ref="#{}"/>'.format(mo.group(1)))
 		char_count+=1
 
-# 可能用不上了, 已在 do_corr 處理了.
-def choice(tag):
-	'''  把 [A>B] 換成 <choice> '''
-	mo = re.match(r'\[([^>\]]*?)>(.*?)\]', tag) 
-	#globals['anchorCount']+=1
-	#id1='anchor{}'.format(globals['anchorCount'])
-	#globals['anchorCount']+=1
-	#id2='anchor{}'.format(globals['anchorCount'])
-	#s = '<choice cb:from="#{}" cb:to="#{}" cb:resp="#resp1">'.format(id1, id2)
-	s = '<choice cb:resp="CBETA.maha"><corr>{}</corr>'.format(mo.group(2))
-	if mo.group(1)=='':
-		s += '<sic/>'
-	else:
-		s += '<sic>{}</sic>'.format(mo.group(1))
-	s += '</choice>'
-	return s
 ######################################################
 # P5a 的版本在修訂不是傳回 <anchor , 而是直接傳回 <choice
 #	globals['backApp'] += s + '\n'
@@ -648,9 +633,7 @@ def start_inline_a(tag):
 def inline_tag(tag):
 	global char_count, buf, L_type
 	#print(tag, sep=' ', end='')
-	if re.match(r'\[([^>\]]*?)>(.*?)\]', tag):	# 處理修訂 [A>B] # 可能用不上了, 已在 do_corr 處理了.
-		out(choice(tag))
-	elif re.match(r'<\[(([\da-zA-Z]{2,3})|＊)\]>', tag):	# 在 do_corr 處理過的校勘數字 , 原來為 <[01]> , 要直接處理成 [01]
+	if re.match(r'<\[(([\da-zA-Z]{2,3})|＊)\]>', tag):	# 在 do_corr_normalize 處理過的校勘數字 , 原來為 <[01]> , 要直接處理成 [01]
 		out(tag[1:-1])
 	elif re.match(r'\[([\da-zA-Z]+?)\]', tag):	# 處理校勘數字
 		out('<anchor xml:id="fn%sp%s%s"/>' % (vol, old_pb, tag[1:-1]))
@@ -913,22 +896,33 @@ def do_chars(s):
 
 '''
 先把 [Ａ>Ｂ] 換成
-<note n="0001b0201" resp="CBETA.maha" type="add">念【CB】，忘【大】</note><app n="0001b0201"><lem wit="【CB】" resp="CBETA">念</lem><rdg wit="【大】">忘</rdg></app>
-因為 Ａ 與 B 也有可能是組字式或校勘數字, 例如 [[金*本]>[口*兄]] , [[01]>]
+<note n="0001b0201" resp="CBETA.maha" type="add">念【CB】，忘【大】</note>
+<app n="0001b0201"><lem wit="【CB】" resp="CBETA">念</lem><rdg wit="【大】">忘</rdg></app>
+因為 Ａ 與 Ｂ 也有可能是組字式或校勘數字, 例如 [[金*本]>[口*兄]] , [[01]>]
+也把 [Ａ=Ｂ] 換成 
+<note n="0002a0201" resp="CBETA" type="add" subtype="規範字詞">系統【CB】，係統【呂澂】</note>
+<app n="0002a0201"><lem wit="【CB】" resp="CBETA">系統</lem><rdg wit="【呂澂】">係統</rdg></app>
+因為 Ａ 與 Ｂ 也有可能是組字式或校勘數字, 例如 [千[金*本]=千[金*本]經]
 '''
-def do_corr(text):
+
+def do_corr_normalize(text):
 	global ed, old_pb, line_num, wit
 	'''
 	先把 [xxx] 組字或校勘數字變成 :gaiji1:xxx:gaiji2:
 	先把 <xxx> 組字或校勘數字變成 :gaiji3:xxx:gaiji4:
 
-	resp 預設為 CBETA.maha
+	resp 預設為 CBETA
 	如果是佛寺志版本 (ed = GA or GB) 則 resp = "DILA"
 	[Ａ>Ｂ]<resp="xxx"> 則 resp = "xxx"
 
 	把[Ａ>Ｂ](<resp="xxx">)?換成 
 	
 	<note n="...." resp="CBETA" type="add">B【CB】，A【xx】</note>
+	<app n="...."><lem wit="【CB】" resp="xxx">B</lem><rdg wit="【xx】">A</rdg></app>
+
+	把[Ａ=Ｂ](<resp="xxx">)?換成 
+	
+	<note n="...." resp="CBETA" type="add" subtype="規範字詞">B【CB】，A【xx】</note>
 	<app n="...."><lem wit="【CB】" resp="xxx">B</lem><rdg wit="【xx】">A</rdg></app>
 	
 	再把:gaiji1:xxx:gaiji2: 換回 [xxx]
@@ -942,18 +936,21 @@ def do_corr(text):
 	if(ed == 'GA' or ed == 'GB'): resp = 'DILA'
 
 	# 換掉 []<> 符號
-	text = re.sub(r"\[([^>\[\]]+?)\]", r":gaiji1:\1:gaiji2:", text)
+	text = re.sub(r"\[([^>=\[\]]+?)\]", r":gaiji1:\1:gaiji2:", text)
 	text = re.sub(r"<([^<>]+?)>", r":gaiji3:\1:gaiji4:", text)
 
 	# 每次處理一個校註
 	note_count = 1
 	FindCorr = True
 	while(FindCorr):
-		mo = re.search(r"\[(?:[^\]]*?)>(?:[^\]]*?)\](:gaiji3:resp=\"(.*?)\":gaiji4:)?",text)
+		mo = re.search(r"\[(?:[^\]]*?)([>=])(?:[^\]]*?)\](:gaiji3:resp=\"(.*?)\":gaiji4:)?",text)
 		if(mo != None):
-			if mo.group(2) != None:
+			subtype = ""
+			if mo.group(3) != None:
 				resp = mo.group(2)
-			text = re.sub(r"\[([^\]]*?)>([^\]]*?)\](:gaiji3:resp=\"(.*?)\":gaiji4:)?", r'<note n="{p}{l}{n:02d}" resp="CBETA" type="add">\2【CB】，\1{ed}</note><app n="{p}{l}{n:02d}"><lem wit="【CB】" resp="{r}">\2</lem><rdg wit="{ed}">\1</rdg></app>'.format(p=old_pb, l=line_num, ed=wit, r=resp, n=note_count), text, count=1)
+			if mo.group(1) == "=":
+				subtype = " subtype=\"規範字詞\""
+			text = re.sub(r"\[([^\]]*?)(?:[>=])([^\]]*?)\](:gaiji3:resp=\"(.*?)\":gaiji4:)?", r'<note n="{p}{l}{n:02d}" resp="CBETA" type="add"{st}>\2【CB】，\1{ed}</note><app n="{p}{l}{n:02d}"><lem wit="【CB】" resp="{r}">\2</lem><rdg wit="{ed}">\1</rdg></app>'.format(p=old_pb, l=line_num, st=subtype, ed=wit, r=resp, n=note_count), text, count=1)
 			note_count = note_count + 1
 		else:
 			FindCorr = False
@@ -981,49 +978,33 @@ def do_corr(text):
 	return text
 
 '''
-舊版的, 修訂是處理成 choice , 新版的如上, 使用 note
-先把 [Ａ>Ｂ] 換成 <choice cb:resp="CBETA.maha"><corr>Ｂ</corr><sic>Ａ</sic></choice>
-因為 Ａ 與 B 也有可能是組字式或校勘數字, 例如 [[金*本]>[口*兄]] , [[01]>]
+先把 [Ａ=Ｂ] 換成 
+<note n="0027a1301" resp="CBETA" type="add" subtype="規範字詞">Ｂ【CB】，Ａ【呂澂】</note><app n="0027a1301"><lem wit="【CB】" resp="CBETA">Ｂ</lem><rdg wit="【呂澂】">Ａ</rdg></app>
 '''
-def do_corr_choice(text):
-	global ed
+def do_normalize_new(text):
 	'''
 	先把 [xxx] 組字或校勘數字變成 :gaiji1:xxx:gaiji2:
 	先把 <xxx> 組字或校勘數字變成 :gaiji3:xxx:gaiji4:
-	如果是佛寺志版本 (ed = GA or GB)
-		先把[Ａ>Ｂ]<resp="CBETA.maha">換成 <choice cb:resp="CBETA.maha"><corr>Ｂ</corr><sic>Ａ</sic></choice>
-		再把[Ａ>Ｂ] 換成 <choice cb:resp="DILA"><corr>Ｂ</corr><sic>Ａ</sic></choice>
-	否則一般版本則
-		把[Ａ>Ｂ] 換成 <choice cb:resp="CBETA.maha"><corr>Ｂ</corr><sic>Ａ</sic></choice>
-	再把 <corr>[01]</corr> 這一類換成 <corr><[01]></corr> , 而 <[01]> 之後會換成 [01], 如不這樣處理, [01] 會被變成一般的校勘數字標記
+	把[Ａ=Ｂ] 換成 
+	<note n="0027a1301" resp="CBETA" type="add" subtype="規範字詞">Ｂ【CB】，Ａ【呂澂】</note><app n="0027a1301"><lem wit="【CB】"　resp="CBETA">Ｂ</lem><rdg wit="【呂澂】">Ａ</rdg></app>
 	再把:gaiji1:xxx:gaiji2: 換回 [xxx]
 	再把:gaiji3:xxx:gaiji4: 換回 <xxx>
-	再把 <corr></corr> 換成 <corr><space quantity="0"/></corr>, <sic> 比對 <corr> 處理.
 	'''
-	text = re.sub(r"\[([^>\[\]]+?)\]", r":gaiji1:\1:gaiji2:", text)
+	text = re.sub(r"\[([^=>\[\]]+?)\]", r":gaiji1:\1:gaiji2:", text)
 	text = re.sub(r"<([^<>]+?)>", r":gaiji3:\1:gaiji4:", text)
-	text = re.sub(r"\[([^\]]*?)>([^\]]*?)\]:gaiji3:resp=\"(.*?)\":gaiji4:", r'<choice cb:resp="\3"><corr>\2</corr><sic>\1</sic></choice>', text)
-	if(ed == 'GB' or ed == 'GA'):
-		text = re.sub(r"\[(.*?)>(.*?)\]", r'<choice cb:resp="DILA"><corr>\2</corr><sic>\1</sic></choice>', text)
-	else:
-		text = re.sub(r"\[([^\]]*?)>([^\]]*?)\]", r'<choice cb:resp="CBETA.maha"><corr>\2</corr><sic>\1</sic></choice>', text)
+	text = re.sub(r"\[([^\]]*?)=([^\]]*?)\]:gaiji3:resp=\"(.*?)\":gaiji4:", r'<choice cb:type="規範字詞" cb:resp="\3"><reg>\2</reg><orig>\1</orig></choice>', text)
+	text = re.sub(r"\[([^\]]*?)=([^\]]*?)\]", r'<choice cb:type="規範字詞"><reg>\2</reg><orig>\1</orig></choice>', text)
 	text = re.sub(":gaiji1:", "[", text)
 	text = re.sub(":gaiji2:", "]", text)
 	text = re.sub(":gaiji3:", "<", text)
 	text = re.sub(":gaiji4:", ">", text)
-	text = re.sub(r"<corr>(\[(([\da-zA-Z]{2,3})|＊)\])<\/corr>", r'<corr><\1></corr>', text)
-	text = re.sub(r"<sic>(\[(([\da-zA-Z]{2,3})|＊)\])<\/sic>", r'<sic><\1></sic>', text)
-	text = re.sub(r"<corr><\/corr>", r'<corr><space quantity="0"/></corr>', text)
-	text = re.sub(r"<sic><\/sic>", r'<sic><space quantity="0"/></sic>', text)
-
 	return text
-
-
+	
 '''
 先把 [Ａ=Ｂ] 換成 <choice cb:type="規範字詞"><reg>Ｂ</reg><orig>Ａ</orig></choice>
 因為 Ａ 與 B 也有可能是組字式或校勘數字, 例如 [千[金*本]=千[金*本]經]
 '''
-def do_normalize(text):
+def do_normalize_old(text):
 	'''
 	先把 [xxx] 組字或校勘數字變成 :gaiji1:xxx:gaiji2:
 	先把 <xxx> 組字或校勘數字變成 :gaiji3:xxx:gaiji4:
@@ -1469,18 +1450,20 @@ def convert():
 		buf += ' ed="{}" n="{}"/>'.format(ed, pb+line_num)
 		
 		text = do_line_head(head_tag, text)	# 因為 S 標記會把空格處理成 <l></l> , 所以要有傳回處理過的 text
+
 		'''
-		先把 [Ａ>Ｂ] 換成 <choice cb:resp="CBETA.maha"><corr>Ｂ</corr><sic>Ａ</sic></choice>
-		因為 Ａ 與 B 也有可能是組字式或校勘數字, 例如 [[金*本]>[口*兄]] , [[01]>]
-		'''
-		text = do_corr(text)
+		先把 [Ａ>Ｂ] 換成
+		<note n="0001b0201" resp="CBETA.maha" type="add">念【CB】，忘【大】</note>
+		<app n="0001b0201"><lem wit="【CB】" resp="CBETA">念</lem><rdg wit="【大】">忘</rdg></app>
+		因為 Ａ 與 Ｂ 也有可能是組字式或校勘數字, 例如 [[金*本]>[口*兄]] , [[01]>]
 		
+		也把 [Ａ=Ｂ] 換成 
+		<note n="0002a0201" resp="CBETA" type="add" subtype="規範字詞">系統【CB】，係統【呂澂】</note>
+		<app n="0002a0201"><lem wit="【CB】" resp="CBETA">系統</lem><rdg wit="【呂澂】">係統</rdg></app>
+		因為 Ａ 與 Ｂ 也有可能是組字式或校勘數字, 例如 [千[金*本]=千[金*本]經]
 		'''
-		先把 [Ａ=Ｂ] 換成 <choice cb:type="規範字詞"><reg>Ｂ</reg><orig>Ａ</orig></choice>
-		因為 Ａ 與 B 也有可能是組字式或校勘數字, 例如 [千[金*本]=千[金*本]經]
-		'''
-		text = do_normalize(text)
-		
+		text = do_corr_normalize(text)
+				
 		'''
 		把這種
 		T04n0213_p0794a23D##[>法集要頌經樂品第三十]<S>　[06]忍勝則怨賊，　　自負則自鄙，
