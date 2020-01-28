@@ -6,6 +6,8 @@
 # pushsign.pl 簡單標記版.txt 舊的xml.xml 結果檔xml.xml > 記錄檔.txt
 #
 ########################################################
+# 2020/01/29 : 根據標記的不同，調整標點的位置。
+# 2020/01/28 : 程式配合部份標記的修改。例: sg -> cb:sg , lang -> xml:lang ...
 # 2019/12/20 : 圖形的處理標記由 <figure> 擴大為 <figure>...</figure>
 # 2019/12/19 : 處理 6/27 </L> 的後遺症，若沒有出現 <I><P>，就不處理沒有接著 <P> 的 </L>
 # 2019/09/26 : 部份悉曇標記要當成標點處理：
@@ -68,6 +70,7 @@ use strict;
 use Encode;
 
 my $debug = 0;
+my $debug2 = 0;
 
 local *INTxt;
 local *INXml;
@@ -210,6 +213,18 @@ while(1)
 	# ------------------------ 判斷二個字是否相同
 	
 	my $result = check_2_word($word1, $word2);
+	
+	if($debug2)
+	{
+		print Encode::encode("big5","hasdot1 : $hasdot1\n");
+		print Encode::encode("big5","hasdot2 : $hasdot2\n");
+		print Encode::encode("big5","tagbuff : $tagbuff\n");
+		print Encode::encode("big5","word1 : $word1\n");
+		print Encode::encode("big5","word2 : $word2\n");
+		print Encode::encode("big5","1:".$lines1[$index1] . "\n");
+		print Encode::encode("big5","a:".$lines1[$index1+1] . "\n");
+		print Encode::encode("big5","2:".$lines2[$index2] . "\n\n");
+	}
 
 	if($result == 1)	# 二邊同步
 	{
@@ -279,7 +294,13 @@ while(1)
 					printout("$hasdot1<<?>:<在 rdg,lem,t,note 之前的句讀應該處理掉>>$tagbuff");
 				}
 			}
-			elsif($hasdot1 =~ /(((?:「)|(?:『)|(?:（)|(?:《)|(?:〈)|(?:“))+)/)		# 這些標記要移到後面
+			# 如果標點在 <lem...> 標記之後，標點要移到前面，不管是不是上引號 (下一個 elsif)
+			elsif($tagbuff =~ /<lem [^>]*>$/)
+			{
+				printout("$hasdot1$tagbuff");
+			}
+			# 這些標記要移到後面
+			elsif($hasdot1 =~ /(((?:「)|(?:『)|(?:（)|(?:《)|(?:〈)|(?:“))+)/)		
 			{
 				my $tmp = $1;
 				$hasdot1 =~ s/(((?:「)|(?:『)|(?:（)|(?:《)|(?:〈)|(?:“))+)//;
@@ -395,9 +416,9 @@ sub make_tt
 	    $line2 =~ s/:2:/\]/g;
 	}
 
-    if($line2 =~ /^\D+\d+n.{5}p.{7}.{3}(.*)/)
+    if($line2 =~ /^[A-Z]+\d+n.{5}p.{7}.{3}(.*)/)
     {
-        $line2 =~ s/^(\D+\d+n.{5}p.{7}.{3})(.*)/$2$1/;
+        $line2 =~ s/^([A-Z]+\d+n.{5}p.{7}.{3})(.*)/$2$1/;
     }
     else
     {
@@ -536,10 +557,9 @@ sub get_word1
 	}
 	
 	$_ = $lines1[$index1];	# 處理修訂與移位
-	
 	# 取行首  X79n1563_p0657a09_##
 	$firstword = 0;
-	if(/^\D+\d+n.{5}p(.{7}).{3}/)
+	if(/^[A-Z]+\d+n.{5}p(.{7}).{3}/)
 	{
 		$firstword = 1;	# 若遇到 [TX]xxn.... 則 $firstword = 1 , 此時若遇到 <P> 則是行首, 否則設為 0 , 變成行中的 <P>
 		# 處理修訂與移位
@@ -572,7 +592,7 @@ sub get_word1
 		
 		$lines1[$index1] = $_;
 		
-		$lines1[$index1] =~ s/^\D+\d+n.{5}p(.{7}).{3}(║)?//;
+		$lines1[$index1] =~ s/^[A-Z]+\d+n.{5}p(.{7}).{3}(║)?//;
 		
 		return "n=\"$1\"";
 	}
@@ -649,6 +669,7 @@ sub get_word1
 	elsif(/^$utf8/)     # 一般字
 	{
 		$lines1[$index1] =~ s/^($utf8)//;
+		
 		return "$1";
 	}
 	else
@@ -902,26 +923,26 @@ sub get_word2
 			next;
 		}
 		
-		if($lines2[$index2] =~ /^<cb:t lang="san-sd">/)
+		if($lines2[$index2] =~ /^<cb:t xml:lang="sa-Sidd">/)
 		{
 		    $whicht = 1;
-		    $lines2[$index2] =~ s/^(<cb:t lang="san-sd">)//;
+		    $lines2[$index2] =~ s/^(<cb:t xml:lang="sa-Sidd">)//;
 			$tagbuff .= $1;
 			next;
 		}
-		if($lines2[$index2] =~ /^<cb:t lang="chi">/)
+		if($lines2[$index2] =~ /^<cb:t xml:lang="zh-Hant">/)
 		{
 		    $whicht = 2;
-		    $lines2[$index2] =~ s/^(<cb:t lang="chi">)//;
+		    $lines2[$index2] =~ s/^(<cb:t xml:lang="zh-Hant">)//;
 			$tagbuff .= $1;
 			next;
 		}
 		
-		if($lines2[$index2] =~ /^<sg.*?>/)
+		if($lines2[$index2] =~ /^<cb:sg.*?>/)
 		{
 			last;
 		}
-		if($lines2[$index2] =~ /^<\/sg>/)
+		if($lines2[$index2] =~ /^<\/cb:sg>/)
 		{
 			last;
 		}
@@ -1002,9 +1023,9 @@ sub get_word2
 			next;
 		}		
 		
-		if($lines2[$index2] =~ /^\xd/)
+		if($lines2[$index2] =~ /^\x0d/)
 		{
-			$lines2[$index2] =~ s/^(\xd)//;
+			$lines2[$index2] =~ s/^(\x0d)//;
 			$tagbuff .= $1;
 			next;
 		}
@@ -1022,7 +1043,7 @@ sub get_word2
 		if($istt == 2 and $index1 < $#lines1)
 		{
 		    # 把第二行還原
-		    $lines1[$index1+1] =~ s/^(.*?)(\D+\d+n.{5}p.{7}.{3})/$2$1/;
+		    $lines1[$index1+1] =~ s/^(.*?)([A-Z]+\d+n.{5}p.{7}.{3})/$2$1/;
 		}
 		$istt = 0;
 		return "$1";
@@ -1095,14 +1116,14 @@ sub get_word2
 		$lines2[$index2] =~ s/^(<figure.*?>.*?<\/figure>)//;
 		return "$1";
 	}
-	if(/^<sg.*?>/)		# <sg>
+	if(/^<cb:sg.*?>/)		# <cb:sg>
 	{
-		$lines2[$index2] =~ s/^(<sg.*?>)//;
+		$lines2[$index2] =~ s/^(<cb:sg.*?>)//;
 		return "$1";
 	}
-	if(/^<\/sg>/)		# <sg>
+	if(/^<\/cb:sg>/)		# <cb:sg>
 	{
-		$lines2[$index2] =~ s/^(<\/sg>)//;
+		$lines2[$index2] =~ s/^(<\/cb:sg>)//;
 		return "$1";
 	}
 	
@@ -1241,12 +1262,12 @@ sub check_2_word
 		return 1;
 	}
 	
-	if($word2 =~ /<sg.*?>/ and $word1 eq "(")
+	if($word2 =~ /<cb:sg.*?>/ and $word1 eq "(")
 	{
 		return 1;
 	}
 	
-	if($word2 eq "</sg>" and $word1 eq ")")
+	if($word2 eq "</cb:sg>" and $word1 eq ")")
 	{
 		return 1;
 	}
