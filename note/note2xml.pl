@@ -3,6 +3,7 @@
 # 格式介紹在最底下
 #
 # 修訂記錄：
+# 2019/12/25 : 更換缺字處理模組, 修訂取消 <app> 和 <choice>
 # 2019/09/04 : 加入 LC 呂澂的資料
 # 2017/05/24 : GA, GB 註解的修訂不用 <app> , 直接用 <choice>
 # 2017/05/22 : 支援頁碼可能為 pa001 這種格式
@@ -12,10 +13,12 @@
 # 2013/11/20 : 處理 N52 校注中有表格, 而且校注不只一行的情況.
 ######################################################################################
 
+use lib "../";
+use cbeta;
 use utf8;
 use autodie;
 use Encode;
-use Win32::ODBC;
+#use Win32::ODBC;
 
 ######################################################################################
 # 參數
@@ -88,11 +91,13 @@ my @lines = <IN>;
 close IN;
 
 open OUT , ">:utf8", $outfile;
-readGaiji();
+#readGaiji();
+my $gaiji = new Gaiji();
+$gaiji->load_access_db();
 
 # 先做必要的變更
 
-for ($i=0; $i<= $#lines; $i++)
+for (my $i=0; $i<= $#lines; $i++)
 {
 	$lines[$i] =~ s/&/&amp;/g;		# 把 & 換成 &amp;
 	$lines[$i] =~ s/<□>/＜□＞/g;	# 先換成全型, 以免不易處理	
@@ -100,7 +105,7 @@ for ($i=0; $i<= $#lines; $i++)
 
 # 逐行處理
 
-for ($i=0; $i<= $#lines; $i++)
+for (my $i=0; $i<= $#lines; $i++)
 {
 	$_ = $lines[$i];
 	
@@ -140,7 +145,7 @@ for ($i=0; $i<= $#lines; $i++)
 			
 			# 到這裡表示這一行是校注的內容
 			
-			$nextline =~ s/^\s*(.*?)\s*$/\1/;	# 去前後空白
+			$nextline =~ s/^\s*(.*?)\s*$/$1/;	# 去前後空白
 			$nextline = check_table($nextline);	# 檢查是否有表格標記, 要先處理, 因為一行是一個 <row>, 接起來就看不出每一行的位置了
 			$notedata .= $nextline;
 			$i++;
@@ -184,7 +189,7 @@ for ($i=0; $i<= $#lines; $i++)
 			
 			# 到這裡表示這一行是校注的內容
 			
-			$nextline =~ s/^\s*(.*?)\s*$/\1/;	# 去前後空白
+			$nextline =~ s/^\s*(.*?)\s*$/$1/;	# 去前後空白
 			$nextline = check_table($nextline);	# 檢查是否有表格標記, 要先處理, 因為一行是一個 <row>, 接起來就看不出每一行的位置了
 			$notedata .= $nextline;
 			$i++;
@@ -211,10 +216,10 @@ for ($i=0; $i<= $#lines; $i++)
 	
 	if($notemod =~ /<p(,\d+)?>/)
 	{
-		$notemod =~ s/(<p(,\d+)?>)/<\/p>\1/g;
+		$notemod =~ s/(<p(,\d+)?>)/<\/p>$1/g;
 		$notemod =~ s/<\/p>//;
 		$notemod .= "</p>";
-		$notemod =~ s/<p,(\d+)>/<p rend="margin-left:\1em">/g;
+		$notemod =~ s/<p,(\d+)>/<p rend="margin-left:$1em">/g;
 		if($notemod =~ /<\/table><\/p>/)
 		{
 			$notemod =~ s/<table /<\/p><table /g;	# <table> 前面要加上 </p> 結束
@@ -224,10 +229,10 @@ for ($i=0; $i<= $#lines; $i++)
 	
 	if($notedata =~ /<p(,\d+)?>/)
 	{
-		$notedata =~ s/(<p(,\d+)?>)/<\/p>\1/g;
+		$notedata =~ s/(<p(,\d+)?>)/<\/p>$1/g;
 		$notedata =~ s/<\/p>//;
 		$notedata .= "</p>";
-		$notedata =~ s/<p,(\d+)>/<p rend="margin-left:\1em">/g;
+		$notedata =~ s/<p,(\d+)>/<p rend="margin-left:$1em">/g;
 		if($notedata =~ /<\/table><\/p>/)
 		{
 			$notedata =~ s/<table /<\/p><table /g;	# <table> 前面要加上 </p> 結束
@@ -239,7 +244,7 @@ for ($i=0; $i<= $#lines; $i++)
 	#<note n="0008002" resp="Xuzangjing" place="foot text" type="orig">省略普賢行願品文</note>
 	#<note n="0245k01" resp="Xuzangjing" place="foot text" type="orig ke">釋止觀義例二初所述題目</note>
 	
-	$out = "<note n=\"${page}${kbj1}${notenum}${noteABC}${note_sub_num}\" resp=\"${source_ename}\" place=\"foot text\" type=\"orig${kbj2}\">${notedata}</note>";
+	my $out = "<note n=\"${page}${kbj1}${notenum}${noteABC}${note_sub_num}\" resp=\"${source_ename}\" place=\"foot text\" type=\"orig${kbj2}\">${notedata}</note>";
 	$out =~ s/＜□＞/<unclear\/>/g;
 	print OUT $out;
 	
@@ -278,6 +283,8 @@ sub run_corr
 	
 	if(/>/)
 	{
+		my $strmod = "";
+		my $strorig = "";
 		#要先將組字式 [xxx] 換成 :!:xxx:=:
 		#最後再換回來
 		s/\[($loseutf8+?)\]/:!:$1:=:/g;
@@ -290,11 +297,17 @@ sub run_corr
 			{
 				$strmod = $1;
 				$strorig = $2;
-				if($ed eq "GA" || $ed eq "GB")
+				if($ed)
+				{
+					$strmod =~ s/\[($loseutf8*?)>($loseutf8*?)\]<resp="(.*?)">/$2/g;
+				}
+				# 底下其實用不到了
+				elsif($ed eq "GA" || $ed eq "GB")
 				{
 					# GA 和 GB 的修訂使用如下轉換
 					# [弟>第]<resp="CBETA.maha">
 					# <choice cb:resp="CBETA.maha"><corr>第</corr><sic>弟</sic></choice>
+					
 					$strmod =~ s/\[($loseutf8*?)>($loseutf8*?)\]<resp="(.*?)">/<choice cb:resp="$3"><corr>$2<\/corr><sic>$1<\/sic><\/choice>/g;
 				}
 				else
@@ -310,7 +323,12 @@ sub run_corr
 				# 要分成二組, 第一組還原, 第二組做成 XML 格式
 				
 				$strorig =~ s/\[($loseutf8*?)>$loseutf8*?\]<resp=".*?">/$1/g;
-				if($ed eq "GA" || $ed eq "GB")
+				if($ed)
+				{
+					$strmod =~ s/\[($loseutf8*?)>($loseutf8*?)\]<resp="(.*?)">/$2/g;
+				}
+				# 其實底下用不到了
+				elsif($ed eq "GA" || $ed eq "GB")
 				{
 					$strmod =~ s/\[($loseutf8*?)>($loseutf8*?)\]<resp="(.*?)">/<choice cb:resp="$3"><corr>$2<\/corr><sic>$1<\/sic><\/choice>/g;
 				}
@@ -347,10 +365,10 @@ sub run_des
 	while(/(\[$loseutf8+?\])/)
 	{
 		my $des = $1;
-		if($des2cb{$des})
+		if($gaiji->des2cb($des))
 		{
 			# my $tmp = "&CB" . $des2cb{$des} . ";";			# 這是 P4 的格式
-			my $tmp = "<g ref=\"#CB" . $des2cb{$des} . "\"/>";	# P5 的格式是用 <g> 來處理 -- 2013/09/16
+			my $tmp = "<g ref=\"#CB" . $gaiji->des2cb($des) . "\"/>";	# P5 的格式是用 <g> 來處理 -- 2013/09/16
 			s/\Q$des\E/$tmp/g;
 		}
 		else
@@ -378,7 +396,7 @@ sub check_table()
 	if(/^<F>/)
 	{
 		# 要算有幾個 <c>
-		$count = 0;
+		my $count = 0;
 		my $tmp = $_;
 		
 		while(/<c>/)
@@ -398,7 +416,7 @@ sub check_table()
 		}
 		
 		$_ = $tmp;
-		s/^<F>(.*)/<table cols="$count"><row>\1<\/cell><\/row>/;
+		s/^<F>(.*)/<table cols="$count"><row>$1<\/cell><\/row>/;
 	}
 	
 	if(/^<c( r)?\d*>/)
@@ -407,8 +425,8 @@ sub check_table()
 	}
 	
 	s/<c>/<\/cell><cell>/g;
-	s/<c(\d+)>/<\/cell><cell cols="\1">/g;
-	s/<c r(\d+)>/<\/cell><cell rows="\1">/g;
+	s/<c(\d+)>/<\/cell><cell cols="$1">/g;
+	s/<c r(\d+)>/<\/cell><cell rows="$1">/g;
 	s/<\/F><\/cell><\/row>/<\/cell><\/row><\/table>/;
 	
 	s/<row><\/cell>/<row>/;
@@ -417,8 +435,9 @@ sub check_table()
 }
 
 # 讀入缺字資料庫
-sub readGaiji {
-	my $cb,$des;
+sub readGaiji_old {
+	my $cb;
+	my $des;
 	print STDERR "Reading Gaiji-m.mdb ....";
 	my $db = new Win32::ODBC("gaiji-m");
 	if ($db->Sql("SELECT * FROM gaiji")) { die "gaiji-m.mdb SQL failure"; }

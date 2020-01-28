@@ -16,14 +16,14 @@ use GD;
 
 my $db_file = "database_update5.txt";	# 經名資料庫
 #my $cover_page_path = "c:/release/epub_cover_ud3/";	# 輸出圖檔的目錄
-my $cover_page_path = "./cover_update4/";	# 輸出圖檔的目錄
+my $cover_page_path = "./cover_update5/";	# 輸出圖檔的目錄
 #my $cover_page_path2 = "./cover/";	# 檢查結果用的
-my $cover_page_path2 = "./cover_update4/";	# 檢查結果用的
+my $cover_page_path2 = "./cover_update5/";	# 檢查結果用的
 
-my $font_size_title = 42;				# 經名字體大小 (python 的大小好像是 px, 這裡好像是 pt)
+my $font_size_title = 55;				# 經名字體大小 (python 的大小好像是 px, 這裡好像是 pt)
 my $font_size_small = 30;				# 譯者字體大小 (python 的大小好像是 px, 這裡好像是 pt)
-my $font_size_byline = 34;				# 譯者字體大小 (python 的大小好像是 px, 這裡好像是 pt)
-my $byline_space = 30;				# 經名與譯者的距離
+my $font_size_byline = 30;				# 譯者字體大小 (python 的大小好像是 px, 這裡好像是 pt)
+my $byline_space = 0;				# 經名與譯者的距離
 my $int_y = 220; 					# 經名的最初高度 (python 是以字的上方為參考, perl 是以文字下方為參考座標)
 
 #################
@@ -88,7 +88,8 @@ sub draw_picture
 	
 	my $image = GD::Image->newFromJpeg("default.jpg", 1);	# 1 表示為 TrueColor
 
-	my $font = "./hh.ttf";	# 指定字型
+	my $font = "./li.ttc";	# 指定字型
+
 
 	# 將各字串畫出來, 傳回的 $y 是下一行的建議值
 	my $y = $int_y;
