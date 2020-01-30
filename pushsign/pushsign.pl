@@ -6,6 +6,7 @@
 # pushsign.pl 簡單標記版.txt 舊的xml.xml 結果檔xml.xml > 記錄檔.txt
 #
 ########################################################
+# 2020/01/30 : 增加新版悉曇格式，增加 <note type="add"> 處理格式。
 # 2020/01/29 : 根據標記的不同，調整標點的位置。
 # 2020/01/28 : 程式配合部份標記的修改。例: sg -> cb:sg , lang -> xml:lang ...
 # 2019/12/20 : 圖形的處理標記由 <figure> 擴大為 <figure>...</figure>
@@ -240,9 +241,9 @@ while(1)
 			printout($tagbuff);
 		}
 		# 悉曇特有標點
-		elsif(($hasdot2 eq "<g ref=\"#SD-D953\"/>" && $hasdot2 eq "…") ||
-			($hasdot2 eq "<g ref=\"#SD-E35A\"/>" && $hasdot2 eq "（") ||
-			($hasdot2 eq "<g ref=\"#SD-E35B\"/>" && $hasdot2 eq "）"))
+		elsif(($hasdot2 eq "<g ref=\"#SD\-D953\"/>" && $hasdot2 eq "…") ||
+			($hasdot2 eq "<g ref=\"#SD\-E35A\"/>" && $hasdot2 eq "（") ||
+			($hasdot2 eq "<g ref=\"#SD\-E35B\"/>" && $hasdot2 eq "）"))
 		{
 			# <g ref="#SD-D953"/> = …
 			# <g ref="#SD-E35A"/> = （
@@ -840,7 +841,8 @@ sub get_word2
 			next;
 	    }
 	    # <note resp="CBETA.say">CBET 的說明</note> # 05/20
-	    if($lines2[$index2] =~ /^<note resp="CBETA\S*?">.*?<\/note>/)			
+		# <note n="0272c0301" resp="CBETA.maha" type="add">...
+	    if($lines2[$index2] =~ /^<note[^>]*?resp="CBETA\S*?"[^>]*?>.*?<\/note>/)			
 	    {
 		    #$lines2[$index2] =~ s/^(^<note resp="CBETA\S*?">.*?<\/note>)//;
 			#$tagbuff .= $1;
@@ -1163,59 +1165,28 @@ sub check_2_word
 		print Encode::encode("big5","word1 : $word1  word2 : $word2\n");
 	}
 	
-	if($word1 eq $word2)
-	{
-		return 1;
-	}
+	if($word1 eq $word2) { return 1; }
 	
 	# 檢查是不是行首
 	
-	if($word2 =~ /<lb/ and $word2 =~ /$word1/)
-	{
-		return 1;
-	}
+	if($word2 =~ /<lb/ and $word2 =~ /$word1/) { return 1; }
+	if($word2 =~ /&CB.*?;/ and $word1 =~ /\[/) { return 1; }		# P4 版缺字, 待判斷
+	if($word2 =~ /<g ref="#CB\d{5}"\/>/ and $word1 =~ /\[/) { return 1; }		# P5 版缺字, 待判斷	
+	if($word2 =~ /<g ref="#CB\d{5}"\/>/ and $word1 =~ /./) { return 1; }	# BM 可能是unicode
+	if($word2 =~ /&unrec;/ and $word1 =~ /□/) { return 1; }		# 模糊字
 	
-	if($word2 =~ /&CB.*?;/ and $word1 =~ /\[/)		# P4 版缺字, 待判斷
-	{
-		return 1;
-	}	
-	if($word2 =~ /<g ref="#CB\d{5}"\/>/ and $word1 =~ /\[/)		# P5 版缺字, 待判斷
-	{
-		return 1;
-	}	
-	if($word2 =~ /<g ref="#CB\d{5}"\/>/ and $word1 =~ /./)	# BM 可能是unicode
-	{
-		return 1;
-	}
-	if($word2 =~ /&unrec;/ and $word1 =~ /□/)		# 模糊字
-	{
-		return 1;
-	}
-	if($word2 =~ /&SD.*?;/ and $word1 =~ /◇/)		# P4 悉曇字
-	{
-		return 1;
-	}
-	if($word2 =~ /<g ref="#((SD)|(RJ)).*?"\/>/ and $word1 =~ /◇/)		# P5 悉曇字
-	{
-		return 1;
-	}
-	if($word2 =~ /&SD-D953;/ and $word1 =~ /…/)		# 悉曇字
-	{
-		return 1;
-	}
-	if($word2 =~ /&SD-E35A;/ and $word1 =~ /（/)		# 悉曇字
-	{
-		return 1;
-	}
-	if($word2 =~ /&SD-E35B;/ and $word1 =~ /\Q）\E/)		# 悉曇字
-	{
-		return 1;
-	}
-	if($word2 =~ /&SD-E347;/ and $word1 =~ /\Q□\E/)		# 悉曇字
-	{
-		return 1;
-	}
+	if($word2 =~ /&SD.*?;/ and $word1 =~ /◇/) { return 1; }		# P4 悉曇字
+	if($word2 =~ /<g ref="#((SD)|(RJ)).*?"\/>/ and $word1 =~ /◇/) { return 1; }		# P5 悉曇字
 	
+	if($word2 =~ /<g ref="#SD\-D953"\/>/ and $word1 =~ /…/) { return 1; }		# 悉曇字
+	if($word2 =~ /<g ref="#SD\-E35A"\/>/ and $word1 =~ /（/) { return 1; }	# 悉曇字
+	if($word2 =~ /<g ref="#SD\-E35B"\/>/ and $word1 =~ /\Q）\E/) { return 1; }	# 悉曇字
+	if($word2 =~ /<g ref="#SD\-E347"\/>/ and $word1 =~ /\Q□\E/) { return 1; }	# 悉曇字
+	
+	if($word2 =~ /&SD\-D953;/ and $word1 =~ /…/) { return 1; }		# 悉曇字
+	if($word2 =~ /&SD\-E35A;/ and $word1 =~ /（/) { return 1; }	# 悉曇字
+	if($word2 =~ /&SD\-E35B;/ and $word1 =~ /\Q）\E/) { return 1; }	# 悉曇字
+	if($word2 =~ /&SD\-E347;/ and $word1 =~ /\Q□\E/) { return 1; }	# 悉曇字
 	
 	
 	if($word2 =~ /&CI.*?;/ and $word1 eq "&CIxxx;")		# 通用詞
