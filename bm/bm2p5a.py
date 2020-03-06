@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2020/03/07 修改缺字產生重複 CB 的問題
 2019/12/26 若某行 <B>....</Q> , </Q> 標記要先結束 byline
 2019/12/24 規範符號[A=B]由 <choice><reg><orig> 格式改成 <note><app><lem><rdg> 格式
 2019/09/12 配合 XML 檔頭大改版, 修改檔頭呈現的格式.
@@ -855,7 +856,7 @@ def gaiji(zuzi):
 	if re.match(r'\[\d+\]', zuzi): return zuzi
 	
 	if(zuzi in des2cb):
-		return '<g ref="#CB{}"/>'.format(des2cb[zuzi])
+		return '<g ref="#{}"/>'.format(des2cb[zuzi])
 	else:
 		print('組字式找不到: ' + zuzi)
 		return ''
