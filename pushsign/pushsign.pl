@@ -410,20 +410,26 @@ sub make_tt
             {
         	    $line3 =~ s/^($utf8*?)\[($loseutf8+?)\]/$1:1:$2:2:/;
 	        }
+	        $line3 =~ s/<([^>]*)>/:3:$1:4:/g;
 	        $line3 =~ s/\[($loseutf8*?)>>($loseutf8*?)\]/$2/g;
 	        $line3 =~ s/\[($loseutf8*?)>($loseutf8*?)\]/$2/g;
 	        $line3 =~ s/:1:/\[/g;
 	        $line3 =~ s/:2:/\]/g;
+	        $line3 =~ s/:3:/>/g;
+	        $line3 =~ s/:4:/>/g;
 	    }
 
         while($line2 =~ /^$utf8*?\[($loseutf8+?)\]/)
         {
     	    $line2 =~ s/^($utf8*?)\[($loseutf8+?)\]/$1:1:$2:2:/;
 	    }
+	    $line2 =~ s/<([^>]*)>/:3:$1:4:/g;
 	    $line2 =~ s/\[($loseutf8*?)>>($loseutf8*?)\]/$2/g;
 	    $line2 =~ s/\[($loseutf8*?)>($loseutf8*?)\]/$2/g;
 	    $line2 =~ s/:1:/\[/g;
 	    $line2 =~ s/:2:/\]/g;
+		$line2 =~ s/:3:/>/g;
+		$line2 =~ s/:4:/>/g;
 	}
 
     if($line2 =~ /^[A-Z]+\d+n.{5}p.{7}.{3}(.*)/)
@@ -578,12 +584,15 @@ sub get_word1
 		{
 			s/^($utf8*?)\[($loseutf8+?)\]/$1:1:$2:2:/;
 		}
-		s/<unclear\/>/:=3=:/g;
+		s/<([^>]*)>/:3:$1:4:/g;
+		#s/<unclear\/>/:=3=:/g;
 		s/\[($loseutf8*?)>>($loseutf8*?)\]/$2$1/g;
 		s/\[($loseutf8*?)>($loseutf8*?)\]/$2/g;
 		s/:1:/\[/g;
 		s/:2:/\]/g;
-		s/:=3=:/<unclear\/>/g;
+		s/:3:/</g;
+		s/:4:/>/g;
+		#s/:=3=:/<unclear\/>/g;
 		
 		# 處理通用詞
 		
@@ -721,6 +730,14 @@ sub get_word2
 			my $lb = $1;
 			if($same_lb{$lb})	# 重覆就略過
 			{
+				$lines2[$index2] =~ s/^(<lb.*?>)//;
+				$tagbuff .= $1;
+				next;
+			}
+			elsif($lb =~ /ed="R\d+"/ || $lb =~ /type="old"/)
+			{
+				# 忽略卍續 R 版 <lb n="0847a01" ed="R114"/>
+				# 忽略印老舊版
 				$lines2[$index2] =~ s/^(<lb.*?>)//;
 				$tagbuff .= $1;
 				next;
@@ -1209,6 +1226,10 @@ sub check_2_word
 	}
 	
 	if($word2 =~ /<note[^>]*?resp="Taisho"[^>]*?>.*?<\/note>/ and $word1 =~ /\[((\d+[A-Za-z]?)|(＊))\]/)
+	{
+		return 1;
+	}	
+	if($word2 =~ /<note[^>]*?type="orig"[^>]*?>.*?<\/note>/ and $word1 =~ /\[((\d+[A-Za-z]?)|(＊))\]/)
 	{
 		return 1;
 	}	
