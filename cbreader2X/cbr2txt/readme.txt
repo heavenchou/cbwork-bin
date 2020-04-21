@@ -11,7 +11,7 @@
   
   或手動移到　c:\temp\cbr_htm\
 
-2.cbr2txt.pl 將上面 CBR 的 HTML 轉成 TXT , 放在 c:\release\cbr_out_txt_xxxxxx\
+2.cbr2txt.pl 將上面 CBR 的 HTML 轉成 TXT , 放在 c:\temp\cbr_out_txt\
 
 3.標準的 P5 轉成 TXT
 

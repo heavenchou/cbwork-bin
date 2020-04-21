@@ -32,7 +32,7 @@ else
 	$path = $bm_path . $ed . "/" . $vol . "/";		# /T/T01
 }
 
-my $output = "";
+my @output = ();
 my $runningpath = "";
 find(\&findfile, $path);	# 處理所有檔案
 if($vol)
@@ -43,7 +43,12 @@ else
 {
 	open OUT, ">:utf8", "comp_result.txt";
 }
-print OUT $output;
+
+move_skip();	# 移除可忽略的
+
+for my $line (@output) {
+	print OUT $line;
+}
 close OUT;
 
 ##########################
@@ -78,7 +83,7 @@ sub comp_file
 
 	if($#bm_lines != $#p5_lines)
 	{
-		$output .= "檔案長度不同 : $bm_file vs $p5_file\n\n";
+		push(@output , "檔案長度不同 : $bm_file vs $p5_file\n\n");
 	}
 
 	my $count = $#bm_lines;
@@ -99,7 +104,7 @@ sub comp_file
 					#$b = rm_punc($b);
 					if($a ne $b)
 					{
-						$output .= $bm_lines[$i] . "\n" . $p5_lines[$i] . "\n\n";
+						push(@output , $bm_lines[$i] . "\n" . $p5_lines[$i] . "\n\n");
 					}
 				}
 			}
@@ -109,7 +114,7 @@ sub comp_file
 				#$b = rm_punc($b);
 				if($a ne $b)
 				{
-					$output .= $bm_lines[$i] . "\n" . $p5_lines[$i] . "\n\n";
+					push(@output , $bm_lines[$i] . "\n" . $p5_lines[$i] . "\n\n");
 				}
 			}
 		}
@@ -215,3 +220,48 @@ sub rm_punc
 	s/[．、，：；。？！—…「」『』〈〉《》“”（）【】〔〕\(\)]//g;
 	return $_;
 }
+
+# 移除可忽略的
+sub move_skip
+{
+	for (my $i=0; $i<=$#output; $i++) {
+
+		if($output[$i] =~ /^T18n/) { 
+			# T18n0850_p0087b23║（一九）[03]
+			# T18n0850_p0087b23║（一九）[03]…
+			
+			if($output[$i] =~ /^(.*?║（[一二三四五六七八九〇]+）(?:\[\d+\])?)\n\1…\n\n$/) {
+				$output[$i] = "";
+			}
+			# T18n0850_p0089b05║（一二二）
+			# T18n0850_p0089b05║（一二二）（）
+			if($output[$i] =~ /^(.*?║（[一二三四五六七八九〇]+）)\n\1（）\n\n$/) {
+				$output[$i] = "";
+			}
+			# T18n0877_p0331b22║涅哩荼(堅牢)[20]跋折羅底瑟吒(一切如來正等菩提金剛堅牢安住我心)
+			# T18n0877_p0331b22║涅哩荼(堅牢)[20]跋折羅底瑟吒(一切如來正等菩提金剛堅牢安住我心)」
+			# T18n0877_p0331b23║」
+			# T18n0877_p0331b23║
+			if($output[$i] =~ /^(.*?║.*?)\n\1」\n\n$/) {
+				# if(($i < $#output) && ($output[$i+1] =~ /^(.*?║)」\n\1\n\n$/)) {
+				# 	$output[$i] = "";
+				# 	$output[$i+1] = "";
+				# }
+				
+				# T18n0914_p0937b25║」[27]
+				# T18n0914_p0937b25║[27]
+				if(($i < $#output) && ($output[$i+1] =~ /^(.*?║)」((?:\[\d+\])?)\n\1\2\n\n$/)) {
+					$output[$i] = "";
+					$output[$i+1] = "";
+				}
+			}
+		}
+
+		# X23n0446_p0778a20║
+		# X23n0446_p0778a20║?
+		if($output[$i] eq "X23n0446_p0778a20║\nX23n0446_p0778a20║?\n\n") {
+			$output[$i] = "";
+		}
+
+	}
+}	
