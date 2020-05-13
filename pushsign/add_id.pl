@@ -8,6 +8,7 @@
 #   <note resp="CBETA...">
 #   <note type="orig">
 #   <note type="mod">
+#   <note type="add">
 #   <rdg>
 #   <t place="foot">
 #   <figure> 算1個字
@@ -219,11 +220,13 @@ sub start_handler
 	if ($el eq "lb") {
 		if($att{"type"} ne "old")
 		{
-			$lb = $att{"n"};
-			$char_count = 1;
-			$app_count = 0;
+			if($att{"ed"} !~ /^R/)
+			{
+				$lb = $att{"n"};
+				$char_count = 1;
+				$app_count = 0;
+			}
 		}
-		#if (not exists $att{"ed"}) { $att{"ed"}="T"; }
 	}
 	
 	# <lem>
@@ -258,7 +261,7 @@ sub start_handler
 	}
 
 	if ($el eq "note") {
-		if ($att{"type"} eq "orig" or $att{"type"} eq "mod" or $att{"place"} eq "foot" or $att{"resp"}=~/^CBETA/) { $pass = 0; }
+		if ($att{"type"} eq "orig" or $att{"type"} eq "mod" or $att{"type"} eq "add" or $att{"place"} eq "foot" or $att{"resp"}=~/^CBETA/) { $pass = 0; }
 		$note_type = $att{'type'};
 	}
 	
