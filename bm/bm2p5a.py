@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2020/05/28 支援經號第一個字可以是英文的狀況，主要是在序、跋、書前語等資料也加入經文中。
 2020/03/07 修改缺字產生重複 CB 的問題
 2019/12/26 若某行 <B>....</Q> , </Q> 標記要先結束 byline
 2019/12/24 規範符號[A=B]由 <choice><reg><orig> 格式改成 <note><app><lem><rdg> 格式
@@ -117,7 +118,6 @@ wits={
 'G': '【佛教】',
 'GA': '【志彙】',
 'GB': '【志叢】',
-'H': '【正史】',
 'HM': '【惠敏】',
 'I': '【佛拓】',
 'J': '【嘉興】',
@@ -131,14 +131,22 @@ wits={
 'S': '【宋遺】',
 'T': '【大】', 
 'U': '【洪武】',
-'W': '【藏外】',
 'X': '【卍續】', 
 'Y': '【印順】', 
+'ZS': '【正史】',
+'ZW': '【藏外】',
 'ZY': '【智諭】',
 }
 
 collectionZh={
-'LC': '呂澂佛學著作集'
+'B': '大藏經補編',
+'GA': '中國佛寺史志彙刊',
+'GB': '中國佛寺志叢刊',
+'LC': '呂澂佛學著作集',
+'N': '漢譯南傳大藏經（元亨寺版）',
+'Y': '印順法師佛學著作集',
+'ZS': '正史佛教資料類編',
+'ZW': '藏外佛教文獻'
 }
 
 collectionEng={
@@ -151,7 +159,6 @@ collectionEng={
 'G': 'Fojiao Canon',
 'GA': 'Zhongguo Fosi Shizhi Huikan',
 'GB': 'Zhongguo fosizhi congkan',
-'H': 'Passages concerning Buddhism from the Official Histories',
 'HM': 'the Complete Works of Ven Huimin',
 'I': 'Selections of Buddhist Stone Rubbings from the Northern Dynasties',
 'J': 'Jiaxing Canon (Shinwenfeng Edition)',
@@ -166,10 +173,11 @@ collectionEng={
 'S': 'Songzang yizhen (Shinwenfeng Edition)',
 'T': 'Taishō Tripiṭaka',
 'U': 'Southern Hongwu Edition of the Canon',
-'W': 'Buddhist Texts not contained in the Tripiṭaka',
 'X': 'Manji Shinsan Dainihon Zokuzōkyō',
 'Y': 'Corpus of Venerable Yin Shun\'s Buddhist Studies',
 'Z': 'Manji Dainihon Zokuzōkyō',
+'ZS': 'Passages concerning Buddhism from the Official Histories',
+'ZW': 'Buddhist Texts not contained in the Tripiṭaka',
 'ZY': 'the Complete Works of Ven Zhiyu'
 }
 
@@ -1416,7 +1424,7 @@ def convert():
 		if (line[:1] == "\ufeff"): line = line[1:]	# 扣除 utf8 格式有 feff 的檔頭
 		aline = line[:len(options.vol)+17]
 		text = line[len(options.vol)+17:]
-		mo=re.match(r'([A-Z]+\d{2,3})(n\d+.)(p.\d{3}[a-z])(\d\d)(.+)$', aline)
+		mo=re.match(r'([A-Z]+\d{2,3})(n.\d+.)(p.\d{3}[a-z])(\d\d)(.+)$', aline)
 		if mo!=None:
 			(vol, num, pb, line_num, head_tag) = mo.groups()
 		else:
