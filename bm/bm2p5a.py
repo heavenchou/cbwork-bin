@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2020/06/01 處理 ZW10 一些標記巢狀問題。
 2020/05/28 支援經號第一個字可以是英文的狀況，主要是在序、跋、書前語等資料也加入經文中。
 2020/03/07 修改缺字產生重複 CB 的問題
 2019/12/26 若某行 <B>....</Q> , </Q> 標記要先結束 byline
@@ -597,7 +598,7 @@ def start_inline_o(tag):
 def start_inline_T(tag):
 	if not 'lg' in opens: opens['lg'] = 0
 	if opens['lg']==0:
-		closeTags('byline', 'p')
+		closeTags('cb:jhead', 'cb:juan', 'byline', 'p')
 		close_head()
 		out('<lg xml:id="lg%sp%s%s%02d" type="abnormal"' % (vol, old_pb, line_num, char_count))
 		if char_count>1: out(' cb:place="inline"')		# 若是行中段落, 則加上 cb:place="inline"
@@ -737,7 +738,7 @@ def inline_tag(tag):
 		while opens['list']>0:
 			closeTag('item', 'list')
 	elif tag.startswith('<mj'):
-		closeTags('cb:jhead', 'cb:juan')
+		closeTags('byline', 'cb:jhead', 'cb:juan')
 		#n=get_number(tag)
 		mo = re.search(r'\d+', tag)
 		if mo!=None: globals['juan_num'] = int(mo.group())
@@ -773,7 +774,7 @@ def inline_tag(tag):
 	elif tag=='<o>':
 		start_inline_o(tag)
 	elif tag=='</o>':
-		closeTags('p')
+		closeTags('byline','p')
 		out1('</cb:div>')
 		opens['div'] -= 1
 		opens['orig'] -= 1
@@ -1156,7 +1157,7 @@ def start_inline_byline(tag):
 def start_S(tag):
 	if not 'lg' in opens: opens['lg'] = 0
 	if opens['lg']==0:
-		closeTags('byline', 'p')
+		closeTags('cb:jhead', 'cb:juan', 'byline', 'p')
 		close_head()
 		out('<lg xml:id="lg%sp%s%s01">' % (vol, old_pb, line_num))
 		opens['lg'] = 1
@@ -1369,7 +1370,7 @@ def close_sutra(num):
 </teiHeader>
 <text><body>'''.format(today = datetime.date.today().strftime('%Y-%m-%d'))
 	fo.write(s)
-	closeTags('l','lg','cb:jhead','p')		# 加上 l, lg  -- 2013/09/30 # 加上 cb:jhead 2014/06/06
+	closeTags('l','lg','byline','cb:jhead','p')		# 加上 l, lg  -- 2013/09/30 # 加上 cb:jhead 2014/06/06
 	close_div(1)
 	out('')		# 處理最後的 <lb> , 因為 BM 版經文最後可能會有空白行, 也要轉出 XML 來
 	
