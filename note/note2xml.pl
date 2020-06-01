@@ -3,6 +3,7 @@
 # 格式介紹在最底下
 #
 # 修訂記錄：
+# 2020/06/01 : 加入 ZW 藏外的資料
 # 2019/12/25 : 更換缺字處理模組, 修訂取消 <app> 和 <choice>
 # 2019/09/04 : 加入 LC 呂澂的資料
 # 2017/05/24 : GA, GB 註解的修訂不用 <app> , 直接用 <choice>
@@ -28,7 +29,7 @@ my $vol = shift;						# 傳入冊數 N01
 
 my $ed = $vol;				
 $ed =~ s/\d+//;						# 取出 $vol 前面的英文字
-my $infile = $vol . ".txt";				# 來源檔名, N01.txt
+my $infile = $vol . ".txt";			# 來源檔名, N01.txt
 my $outfile = "out_" . $infile;		# 輸出檔名 , 也就是在輸入檔名前加上 out_ 
 my $errfile = "err_" . $infile;		# 錯誤檔名 , 也就是在輸入檔名前加上 err_ 
 
@@ -58,6 +59,11 @@ elsif($ed eq "LC")
 {
 	$source_ename = "LüCheng";		# resp="xxx" 的名稱
 	$source_cname = "呂澂";			#<rdg wit="xxxx"> 的名稱
+}
+elsif($ed eq "ZW")
+{
+	$source_ename = "ZangWai";		# resp="xxx" 的名稱
+	$source_cname = "藏外";			#<rdg wit="xxxx"> 的名稱
 }
 else
 {
