@@ -107,7 +107,7 @@ sub initial
         if($i == $#datas || $levels[$i] >= $levels[$i+1])
         {
             # T0001 , T0001a
-            if($datas[$i] =~ /^([A-Z]+\d+[A-Za-z]?)\s/) 
+            if($datas[$i] =~ /^([A-Z]+a?\d+[A-Za-z]?)\s/) 
             {
                 $datas[$i] = $1;
                 $types[$i] = "C";   # 表示這一筆是 CBETA 經文

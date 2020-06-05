@@ -101,14 +101,14 @@ sub SearchFile
 	{
 		if($findbody == 0)
 		{
-			if (/title.*No. ([AB]?)(\d+)([A-Za-z])?\s*(.*)<\/title/) 
+			if (/title.*No. ([ABa]?)(\d+)([A-Za-z])?\s*(.*)<\/title/) 
 			{
 				my $j = $1;
 				my $number  = $2;
 				my $other = $3;
 				$name = $4;
 
-				if($j)	#嘉興藏的經號
+				if($j)	# A,B 嘉興藏的經號, 或是 a 是 CBETA 新增經號
 				{
 					$num = $j . sprintf("%03d",$number) . $other;
 				}
@@ -163,7 +163,7 @@ sub SearchFile
 			{
 				my $n = $1;
 
-				if(length($n)<5 && $n !~ /^[AB]\d{3}$/)
+				if(length($n)<5 && $n !~ /^[ABa]\d{3}$/)
 				{
 					$n = "00000" . $n;
 					$n =~ s/^.*?(\d{4}\D?)$/$1/;

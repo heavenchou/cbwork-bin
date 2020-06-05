@@ -150,12 +150,12 @@ sub get_keys
             # T 全藏
             $self->get_keys_by_book($keys,$from);
         }
-        elsif($from =~ /^\D+\d{2,3}$/ && $from !~ /^J[AB]\d{3}$/)
+        elsif($from =~ /^[A-Z]+\d{2,3}$/ && $from !~ /^J[AB]\d{3}$/)
         {
             # T01 全冊
             $self->get_keys_by_vol($keys,$from);
         }
-        elsif($from =~ /^\D+\d{3,4}.?$/)
+        elsif($from =~ /^[A-Z]+a?\d{3,4}.?$/)
         {
             # T0001 , JA001 , T0001a 全經
             $self->get_keys_by_sutra($keys,$from);
