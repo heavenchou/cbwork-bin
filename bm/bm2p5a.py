@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2020/06/05 修訂中若沒有文字，則在註解中要使用〔－〕來表示。
 2020/06/01 處理作譯者全型空格變成半型的問題。
 2020/06/01 處理 ZW10 一些標記巢狀問題。
 2020/05/28 支援經號第一個字可以是英文的狀況，主要是在序、跋、書前語等資料也加入經文中。
@@ -932,6 +933,8 @@ def do_corr_normalize(text):
 	<note n="...." resp="CBETA" type="add">B【CB】，A【xx】</note>
 	<app n="...."><lem wit="【CB】" resp="xxx">B</lem><rdg wit="【xx】">A</rdg></app>
 
+	B【CB】，A【xx】若 A 與 B 是空的，要換成 〔－〕【CB】，〔－〕【xx】
+
 	把[Ａ=Ｂ](<resp="xxx">)?換成 
 	
 	<note n="...." resp="CBETA" type="add" subtype="規範字詞">B【CB】，A【xx】</note>
@@ -967,6 +970,11 @@ def do_corr_normalize(text):
 		else:
 			FindCorr = False
 	
+	# B【CB】，A【xx】若 A 與 B 是空的，要換成 〔－〕【CB】，〔－〕【xx】
+
+	text = re.sub(r"(<note[^>]*>)【CB】", r'\1〔－〕【CB】', text)
+	text = re.sub(r"【CB】，(【.*?】)", r'【CB】，〔－〕\1', text)
+
 	# 換回 [] 符號
 	text = re.sub(":gaiji1:", "[", text)
 	text = re.sub(":gaiji2:", "]", text)
@@ -975,7 +983,7 @@ def do_corr_normalize(text):
 	# <note...>[01]【CB】 改成 <note...><[01]>【CB】
 	text = re.sub(r"(<note[^>]*>)(\[(([\da-zA-Z]{2,3})|＊)\])【CB】", r'\1<\2>【CB】', text)
 	# ，[01]【xx】 改成 ，<[01]>【xx】
-	text = re.sub(r"，(\[(?:(?:[\da-zA-Z]{2,3})|＊)\])(【.*?】)", r'，<\1>\2', text)
+	text = re.sub(r"【CB】，(\[(?:(?:[\da-zA-Z]{2,3})|＊)\])(【.*?】)", r'【CB】，<\1>\2', text)
 	
 	text = re.sub(r"(<lem[^>]*>)(\[(([\da-zA-Z]{2,3})|＊)\])<\/lem>", r'\1<\2></lem>', text)
 	text = re.sub(r"(<rdg[^>]*>)(\[(([\da-zA-Z]{2,3})|＊)\])<\/rdg>", r'\1<\2></rdg>', text)
