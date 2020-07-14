@@ -69,7 +69,7 @@ import zbxxml, siddam, ranjana
 
 time_format='%Y.%m.%d %H:%M'
 
-EMPTY=['anchor', 'lb', 'milestone', 'mulu', 'pb', 'space']
+EMPTY=['anchor', 'caesura', 'lb', 'milestone', 'mulu', 'pb', 'space']
 
 WITS = {
 	'A' : '【金藏】',
@@ -2010,7 +2010,7 @@ class MyTransformer():
 		n=e.get('n')
 		resp=e.get('resp', '')
 		if 'body' in mode:
-			if type in ('cf1', 'cf2', 'cf3'):
+			if type in ('cf1', 'cf2', 'cf3', 'cf4', 'cf5', 'cf6', 'cf7', 'cf8', 'cf9'):
 				pass
 			elif (n is not None) and (n != ''):
 				# <note> 的 n 屬性相同, 但位置可能不同.
@@ -2313,6 +2313,20 @@ class MyTransformer():
 				del node.attrib['cf1']
 			if 'cf2' in node.attrib: 
 				del node.attrib['cf2']
+			if 'cf3' in node.attrib: 
+				del node.attrib['cf3']
+			if 'cf4' in node.attrib: 
+				del node.attrib['cf4']
+			if 'cf5' in node.attrib: 
+				del node.attrib['cf5']
+			if 'cf6' in node.attrib: 
+				del node.attrib['cf6']
+			if 'cf7' in node.attrib: 
+				del node.attrib['cf7']
+			if 'cf8' in node.attrib: 
+				del node.attrib['cf8']
+			if 'cf9' in node.attrib: 
+				del node.attrib['cf9']
 			r = node.open_tag() + self.traverse(e, mode)
 			if 'cf1' in e.attrib: 
 				cf1 = e.get('cf1')
@@ -2320,6 +2334,27 @@ class MyTransformer():
 			if 'cf2' in e.attrib: 
 				cf2 = e.get('cf2')
 				r += '<note type="cf2">' + cf2 + '</note>'
+			if 'cf3' in e.attrib: 
+				cf3 = e.get('cf3')
+				r += '<note type="cf3">' + cf3 + '</note>'
+			if 'cf4' in e.attrib: 
+				cf4 = e.get('cf4')
+				r += '<note type="cf4">' + cf4 + '</note>'
+			if 'cf5' in e.attrib: 
+				cf5 = e.get('cf5')
+				r += '<note type="cf5">' + cf5 + '</note>'
+			if 'cf6' in e.attrib: 
+				cf6 = e.get('cf6')
+				r += '<note type="cf6">' + cf6 + '</note>'
+			if 'cf7' in e.attrib: 
+				cf7 = e.get('cf7')
+				r += '<note type="cf7">' + cf7 + '</note>'
+			if 'cf8' in e.attrib: 
+				cf8 = e.get('cf8')
+				r += '<note type="cf8">' + cf8 + '</note>'
+			if 'cf9' in e.attrib: 
+				cf9 = e.get('cf9')
+				r += '<note type="cf9">' + cf9 + '</note>'
 			r += node.end_tag()
 		return r
 		

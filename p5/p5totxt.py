@@ -201,7 +201,7 @@ def handleNode(e):
 			r += globals['nextLineBuf']
 			globals['nextLineBuf']=''
 	elif e.tag=='lg':
-		type=e.get('type')
+		type=e.get('subtype')
 		if type=='note2' or type=='note1':
 			r= '('+traverse(e)+')'
 		else: r=traverse(e)
