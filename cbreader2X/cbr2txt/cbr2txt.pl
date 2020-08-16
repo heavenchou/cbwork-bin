@@ -112,7 +112,7 @@ sub h2t()
 		#s/<p.*?>/\n\n　　/g;
 		
 		#s#<span class="corr">(.*?)</span>#$1#g;		# 因為標記有巢狀, 所以要先處理
-		s/<img src=['"][^>]*\\([^>]*gif)['"]>/【圖】/g; 	# <img src="C:\cbeta\CBReader\Figures\T\T18014601.gif">
+		s/<img src=['"][^>]*['"]>/【圖】/g; 	# <img src="C:\cbeta\CBReader\Figures\T\T18014601.gif">
 		
 		# <font face="siddam">扣</font>(<span class="nonhan">hā</span>)
 		# <font face="siddam">扣</font>(<span class="foreign">hā</span>)
