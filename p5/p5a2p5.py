@@ -3,6 +3,7 @@
 2013.1.4 周邦信 改寫自 cbp4top5.py
 
 Heaven 修改:
+2020/07/20 支援西蓮淨苑資料, 要修改 git 的查詢目錄.
 2019/09/15 修改成也支援 P5b 版。
 2019/09/14 支援新改版的檔頭，檔頭中的日期是 P5a 最後一次提交 GitHub 的日期。
 		   <listWit> 改變位置。
@@ -2476,14 +2477,28 @@ class MyTransformer():
 		return r
 		
 	def handle_publicationstmt(self, e, mode):
-		global p5a_filename
+		global p5a_filename, globals, cbwork_dir
 		r =''
 		node=MyNode(e)
 		r += node.open_tag()
 		r += self.traverse(e, mode)
 		# 加上日期 <data>....</date>, 此日期由 git 取出 p5a 最後提交的日期
 		# git log -1 --pretty=format:"%ai" file.xml
-		git_date = subprocess.check_output('git log -1 --pretty=format:"%ai" ' + p5a_filename, cwd=IN_P5a)
+
+		# 西蓮的 git 目錄不同, 所以要另外處理
+		if globals['coll'] == 'DA' or globals['coll'] == 'HM' or globals['coll'] == 'ZY':
+			IN_Seeland = cbwork_dir + '/cbeta_project/' + globals['coll']
+			# c:/cbwork/xml-p5a/HM/HM01\HM01n0001.xml
+			# c:/cbwork/cbeta_project/HM/xml-p5a/HM01\HM01n0001.xml
+			see_filename = p5a_filename
+			see_filename = see_filename.replace('xml-p5a/HM','cbeta_project/HM/xml-p5a')
+			see_filename = see_filename.replace('xml-p5a/DA','cbeta_project/DA/xml-p5a')
+			see_filename = see_filename.replace('xml-p5a/ZY','cbeta_project/ZY/xml-p5a')
+			
+			git_date = subprocess.check_output('git log -1 --pretty=format:"%ai" ' + see_filename, cwd=IN_Seeland)
+		else:
+			git_date = subprocess.check_output('git log -1 --pretty=format:"%ai" ' + p5a_filename, cwd=IN_P5a)
+
 		r += '\t<date>' + git_date.decode() + '</date>\n'
 		r += '\t\t' + node.end_tag()
 		return r

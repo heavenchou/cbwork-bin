@@ -113,6 +113,8 @@ sub h2t()
 		
 		#s#<span class="corr">(.*?)</span>#$1#g;		# 因為標記有巢狀, 所以要先處理
 		s/<img src=['"][^>]*['"]>/【圖】/g; 	# <img src="C:\cbeta\CBReader\Figures\T\T18014601.gif">
+		#<span class='figdesc'>（立菩提願、發心菩提、修悲濟行、伏心菩提、住性空見、明心菩提）</span>
+		s/<span class='figdesc'>（.*?）<\/span>//g;
 		
 		# <font face="siddam">扣</font>(<span class="nonhan">hā</span>)
 		# <font face="siddam">扣</font>(<span class="foreign">hā</span>)

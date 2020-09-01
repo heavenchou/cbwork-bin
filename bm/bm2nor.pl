@@ -397,7 +397,7 @@ reinitial();                    #初值設定
 
 while($line=shift(@all_sutra))	# 取得每一行資料
 {
-	next if($line !~ /^[TXJZIABCDFGKLMNPQSUY]/);
+	next if($line !~ /^[A-Z]/);
 	$line =~ /^\D+\d+n(.{5}).{8}(...)/;
 	$now_sutra = $1;
 
@@ -458,6 +458,11 @@ sub makefile()
 {
 	local $_;
 	$filename = getfilename();
+	if($filename !~ /^\D+\d\d\d+[a-zA-Z]?_\d\d\d/) { 
+		print ERR "檔名格式錯誤: $filename\n";
+		exit_show_err_msg("檔名格式錯誤: $filename");
+	}
+	
 	mkdir ("$outdir", "0777") if (not -d $outdir);
 	mkdir ("$outdir$format", "0777") if (not -d "$outdir$format");
 	mkdir ("$outdir$format/$vol_head", "0777") if (not -d "$outdir$format/$vol_head");
@@ -589,6 +594,7 @@ sub print_jun_head()
 # G 佛教大藏經 (Fojiao Canon) 　 【教藏】
 # GA 中國佛寺史志彙刊 (Zhongguo Fosi Shizhi Huikan) 【志彙】
 # GB 中國佛寺志叢刊 (Zhongguo Fosizhi Congkan) 【志叢】
+# HM 惠敏法師蓮風集 (the Seeland Works of Ven Huimin) 【惠敏】
 # K 高麗大藏經 (Tripitaka Koreana) （高麗藏） 【麗】
 # L 乾隆大藏經(新文豐版) (Qianlong Edition of the Canon(Xinwenfeng Edition)) （清藏、龍藏、乾隆藏） 【龍】
 # M 卍正藏經(新文豐版) (Manji Daizokyo(Xinwenfeng Edition)) （卍正藏） 【卍正】
@@ -720,6 +726,11 @@ sub print_jun_head()
 	{
 		$sutraver_c = "道安長老全集";
 		$sutraver_e = "the Complete Works of Ven Daoan";
+	}
+	elsif($vol_head eq "HM")
+	{
+		$sutraver_c = "惠敏法師蓮風集";
+		$sutraver_e = "the Seeland Works of Ven Huimin";
 	}
 	elsif($vol_head eq "U")
 	{
@@ -2224,6 +2235,11 @@ s之後的第一個Ｐ：變成二個空格。（是否是不管之前的繼承�
 			s/<[ABCEY]>/$fullspace4/;
 			next;
 		}
+		if($thistag =~ /<\/?border>/)
+		{
+			s/<\/?border>//;
+			next;
+		}	
 		
 =begin		
 		if($thistag eq "Ｐ")
