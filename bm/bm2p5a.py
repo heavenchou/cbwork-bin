@@ -1555,6 +1555,7 @@ def convert():
 	f1=open(BMJingWen, "r", encoding="utf8")
 	reo=re.compile(r'\[[^>\[]*?\]') # 組字式
 	globals['sutraNumber'] = ''
+	if not 'normal_lg' in globals: globals['normal_lg'] = False
 	for line in f1:
 		char_count = 1
 		line=line.rstrip()
