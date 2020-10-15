@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2020/09/06 改用新的偈頌規則，支援 caesura。
 2020/06/05 修訂中若沒有文字，則在註解中要使用〔－〕來表示。
 2020/06/01 處理作譯者全型空格變成半型的問題。
 2020/06/01 處理 ZW10 一些標記巢狀問題。
@@ -597,7 +598,145 @@ def start_inline_o(tag):
 	start_div(opens['div']+1, 'orig')
 	opens['orig'] = 1
 
+def start_inline_S(tag):
+	global globals
+	if not 'lg' in opens: opens['lg'] = 0
+	if not 'lg_marginleft' in globals: globals['lg_marginleft'] = 0
+	if not 'normal_lg' in globals: globals['normal_lg'] = True
+	
+	if opens['lg'] == 1:
+		closeTags('l','lg')
+	if opens['lg'] == 0:
+		closeTags('cb:jhead', 'cb:juan', 'byline', 'p')
+		close_head()
+		opens['lg'] = 1
+	globals['lg_marginleft'] = 1
+	mo = re.search(r'<S,?(\d*),?(\-?\d*),?(\d*)>', tag)
+	if mo!=None:
+		globals['normal_lg'] = True
+		# <lg xml:id="..."
+		out('<lg xml:id="lg%sp%s%s%02d"' % (vol, old_pb, line_num, char_count))
+		# style="..."
+		if(mo.group(1) != '' and mo.group(1) != '1') or (mo.group(2) != '' and mo.group(2) != '0'):
+			out(' style="')
+			if mo.group(1) != '' and mo.group(1) != '1':
+				out('margin-left:%sem;' % mo.group(1))
+				globals['lg_marginleft'] = int(mo.group(1))
+			if mo.group(2) != '' and mo.group(2) != '0':
+				out('text-indent:%sem;' % mo.group(2))
+			out('"')
+		# cb:place="..."
+		if char_count>1: out(' cb:place="inline"')		# 若是行中段落, 則加上 cb:place="inline"
+		out('>')
+
+		# <l style="...">'
+		if mo.group(3) != '' and mo.group(3) != '0':
+			out('<l style="text-indent:%sem;">' % mo.group(3))
+		else:
+			out('<l>')
+		record_open('l')
+		globals['lg_space_count'] = 1
+	else:
+		out('<err S 標記不合法 %s>' % tag)
+		print('錯誤 : S 標記不合法 %s' % tag)
+
+# 處理空白, 主要是針對偈頌的空白
+# 行首空白換成 <l>, 要考慮偈頌的 left-margin
+# 行中空白換成 <caesura>
+def start_inline_space(tag):
+	global globals
+	if tag == '<nosp>':	space_length = 0
+	else: space_length = len(tag)
+
+	# 在 lg 中才要處理
+	if opens['lg'] == 1:
+		if globals['lg_space_count'] == 0:
+			# 第一個空白要處理成 <l>
+			s = space_length - int(globals['lg_marginleft'])
+			if s == 0:
+				# l 空白和 lg 的移位相同, 就用 <l> 即可
+				out('<l>')
+			elif s > 0:
+				out('<l style="text-indent:%sem">' % s)
+			else:
+				# 錯誤, s 不可以為負
+				out('<err 有負數的 text-indent:%sem:%s>' % (s, tag))
+				print('錯誤 : 算出負數的 text-indent:%s:%s:' % (s, tag))
+			record_open('l')
+			globals['lg_space_count'] += 1
+		else:
+			# 其他空白要處理成 <casesura>
+			if space_length == 2:
+				out('<caesura/>')
+			else:
+				out('<caesura style="text-indent:%sem;"/>' % space_length)
+	else:
+		# 非偈頌空白就交給 do_chars
+		do_chars(tag)
+
 def start_inline_T(tag):
+	global globals, opens
+	if not 'lg' in opens: opens['lg'] = 0
+	if not 'TL_count' in globals: globals['TL_count'] = 0
+	if not 'lg_marginleft' in globals: globals['lg_marginleft'] = 0
+
+	if opens['lg']==0:
+		closeTags('cb:jhead', 'cb:juan', 'byline', 'p')
+		close_head()
+
+	moTL = re.search(r'<TL,?(\d*),?(\-?\d*),?(\d*)>', tag)
+	moT = re.search(r'<T,?(\d*)>', tag)
+	
+	if moTL!=None:
+		if globals['TL_count'] == 0:
+			# 第一個 TL
+				
+			# <lg xml:id="..."
+			out('<lg xml:id="lg%sp%s%s%02d"' % (vol, old_pb, line_num, char_count))
+			# style="..."
+			if(moTL.group(1) != '' and moTL.group(1) != '1') or (moTL.group(2) != '' and moTL.group(2) != '0'):
+				out(' style="')
+				if moTL.group(1) != '' and moTL.group(1) != '1':
+					out('margin-left:%sem;' % moTL.group(1))
+					globals['lg_marginleft'] = moTL.group(1)
+				if moTL.group(2) != '' and moTL.group(2) != '0':
+					out('text-indent:%sem;' % moTL.group(2))
+				out('"')
+			# cb:place="..."
+			if char_count>1: out(' cb:place="inline"')		# 若是行中段落, 則加上 cb:place="inline"
+			out('>')
+
+			# <l style="...">'
+			if moTL.group(3) != '' and moTL.group(3) != '0':
+				out('<l style="text-indent:%sem;">' % moTL.group(3))
+			else:
+				out('<l>')
+			opens['lg'] = 1
+			record_open('l')
+			globals['TL_count'] += 1
+		else:
+			# 第二個 TL
+			closeTags('l')
+			# <l style="...">'
+			if moTL.group(1) != '' and moTL.group(1) != '0':
+				out('<l style="text-indent:%sem;">' % moTL.group(1))
+			else:
+				out('<l>')
+			record_open('l')
+	elif moT!=None:
+		# <T,x>
+		# <caesura style="..."/>'
+		if moT.group(1) == '':
+			out('<caesura style="text-indent:0em;"/>')
+		elif moT.group(1) == '2':
+			out('<caesura/>')
+		else:
+			out('<caesura style="text-indent:%sem;"/>' % moT.group(1))
+	else:
+		out('<err T 標記不合法 %s>' % tag)
+		print('錯誤 : T 標記不合法 %s' % tag)
+
+def start_inline_T_old(tag):
 	if not 'lg' in opens: opens['lg'] = 0
 	if opens['lg']==0:
 		closeTags('cb:jhead', 'cb:juan', 'byline', 'p')
@@ -644,7 +783,7 @@ def start_inline_a(tag):
 
 # 處理經文中的標記
 def inline_tag(tag):
-	global char_count, buf, L_type
+	global char_count, buf, L_type, globals
 	#print(tag, sep=' ', end='')
 	if re.match(r'<\[(([\da-zA-Z]{2,3})|＊)\]>', tag):	# 在 do_corr_normalize 處理過的校勘數字 , 原來為 <[01]> , 要直接處理成 [01]
 		out(tag[1:-1])
@@ -724,17 +863,14 @@ def inline_tag(tag):
 	elif tag.startswith('<J'):
 		start_J(tag)
 	elif tag=='<L_sp>':
-		start_inline_Lsp(tag)
-	elif tag =='<l>':
-		out('<l>')	# 行首標記有 S 及 s 時, 會在行中自動將空格變成 <l></l></lg> 等標記
-	elif tag =='</l>':	out('</l>')	# 行首標記有 S 及 s 時, 會在行中自動將空格變成 <l></l></lg> 等標記
-		
+		start_inline_Lsp(tag)		
 	elif tag.startswith('<lem'):
 		out(tag)
 	elif tag=='</lem>':
 		out(tag)
-	elif tag =='</lg>':	out('</lg>')	# 行首標記有 S 及 s 時, 會在行中自動將空格變成 <l></l></lg> 等標記
-	elif tag =='</L>':
+	elif tag=='</l>':
+		closeTags('l')
+	elif tag=='</L>':
 		closeTags('p')
 		L_type = ""
 		while opens['list']>0:
@@ -765,6 +901,10 @@ def inline_tag(tag):
 		out('<term cb:behaviour="no-norm">')
 	elif tag=='</no_chg>':
 		out('</term>')
+	elif tag=='<nosp>':
+		start_inline_space(tag)
+	elif tag.startswith('　'):
+		start_inline_space(tag)
 	elif tag.startswith('<note'):
 		out(tag)
 	elif tag=='</note>':
@@ -809,9 +949,14 @@ def inline_tag(tag):
 	elif tag=='<reg>':
 		out(tag)
 	elif tag=='</reg>':
-		out(tag)		
+		out(tag)
 	elif tag=='<S>':
-		start_S(tag)
+		start_inline_S(tag)
+	elif tag.startswith('<S,'):
+		start_inline_S(tag)
+	elif tag=='</S>':
+		globals['normal_lg'] = False
+		closeTags('lg')
 	elif tag=='<sd>':
 		out('<term xml:lang="sa-Sidd">')
 		opens['term'] = 1
@@ -835,7 +980,8 @@ def inline_tag(tag):
 		start_trans_mark(tag)
 	elif tag.startswith('<T'):
 		start_inline_T(tag)
-	elif tag=='</T>':
+	elif tag=='</T>' or tag=='</TL>':
+		globals['TL_count'] = 0
 		closeTags('l', 'lg')
 	elif tag=='<u>':
 		start_inline_u(tag)
@@ -1006,7 +1152,7 @@ def do_normalize_new(text):
 	先把 [xxx] 組字或校勘數字變成 :gaiji1:xxx:gaiji2:
 	先把 <xxx> 組字或校勘數字變成 :gaiji3:xxx:gaiji4:
 	把[Ａ=Ｂ] 換成 
-	<note n="0027a1301" resp="CBETA" type="add" subtype="規範字詞">Ｂ【CB】，Ａ【呂澂】</note><app n="0027a1301"><lem wit="【CB】"　resp="CBETA">Ｂ</lem><rdg wit="【呂澂】">Ａ</rdg></app>
+	<note n="0027a1301" resp="CBETA" type="add" subtype="規範字詞">Ｂ【CB】，Ａ【呂澂】</note><app n="0027a1301"><lem wit="【CB】" resp="CBETA">Ｂ</lem><rdg wit="【呂澂】">Ａ</rdg></app>
 	再把:gaiji1:xxx:gaiji2: 換回 [xxx]
 	再把:gaiji3:xxx:gaiji4: 換回 <xxx>
 	'''
@@ -1042,25 +1188,11 @@ def do_normalize_old(text):
 	text = re.sub(":gaiji4:", ">", text)
 	return text
 	
-'''
-把這種
-T04n0213_p0794a23D##[>法集要頌經樂品第三十]<S>　[06]忍勝則怨賊，　　自負則自鄙，
-把 <S> 後面的空格換成 <l></l>
-'''
-def do_tag_s(text):
-	while re.search("<S>.*　　", text):
-		text = re.sub(r"(<S>.*)　　", r"\1</l><l>", text)
-	while re.search("<S>.*　", text):
-		text = re.sub(r"(<S>.*)　", r"\1<l>", text)
-	if re.search("<S>", text):
-		text = text + "</l>\n";
-	return text
-
 # 分析每一行經文
 def do_text(s):
-	tokens = re.findall(r'(<i>\(|\)</i>|<.*?>|\[[^\]]*?>.*?\]|\[[^>\[ ]+?\]|\(|\)|&SD\-\w{4};|&RJ\-\w{4};|.)', s)
+	tokens = re.findall(r'(<i>\(|\)</i>|<.*?>|\[[^\]]*?>.*?\]|\[[^>\[ ]+?\]|\(|\)|&SD\-\w{4};|&RJ\-\w{4};|　+|.)', s)
 	for t in tokens:
-		if re.match('[<\(\)\[&]', t): inline_tag(t)	# 處理經文中的標記
+		if re.match('[<\(\)\[&　]', t): inline_tag(t)	# 處理經文中的標記和空格
 		else: do_chars(t)							# 處理經文中的文字
 	return s
 
@@ -1164,16 +1296,18 @@ def start_inline_byline(tag):
 	opens['byline'] = 1
 
 def start_S(tag):
+	global globals
 	if not 'lg' in opens: opens['lg'] = 0
+	if not 'lg_marginleft' in globals: globals['lg_marginleft'] = 0
+	if not 'normal_lg' in globals: globals['normal_lg'] = True
 	if opens['lg']==0:
 		closeTags('cb:jhead', 'cb:juan', 'byline', 'p')
 		close_head()
+		globals['lg_marginleft'] = 1
 		out('<lg xml:id="lg%sp%s%s01">' % (vol, old_pb, line_num))
 		opens['lg'] = 1
+		globals['normal_lg'] = True
 	closeTags('l')
-	
-def start_s(tag):
-	opens['lg'] = 0
 
 def start_x(tag):
 	global buf, div_head, globals
@@ -1258,15 +1392,8 @@ def do_line_head(tag, text):
 			start_p(tag)	# 依 p 的方式處理
 	elif 'S' in tag: 
 		start_S(tag)
-		text = re.sub("　　", "</l><l>", text)
-		text = re.sub("　", "<l>", text)
-		text = text + "</l>\n";
 	elif 's' in tag:
-		start_s(tag)
-		text = re.sub("　　", "</l><l>", text)
-		text = re.sub("　", "<l>", text)
-		text = text + "</l></lg>\n";
-		text = re.sub(r"(</Q\d*>)(</l></lg>)$", r"\2\1", text)	# 把 </Qx> 移到後面, 例: B10n0068_p0839b03s##　能令清淨諸儀軌　　如智者論顯了說</Q1>
+		text = text + "</S>"
 	elif 'x' in tag: start_x(tag)
 	elif 'Z' in tag: start_p(tag)
 	else: 
@@ -1423,7 +1550,7 @@ def sutraInit(newSutraNumber):
 	globals['sutraNumber'] = newSutraNumber
 
 def convert():
-	global buf, char_count, fo, head_tag, line_num, old_pb
+	global buf, char_count, fo, head_tag, line_num, old_pb, globals
 	print('BMJingWen:', BMJingWen, file=log)
 	f1=open(BMJingWen, "r", encoding="utf8")
 	reo=re.compile(r'\[[^>\[]*?\]') # 組字式
@@ -1470,6 +1597,19 @@ def convert():
 		buf += ' ed="{}" n="{}"/>'.format(ed, pb+line_num)
 		
 		text = do_line_head(head_tag, text)	# 因為 S 標記會把空格處理成 <l></l> , 所以要有傳回處理過的 text
+		globals['lg_space_count'] = 0	# 每一行的空格數歸0
+
+		# 變數
+		# globals['lg_space_count'] : 每一行第 n 個 <l>，計數會在每一行歸零, 在偈頌中遇到空白就會 +1
+		# globals['lg_marginleft'] : 偈頌的整段位移，會在 lg 產生時重設, 通常預設是 1
+		# globals['normal_lg'] : 表示是使用 S## 或 <S> 的標準偈頌, 不是 <T> 的偈頌
+		if not 'lg' in opens: opens['lg'] = 0
+		if opens['lg'] == 1 and globals['normal_lg'] == True:
+			if not re.match(r'^　', text): text = "<nosp>" + text
+		if (opens['lg'] == 1 and globals['normal_lg'] == True) or '<S' in text: # <S 會在行中
+			if text[-4:] == "</S>": text = text[:-4] + "</l></S>"
+			else: text = text + "</l>"
+			text = re.sub(r"(</Q\d*>)(</l></S>)$", r"\2\1", text)	# 把 </Qx> 移到後面, 例: 	B10n0068_p0839b03s##　能令清淨諸儀軌　　如智者論顯了說</Q1>
 
 		'''
 		先把 [Ａ>Ｂ] 換成
@@ -1484,14 +1624,9 @@ def convert():
 		'''
 		text = do_corr_normalize(text)
 				
-		'''
-		把這種
-		T04n0213_p0794a23D##[>法集要頌經樂品第三十]<S>　[06]忍勝則怨賊，　　自負則自鄙，
-		把 <S> 後面的空格換成 <l></l>
-		'''
-		text = do_tag_s(text)
-		
+		# 處理一般文字
 		do_text(text)
+
 	close_sutra(globals['sutraNumber'])
 	f1.close()
 
