@@ -37,6 +37,7 @@ u8-b5.py
 2009.12.02 Ray: 從 Unicode 網站取得 Unihan.txt, 取出裏面的異寫字資訊 kCompatibilityVariant, 放在 variant
 
 Heaven 修改:
+2020/10/16 加上特殊字'々'的處理，這種字 python 認為有 big5 可以轉. 
 2017/10/29 取消通用詞
 2017/10/29 取消 -n 參數, 加上 -u [dnx] 和 -r [dnx] 參數, 詳見功能說明
 2017/10/28 修改缺字的讀取, 原本讀取 MS Access 資料庫改成讀純文字 csv 檔, 速度快很多
@@ -50,7 +51,7 @@ Heaven 修改:
 
 import configparser, os, codecs, sys, csv
 from optparse import OptionParser
-import win32com.client # 要安裝 PythonWin
+#import win32com.client # 要安裝 PythonWin
 import re
 
 #################################################
@@ -1384,8 +1385,11 @@ def trans_file(fn1, fn2):
 		new = ''
 		for c in line:
 			try:
-				temp = c.encode('cp950') # 測試能否編碼為 cp950
-				new += c
+				if c == '々':
+					new += '[?夕]'
+				else:
+					temp = c.encode('cp950') # 測試能否編碼為 cp950
+					new += c
 			except:
 				new += u8tob5(c)
 		f2.write(new)
