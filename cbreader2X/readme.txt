@@ -12,6 +12,7 @@
     5. 產生各經文的目錄 toc -----> 要處理 <g> 缺字
     6. 產生經文目錄 catalog  ----> 手動處理大般若經, 部別, <g> 缺字
     7. 產生經文流水順序 spine
+    8. 別忘了要做新增經文的 epub 封面圖檔
 
 其中 sutralist , catalog 的資料都要同時包含跨冊的記錄, 例如
 
@@ -60,9 +61,7 @@ catalog 雖然有多份, 但都連結到同一卷嗎? 例 點 A121n1565 經, 要到 33 卷嗎?
 
 ■ 產生導覽目錄 nav
 
-	若有新的典籍加入，要修改 bulei.xlsx , 並貼成純文字檔 bulei.txt
-	
-	也要處理 simple_nav.xlsx, advance_nav.xlsx , 並貼成對應的純文字檔
+	若有新的典籍加入，要處理 simple_nav.xlsx, advance_nav.xlsx , 並貼成對應的純文字檔
 
 	【執行 nav.bat , 西蓮版執行 nav_slreader.bat】
 	

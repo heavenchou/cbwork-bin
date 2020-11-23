@@ -89,7 +89,9 @@ sub h2t()
 		# <a class='noteAnchor' href='#n0001001'></a>
 		# <a class='noteAnchor' href='#n0004002-n01'>
 		# <a class='noteAnchor' href='#n0272003A'></a>
+		# <a class="noteAnchor" href="#n0032002-n11"/>
 		s/<a class=['"]noteAnchor['"] href=['"]#n....0?(\d{2,3}[A-Z]?)['"\-].*?><\/a>/[$1]/g;
+		s/<a class=['"]noteAnchor['"] href=['"]#n....0?(\d{2,3}[A-Z]?)['"\-].*?\/>/[$1]/g;
 		
 		# 卍續 <a class='noteAnchor' href='#n0600b01' data-label='標01'></a>
 		# 卍續 <a class='noteAnchor' href='#n0524k01' data-label='科01'></a>
@@ -100,20 +102,32 @@ sub h2t()
 		s/<a class=['"]noteAnchor['"] href=['"]#n....j(\d\d)['"].*?><\/a>/[解$1]/g;
 		s/<a class=['"]noteAnchor['"][^>]*data\-label=['"]([科標解]\d+)['"]><\/a>/[$1]/g;
 		s/<a class=['"]noteAnchor['"][^>]*data\-label=['"]&#x79D1;(\d+)['"]><\/a>/[科$1]/g;
+
+		s/<a class=['"]noteAnchor['"] href=['"]#n....k(\d\d)['"].*?\/>/[科$1]/g;
+		s/<a class=['"]noteAnchor['"] href=['"]#n....b(\d\d)['"].*?\/>/[標$1]/g;
+		s/<a class=['"]noteAnchor['"] href=['"]#n....j(\d\d)['"].*?\/>/[解$1]/g;
+		s/<a class=['"]noteAnchor['"][^>]*data\-label=['"]([科標解]\d+)['"]\/>/[$1]/g;
+		s/<a class=['"]noteAnchor['"][^>]*data\-label=['"]&#x79D1;(\d+)['"]\/>/[科$1]/g;
 		
 		# 星號
 		# <a class='noteAnchor star' href='#n0001004'></a>
 		s/<a class=['"]noteAnchor star['"][^>]*><\/a>/[＊]/g;
+		s/<a class=['"]noteAnchor star['"][^>]*\/>/[＊]/g;
 		
 		# 新增校註
 		# <a class='noteAnchor add' href='#cb_note_1'></a>
 		s/<a class=['"]noteAnchor add['"][^>]*><\/a>/[A]/g;
+		# <a class="noteAnchor add" href="#cb_note_7"/>
+		s/<a class=['"]noteAnchor add['"][^>]*\/>/[A]/g;
 
 		# 圖
 		# <p class='figure'>
 		s/<p class=['"]figure['"]>/【圖】/g;
 		# 2019Q3 改成 <span imgsrc='B04p1381_01.gif' class='graphic'></span>
 		s/<span [^>]*class=['"]graphic['"][^>]*><\/span>/【圖】/g;
+		# 2020Q4 改成 <img src="https://raw.githubusercontent.com/cbeta-git/CBR2X-figures/master/K/K35p0182_01.gif" class="graphic" />
+		s/<img [^>]*class=['"]graphic['"][^>]*><\/img>/【圖】/g;
+		s/<img [^>]*class=['"]graphic['"][^>]*\/>/【圖】/g;
 		
 		# 雙行小註
 		# <span class='doube-line-note'>闍尼沙秦言勝結使</span>
