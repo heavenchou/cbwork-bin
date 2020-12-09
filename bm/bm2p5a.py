@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2020/12/08 <sub>, <sup> 標記要由 rend 改成 style。
 2020/09/06 改用新的偈頌規則，支援 caesura。
 2020/06/05 修訂中若沒有文字，則在註解中要使用〔－〕來表示。
 2020/06/01 處理作譯者全型空格變成半型的問題。
@@ -968,11 +969,11 @@ def inline_tag(tag):
 	elif tag=='<space quantity="0"/>':
 		out2(tag)
 	elif tag=='<sub>':
-		out('<hi rend="vertical-align:sub">')
+		out('<hi style="vertical-align:sub">')
 	elif tag=='</sub>':
 		out2("</hi>")
 	elif tag=='<sup>':
-		out('<hi rend="vertical-align:super">')
+		out('<hi style="vertical-align:super">')
 	elif tag=='</sup>':
 		out2("</hi>")
 	elif tag=='<sic>':
