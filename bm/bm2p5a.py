@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2020/12/22 支援斜體<it>、粗體<bold>及楷<kai>、明<ming>、宋<song>、黑體<hei>標記。
 2020/12/08 <sub>, <sup> 標記要由 rend 改成 style。
 2020/09/06 改用新的偈頌規則，支援 caesura。
 2020/06/05 修訂中若沒有文字，則在註解中要使用〔－〕來表示。
@@ -287,7 +288,7 @@ def start_trans_mark(tag):
 	out(s)
 
 def start_p(tag):
-	closeTags('cb:jhead', 'cb:juan', 'p', 'byline', 'head')
+	closeTags('seg', 'cb:jhead', 'cb:juan', 'p', 'byline', 'head')
 	closeTags('l', 'lg')
 	r = get_number(tag)
 	out('<p xml:id="p%sp%s%s01"' % (vol, old_pb, line_num))
@@ -301,7 +302,7 @@ def start_p(tag):
 	opens['p']=1
 
 def start_inline_p(tag):
-	closeTags('cb:jhead', 'cb:juan', 'p', 'byline')
+	closeTags('seg', 'cb:jhead', 'cb:juan', 'p', 'byline')
 	close_head()
 	closeTags('l', 'lg')
 	s = '<p xml:id="p%sp%s%s%02d"' % (vol, old_pb, line_num, char_count)
@@ -818,10 +819,16 @@ def inline_tag(tag):
 		out(tag)
 	elif re.match(r'<[ABCEY]>', tag):
 		start_inline_byline(tag)
+	elif tag=='<bold>':
+		out('<seg rend="bold">')
+		record_open('seg')
+	elif tag=='</bold>':
+		closeTags('seg')	
 	elif tag=='<border>':
 		out('<seg rend="border">')
+		record_open('seg')
 	elif tag=='</border>':
-		out('</seg>')
+		closeTags('seg')
 	elif re.match(r'<c[\d\s>]', tag):
 		start_inline_c(tag)
 	elif tag=='<corr>':
@@ -843,22 +850,32 @@ def inline_tag(tag):
 		close_e(tag)
 	elif tag=='<event>':
 		start_inline_event(tag)
+	elif tag=='<formula>':
+		out('<formula>')
+	elif tag=='</formula>':
+		out2("</formula>")
 	elif tag=='</F>':
 		close_F(tag)
+	elif tag=='<hei>':
+		out('<seg rend="heiti">')
+		record_open('seg')
+	elif tag=='</hei>':
+		closeTags('seg')
 	elif tag.startswith('<h'):
 		start_inline_h(tag)
 	elif tag.startswith('</h'):
 		close_h(tag)
 	elif re.match(r'<I\d*>', tag):
 		start_i(tag)
-	elif tag=='<formula>':
-		out('<formula>')
-	elif tag=='</formula>':
-		out2("</formula>")
 	elif tag=='<i>(':
 		out2('<note place="interlinear">')
 	elif tag==')' or tag==")</i>":
 		out2('</note>')
+	elif tag=='<it>':
+		out('<seg rend="italic">')
+		record_open('seg')
+	elif tag=='</it>':
+		closeTags('seg')
 	elif tag =='<j>':
 		closeTags('p')
 		out('<cb:juan fun="close"><cb:jhead>')
@@ -866,6 +883,11 @@ def inline_tag(tag):
 		record_open('cb:jhead')
 	elif tag.startswith('<J'):
 		start_J(tag)
+	elif tag=='<kai>':
+		out('<seg rend="kaiti">')
+		record_open('seg')
+	elif tag=='</kai>':
+		closeTags('seg')
 	elif tag=='<L_sp>':
 		start_inline_Lsp(tag)		
 	elif tag.startswith('<lem'):
@@ -879,6 +901,11 @@ def inline_tag(tag):
 		L_type = ""
 		while opens['list']>0:
 			closeTag('item', 'list')
+	elif tag=='<ming>':
+		out('<seg rend="mingti">')
+		record_open('seg')
+	elif tag=='</ming>':
+		closeTags('seg')
 	elif tag.startswith('<mj'):
 		closeTags('byline', 'cb:jhead', 'cb:juan')
 		#n=get_number(tag)
@@ -934,8 +961,6 @@ def inline_tag(tag):
 		start_inline_p(tag)
 	elif tag == '</p>':
 		closeTags('p')
-	elif tag == '</P>':
-		closeTags('p')
 	elif re.match(r'<quote .*?>', tag):	# 出處連結, 例如 : ZY01n0001_p0020a02_##...佛於經中說，<quote T09n0262_p0007c07-09>舍利弗！汝等當一心...</quote>
 		# 要做成 <quote source="CBETA.T09n0262_p0007c07-09">
 		mo = re.match(r'<quote (.*?)>', tag)
@@ -966,6 +991,11 @@ def inline_tag(tag):
 		opens['term'] = 1
 	elif tag=='</sd>':
 		closeTags('term')
+	elif tag=='<song>':
+		out('<seg rend="songti">')
+		record_open('seg')
+	elif tag=='</song>':
+		closeTags('seg')
 	elif tag=='<space quantity="0"/>':
 		out2(tag)
 	elif tag=='<sub>':
