@@ -3852,13 +3852,10 @@ N 漢譯南傳大藏經（元亨寺版）
 近代新編文獻					
 	ZW 藏外佛教文獻				
 		第一輯			
-			help/other/ZW01/ZW01a.htm 緣起		
-			卷首語		
-				help/other/ZW01/ZW01b-1.htm 中文	
-				help/other/ZW01/ZW01b-2.htm 英文	
-				help/other/ZW01/ZW01b-3.htm 日文	
-			help/other/ZW01/ZW01c.htm 目錄		
-			help/other/ZW01/ZW01d.htm 錄文校勘體例		
+			ZWa001 緣起		
+			ZWa002 卷首語		
+			ZWa003 目錄		
+			ZWa004 錄文校勘體例		
 			敦煌禪籍		
 				ZW0001 天竺國菩提達摩禪師論	
 				ZW0002 禪策問答	
@@ -3885,29 +3882,13 @@ N 漢譯南傳大藏經（元亨寺版）
 				ZW0015d 大般涅槃經佛為摩耶夫人說偈品經	
 			研究論文		
 				ZW0016 關於《禪藏》與敦煌禪籍的若干問題	
-			help/other/ZW01/ZW01e.htm 徵稿啟事		
-			help/other/ZW01/ZW01f.htm 《藏外佛教文獻》編委會啟事		
+			ZWa005 徵稿啟事		
+			ZWa006 《藏外佛教文獻》編委會啟事		
 		第二輯			
-			卷首語		
-				help/other/ZW02/ZW02a-1.htm 中文	
-				help/other/ZW02/ZW02a-2.htm 英文	
-				help/other/ZW02/ZW02a-3.htm 日文	
-			help/other/ZW02/ZW02b.htm 目錄		
-			help/other/ZW02/ZW02c.htm 錄文校勘體例		
-			大藏經編纂及電腦化研討會論文特集		
-				help/other/ZW02/ZW02d-1.htm 在大藏經編纂及電腦化研討會上的發言　葉小文	
-				help/other/ZW02/ZW02d-2.htm 關於新編漢文大藏經的意見　吳立民	
-				help/other/ZW02/ZW02d-3.htm 編譯南傳大藏經緣起　吳立民	
-				help/other/ZW02/ZW02d-4.htm 大藏經及其光電版編纂芻議　方廣錩	
-				help/other/ZW02/ZW02d-5.htm 關於製作大藏經電子文庫的工程技術方案　中國綜合開發研究院古籍電子化課題組	
-				help/other/ZW02/ZW02d-6.htm 電腦化大藏經工程意義重大勢在必行　王志遠	
-				help/other/ZW02/ZW02d-7.htm 關於製作大藏經電子文庫的技術經濟背景概述　中國綜合開發研究院古籍電子化課題組	
-				help/other/ZW02/ZW02d-8.htm 日本近代以來的大藏經編印事業　楊曾文	
-				help/other/ZW02/ZW02d-9.htm 《中華大藏經》編輯工作的一些情況和經驗教訓　李富華	
-				help/other/ZW02/ZW02d-10.htm 臺灣編印《中華大藏經》始末　張新鷹	
-				help/other/ZW02/ZW02d-11.htm 海外大藏經編輯及光電版大藏經的情況　方廣錩	
-				help/other/ZW02/ZW02d-12.htm 大藏經編纂及電腦化研討會發言摘要	
-				help/other/ZW02/ZW02d-13.htm 大藏經編纂及電腦化研討會紀要	
+			ZWa007 卷首語		
+			ZWa008 目錄		
+			ZWa009 錄文校勘體例		
+			ZWa010 大藏經編纂及電腦化研討會論文特集		
 			敦煌禪籍		
 				ZW0017 七祖法寶記下卷	
 				ZW0018a 天竺國菩提達摩禪師論	
@@ -3919,15 +3900,12 @@ N 漢譯南傳大藏經（元亨寺版）
 				ZW0021 諦義證得經	
 			遺珠集粹		
 				ZW0022 《瑜伽師地論》披尋記敘	
-			help/other/ZW02/ZW02e.htm 徵稿啟事		
-			help/other/ZW02/ZW02f.htm 徵訂啟事		
+			ZWa011 徵稿啟事		
+			ZWa012 徵訂啟事		
 		第三輯			
-			卷首語		
-				help/other/ZW03/ZW03a-1.htm 中文	
-				help/other/ZW03/ZW03a-2.htm 英文	
-				help/other/ZW03/ZW03a-3.htm 日文	
-			help/other/ZW03/ZW03b.htm 目錄		
-			help/other/ZW03/ZW03c.htm 錄文校勘體例		
+			ZWa013 卷首語		
+			ZWa014 目錄		
+			ZWa015 錄文校勘體例		
 			敦煌禪籍		
 				ZW0023 菩薩總持法	
 				ZW0024 大乘起世論	
@@ -3946,19 +3924,14 @@ N 漢譯南傳大藏經（元亨寺版）
 				ZW0031e 觀佛三昧海經本行品第八	
 			研究論文		
 				ZW0032 《金藏》新資料考	
-			help/other/ZW03/ZW03d.htm 《藏外佛教文獻》第一、二輯要目		
-			help/other/ZW03/ZW03e.htm 徵稿啟事		
-			編委會名單		
-				help/other/ZW03/ZW03f-1.htm 中文	
-				help/other/ZW03/ZW03f-2.htm 英文	
-			help/other/ZW03/ZW03g.htm 鳴謝		
+			ZWa016 《藏外佛教文獻》第一、二輯要目		
+			ZWa017 徵稿啟事		
+			ZWa018 編委會名單		
+			ZWa019 鳴謝		
 		第四輯			
-			卷首語		
-				help/other/ZW04/ZW04a-1.htm 中文	
-				help/other/ZW04/ZW04a-2.htm 英文	
-				help/other/ZW04/ZW04a-3.htm 日文	
-			help/other/ZW04/ZW04b.htm 目錄		
-			help/other/ZW04/ZW04c.htm 錄文校勘體例		
+			ZWa020 卷首語		
+			ZWa021 目錄		
+			ZWa022 錄文校勘體例		
 			漢譯藏文佛典		
 				ZW0033 入菩薩行論廣解	
 			石刻資料		
@@ -3977,19 +3950,14 @@ N 漢譯南傳大藏經（元亨寺版）
 				ZW0043b 如來在金棺囑累清淨莊嚴敬福經	
 			研究論文		
 				ZW0044 傳善無畏所譯三部密教儀軌出處及年代考	
-			help/other/ZW04/ZW04d.htm 「中國社會科學院佛教研究中心成立暨佛教研究與新時期的文化建設研討會」紀要 學迅		
-			help/other/ZW04/ZW04e.htm 《藏外佛教文獻》第一～六輯要目		
-			help/other/ZW04/ZW04f.htm 徵稿啟事		
-			編委會名單		
-				help/other/ZW04/ZW04g-1.htm 中文	
-				help/other/ZW04/ZW04g-2.htm 英文	
+			ZWa023 「中國社會科學院佛教研究中心成立暨佛教研究與新時期的文化建設研討會」紀要 學迅		
+			ZWa024 《藏外佛教文獻》第一～六輯要目		
+			ZWa025 徵稿啟事		
+			ZWa026 編委會名單		
 		第五輯			
-			卷首語		
-				help/other/ZW05/ZW05a-1.htm 中文	
-				help/other/ZW05/ZW05a-2.htm 英文	
-				help/other/ZW05/ZW05a-3.htm 日文	
-			help/other/ZW05/ZW05b.htm 目錄		
-			help/other/ZW05/ZW05c.htm 錄文校勘體例		
+			ZWa027 卷首語		
+			ZWa028 目錄		
+			ZWa029 錄文校勘體例		
 			南傳佛典		
 				ZW0045 小誦	
 				ZW0046 即興自說	
@@ -3999,18 +3967,13 @@ N 漢譯南傳大藏經（元亨寺版）
 				ZW0049 瑜伽師地開釋分門記	
 			研究論文		
 				ZW0050 天台教典入藏考	
-			help/other/ZW05/ZW05d.htm 《藏外佛教文獻》第一～六輯要目		
-			help/other/ZW05/ZW05e.htm 徵稿啟事		
-			編委會名單		
-				help/other/ZW05/ZW05f-1.htm 中文	
-				help/other/ZW05/ZW05f-2.htm 英文	
+			ZWa030 《藏外佛教文獻》第一～六輯要目		
+			ZWa031 徵稿啟事		
+			ZWa032 編委會名單		
 		第六輯			
-			卷首語		
-				help/other/ZW06/ZW06a-1.htm 中文	
-				help/other/ZW06/ZW06a-2.htm 英文	
-				help/other/ZW06/ZW06a-3.htm 日文	
-			help/other/ZW06/ZW06b.htm 目錄		
-			help/other/ZW06/ZW06c.htm 錄文校勘體例		
+			ZWa033 卷首語		
+			ZWa034 目錄		
+			ZWa035 錄文校勘體例		
 			阿吒力教典籍		
 				ZW0051 楞嚴解冤釋結道場儀	
 				ZW0052 地藏慈悲救苦薦福利生道場儀	
@@ -4021,18 +3984,13 @@ N 漢譯南傳大藏經（元亨寺版）
 				ZW0056 進新譯大方廣佛花嚴經表	
 			研究論文		
 				ZW0057 雲南阿吒力教經典及其在中國佛教研究中的價值	
-			help/other/ZW06/ZW06d.htm 《藏外佛教文獻》第一～六輯要目		
-			help/other/ZW06/ZW06e.htm 徵稿啟事		
-			編委會名單		
-				help/other/ZW06/ZW06f-1.htm 中文	
-				help/other/ZW06/ZW06f-2.htm 英文	
+			ZWa036 《藏外佛教文獻》第一～六輯要目		
+			ZWa037 徵稿啟事		
+			ZWa038 編委會名單		
 		第七輯			
-			卷首語		
-				help/other/ZW07/ZW07a-1.htm 中文	
-				help/other/ZW07/ZW07a-2.htm 英文	
-				help/other/ZW07/ZW07a-3.htm 日文	
-			help/other/ZW07/ZW07b.htm 目錄		
-			help/other/ZW07/ZW07c.htm 錄文校勘體例		
+			ZWa039 卷首語		
+			ZWa040 目錄		
+			ZWa041 錄文校勘體例		
 			三藏論疏		
 				ZW0058 注心要法門	
 			佛教儀軌		
@@ -4056,14 +4014,12 @@ N 漢譯南傳大藏經（元亨寺版）
 				ZW0065 寧夏西夏方塔出土漢文佛典敘錄	
 			研究論文		
 				ZW0066 日本佛教目錄學的形成——以《東域傳燈錄》為中心	
-			help/other/ZW07/ZW07d.htm 《藏外佛教文獻要目》		
-			help/other/ZW07/ZW07e.htm 徵稿啟事		
+			ZWa042 《藏外佛教文獻要目》		
+			ZWa043 徵稿啟事		
 		第八輯			
-			help/other/ZW08/ZW08a.htm 卷首語		
-			help/other/ZW08/ZW08b.htm 目錄		
-			錄文校勘體例		
-				help/other/ZW08/ZW08c-1.htm 錄文校勘體例	
-				help/other/ZW08/ZW08c-2.htm 附：一般組字法基本規則	
+			ZWa044 卷首語		
+			ZWa045 目錄		
+			ZWa046 錄文校勘體例		
 			三藏論疏		
 				ZW0067 華嚴略疏卷第一	
 			阿吒力教典籍		
@@ -4073,15 +4029,13 @@ N 漢譯南傳大藏經（元亨寺版）
 			研究論文		
 				ZW0070 敦煌寺院所藏大藏經概貌	
 				ZW0071 《慧琳音義》與唐代大藏經	
-			help/other/ZW08/ZW08d.htm 《藏外佛教文獻》要目		
-			help/other/ZW08/ZW08e.htm 徵稿啟事		
-			help/other/ZW08/ZW08f.htm 鳴謝		
+			ZWa047 《藏外佛教文獻》要目		
+			ZWa048 徵稿啟事		
+			ZWa049 鳴謝		
 		第九輯			
-			help/other/ZW09/ZW09a.htm 卷首語		
-			help/other/ZW09/ZW09b.htm 目錄		
-			錄文校勘體例		
-				help/other/ZW09/ZW09c-1.htm 錄文校勘體例	
-				help/other/ZW09/ZW09c-2.htm 附：一般組字法基本規則	
+			ZWa050 卷首語		
+			ZWa051 目錄		
+			ZWa052 錄文校勘體例		
 			三階教典籍		
 				ZW0072 佛性觀修善法	
 			三藏論疏		
@@ -4099,14 +4053,14 @@ N 漢譯南傳大藏經（元亨寺版）
 			研究論文		
 				ZW0076 三階教文獻綜述	
 				ZW0077 關於江泌女子僧法誦出經	
-			help/other/ZW09/ZW09d.htm 談當前數字圖書館的幾個問題		
-			help/other/ZW09/ZW09e.htm 《藏外佛教文獻》要目		
-			help/other/ZW09/ZW09f.htm 徵稿啟事		
-			help/other/ZW09/ZW09g.htm 鳴謝		
+			ZWa053 談當前數字圖書館的幾個問題		
+			ZWa054 《藏外佛教文獻》要目		
+			ZWa055 徵稿啟事		
+			ZWa056 鳴謝		
 		第十輯			
-			ZWa069 目錄		
-			ZWa070 卷首語		
-			ZWa071 錄文校勘體例		
+			ZWa057 目錄		
+			ZWa058 卷首語		
+			ZWa059 錄文校勘體例		
 			梵藏典籍新譯		
 				ZW0078 三自性論	
 			漢譯藏文佛典		
@@ -4126,13 +4080,13 @@ N 漢譯南傳大藏經（元亨寺版）
 			研究論文		
 				ZW0087 敦煌本《壇經》錄校三題	
 				ZW0088 明初的兩部南藏	
-			ZWa072 徵稿啟事		
-			ZWa073 《藏外佛教文獻》總目錄（第一輯～第十二輯）		
-			ZWa074 鳴謝		
+			ZWa060 徵稿啟事		
+			ZWa061 《藏外佛教文獻》總目錄（第一輯～第十二輯）		
+			ZWa062 鳴謝		
 		第十一輯			
-			ZWa075 目錄		
-			ZWa076 卷首語		
-			ZWa077 錄文校勘體例		
+			ZWa063 目錄		
+			ZWa064 卷首語		
+			ZWa065 錄文校勘體例		
 			三階教資料		
 				ZW0089 讚禮地藏菩薩懺悔發願法	
 			佛教懺儀		
@@ -4146,13 +4100,13 @@ N 漢譯南傳大藏經（元亨寺版）
 			研究論文		
 				ZW0095 日本的漢文大藏經收藏及其特色——以刻本大藏經為中心	
 				ZW0096 論《高麗再雕藏》中所見的《契丹藏》	
-			ZWa078 徵稿啟事		
-			ZWa079 《藏外佛教文獻》總目錄（第一輯～第十二輯）		
-			ZWa080 鳴謝		
+			ZWa066 徵稿啟事		
+			ZWa067 《藏外佛教文獻》總目錄（第一輯～第十二輯）		
+			ZWa068 鳴謝		
 		第十二輯			
-			ZWa081 目錄		
-			ZWa082 卷首語		
-			ZWa083 錄文校勘體例		
+			ZWa069 目錄		
+			ZWa070 卷首語		
+			ZWa071 錄文校勘體例		
 			三藏論疏		
 				ZW0097 金剛般若經義疏卷二,方廣錩整理	
 			佛教懺儀		
@@ -4165,16 +4119,16 @@ N 漢譯南傳大藏經（元亨寺版）
 				ZW0101 關於《佛說孝順子修行成佛經》的若干新資料,方廣錩	
 				ZW0102 關於宮內廳書陵部所藏福州版大藏經中的混合冊與印章,日本 宮內廳書陵部 中村一紀	
 				ZW0103 漢文大藏經研究要重視文獻價值的判別,熊國禎	
-			ZWa084 徵稿啟事		
-			ZWa085 《藏外佛教文獻》總目錄（第一輯～第十二輯）		
+			ZWa072 徵稿啟事		
+			ZWa073 《藏外佛教文獻》總目錄（第一輯～第十二輯）		
 	ZS 正史佛教資料類編				
-		help/other/ZS01/ZS01a.htm 緣起			
-		help/other/ZS01/ZS01b.htm 前言			
-		help/other/ZS01/ZS01c.htm 說明			
-		help/other/ZS01/ZS01d.htm 目錄			
+		ZSa001 緣起			
+		ZSa002 前言			
+		ZSa003 說明			
+		ZSa004 目錄			
 		ZS0001 正史佛教資料類編			
 	I 北朝佛教石刻拓片百品				
-		help/other/I01/I01.htm 說明			
+		Ia001 說明
 		朝代			
 			北魏		
 				I0001 宕昌公暉福寺碑	

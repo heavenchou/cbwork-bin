@@ -25,15 +25,15 @@ my $path;
 
 if($vol eq "")
 {
-	$path = $cbr_path;
+	$path = $txt_path;
 }
 elsif($vol eq $ed )
 {
-	$path = $cbr_path . $ed . "/";					# /T/
+	$path = $txt_path . $ed . "/";					# /T/
 }
 else
 {
-	$path = $cbr_path . $ed . "/" . $vol . "/";		# /T/T01
+	$path = $txt_path . $ed . "/" . $vol . "/";		# /T/T01
 }
 
 my $output = "";
@@ -49,9 +49,9 @@ sub findfile
 {
 	local $_;
 	my $thispath = $File::Find::dir;
-	my $cbr_file = $File::Find::name;
-	my $txt_file = $cbr_file;
-	$txt_file =~ s#$cbr_path#$txt_path#;
+	my $txt_file = $File::Find::name;
+	my $cbr_file = $txt_file;
+	$cbr_file =~ s#$txt_path#$cbr_path#;
 
 	if($runningpath ne $thispath)
 	{
@@ -117,9 +117,10 @@ sub comp_file
 			}
 			next if($a eq $b);
 
-			if($a =~ /◇◇/)
+			if($a =~ /◇◇/ || $b =~ /◇◇/)
 			{
 				$a =~ s/◇◇+/【◇】/g;
+				$b =~ s/◇◇+/【◇】/g;
 			}
 			next if($a eq $b);
 

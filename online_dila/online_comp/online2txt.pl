@@ -46,6 +46,7 @@ sub findfile
 	$juannum = $2;	# 001
 
 	return if($sutranum lt $start_sutra);
+	#return if($sutranum ne $start_sutra);
 
 	# 處理來源檔
 	open IN, "<:utf8", $File::Find::name;
@@ -72,6 +73,10 @@ sub h2t()
 		{
 			last;
 		}
+		if(/<div id="back">/)
+		{
+			last;
+		}
 		# 頁碼
 		# <pb>0001a</pb>
 		s/<pb>.*?<\/pb>//g;
@@ -79,11 +84,12 @@ sub h2t()
 		# 行首
 		# <span class="lb" id="T01n0001_p0001a01">T01n0001_p0001a01</span>
 		# <span class="lb honorific" id="A098n1276_p0144b08">A098n1276_p0144b08</span>
-		s/<span[^>]*class=['"]lb(?: honorific)?['"][^>]*>((.*?)n.*?)<\/span>/\n${1}║/g;
-		my $thisvol = $2;
-		if($vol eq "" && $thisvol ne "")
-		{
-			$vol = $thisvol;
+		if(s/<span[^>]*class=['"]lb(?: honorific)?['"][^>]*>((.*?)n.*?)<\/span>/\n${1}║/g) {
+			my $thisvol = $2;
+			if($vol eq "" && $thisvol ne "")
+			{
+				$vol = $thisvol;
+			}
 		}
 		# 校勘數字
 		# <a class='noteAnchor' href='#n0001001'></a>
@@ -126,8 +132,10 @@ sub h2t()
 		# 2019Q3 改成 <span imgsrc='B04p1381_01.gif' class='graphic'></span>
 		s/<span [^>]*class=['"]graphic['"][^>]*><\/span>/【圖】/g;
 		# 2020Q4 改成 <img src="https://raw.githubusercontent.com/cbeta-git/CBR2X-figures/master/K/K35p0182_01.gif" class="graphic" />
-		s/<img [^>]*class=['"]graphic['"][^>]*><\/img>/【圖】/g;
-		s/<img [^>]*class=['"]graphic['"][^>]*\/>/【圖】/g;
+		# 取消底下, 發現 GB 有 <img src=".." class="graphic"> , 沒有結束標記
+		#s/<img [^>]*class=['"]graphic['"][^>]*><\/img>/【圖】/g;
+		#s/<img [^>]*class=['"]graphic['"][^>]*\/>/【圖】/g;
+		s/<img [^>]*class=['"]graphic['"][^>]*>/【圖】/g;
 		
 		# 雙行小註
 		# <span class='doube-line-note'>闍尼沙秦言勝結使</span>
@@ -177,17 +185,52 @@ sub output
 		$pre_vol = $vol;
 	}
 
-	my $outfile = $outpath_base . $ed . "/";	# xxx/T/
-	mkdir($outfile);
-	$outfile = $outfile . $vol . "/";	# xxx/T/T01/
-	mkdir($outfile);
+	my $outpath = $outpath_base . $ed . "/";	# xxx/T/
+	mkdir($outpath);
+	mkdir($outpath . $vol . "/");	# xxx/T/T01/
 	
-	$outfile = $outfile . $sutranum . "_" . $juannum . ".txt";
+	my $outfile = $outpath . $vol . "/" . $sutranum . "_" . $juannum . ".txt";
+
+	# 處理一些跨冊的特殊卷
+	my $text2 = "";
+	my $outfile2 = "";
 
 	$text =~ s/^\n//;
+
+	if($outfile =~ /L1557_017\.txt/) {
+		$text =~ s/(L131n1557_p.*)//s;
+		$text2 = $1;
+		$outfile2 = $outfile;
+		$outfile2 =~ s/L130/L131/;
+	}
+	if($outfile =~ /L1557_034\.txt/) {
+		$text =~ s/(L132n1557_p.*)//s;
+		$text2 = $1;
+		$outfile2 = $outfile;
+		$outfile2 =~ s/L131/L132/;
+	}
+	if($outfile =~ /L1557_051\.txt/) {
+		$text =~ s/(L133n1557_p.*)//s;
+		$text2 = $1;
+		$outfile2 = $outfile;
+		$outfile2 =~ s/L132/L133/;
+	}
+	if($outfile =~ /X0714_003\.txt/) {
+		$text =~ s/(X40n0714_p.*)//s;
+		$text2 = $1;
+		$outfile2 = $outfile;
+		$outfile2 =~ s/X39/X40/;
+	}
+
 	open OUT, ">:utf8", $outfile;
 	print OUT $text;
 	close OUT;
+
+	if($outfile2) { 
+		open OUT, ">:utf8", $outfile2;
+		print OUT $text2;
+		close OUT;
+	}
 
 	$text = "";
 	$vol = "";

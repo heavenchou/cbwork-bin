@@ -99,7 +99,7 @@ sub output_mulu
     for(my $i=0; $i<=$#::mulu_tree; $i++)
     {
         my $data = $::mulu_tree[$i];
-        $data =~ /^(.*?),(.*?),(.*)$/;
+        $data =~ /^(.*?),(.*),(.*)$/;
         $level[$i] = $1;
         $text[$i] = $2;
         $link[$i] = $3;
