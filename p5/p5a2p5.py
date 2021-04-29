@@ -3327,7 +3327,7 @@ if options.vol_start is not None:
 	options.vol_start = options.vol_start.upper()
 
 # 讀取設定檔 cbwork_bin.ini
-config = configparser.SafeConfigParser()
+config = configparser.ConfigParser()
 config.read('../cbwork_bin.ini')
 CBTEMP = config.get('default', 'temp')
 cbwork_dir = config.get('default', 'cbwork')

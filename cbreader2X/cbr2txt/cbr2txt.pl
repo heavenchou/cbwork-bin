@@ -13,8 +13,8 @@ use File::Find;
 use strict;
 
 # 來源目錄, 也就是 cbreader 產生的 html 檔目錄
-my $source_path = "c:/temp/cbr_htm/";
-my $outpath_base = "c:/temp/cbr_out_txt/";
+my $source_path = "d:/temp/cbr_htm/";
+my $outpath_base = "d:/temp/cbr_out_txt/";
 
 my $vol = shift;	# T01
 my $ed = $vol;

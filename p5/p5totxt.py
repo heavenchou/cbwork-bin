@@ -494,7 +494,7 @@ parser.add_option("-z", action="store_false", dest="gaijiNormalize", default=Tru
 (options, args) = parser.parse_args()
 
 # 讀取 設定檔 cbwork_bin.ini
-config = configparser.SafeConfigParser()
+config = configparser.ConfigParser()
 config.read('../cbwork_bin.ini')
 xmlP5Base = config.get('p5totxt', 'xml_p5')
 outBase = config.get('p5totxt', 'output_dir')

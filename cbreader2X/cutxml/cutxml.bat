@@ -12,7 +12,7 @@
 :: ½d¨Ò¡Gperl cutxml.pl -b T01 (p5b ¤Á¨÷)
 :: ==================================================
 
-set p5bdir=c:\cbwork\xml-p5b
+set p5bdir=d:\cbwork\xml-p5b
 
 IF "%1"=="" call :show_help
 IF "%1"=="-h" call :show_help

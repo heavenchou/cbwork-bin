@@ -7,8 +7,8 @@ use utf8;
 use Cwd;
 use strict;
 
-my $SourcePath = "d:/cbeta.www/download/epub/cbeta_epub_2021q1";			# 初始目錄, 最後不用加斜線 /
-my $OutputPath = "d:/cbeta.www/download/pdf_a4/cbeta_pdf_2021q1";		# 目地初始目錄, 如果有需要的話. 最後不用加斜線 /
+my $SourcePath = "d:/cbeta.www/download/epub/cbeta_epub_2021q2/Y";			# 初始目錄, 最後不用加斜線 /
+my $OutputPath = "d:/cbeta.www/download/pdf_a4/cbeta_pdf_2021q2_old";		# 目地初始目錄, 如果有需要的話. 最後不用加斜線 /
 my $MakeOutputPath = 1;		# 1 : 產生對應的輸出目錄
 my $IsIncludeSubDir = 1;	# 1 : 包含子目錄 0: 不含子目錄
 my $FilePattern = "*.epub";		# 要找的檔案類型
@@ -81,8 +81,7 @@ sub SearchFile
 	# SimSun
 
 	#my $cmd = "\"c:/Program Files/Calibre2/ebook-convert.exe\" $file $outfile --paper-size a4 --pdf-serif-family DFKai-SB --pdf-mono-family DFKai-SB --pdf-sans-family DFKai-SB --pdf-standard-font serif --input-encoding UTF-8 --uncompressed-pdf --embed-all-fonts --subset-embedded-fonts";
-	my $cmd = "\"c:/Users/Heaven/Calibre3.48/Calibre Portable/Calibre/ebook-convert.exe\" $file $outfile --paper-size a4 --pdf-serif-family MingLiU --pdf-page-numbers";
-
+	my $cmd = "\"c:/App/Calibre5.14/Calibre Portable/Calibre/ebook-convert.exe\" $file $outfile --paper-size a4 --pdf-serif-family MingLiU --pdf-page-numbers";
 	print $cmd . "\n";
 	system($cmd);
 }

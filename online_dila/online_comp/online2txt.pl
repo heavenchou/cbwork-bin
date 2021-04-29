@@ -11,8 +11,8 @@ use File::Find;
 use strict;
 
 # 來源目錄, 也就是 cbreader 產生的 html 檔目錄
-my $source_path = "c:/temp/online_html/";
-my $outpath_base = "c:/temp/online_out_txt/";
+my $source_path = "d:/temp/online_html/";
+my $outpath_base = "d:/temp/online_out_txt/";
 mkdir($outpath_base);
 
 my $ed = shift;		# T 藏
@@ -227,6 +227,10 @@ sub output
 	close OUT;
 
 	if($outfile2) { 
+		my $path = $outfile2;
+		$path =~ s/[^\\\/]*$//;
+		print "path: $path\n";
+		mkdir($path);
 		open OUT, ">:utf8", $outfile2;
 		print OUT $text2;
 		close OUT;

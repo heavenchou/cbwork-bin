@@ -14,8 +14,8 @@ my $gaiji = new Gaiji();
 $gaiji->load_access_db();
 
 # 來源目錄, 也就是 cbreader 產生的 html 檔目錄
-my $cbr_path = "c:/temp/online_out_txt/";
-my $txt_path = "c:/temp/p5xml-p5noru8/";
+my $cbr_path = "d:/temp/online_out_txt/";
+my $txt_path = "d:/temp/p5xml-p5noru8/";
 
 my $vol = shift;	# T01
 my $ed = $vol;
@@ -75,7 +75,7 @@ sub comp_file
 
 	if($#cbr_lines != $#txt_lines)
 	{
-		$output .= "檔案長度不同 : $cbr_file vs $txt_file\n\n";
+		$output .= "檔案長度不同 : $cbr_file ($#cbr_lines) vs $txt_file ($#txt_lines) \n\n";
 	}
 
 	my $count = $#cbr_lines;

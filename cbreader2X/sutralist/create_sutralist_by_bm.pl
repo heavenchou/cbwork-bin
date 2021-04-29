@@ -6,8 +6,8 @@ use Cwd;
 use strict;
 
 # 使用 p5a , 免得經名有 ext-b 以上的 unicode , 造成 mac 處理有問題
-my $SourcePath = "c:/cbwork/bm";		# 初始目錄, 最後不用加斜線 /
-my $OutputPath = "c:/cbwork/xml-p5b";		# 目地初始目錄, 如果有需要的話. 最後不用加斜線 /
+my $SourcePath = "d:/cbwork/bm";		# 初始目錄, 最後不用加斜線 /
+my $OutputPath = "d:/cbwork/xml-p5b";		# 目地初始目錄, 如果有需要的話. 最後不用加斜線 /
 my $MakeOutputPath = 0;		# 1 : 產生對應的輸出目錄
 my $IsIncludeSubDir = 1;	# 1 : 包含子目錄 0: 不含子目錄
 my $FilePattern = "source.txt";		# 要找的檔案類型

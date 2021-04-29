@@ -6,11 +6,13 @@ use Cwd;
 use strict;
 
 # 使用 p5a , 免得經名有 ext-b 以上的 unicode , 造成 mac 處理有問題
-my $SourcePath = "c:/cbwork/xml-p5b";		# 初始目錄, 最後不用加斜線 /
-my $OutputPath = "c:/cbwork/xml-p5b";		# 目地初始目錄, 如果有需要的話. 最後不用加斜線 /
+my $SourcePath = "d:/cbwork/xml-p5b";		# 初始目錄, 最後不用加斜線 /
+my $OutputPath = "d:/cbwork/xml-p5b";		# 目地初始目錄, 如果有需要的話. 最後不用加斜線 /
 my $MakeOutputPath = 0;		# 1 : 產生對應的輸出目錄
 my $IsIncludeSubDir = 1;	# 1 : 包含子目錄 0: 不含子目錄
 my $FilePattern = "*.xml";		# 要找的檔案類型
+
+my %list_hash = ();         # 用來放某一冊的結果, 要使用頁欄行排序
 
 open OUT, ">:utf8", "sutralist.txt" or die "open error";
 SearchDir($SourcePath, $OutputPath);
@@ -35,6 +37,7 @@ sub SearchDir
 	my @files = glob($FilePattern);
 	chdir($myPath);				# 回到目前路徑
 	
+	%list_hash = ();         # 用來放某一冊的結果, 要使用頁欄行排序
 	foreach my $file (sort(@files))
 	{
 		next if($file =~ /^\./);		# 不要 . 與 ..
@@ -45,6 +48,13 @@ sub SearchDir
 			SearchFile($NewFile , $NewOutputFile);
 		}
 	}
+
+	# 輸出 %list_hash
+
+	for my $key (sort(keys(%list_hash))) { 
+		print OUT $list_hash{$key};
+	}
+
 	return unless($IsIncludeSubDir);	# 若不搜尋子目錄就離開
 	
 	opendir (DIR, "$ThisDir");
@@ -248,7 +258,16 @@ sub SearchFile
 		<>;
 	}
 
-	print OUT "$book,$volnum,$num,$juan,$first_juan,$first_lb,$name,$byline\n";
+	my $list = "$book,$volnum,$num,$juan,$first_juan,$first_lb,$name,$byline\n";
+	my $key = $first_lb;
+	if($first_lb =~ /^[a-m]/i) {
+		$first_lb = "1" . $first_lb;
+	} elsif($first_lb =~ /^[n-z]/i) {
+		$first_lb = "3" . $first_lb;
+	} else {
+		$first_lb = "2" . $first_lb;
+	}
+	$list_hash{$first_lb} = $list;
 }
 
 

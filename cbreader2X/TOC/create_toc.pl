@@ -29,8 +29,8 @@ else
 	$input_vol = "";
 }
 
-my $SourcePath = "c:/cbwork/xml-p5b" . $input_vol;		# 初始目錄, 最後不用加斜線 /
-my $OutputPath = "c:/cbwork/bin/cbreader2X/toc/toc_gaiji";		# 目地初始目錄, 如果有需要的話. 最後不用加斜線 /
+my $SourcePath = "d:/cbwork/xml-p5b" . $input_vol;		# 初始目錄, 最後不用加斜線 /
+my $OutputPath = "d:/cbwork/bin/cbreader2X/toc/toc_gaiji";		# 目地初始目錄, 如果有需要的話. 最後不用加斜線 /
 my $logfile = "errlog.txt";				# 錯誤記錄檔
 my $MakeOutputPath = 0;		# 1 : 產生對應的輸出目錄
 my $IsIncludeSubDir = 1;	# 1 : 包含子目錄 0: 不含子目錄
