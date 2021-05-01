@@ -6,6 +6,7 @@
 # pushsign.pl 簡單標記版.txt 舊的xml.xml 結果檔xml.xml > 記錄檔.txt
 #
 ########################################################
+# 2021/05/02 : 支援 BM 標記 <I1><I2>...</L>
 # 2020/02/06 : 將【】列為新標符號
 # 2020/02/02 : 將行首下引號移到前一行行尾的 </p> 之前
 # 2020/01/30 : 增加新版悉曇格式，增加 <note type="add"> 處理格式。
@@ -113,7 +114,9 @@ my $istt = 0;           # 判斷是不是 <tt> 隔行對照, 0:一般狀況, 1:x
 my $whicht = 0;         # 目前是在哪一個 <t> 裡面? 梵 : 1 , 漢 : 2 
 
 my $firstword = 0;		# 若遇到 [TX]xxn.... 則 $firstword = 1 , 此時若遇到 <P> 則是行首, 否則設為 0 , 變成行中的 <P>
-my $firstitem = 1;		# 判斷是否是第一個 item , 用來處理 <I><P>, </L><P> 的情況
+my $itemLevel = 0;		# 目前的 item 的層數, <I> 和 <I1> = 1, <I2> = 2, ....
+
+my $hasIP = 0;	# 如果有出現 <I><P> 這類的標記, 單獨的 </L> 才要處理, 以免和舊標記 </L> 重複
 
 my %same_lb = ();	# 記錄相同的 <lb> , 因為 XML 會因為校勘有重覆的 <lb> 第二個之後要略去.
 
@@ -169,8 +172,6 @@ while(1)
 }
 $index2++;
 $index3++;
-
-my $hasIP = 0;	# 如果有出現 <I><P> 這類的標記, 單獨的 </L> 才要處理, 以免和舊標記 </L> 重複
 
 while(1)
 {
@@ -471,10 +472,18 @@ sub get_word1
 		#   第一個 <I><P> 要轉成 </p><list><item><p>
 		#   第二個 <I><P> 要轉成 </p></item><item><p> 
 		#   最後的 </L><P> 要轉成 </p></item></list><p>
-		if($lines1[$index1] =~ /^((?:。)|(?:、)|(?:，)|(?:．)|(?:；)|(?:：)|(?:「)|(?:」)|(?:『)|(?:』)|(?:（)|(?:）)|(?:？)|(?:！)|(?:—)|(?:…)|(?:《)|(?:》)|(?:〈)|(?:〉)|(?:“)|(?:”)|(?:【)|(?:】)|(?:★)|(?:(?:<\/?[ouwsaIL]>)?<P(?:,\d+)?>))/)
+		# <I1><I2></L> 是新增的標記 2021/04/30
+		#   第一個 <I1><P> 要轉成 </p><list><item><p>
+		#   第二個 <I1><P> 要轉成 </p></item><item><p> 
+		#   第一個 <I2><P> 要轉成 </p><list><item><p>
+		#   第二個 <I2><P> 要轉成 </p></item><item><p> 
+		#   <I2> 回到 <I1><P> 要轉成 </p></item></list></item><item><p> 
+		#   <I2> 回到 </L><P> 要轉成 </p></item></list></item></list><p>
+		#   <I1> 回到 </L><P> 要轉成 </p></item></list><p>
+		if($lines1[$index1] =~ /^((?:。)|(?:、)|(?:，)|(?:．)|(?:；)|(?:：)|(?:「)|(?:」)|(?:『)|(?:』)|(?:（)|(?:）)|(?:？)|(?:！)|(?:—)|(?:…)|(?:《)|(?:》)|(?:〈)|(?:〉)|(?:“)|(?:”)|(?:【)|(?:】)|(?:★)|(?:(?:<\/?[ouwsaIL]\d*>)?<P(?:,\d+)?>))/)
 		{
 			my $tmp = $1;
-			if($tmp =~ /(<\/?[ouwsaIL]>)?(<P(?:,\d+)?>)/)
+			if($tmp =~ /(<\/?[ouwsaIL]\d*>)?(<P(?:,\d+)?>)/)
 			{
 				my $tag1 = $1;
 				my $tag2 = $2;
@@ -491,23 +500,48 @@ sub get_word1
 				#    第二個 <I> => </item><item>
 				#    </L> => </item></list>
 
-				if($tag1 eq "<I>")
-				{
+				if($tag1 =~ /<I(\d*)>/) {
+					my $level = $1;
 					$hasIP = 1;
-					if($firstitem)
-					{
+					$level = 1 if($level == 0);
+					if($level == $itemLevel + 1) {
+						# 進入下一層 : ex. <I3> -> <I4>
+						$itemLevel = $level;
 						$tag1 = "<list><item>";
-						$firstitem = 0;
-					}
-					else
-					{
+					} elsif ($level == $itemLevel) {
+						# 還在同一層 : ex. <I3> -> <I3>
 						$tag1 = "</item><item>";
+					} elsif ($level < $itemLevel) {
+						# 回到上一層 : ex. <I3> -> <I1>
+						# <I1> => <list><item>
+						# <I2> =>   <list><item>
+						# <I3> =>     <list><item>
+						# <I1> => </item></list></item></list></item><item>
+						$tag1 = "";
+						while($level < $itemLevel) {
+							$tag1 .= "</item></list>";
+							$itemLevel--;
+						}
+						$tag1 .= "</item><item>";
+					} else {
+						# 錯誤的層數, 可能跳太多了 <I3> -> <I5>
+						$tag1 = "<?>item level error";
 					}
 				}
 				elsif($tag1 eq "</L>")
 				{
-					$tag1 = "</item></list>";
-					$firstitem = 1;
+
+					# 回到上一層 : ex. <I3> -> </L>
+					# <I1> => <list><item>
+					# <I2> =>   <list><item>
+					# <I3> =>     <list><item>
+					# </L> => </item></list></item></list></item></list>
+					$tag1 = "";
+					while($itemLevel > 0) {
+						$tag1 .= "</item></list>";
+						$itemLevel--;
+					}
+					$itemLevel = 0;
 				}
 
 				# 3. <P> => <p>
@@ -543,13 +577,14 @@ sub get_word1
 			}
 				
 			$hasdot1 .= $tmp;		
-			$lines1[$index1] =~ s/^((?:。)|(?:、)|(?:，)|(?:．)|(?:；)|(?:：)|(?:「)|(?:」)|(?:『)|(?:』)|(?:（)|(?:）)|(?:？)|(?:！)|(?:—)|(?:…)|(?:《)|(?:》)|(?:〈)|(?:〉)|(?:“)|(?:”)|(?:【)|(?:】)|(?:★)|(?:(?:<\/?[ouwsaIL]>)?<P(?:,\d+)?>))//;
+			$lines1[$index1] =~ s/^((?:。)|(?:、)|(?:，)|(?:．)|(?:；)|(?:：)|(?:「)|(?:」)|(?:『)|(?:』)|(?:（)|(?:）)|(?:？)|(?:！)|(?:—)|(?:…)|(?:《)|(?:》)|(?:〈)|(?:〉)|(?:“)|(?:”)|(?:【)|(?:】)|(?:★)|(?:(?:<\/?[ouwsaIL]\d*>)?<P(?:,\d+)?>))//;
 			next;
 		}
 		elsif($lines1[$index1] =~ /^(<\/L>)/ and $hasIP == 1)
 		{
 			# 單獨處理 </L>	
-			$firstitem = 1;
+			$itemLevel = 0;
+			$hasIP = 0;
 			$hasdot1 .= "</item></list>";
 			$lines1[$index1] =~ s/^(<\/L>)//;
 			next;
