@@ -6,6 +6,7 @@
 # pushsign.pl 簡單標記版.txt 舊的xml.xml 結果檔xml.xml > 記錄檔.txt
 #
 ########################################################
+# 2021/05/02 : 支援 BM 標記 <o><u>...</u>
 # 2021/05/02 : 支援 BM 標記 <I1><I2>...</L>
 # 2020/02/06 : 將【】列為新標符號
 # 2020/02/02 : 將行首下引號移到前一行行尾的 </p> 之前
@@ -116,7 +117,9 @@ my $whicht = 0;         # 目前是在哪一個 <t> 裡面? 梵 : 1 , 漢 : 2
 my $firstword = 0;		# 若遇到 [TX]xxn.... 則 $firstword = 1 , 此時若遇到 <P> 則是行首, 否則設為 0 , 變成行中的 <P>
 my $itemLevel = 0;		# 目前的 item 的層數, <I> 和 <I1> = 1, <I2> = 2, ....
 
-my $hasIP = 0;	# 如果有出現 <I><P> 這類的標記, 單獨的 </L> 才要處理, 以免和舊標記 </L> 重複
+my $hasIP = 0;			# 如果有出現 <I><P> 這類的標記, 單獨的 </L> 才要處理, 以免和舊標記 </L> 重複
+
+my $has_Otag = 0;		# 遇到 <o> 設為 1, 遇到 </u> 設為 0
 
 my %same_lb = ();	# 記錄相同的 <lb> , 因為 XML 會因為校勘有重覆的 <lb> 第二個之後要略去.
 
@@ -480,6 +483,12 @@ sub get_word1
 		#   <I2> 回到 <I1><P> 要轉成 </p></item></list></item><item><p> 
 		#   <I2> 回到 </L><P> 要轉成 </p></item></list></item></list><p>
 		#   <I1> 回到 </L><P> 要轉成 </p></item></list><p>
+
+		# 2021/05/02 處理 <o><u>
+		# <o> =>     <cb:div type="orig"><p>...</p></cb:div>
+		# <u> =>     <cb:div type="commentary"><p>...</p></cb:div>
+		# </u> =>     </p></cb:div>
+
 		if($lines1[$index1] =~ /^((?:。)|(?:、)|(?:，)|(?:．)|(?:；)|(?:：)|(?:「)|(?:」)|(?:『)|(?:』)|(?:（)|(?:）)|(?:？)|(?:！)|(?:—)|(?:…)|(?:《)|(?:》)|(?:〈)|(?:〉)|(?:“)|(?:”)|(?:【)|(?:】)|(?:★)|(?:(?:<\/?[ouwsaIL]\d*>)?<P(?:,\d+)?>))/)
 		{
 			my $tmp = $1;
@@ -488,12 +497,26 @@ sub get_word1
 				my $tag1 = $1;
 				my $tag2 = $2;
 
-				# 1. <[ouwsa]> => <!-- <[ouwsa]> --> 
-				# ex. <o> => <!-- <o> -->
+				# 1. <[wsa]> => <!-- <[wsa]> --> 
+				# ex. <w> => <!-- <w> -->
 
-				if($tag1 =~ /(<[ouwsa]>)/)
+				if($tag1 =~ /(<[wsa]>)/)
 				{
 					$tag1 = "<!-- $1 -->";
+				}
+
+				if($tag1 eq "<o>") {
+					$tag1 = "<cb:div type=\"orig\">";
+					if($has_Otag == 0) {
+						$has_Otag = 1;
+					} else {
+						$tag1 = "</cb:div>" . $tag1;
+					}
+				} elsif($tag1 eq "<u>") {
+					$tag1 = "</cb:div><cb:div type=\"commentary\">";
+				} elsif($tag1 eq "</u>") {
+					$tag1 = "</cb:div>";
+					$has_Otag = 0;
 				}
 
 				# 2. 第一個 <I> => <list><item>
@@ -587,6 +610,13 @@ sub get_word1
 			$hasIP = 0;
 			$hasdot1 .= "</item></list>";
 			$lines1[$index1] =~ s/^(<\/L>)//;
+			next;
+		}
+		elsif($lines1[$index1] =~ /^(<\/u>)/)
+		{
+			$has_Otag = 0;
+			$hasdot1 .= "</p></cb:div>";
+			$lines1[$index1] =~ s/^(<\/u>)//;
 			next;
 		}
 		
