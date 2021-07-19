@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2021/07/19 新增支援太虛大師全書 TX。
 2020/12/22 支援斜體<it>、粗體<bold>及楷<kai>、明<ming>、宋<song>、黑體<hei>標記。
 2020/12/08 <sub>, <sup> 標記要由 rend 改成 style。
 2020/09/06 改用新的偈頌規則，支援 caesura。
@@ -136,6 +137,7 @@ wits={
 'Q': '【磧砂】',
 'S': '【宋遺】',
 'T': '【大】', 
+'TX': '【太虛】', 
 'U': '【洪武】',
 'X': '【卍續】', 
 'Y': '【印順】', 
@@ -152,6 +154,7 @@ collectionZh={
 'HM': '惠敏法師著作集',
 'LC': '呂澂佛學著作集',
 'N': '漢譯南傳大藏經（元亨寺版）',
+'TX': '太虛大師全書',
 'Y': '印順法師佛學著作集',
 'ZS': '正史佛教資料類編',
 'ZW': '藏外佛教文獻',
@@ -181,6 +184,7 @@ collectionEng={
 'R': 'Manji Zokuzōkyō (Shinwenfeng Edition)',
 'S': 'Songzang yizhen (Shinwenfeng Edition)',
 'T': 'Taishō Tripiṭaka',
+'TX': 'Corpus of Venerable Tai Xu\'s Buddhist Studies',
 'U': 'Southern Hongwu Edition of the Canon',
 'X': 'Manji Shinsan Dainihon Zokuzōkyō',
 'Y': 'Corpus of Venerable Yin Shun\'s Buddhist Studies',
@@ -1753,7 +1757,7 @@ ed = mo.group()
 
 
 # 讀取 設定檔 cbwork_bin.ini
-config = configparser.SafeConfigParser()
+config = configparser.ConfigParser()
 config.read('../cbwork_bin.ini')
 gaijiMdb = config.get('default', 'gaiji-m.mdb_file')
 cbwork_dir = config.get('default', 'cbwork')
