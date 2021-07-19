@@ -6,6 +6,7 @@
 # pushsign.pl 簡單標記版.txt 舊的xml.xml 結果檔xml.xml > 記錄檔.txt
 #
 ########################################################
+# 2021/06/25 : 處理 <o><P> 遇到原來就有 <p> 的情況，會有重複的 <p> 和 </p> 要去除。
 # 2021/05/02 : 支援 BM 標記 <o><u>...</u>
 # 2021/05/02 : 支援 BM 標記 <I1><I2>...</L>
 # 2020/02/06 : 將【】列為新標符號
@@ -361,6 +362,11 @@ while(1)
 	}
 }
 
+# 因為 <o><P> 會處理成  <cb:div type="orig"><p> , 如果本來就有 <p>
+# 就會出現 <cb:div type="orig"><p><p xml:id="....">
+# 因此要移掉一個 <p>
+remove_two_p();
+
 # 將行首的 </p> 移到前一行行尾
 mv_endtag_to_pre_line();
 
@@ -371,6 +377,7 @@ mv_endtag_to_pre_line();
 # .........</cb:t></cb:tt>」</p>
 # <lb n="0254a26" ed="T"/>
 mv_under_quotes_to_pre_line();
+
 
 # 輸出結果
 for(my $i=0; $i<=$#lines3; $i++)
@@ -517,6 +524,9 @@ sub get_word1
 				} elsif($tag1 eq "</u>") {
 					$tag1 = "</cb:div>";
 					$has_Otag = 0;
+				} elsif($tag1 eq "</o>") {
+					$tag1 = "</cb:div>";
+					$has_Otag = 0;
 				}
 
 				# 2. 第一個 <I> => <list><item>
@@ -612,11 +622,11 @@ sub get_word1
 			$lines1[$index1] =~ s/^(<\/L>)//;
 			next;
 		}
-		elsif($lines1[$index1] =~ /^(<\/u>)/)
+		elsif($lines1[$index1] =~ /^(<\/[ou]>)/)
 		{
 			$has_Otag = 0;
 			$hasdot1 .= "</p></cb:div>";
-			$lines1[$index1] =~ s/^(<\/u>)//;
+			$lines1[$index1] =~ s/^(<\/[ou]>)//;
 			next;
 		}
 		
@@ -636,7 +646,7 @@ sub get_word1
 		}
 		last;
 	}
-	
+
 	$_ = $lines1[$index1];	# 處理修訂與移位
 	# 取行首  X79n1563_p0657a09_##
 	$firstword = 0;
@@ -1363,6 +1373,29 @@ sub printout
 		$_ = $2;
 	}
 	$lines3[$index3] .= $_;
+}
+
+
+# 因為 <o><P> 會處理成  <cb:div type="orig"><p> , 如果本來就有 <p>
+# 就會出現 </p></cb:div><cb:div type="orig"><p><p xml:id="....">
+# 因此要移掉一個 <p>
+sub remove_two_p 
+{
+	for(my $i=1; $i<=$#lines3; $i++)
+	{
+		$lines3[$i] =~ s/<\/p>((?:<\/cb:div>)?<cb:div[^>]*>)<p(?: cb:place="inline")?>(<p[ >])/$1$2/g;
+	
+		# 有一種情況是先有 </p><p ...> 處理後變成
+		# </p></cb:div><cb:div type="orig"><p></p><p ....>
+		# 處理變成如下
+		
+		$lines3[$i] =~ s/(<\/p>(?:<\/cb:div>)?<cb:div[^>]*>)<p(?: cb:place="inline")?><\/p>(<p[ >])/$1$2/g;
+
+		# </u> => </p></cb:div>
+		# 有時會遇到原本就有 </p>, 就會變成 </p></cb:div></p>
+
+		$lines3[$i] =~ s/(<\/p><\/cb:div>)<\/p>/$1/g;
+	}
 }
 
 # 將行首的 </p> 移到前一行行尾

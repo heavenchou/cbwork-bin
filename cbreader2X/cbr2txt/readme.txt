@@ -7,11 +7,11 @@
   c.CBETA 校勘 (原書校勘 不易和 P5totxt 比對)
   d.使用 組字式 (不使用 unicode ext 和通用字, 免得無法比對)
   
-  並輸出至 c:\temp\cbr_htm\ (old c:\Users\Heaven\AppData\Local\Temp\CBReader\Debug\)
+  並輸出至 d:\temp\cbr_htm\ (old d:\_SysTemp\CBReader\Debug\)
   
-  或手動移到　c:\temp\cbr_htm\
+  或手動移到　d:\temp\cbr_htm\
 
-2.cbr2txt.pl 將上面 CBR 的 HTML 轉成 TXT , 放在 c:\temp\cbr_out_txt\
+2.cbr2txt.pl 將上面 CBR 的 HTML 轉成 TXT , 放在 d:\temp\cbr_out_txt\
 
 3.標準的 P5 轉成 TXT
 

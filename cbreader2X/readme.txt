@@ -1,146 +1,146 @@
 
-¡½ readme.txt ¥»»¡©úÀÉ
+â–  readme.txt æœ¬èªªæ˜æª”
 
-³o­Ó¥Ø¿ı¬O³B²z CBReader 2X ª©¥»¬ÛÃö¸ê®Æªºµ{¦¡
+é€™å€‹ç›®éŒ„æ˜¯è™•ç† CBReader 2X ç‰ˆæœ¬ç›¸é—œè³‡æ–™çš„ç¨‹å¼
 
-¸ê®Æ·Ç³Æ¬yµ{
+è³‡æ–™æº–å‚™æµç¨‹
 
-	1. P5a Âà P5b¡A¦¹°Ê§@­n¥ı°µ¡A¦]¬°©³¤U¦³¨Ç¸ê®Æ¬O¥Ñ P5b ²£¥Íªº¡C
-    2. ·Ç³Æ°ò¥»¸ê®Æ sutralist , bulei (sutralist ±Ä¥Î p5b ªºª©¥», ¸g¦W¤~¤£·|¦³ unicode ext-b)
-    3. P5b ¤Á¨÷
-    4. ²£¥Í¤G¥÷¥D­n¾ÉÄı¤å¥ó bulei_nav.xhtml , book_nav.xhtml -----> ­n³B²z <g> ¯Ê¦r , ¤â°Ê§ï ¥j¤µ¹Ï®Ñ¶°¦¨ ..¡]¤W¡^²¾°£
-    5. ²£¥Í¦U¸g¤åªº¥Ø¿ı toc -----> ­n³B²z <g> ¯Ê¦r
-    6. ²£¥Í¸g¤å¥Ø¿ı catalog  ----> ¤â°Ê³B²z¤j¯ë­Y¸g, ³¡§O, <g> ¯Ê¦r
-    7. ²£¥Í¸g¤å¬y¤ô¶¶§Ç spine
-    8. §O§Ñ¤F­n°µ·s¼W¸g¤åªº epub «Ê­±¹ÏÀÉ
+	1. P5a è½‰ P5bï¼Œæ­¤å‹•ä½œè¦å…ˆåšï¼Œå› ç‚ºåº•ä¸‹æœ‰äº›è³‡æ–™æ˜¯ç”± P5b ç”¢ç”Ÿçš„ã€‚
+    2. æº–å‚™åŸºæœ¬è³‡æ–™ sutralist , bulei (sutralist æ¡ç”¨ p5b çš„ç‰ˆæœ¬, ç¶“åæ‰ä¸æœƒæœ‰ unicode ext-b)
+    3. P5b åˆ‡å·
+    4. ç”¢ç”ŸäºŒä»½ä¸»è¦å°è¦½æ–‡ä»¶ bulei_nav.xhtml , book_nav.xhtml -----> è¦è™•ç† <g> ç¼ºå­— , æ‰‹å‹•æ”¹ å¤ä»Šåœ–æ›¸é›†æˆ ..ï¼ˆä¸Šï¼‰ç§»é™¤
+    5. ç”¢ç”Ÿå„ç¶“æ–‡çš„ç›®éŒ„ toc -----> è¦è™•ç† <g> ç¼ºå­—
+    6. ç”¢ç”Ÿç¶“æ–‡ç›®éŒ„ catalog  ----> æ‰‹å‹•è™•ç†å¤§èˆ¬è‹¥ç¶“, éƒ¨åˆ¥, <g> ç¼ºå­—
+    7. ç”¢ç”Ÿç¶“æ–‡æµæ°´é †åº spine
+    8. åˆ¥å¿˜äº†è¦åšæ–°å¢ç¶“æ–‡çš„ epub å°é¢åœ–æª”
 
-¨ä¤¤ sutralist , catalog ªº¸ê®Æ³£­n¦P®É¥]§t¸ó¥Uªº°O¿ı, ¨Ò¦p
+å…¶ä¸­ sutralist , catalog çš„è³‡æ–™éƒ½è¦åŒæ™‚åŒ…å«è·¨å†Šçš„è¨˜éŒ„, ä¾‹å¦‚
 
-A,120,1565,18,1,0175b01,·ì¦÷®v¦a½×¸qºt(²Ä1¨÷-²Ä32¨÷),­ğ ²M¯À¡D¼á²b­z
-A,121,1565,5,33,0001b01,·ì¦÷®v¦a½×¸qºt(²Ä33¨÷-²Ä40¨÷),­ğ ²M¯À¡D¼á²b­z
+A,120,1565,18,1,0175b01,ç‘œä¼½å¸«åœ°è«–ç¾©æ¼”(ç¬¬1å·-ç¬¬32å·),å” æ¸…ç´ ï¼æ¾„æ·¨è¿°
+A,121,1565,5,33,0001b01,ç‘œä¼½å¸«åœ°è«–ç¾©æ¼”(ç¬¬33å·-ç¬¬40å·),å” æ¸…ç´ ï¼æ¾„æ·¨è¿°
 
-¦ı¦b²£¥Í bulei_nav , book_nav ¥u­n³B²z²Ä¤@µ§
+ä½†åœ¨ç”¢ç”Ÿ bulei_nav , book_nav åªè¦è™•ç†ç¬¬ä¸€ç­†
 
-toc «h­n±N¸ó¥U¸ê®Æ¦X¨Ö¦b¦P¤@­Ó¥Ø¿ı¤¤
+toc å‰‡è¦å°‡è·¨å†Šè³‡æ–™åˆä½µåœ¨åŒä¸€å€‹ç›®éŒ„ä¸­
 
-catalog ÁöµM¦³¦h¥÷, ¦ı³£³sµ²¨ì¦P¤@¨÷¶Ü? ¨Ò ÂI A121n1565 ¸g, ­n¨ì 33 ¨÷¶Ü?
+catalog é›–ç„¶æœ‰å¤šä»½, ä½†éƒ½é€£çµåˆ°åŒä¸€å·å—? ä¾‹ é» A121n1565 ç¶“, è¦åˆ° 33 å·å—?
 
-¡½ P5a Âà P5b
+â–  P5a è½‰ P5b
 
-	³o­Ó­n¥ı°µ
+	é€™å€‹è¦å…ˆåš
 
-¡½ sutralist
+â–  sutralist
 
-	¡i°õ¦æ sutralist.bat¡j
+	ã€åŸ·è¡Œ sutralist.batã€‘
 	
-	³o¸Ì¬O°õ¦æ¤G­Ó°Ê§@
+	é€™è£¡æ˜¯åŸ·è¡ŒäºŒå€‹å‹•ä½œ
 	
-	1. °õ¦æ perl create_sutralist.pl
+	1. åŸ·è¡Œ perl create_sutralist.pl
 
-	²£¥Í sutralist.txt¡A³o¬O©Ò¦³¸g¤åªº¥U¡B¸g¸¹¡B¸g¦W¡B¨÷¼Æ¡B²Ä¤@¨÷¡B°_©l­¶¦æÄæ
+	ç”¢ç”Ÿ sutralist.txtï¼Œé€™æ˜¯æ‰€æœ‰ç¶“æ–‡çš„å†Šã€ç¶“è™Ÿã€ç¶“åã€å·æ•¸ã€ç¬¬ä¸€å·ã€èµ·å§‹é è¡Œæ¬„
 
-	¬O­«­nªº°òÂ¦¥Ø¿ı
+	æ˜¯é‡è¦çš„åŸºç¤ç›®éŒ„
 	
-	2. °õ¦æ perl create_sutralist_by_bm.pl
+	2. åŸ·è¡Œ perl create_sutralist_by_bm.pl
 	
-	¥Ñ BM ²£¥Í sutralist_by_bm.txt¡A²z½×¤W­n©M sutralist.txt ¤@¼Ë¡A¥i¦C¬°ÀË¬d¶µ¥Ø¡C
+	ç”± BM ç”¢ç”Ÿ sutralist_by_bm.txtï¼Œç†è«–ä¸Šè¦å’Œ sutralist.txt ä¸€æ¨£ï¼Œå¯åˆ—ç‚ºæª¢æŸ¥é …ç›®ã€‚
 	
-	¦P®É·|¤ñ¹ïÂÂªº»P·sªº¡A¬İ¬İ¦³¨S¦³¤£¦P¡C
+	åŒæ™‚æœƒæ¯”å°èˆŠçš„èˆ‡æ–°çš„ï¼Œçœ‹çœ‹æœ‰æ²’æœ‰ä¸åŒã€‚
 
-¡½ ¤Á¨÷µ{¦¡ cutxml
+â–  åˆ‡å·ç¨‹å¼ cutxml
 
-	¡i°õ¦æ cutxml.bat ¥i¬İ°Ñ¼Æ¡j
-	°õ¦æ cutxml.bat -a ³B²z CBETA ¥ş³¡¸ê®Æ
-	°õ¦æ cutxml.bat -see ³B²z¦è½¬¥ş³¡¸ê®Æ
+	ã€åŸ·è¡Œ cutxml.bat å¯çœ‹åƒæ•¸ã€‘
+	åŸ·è¡Œ cutxml.bat -a è™•ç† CBETA å…¨éƒ¨è³‡æ–™
+	åŸ·è¡Œ cutxml.bat -see è™•ç†è¥¿è“®å…¨éƒ¨è³‡æ–™
 	
-¡½ bulie
+â–  bulie
 
-	³¡Ãş¸ê®Æ
+	éƒ¨é¡è³‡æ–™
 	
-	­Y¦³·sªº¨åÄy¥[¤J¡A­n­×§ï bulei.xlsx , ¨Ã¶K¦¨¯Â¤å¦rÀÉ bulei.txt
+	è‹¥æœ‰æ–°çš„å…¸ç±åŠ å…¥ï¼Œè¦ä¿®æ”¹ bulei.xlsx , ä¸¦è²¼æˆç´”æ–‡å­—æª” bulei.txt
 
-¡½ ²£¥Í¾ÉÄı¥Ø¿ı nav
+â–  ç”¢ç”Ÿå°è¦½ç›®éŒ„ nav
 
-	­Y¦³·sªº¨åÄy¥[¤J¡A­n³B²z simple_nav.xlsx, advance_nav.xlsx , ¨Ã¶K¦¨¹ïÀ³ªº¯Â¤å¦rÀÉ
+	è‹¥æœ‰æ–°çš„å…¸ç±åŠ å…¥ï¼Œè¦è™•ç† simple_nav.xlsx, advance_nav.xlsx , ä¸¦è²¼æˆå°æ‡‰çš„ç´”æ–‡å­—æª”
 
-	¡i°õ¦æ nav.bat , ¦è½¬ª©°õ¦æ nav_slreader.bat¡j
+	ã€åŸ·è¡Œ nav.bat , è¥¿è“®ç‰ˆåŸ·è¡Œ nav_slreader.batã€‘
 	
-	²£¥Í¦p¤U¤T­ÓÀÉ®×
+	ç”¢ç”Ÿå¦‚ä¸‹ä¸‰å€‹æª”æ¡ˆ
 	
 	1. bulei_nav.xhtml
 
-	¥H³¡Ãş¬°¥Dªº¸g¥Ø¾ğª¬¦Cªí
+	ä»¥éƒ¨é¡ç‚ºä¸»çš„ç¶“ç›®æ¨¹ç‹€åˆ—è¡¨
 
-	¥Ñ bulei_nav.pl ²£¥Í, »İ­nÅª¨ú sutralist.txt ©M³¡Ãş¸ê®Æ bulei.txt
+	ç”± bulei_nav.pl ç”¢ç”Ÿ, éœ€è¦è®€å– sutralist.txt å’Œéƒ¨é¡è³‡æ–™ bulei.txt
 
 	2. advance_nav.xhtml
 	3. simple_nav.xhtml
 
-	¥H­ì®Ñµ²ºc¬°¥Dªº¸g¥Ø¾ğª¬¦Cªí
+	ä»¥åŸæ›¸çµæ§‹ç‚ºä¸»çš„ç¶“ç›®æ¨¹ç‹€åˆ—è¡¨
 	
-	³o¬O¦³¸g¹L¯Ê¦r³B²zªºª©¥»
+	é€™æ˜¯æœ‰ç¶“éç¼ºå­—è™•ç†çš„ç‰ˆæœ¬
 
-¡½ ²£¥Í¦U¸gªº¥Ø¿ı toc
+â–  ç”¢ç”Ÿå„ç¶“çš„ç›®éŒ„ toc
 
-	­«­n : ¦]¬° mac ¦b parser XML ®É, ¼Ğ°O¤¤ªº²Ä¤@­Ó¦r¤£¯à¬O unicode ext-b ªº¦r, 
-	¦]¦¹³Ì¦n¥ş³¡ªÅ¤@®æ. ¥Ø«e³o¬O¦b gaiji2word ¨BÆJ¹J¯Ê¦r¤~³B²z, ¥¼¨ÓÀ³¸Ó¦b²£¥Í®É¥ş³¡²Î¤@³B²z.
+	é‡è¦ : å› ç‚º mac åœ¨ parser XML æ™‚, æ¨™è¨˜ä¸­çš„ç¬¬ä¸€å€‹å­—ä¸èƒ½æ˜¯ unicode ext-b çš„å­—, 
+	å› æ­¤æœ€å¥½å…¨éƒ¨ç©ºä¸€æ ¼. ç›®å‰é€™æ˜¯åœ¨ gaiji2word æ­¥é©Ÿé‡ç¼ºå­—æ‰è™•ç†, æœªä¾†æ‡‰è©²åœ¨ç”¢ç”Ÿæ™‚å…¨éƒ¨çµ±ä¸€è™•ç†.
 
-	¡i°õ¦æ toc.bat ¥i¬İ°Ñ¼Æ¡j
-	toc.bat -a ¥ş³¡°õ¦æ
-	toc.bat -g -a ¥ş³¡°õ¦æ, ¦Ó¥B¦Û°Ê³B²z¯Ê¦rªº³¡¥÷
+	ã€åŸ·è¡Œ toc.bat å¯çœ‹åƒæ•¸ã€‘
+	toc.bat -a å…¨éƒ¨åŸ·è¡Œ
+	toc.bat -g -a å…¨éƒ¨åŸ·è¡Œ, è€Œä¸”è‡ªå‹•è™•ç†ç¼ºå­—çš„éƒ¨ä»½
 	
-	¥¦¹ê»Ú¦³¤G­Ó³¡¥÷¡G
+	å®ƒå¯¦éš›æœ‰äºŒå€‹éƒ¨ä»½ï¼š
 
-	1. °õ¦æ perl create_toc.pl ¦b toc_gaiji ¥Ø¿ı²£¥Í¥Ø¦¸ÀÉ
+	1. åŸ·è¡Œ perl create_toc.pl åœ¨ toc_gaiji ç›®éŒ„ç”¢ç”Ÿç›®æ¬¡æª”
 
-	2. ¥[¤W -g °Ñ¼Æ«h¦Ü ../gaiji2word °õ¦æ
+	2. åŠ ä¸Š -g åƒæ•¸å‰‡è‡³ ../gaiji2word åŸ·è¡Œ
 
 	perl gaiji2word_toc.pl 
 	
-	·|¦b toc ªº¥Ø¿ı¤U²£¥Í toc , ³o¬O¦³³B²z¹L¯Ê¦rªºµ²ªG
+	æœƒåœ¨ toc çš„ç›®éŒ„ä¸‹ç”¢ç”Ÿ toc , é€™æ˜¯æœ‰è™•ç†éç¼ºå­—çš„çµæœ
 
-¡½ ²£¥Í¸g¥Ø¦Cªí catalog
+â–  ç”¢ç”Ÿç¶“ç›®åˆ—è¡¨ catalog
 
-	¡i°õ¦æ catalog.bat (ÁÙ¨S²Ó¤À CBETA ©M¦è½¬ª©)¡j
+	ã€åŸ·è¡Œ catalog.bat (é‚„æ²’ç´°åˆ† CBETA å’Œè¥¿è“®ç‰ˆ)ã€‘
 	
-	¡¯ ³o¤@ª©µ²ªG¤£ºÉ²z·Q, ÁÙ­n¦Ò¼{³æ¸g¦h³¡Ãş°İÃD, ¥H¤Î T0220x , ­n°O±o©M¤W¤@­Ó¥¿¦¡ª©¤ñ¹ï¡C
+	ï¼Š é€™ä¸€ç‰ˆçµæœä¸ç›¡ç†æƒ³, é‚„è¦è€ƒæ…®å–®ç¶“å¤šéƒ¨é¡å•é¡Œ, ä»¥åŠ T0220x , è¦è¨˜å¾—å’Œä¸Šä¸€å€‹æ­£å¼ç‰ˆæ¯”å°ã€‚
 
-¡½ ²£¥Í´`§Ç¦U¨÷¨÷¦W¦CªíÀÉ®× Spine
+â–  ç”¢ç”Ÿå¾ªåºå„å·å·ååˆ—è¡¨æª”æ¡ˆ Spine
 
-	¡i°õ¦æ spine.bat¡j
+	ã€åŸ·è¡Œ spine.batã€‘
 
-	spine.txt ¬O´£¨Ñ¥ş¤åÀË¯Á¥ÎªºÀÉ®×¦Cªí
+	spine.txt æ˜¯æä¾›å…¨æ–‡æª¢ç´¢ç”¨çš„æª”æ¡ˆåˆ—è¡¨
 
-	¥¦¹ê»Ú¦³¤G­Ó³¡¥÷¡G
+	å®ƒå¯¦éš›æœ‰äºŒå€‹éƒ¨ä»½ï¼š
 	
-	1. °õ¦æ perl create_spine.pl
+	1. åŸ·è¡Œ perl create_spine.pl
 	
-	¥Ñ XML P5b ²£¥Í spine.txt
+	ç”± XML P5b ç”¢ç”Ÿ spine.txt
 
-	2. °õ¦æ perl create_spine_by_bm.pl
+	2. åŸ·è¡Œ perl create_spine_by_bm.pl
 	
-	¥Ñ BM ²£¥Í spine_by_bm.txt¡A²z½×¤W­n©M spine.txt ¤@¼Ë¡A¥i¦C¬°ÀË¬d¶µ¥Ø¡C
+	ç”± BM ç”¢ç”Ÿ spine_by_bm.txtï¼Œç†è«–ä¸Šè¦å’Œ spine.txt ä¸€æ¨£ï¼Œå¯åˆ—ç‚ºæª¢æŸ¥é …ç›®ã€‚
 	
-	³Ì«á·|¦Û°Ê¤ñ¹ï¤W­±¤GªÌ¡A¥H¤ÎÂÂª©ªº¤º®e¡C
+	æœ€å¾Œæœƒè‡ªå‹•æ¯”å°ä¸Šé¢äºŒè€…ï¼Œä»¥åŠèˆŠç‰ˆçš„å…§å®¹ã€‚
 	
-	¦è½¬²b­bª©­n¦Û¦æ§ï¤@¤Uµ{¦¡
+	è¥¿è“®æ·¨è‹‘ç‰ˆè¦è‡ªè¡Œæ”¹ä¸€ä¸‹ç¨‹å¼
 	
 	my @book_order = ("T","X","A","K","S","F","C"...
 	
-	´«¦¨³o¦æ
+	æ›æˆé€™è¡Œ
 	
 	my @book_order = ("DA","ZY","HM");
 
-¡½ §O§Ñ¤F­n°µ·s¼W¸g¤åªº epub «Ê­±¹ÏÀÉ
+â–  åˆ¥å¿˜äº†è¦åšæ–°å¢ç¶“æ–‡çš„ epub å°é¢åœ–æª”
 
-¡½ §â¯Ê¦r g ¼Ğ°O´«¦¨ unicode ©Î²Õ¦r¦¡
+â–  æŠŠç¼ºå­— g æ¨™è¨˜æ›æˆ unicode æˆ–çµ„å­—å¼
 
 
 ================================================================================================
-¥H¤U¬O²Ä¤@¥N CBReader ²£¥Í¸ê®Æªº»¡©ú¡A¯dµÛ°Ñ¦Ò¥Î
+ä»¥ä¸‹æ˜¯ç¬¬ä¸€ä»£ CBReader ç”¢ç”Ÿè³‡æ–™çš„èªªæ˜ï¼Œç•™è‘—åƒè€ƒç”¨
 ================================================================================================
 
-¡½ ²£¥Í³¡Ãş¸ê®Æªºµ{¦¡ , ¸Ô¨£ bulei/readme.txt
+â–  ç”¢ç”Ÿéƒ¨é¡è³‡æ–™çš„ç¨‹å¼ , è©³è¦‹ bulei/readme.txt
 
 bulei1.txt
 bulei2.txt
@@ -149,52 +149,52 @@ bulei4.txt
 buleinewsign.txt
 .....
 
-¥H¤W³o¨ÇÀÉ®×¬O²£¥Í TOC »İ­nªº.
+ä»¥ä¸Šé€™äº›æª”æ¡ˆæ˜¯ç”¢ç”Ÿ TOC éœ€è¦çš„.
 
-¦A¥Î buleilist_make.pl ¥Ñ bulei1_orig.txt ²£¥Í buleilist.txt , ¨Ñ cbreader ¨Ï¥Î.
+å†ç”¨ buleilist_make.pl ç”± bulei1_orig.txt ç”¢ç”Ÿ buleilist.txt , ä¾› cbreader ä½¿ç”¨.
 
-¡½ ²£¥Í TOC ªºµ{¦¡ , ¸Ô¨£ toc/readme.txt
+â–  ç”¢ç”Ÿ TOC çš„ç¨‹å¼ , è©³è¦‹ toc/readme.txt
 
 make_toc.cfg
-make_toc.pl             (­Y¸g¤å¦³¼W¥[, ­n§ï c:/cbwork/work/bin/cbetasub.pl)
+make_toc.pl             (è‹¥ç¶“æ–‡æœ‰å¢åŠ , è¦æ”¹ c:/cbwork/work/bin/cbetasub.pl)
 make_toc_all.bat
-readme.txt		¥D­n»¡©úÀÉ
+readme.txt		ä¸»è¦èªªæ˜æª”
 
-¡½ cbreader ²£¥Í normal ªºµ{¦¡
+â–  cbreader ç”¢ç”Ÿ normal çš„ç¨‹å¼
 
-cbr2t.pl		¥Dµ{¦¡
-cbr2t_all.bat	°õ¦æ¥ş³¡ªº§å¦¸ÀÉ
-cbr2t_one.bat	°õ¦æ³æ¥Uªº§å¦¸ÀÉ
-cbr/readme.txt	»¡©úÀÉ
+cbr2t.pl		ä¸»ç¨‹å¼
+cbr2t_all.bat	åŸ·è¡Œå…¨éƒ¨çš„æ‰¹æ¬¡æª”
+cbr2t_one.bat	åŸ·è¡Œå–®å†Šçš„æ‰¹æ¬¡æª”
+cbr/readme.txt	èªªæ˜æª”
 
-¡½ ±N xml ¤Á¦¨¤@¨÷¤@ÀÉªºµ{¦¡
+â–  å°‡ xml åˆ‡æˆä¸€å·ä¸€æª”çš„ç¨‹å¼
 
-cutxml-all.bat	¤Á¥ş³¡ªº§å¦¸ÀÉ
-cutxml.pl		¤Á¨÷µ{¦¡
-cutxml_cfg.pl	³]©wÀÉ
+cutxml-all.bat	åˆ‡å…¨éƒ¨çš„æ‰¹æ¬¡æª”
+cutxml.pl		åˆ‡å·ç¨‹å¼
+cutxml_cfg.pl	è¨­å®šæª”
 
-¡½ ²£¥Í cbreader ¥ş¤åÀË¯Áªº perl µ{¦¡
+â–  ç”¢ç”Ÿ cbreader å…¨æ–‡æª¢ç´¢çš„ perl ç¨‹å¼
 
-build.pl			¥Dµ{¦¡
-build/readme.txt	»¡©ú¤å¥ó
+build.pl			ä¸»ç¨‹å¼
+build/readme.txt	èªªæ˜æ–‡ä»¶
 
-build.pl ¸Ì­±³B²z³q¥Îµü¬O­n¿W¥ß³B²z, 
-¦³¤@¬qµ{¦¡¥i¥H¥Ñ "²£¥Í³q¥Î¦rbuild.pl" ¨Ó²£¥Í "³q¥Î¦r_build.pl" , ¥¼¨ÓÀ³¸Ó¥i¥H¾ã¦X¶i¨Ó.
+build.pl è£¡é¢è™•ç†é€šç”¨è©æ˜¯è¦ç¨ç«‹è™•ç†, 
+æœ‰ä¸€æ®µç¨‹å¼å¯ä»¥ç”± "ç”¢ç”Ÿé€šç”¨å­—build.pl" ä¾†ç”¢ç”Ÿ "é€šç”¨å­—_build.pl" , æœªä¾†æ‡‰è©²å¯ä»¥æ•´åˆé€²ä¾†.
 
-¡½ ²£¥Í¥ş¤åÀË¯Á¥i³æ¸g¿ï¾Üªº¦Cªí bulei_sutra_sch.lst ¤Î sutra_sch.lst
+â–  ç”¢ç”Ÿå…¨æ–‡æª¢ç´¢å¯å–®ç¶“é¸æ“‡çš„åˆ—è¡¨ bulei_sutra_sch.lst åŠ sutra_sch.lst
 
-¸Ô¨£ search_list/readme.txt
+è©³è¦‹ search_list/readme.txt
 
-¡½ ±N¨C¤@¨÷²Ä¤@¦æ¸ê®Æ©ñ¦b c:/release/juanline ¥Ø¿ı¤¤
+â–  å°‡æ¯ä¸€å·ç¬¬ä¸€è¡Œè³‡æ–™æ”¾åœ¨ c:/release/juanline ç›®éŒ„ä¸­
 
 getjuan1line.pl
 getjuan1line_all.bat
 
-¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½
-¡½ ¯S®í¸ê®Æ
-¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½
+â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– 
+â–  ç‰¹æ®Šè³‡æ–™
+â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– 
 
-¡½ ²£¥Í epub »İ­nªº¥Ø¿ı 
+â–  ç”¢ç”Ÿ epub éœ€è¦çš„ç›®éŒ„ 
 
 bulei1.txt
 bulei2.txt
@@ -203,9 +203,9 @@ bulei4.txt
 buleinewsign.txt
 .....
 make_epub.cfg
-make_epub.pl             (­Y¸g¤å¦³¼W¥[, ­n§ï c:/cbwork/work/bin/cbetasub.pl)
+make_epub.pl             (è‹¥ç¶“æ–‡æœ‰å¢åŠ , è¦æ”¹ c:/cbwork/work/bin/cbetasub.pl)
 make_epub_all.bat
 
-c:\cbwork\work\epub\readme.txt		¥D­n»¡©úÀÉ
+c:\cbwork\work\epub\readme.txt		ä¸»è¦èªªæ˜æª”
 
-¸Ì­±¦³¥Î buleilist_make.pl ²£¥Í buleilist.txt , ¨Ñ cbreader ¨Ï¥Î
+è£¡é¢æœ‰ç”¨ buleilist_make.pl ç”¢ç”Ÿ buleilist.txt , ä¾› cbreader ä½¿ç”¨

@@ -14,11 +14,11 @@ use GD;
 
 # 參數
 
-my $db_file = "database_update6.txt";	# 經名資料庫
+my $db_file = "database_update7.txt";	# 經名資料庫
 #my $cover_page_path = "c:/release/epub_cover_ud3/";	# 輸出圖檔的目錄
-my $cover_page_path = "./cover_update6/";	# 輸出圖檔的目錄
+my $cover_page_path = "./cover_update7/";	# 輸出圖檔的目錄
 #my $cover_page_path2 = "./cover/";	# 檢查結果用的
-my $cover_page_path2 = "./cover_update6/";	# 檢查結果用的
+my $cover_page_path2 = "./cover_update7/";	# 檢查結果用的
 
 my $font_size_title = 55;				# 經名字體大小 (python 的大小好像是 px, 這裡好像是 pt)
 my $font_size_small = 30;				# 譯者字體大小 (python 的大小好像是 px, 這裡好像是 pt)

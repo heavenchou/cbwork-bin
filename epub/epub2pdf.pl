@@ -7,8 +7,8 @@ use utf8;
 use Cwd;
 use strict;
 
-my $SourcePath = "d:/cbeta.www/download/epub/cbeta_epub_2021q2/Y";			# 初始目錄, 最後不用加斜線 /
-my $OutputPath = "d:/cbeta.www/download/pdf_a4/cbeta_pdf_2021q2_old";		# 目地初始目錄, 如果有需要的話. 最後不用加斜線 /
+my $SourcePath = "d:/cbeta.www/download/epub/cbeta_epub_2021q3";			# 初始目錄, 最後不用加斜線 /
+my $OutputPath = "d:/cbeta.www/download/pdf_a4/cbeta_pdf_2021q3";		# 目地初始目錄, 如果有需要的話. 最後不用加斜線 /
 my $MakeOutputPath = 1;		# 1 : 產生對應的輸出目錄
 my $IsIncludeSubDir = 1;	# 1 : 包含子目錄 0: 不含子目錄
 my $FilePattern = "*.epub";		# 要找的檔案類型
