@@ -96,8 +96,8 @@ sub h2t()
 		# <a class='noteAnchor' href='#n0004002-n01'>
 		# <a class='noteAnchor' href='#n0272003A'></a>
 		# <a class="noteAnchor" href="#n0032002-n11"/>
-		s/<a class=['"]noteAnchor['"] href=['"]#n....0?(\d{2,3}[A-Z]?)['"\-].*?><\/a>/[$1]/g;
-		s/<a class=['"]noteAnchor['"] href=['"]#n....0?(\d{2,3}[A-Z]?)['"\-].*?\/>/[$1]/g;
+		s/<a class=['"]noteAnchor['"] href=['"]#n....0?(\d{2,3}[A-Z]?)a?['"\-].*?><\/a>/[$1]/g;
+		s/<a class=['"]noteAnchor['"] href=['"]#n....0?(\d{2,3}[A-Z]?)a?['"\-].*?\/>/[$1]/g;
 		
 		# 卍續 <a class='noteAnchor' href='#n0600b01' data-label='標01'></a>
 		# 卍續 <a class='noteAnchor' href='#n0524k01' data-label='科01'></a>

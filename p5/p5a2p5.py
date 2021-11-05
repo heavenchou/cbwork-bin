@@ -3,6 +3,7 @@
 2013.1.4 周邦信 改寫自 cbp4top5.py
 
 Heaven 修改:
+2021/07/21 支援太虛大師全書.
 2020/07/20 支援西蓮淨苑資料, 要修改 git 的查詢目錄.
 2019/09/15 修改成也支援 P5b 版。
 2019/09/14 支援新改版的檔頭，檔頭中的日期是 P5a 最後一次提交 GitHub 的日期。
@@ -94,6 +95,7 @@ WITS = {
 	'Q' : '【磧砂】',
 	'S' : '【宋遺】',
 	'T' : '【大】',
+	'TX' : '【太虛】',
 	'U' : '【洪武】',
 	'X' : '【卍續】',
 	'Y' : '【印順】',
@@ -107,6 +109,7 @@ RESPS = {
 	'D' : 'NCLRareBook',
 	'J' : 'Jiaxing',
 	'T' : 'Taisho',
+	'TX' : 'TaiXu',
 	'X' : 'Xuzangjing',
 	'ZS' : 'Dudoucheng',
 	'ZW' : 'ZangWai',
@@ -3034,6 +3037,9 @@ def handle_back(t):
 		elif k=='Taisho':
 			r += '<cb:div type="taisho-notes">\n'
 			r += '<head>大正 校註</head>\n'
+		elif k=='TaiXu':
+			r += '<cb:div type="taixu-notes">\n'
+			r += '<head>太虛大師全書 校註</head>\n'
 		elif k=='Xuzangjing':
 			r += '<cb:div type="xuzang-notes">\n'
 			r += '<head>卍續藏 校註</head>\n'

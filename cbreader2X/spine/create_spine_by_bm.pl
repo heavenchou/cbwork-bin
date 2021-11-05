@@ -14,7 +14,7 @@ my $FilePattern = "new.txt";		# 要找的檔案類型
 my @all_files = ();		# 記錄所找到的檔案, 先記起來, 最後再處理.
 
 # 處理藏經的順序
-my @book_order = ("T","X","A","K","S","F","C","D","U","P","J","L","G","M","N","ZS","I","ZW","B","GA","GB","Y","LC");
+my @book_order = ("T","X","A","K","S","F","C","D","U","P","J","L","G","M","N","ZS","I","ZW","B","GA","GB","Y","LC","TX");
 #my @book_order = ("DA","ZY","HM");
 
 open OUT, ">:utf8", "spine_by_bm.txt";
