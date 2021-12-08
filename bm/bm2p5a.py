@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2021/12/08 太虛大師全書 TX 的校註採用特殊格式 <note ... rend="hide">....</note>
 2021/12/07 太虛大師全書 TX 的校註採用特殊格式 <rdg resp="CBETA" type="cbetaRemark">....</rdg>
 2021/07/19 新增支援太虛大師全書 TX。
 2020/12/22 支援斜體<it>、粗體<bold>及楷<kai>、明<ming>、宋<song>、黑體<hei>標記。
@@ -1151,7 +1152,7 @@ def do_corr_normalize(text):
 			if mo.group(1) == "=":
 				subtype = " subtype=\"規範字詞\""
 			if ed == 'TX' :
-				text = re.sub(r"\[([^\]]*?)(?:[>=])([^\]]*?)\](:gaiji3:resp=\"(.*?)\":gaiji4:)?", r'<note n="{p}{l}{n:02d}" resp="CBETA" type="add"{st}>\2【CB】，\1{ed}</note><app n="{p}{l}{n:02d}"><lem wit="{ed}">\1</lem><rdg resp="{r}" type="cbetaRemark">\2</rdg></app>'.format(p=old_pb, l=line_num, st=subtype, ed=wit, r=resp, n=note_count), text, count=1)
+				text = re.sub(r"\[([^\]]*?)(?:[>=])([^\]]*?)\](:gaiji3:resp=\"(.*?)\":gaiji4:)?", r'<note n="{p}{l}{n:02d}" resp="CBETA" type="add"{st} rend="hide">\2【CB】，\1{ed}</note><app n="{p}{l}{n:02d}"><lem wit="{ed}">\1</lem><rdg resp="{r}" type="cbetaRemark">\2</rdg></app>'.format(p=old_pb, l=line_num, st=subtype, ed=wit, r=resp, n=note_count), text, count=1)
 			else :
 				text = re.sub(r"\[([^\]]*?)(?:[>=])([^\]]*?)\](:gaiji3:resp=\"(.*?)\":gaiji4:)?", r'<note n="{p}{l}{n:02d}" resp="CBETA" type="add"{st}>\2【CB】，\1{ed}</note><app n="{p}{l}{n:02d}"><lem wit="【CB】" resp="{r}">\2</lem><rdg wit="{ed}">\1</rdg></app>'.format(p=old_pb, l=line_num, st=subtype, ed=wit, r=resp, n=note_count), text, count=1)
 			note_count = note_count + 1
