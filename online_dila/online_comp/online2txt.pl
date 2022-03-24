@@ -140,10 +140,16 @@ sub h2t()
 		# 雙行小註
 		# <span class='doube-line-note'>闍尼沙秦言勝結使</span>
 		# <span class='interlinear-note'>
-		s/<span[^>]*class=['"]doube\-line\-note['"][^>]*>(.*?)<\/span>/($1)/g;
-		s/<span[^>]*class=['"]interlinear\-note['"][^>]*>(.*?)<\/span>/($1)/g;
-		s/<span[^>]*class=['"]doube\-line\-note['"][^>]*>/(/g;
-		s/<span[^>]*class=['"]interlinear\-note['"][^>]*>/(/g;
+		
+		#s/<span[^>]*class=['"]doube\-line\-note['"][^>]*>(.*?)<\/span>/($1)/g;
+		#s/<span[^>]*class=['"]interlinear\-note['"][^>]*>(.*?)<\/span>/($1)/g;
+		#s/<span[^>]*class=['"]doube\-line\-note['"][^>]*>/(/g;
+		#s/<span[^>]*class=['"]interlinear\-note['"][^>]*>/(/g;
+
+		# 2022Q1 換成 <small class="inline-note doube-line-note">...</small>
+		s/<small[^>]*doube\-line\-note[^>]*>/(/g;
+		s/<small[^>]*interlinear\-note[^>]*>/(/g;
+		s/<\/small>/)/g;
 
 		# 悉曇
 		# <span class='siddam' roman='na' code='SD-A5A9' char=''/>

@@ -3,6 +3,7 @@
 2013.1.4 周邦信 改寫自 cbp4top5.py
 
 Heaven 修改:
+2022/01/15 印順法師全集(Y) 的 p5b 取消 app ，直接呈現 lem 的內容，因為印順基金會要求不要呈現新增校注。
 2021/07/21 支援太虛大師全書.
 2020/07/20 支援西蓮淨苑資料, 要修改 git 的查詢目錄.
 2019/09/15 修改成也支援 P5b 版。
@@ -2187,7 +2188,11 @@ class MyTransformer():
 		# P5b 不把 app 放在 back 區了
 		if options.P5b_Format == True:
 			node=MyNode(e)
-			r = node.open_tag() + self.traverse(e, mode) + node.end_tag()
+			# Y 就直接呈現 lem 內容, 不要標記了, rdg 則不呈現
+			if globals['coll'] == 'Y' and globals['coll'] == 'TX':
+				r = self.traverse(e, mode)
+			else:
+				r = node.open_tag() + self.traverse(e, mode) + node.end_tag()
 			return r
 
 		type=e.get('type')
@@ -2268,7 +2273,11 @@ class MyTransformer():
 		# P5b 不把 lem 放在 back 區了
 		if options.P5b_Format == True:
 			node=MyNode(e)
-			r = node.open_tag() + self.traverse(e, mode) + node.end_tag()
+			# Y 就直接呈現 lem 內容, 不要標記了, rdg 則不呈現
+			if globals['coll'] == 'Y' and globals['coll'] == 'TX':
+				r = self.traverse(e, mode)
+			else:
+				r = node.open_tag() + self.traverse(e, mode) + node.end_tag()
 			return r
 		if 'choice' in mode:
 			node = MyNode()
@@ -2299,7 +2308,11 @@ class MyTransformer():
 		# P5b 不把 rdg 放在 back 區了
 		if options.P5b_Format == True:
 			node=MyNode(e)
-			r = node.open_tag() + self.traverse(e, mode) + node.end_tag()
+			# Y 就直接呈現 lem 內容, 不要標記了, rdg 則不呈現
+			if globals['coll'] == 'Y' and globals['coll'] == 'TX':
+				r = ''
+			else:
+				r = node.open_tag() + self.traverse(e, mode) + node.end_tag()
 			return r
 		if 'choice' in mode:
 			if 'back' in mode:

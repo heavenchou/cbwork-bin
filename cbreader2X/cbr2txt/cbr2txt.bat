@@ -45,6 +45,7 @@ perl cbr2txt.pl N
 perl cbr2txt.pl P
 perl cbr2txt.pl S
 perl cbr2txt.pl T
+perl cbr2txt.pl TX
 perl cbr2txt.pl U
 perl cbr2txt.pl X
 perl cbr2txt.pl Y

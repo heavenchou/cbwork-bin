@@ -12,9 +12,10 @@
 #
 # 設定檔：相關設定由 ../cbwork_bin.ini 取得
 #
-# Copyright (C) 1998-2021 CBETA
-# Copyright (C) 1999-2021 Heaven Chou
+# Copyright (C) 1998-2022 CBETA
+# Copyright (C) 1999-2022 Heaven Chou
 ########################################################################
+# 2021/01/15 太虛大師全集 TX 的修訂採用修訂前的文字
 # 2021/09/09 1. <Q> 和 <p=h> 支援到 25 層.
 # 2021/01/07 1. 支援 <c,2>, <c2 r3,2> 這種格式, ",2" 表示內文空二格, 但轉 normal 不處理
 # 2020/12/25 1. 忽略 <it> <bold> <kai> <ming> <hei> <song>
@@ -2544,7 +2545,12 @@ sub select_corr
 	s/\[($loseutf8*?)\]/:1az1:$1:2az2:/g;
 	s/<([^>]{1,3})>/:3az3:$1:4az4:/g;	# 標記也先換掉
 	s/<(.?no_chg)>/:3az3:$1:4az4:/g;	# 標記也先換掉
-	s/\[$loseutf8*?>{1,2}($loseutf8*?)\]/$1/g;
+	# 太虛大師全集 TX 的修訂有點奇特，BM 都是 [A>B] ，XML 則有時是A有時是B，所以 BM 二者都要呈現。
+	if($vol_head eq "TX") {
+		s/\[($loseutf8*?)>{1,2}($loseutf8*?)\]/【$1,$2】/g;
+	} else {
+		s/\[$loseutf8*?>{1,2}($loseutf8*?)\]/$1/g;
+	}
 	s/:1az1:/\[/g;
 	s/:2az2:/\]/g;
 	s/:3az3:/</g;

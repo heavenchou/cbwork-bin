@@ -44,6 +44,8 @@ perl online2txt.pl S
 perl comp_online_txt.pl S
 perl online2txt.pl T
 perl comp_online_txt.pl T
+perl online2txt.pl TX
+perl comp_online_txt.pl TX
 perl online2txt.pl U
 perl comp_online_txt.pl U
 perl online2txt.pl X
