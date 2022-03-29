@@ -10,6 +10,7 @@ $Revision: 1.7 $
 $Date: 2013/04/23 19:42:06 $
 
 Heaven 修改:
+2022/03/29 處理 <p_c> , <p_r>, 加上 rend="text-center" , rend="text-right" (文字靠右)
 2021/12/08 太虛大師全書 TX 的校註採用特殊格式 <note ... rend="hide">....</note>
 2021/12/07 太虛大師全書 TX 的校註採用特殊格式 <rdg resp="CBETA" type="cbetaRemark">....</rdg>
 2021/07/19 新增支援太虛大師全書 TX。
@@ -345,7 +346,16 @@ def start_inline_p(tag):
 	mo = re.search(r'<p=h(\d+)>', tag)
 	if mo!=None:
 		s += ' cb:type="head{}"'.format(mo.group(1))
+
+	# 處理 <p_c> , <p_r> - 2022-03-29
 	
+	mo = re.search(r'<[pz]_c', tag)
+	if mo!=None:
+		s += ' rend="text-center"'
+	mo = re.search(r'<[pz]_r', tag)
+	if mo!=None:
+		s += ' rend="text-right"'
+
 	s += '>'
 	out(s)
 	opens['p']=1
