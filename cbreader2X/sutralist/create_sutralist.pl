@@ -5,6 +5,8 @@ use utf8;
 use Cwd;
 use strict;
 
+my $para = shift;	# 傳入的參數，主要是 see 是處理西蓮
+
 # 使用 p5a , 免得經名有 ext-b 以上的 unicode , 造成 mac 處理有問題
 my $SourcePath = "d:/cbwork/xml-p5b";		# 初始目錄, 最後不用加斜線 /
 my $OutputPath = "d:/cbwork/xml-p5b";		# 目地初始目錄, 如果有需要的話. 最後不用加斜線 /
@@ -13,8 +15,14 @@ my $IsIncludeSubDir = 1;	# 1 : 包含子目錄 0: 不含子目錄
 my $FilePattern = "*.xml";		# 要找的檔案類型
 
 my %list_hash = ();         # 用來放某一冊的結果, 要使用頁欄行排序
+my $outfile = "sutralist.txt";
 
-open OUT, ">:utf8", "sutralist.txt" or die "open error";
+# 處理西蓮淨苑
+if($para eq "see") {
+	$outfile = "sutralist_see.txt"
+}
+
+open OUT, ">:utf8", $outfile or die "open error";
 SearchDir($SourcePath, $OutputPath);
 close OUT;
 
@@ -64,6 +72,18 @@ sub SearchDir
 	foreach my $file (sort(@files))
 	{
 		next if($file =~ /^\./);
+
+		# 判斷是不是西蓮
+		if($para eq "see") {
+			if($file !~ /DA|ZY|HM/) {
+				next;
+			}
+		} else {
+			if($file =~ /DA|ZY|HM/) {
+				next;
+			}
+		}
+
 		my $NewDir = $ThisDir . "/" . $file ;
 		my $NewOutputDir = $ThisOutputDir . "/" . $file ; 
 		if (-d $NewDir)

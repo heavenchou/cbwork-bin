@@ -5,6 +5,8 @@ use utf8;
 use Cwd;
 use strict;
 
+my $para = shift;	# 傳入的參數，主要是 see 是處理西蓮
+
 my $SourcePath = "d:/cbwork/bm";			# 初始目錄, 最後不用加斜線 /
 my $OutputPath = "d:/cbwork/bm";		# 目地初始目錄, 如果有需要的話. 最後不用加斜線 /
 my $MakeOutputPath = 0;		# 1 : 產生對應的輸出目錄
@@ -15,9 +17,16 @@ my @all_files = ();		# 記錄所找到的檔案, 先記起來, 最後再處理.
 
 # 處理藏經的順序
 my @book_order = ("T","X","A","K","S","F","C","D","U","P","J","L","G","M","N","ZS","I","ZW","B","GA","GB","Y","LC","TX");
-#my @book_order = ("DA","ZY","HM");
 
-open OUT, ">:utf8", "spine_by_bm.txt";
+my $outfile = "spine_by_bm.txt";
+
+# 處理西蓮淨苑
+if($para eq "see") {
+	@book_order = ("DA","ZY","HM");
+	$outfile = "spine_see_by_bm.txt"
+}
+
+open OUT, ">:utf8", $outfile;
 open LOG, ">:utf8", "error_by_bm.txt";
 for(my $i=0; $i<=$#book_order; $i++)
 {

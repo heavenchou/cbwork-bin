@@ -21,12 +21,23 @@ use Bulei;
 use lib "../..";
 use CBETA;
 
+my $para = shift;	# 傳入的參數，主要是 see 是處理西蓮
+
 my $sutralist = SutraList->new;     # 宣告
 my $bulei = Bulei->new;
-$sutralist->initial("../sutralist/sutralist.txt");  # 初始化, 要傳入 sutralist.txt 的位置
+my $outfile = "catalog_gaiji.txt";
+
+# 判斷是不是西蓮專案
+if($para eq "see") {
+    $sutralist->initial("../sutralist/sutralist_see.txt");  # 初始化, 要傳入 sutralist.txt 的位置
+    $outfile = "catalog_see_gaiji.txt";
+} else {
+    $sutralist->initial("../sutralist/sutralist.txt");  # 初始化, 要傳入 sutralist.txt 的位置
+}
+
 $bulei->initial("../bulei/bulei.txt");
 
-open OUT, ">:utf8", "catalog_gaiji.txt";
+open OUT, ">:utf8", $outfile;
 
 for(my $i=0; $i<=$#{$sutralist->book}; $i++)
 {

@@ -28,10 +28,10 @@ if($argv eq "nav")
     $outfile = "/cbwork/bin/cbreader2x/nav/bulei_nav.xhtml"; 
     runfile();
 }
-elsif($argv eq "slreader_nav")
+elsif($argv eq "nav_see")
 {
-    $infile = "/cbwork/bin/cbreader2x/nav/slreader_nav_gaiji.xhtml";
-    $outfile = "/cbwork/bin/cbreader2x/nav/slreader_nav.xhtml"; 
+    $infile = "/cbwork/bin/cbreader2x/nav/seeland_nav_gaiji.xhtml";
+    $outfile = "/cbwork/bin/cbreader2x/nav/seeland_nav.xhtml"; 
     runfile();
 }
 elsif($argv eq "catalog")
@@ -40,10 +40,10 @@ elsif($argv eq "catalog")
     $outfile = "/cbwork/bin/cbreader2x/catalog/catalog.txt"; 
     runfile();
 }
-elsif($argv eq "slreader_catalog")
+elsif($argv eq "catalog_see")
 {
-    $infile = "/cbwork/bin/cbreader2x/catalog/slreader_catalog_gaiji.txt";
-    $outfile = "/cbwork/bin/cbreader2x/catalog/slreader_catalog.txt"; 
+    $infile = "/cbwork/bin/cbreader2x/catalog/catalog_see_gaiji.txt";
+    $outfile = "/cbwork/bin/cbreader2x/catalog/catalog_see.txt"; 
     runfile();
 }
 

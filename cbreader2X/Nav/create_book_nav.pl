@@ -8,7 +8,7 @@ use SutraList;
 use lib ".";
 use BookNav;   # 原書結構樹狀目錄
 
-my $infile = shift;     # 來源檔
+my $infile = shift;     # 來源檔, 特別注意西蓮版是 seeland_nav.txt
 my $outfile = $infile;  # 輸出檔
 
 if($infile eq "")
@@ -21,7 +21,13 @@ $outfile =~ s/\.txt/_gaiji.xhtml/;
 my $sutralist = SutraList->new;
 my $book_nav = BookNav->new;
 
-$sutralist->initial("../sutralist/sutralist.txt");
+# 判斷是不是西蓮專案
+if($infile eq "seeland_nav.txt") {
+    $sutralist->initial("../sutralist/sutralist_see.txt");
+} else {
+    $sutralist->initial("../sutralist/sutralist.txt");
+}
+
 $book_nav->initial($infile);
 
 my $pre_level = 0;
@@ -114,7 +120,7 @@ sub create_body
                     my $link = $sutralist->link->[$index];
                     my $name = $sutralist->name->[$index];
                     $name =~ s/\(第.*?卷\)$//;  # 去除卷數
-                    $name =~ s/（上）$//;
+                    $name =~ s/（上）$// if($name !~ /紀念集（上）/); # ZY47 特例
                     $name =~ s/（一）$// if($name !~ /華雨集（一）/); # 特例
                     $key =~ s/^T0220a$/T0220/; # 特例 
                     $link =~ s/T05n0220a_001/T05n0220_001/; # 特例

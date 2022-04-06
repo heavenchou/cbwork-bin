@@ -3,6 +3,8 @@
 2013.1.4 周邦信 改寫自 cbp4top5.py
 
 Heaven 修改:
+2022/03/31 校注 resp 加上智諭法師全集
+		   所有 "校註" 都改成 "校注"
 2022/01/15 印順法師全集(Y) 的 p5b 取消 app ，直接呈現 lem 的內容，因為印順基金會要求不要呈現新增校注。
 2021/07/21 支援太虛大師全書.
 2020/07/20 支援西蓮淨苑資料, 要修改 git 的查詢目錄.
@@ -18,7 +20,7 @@ Heaven 修改:
 2018/07/24 加入惠敏法師著作 HM
 2018/06/06 P5b 格式將 </row>...<row><cell> 轉成 </row><row><cell>... 以利 cbreader 處理
 2018/03/27 處理屬性中的 & 轉成 &amp; , < 轉成 &lt;
-2018/03/23 校註 resp 加上正聞出版社
+2018/03/23 校注 resp 加上正聞出版社
 2017/11/25 增加 -b 參數, 產生 CBReader 專用的 P5b 格式, 特點為:
            1. 沒有 <back> 區, 校勘等資料都和 p5a 一樣, 不做任何移動.
 		   2. 缺字是單一標記 <g xxx/> , 沒有包含任何文字, 因為 Mac 版不接受有 Ext-B 的 XML.
@@ -2998,7 +3000,7 @@ def handle_back(t):
 	r = '\n<back>\n'
 	if t.back['app']!='':
 		r += '<cb:div type="apparatus">\n'
-		r += '<head>校註</head>\n'
+		r += '<head>校注</head>\n'
 		r += '<p>\n'
 		r += t.back['app']
 		r += '</p>\n'
@@ -3015,67 +3017,70 @@ def handle_back(t):
 	for k in sorted(t.back_notes):
 		if k=='add':
 			r += '<cb:div type="add-notes">\n'
-			r += '<head>新增校註</head>\n'
+			r += '<head>新增校注</head>\n'
 		elif k=='BuBian':
 			r += '<cb:div type="bubian-notes">\n'
-			r += '<head>大藏經補編 校註</head>\n'
+			r += '<head>大藏經補編 校注</head>\n'
 		elif k=='CBETA':
 			r += '<cb:div type="cbeta-notes">\n'
-			r += '<head>CBETA 校註</head>\n'
+			r += '<head>CBETA 校注</head>\n'
 		elif k=='Daoan':
 			r += '<cb:div type="daoan-notes">\n'
-			r += '<head>道安長老全集 校註</head>\n'
+			r += '<head>道安長老全集 校注</head>\n'
 		elif k=='DILA':
 			r += '<cb:div type="dila-notes">\n'
-			r += '<head>法鼓文理學院 校註</head>\n'
+			r += '<head>法鼓文理學院 校注</head>\n'
 		elif k=='Dudoucheng':
 			r += '<cb:div type="dudoucheng-notes">\n'
-			r += '<head>正史佛教資料類編 校註</head>\n'
-		elif k=='Huimin':
-			r += '<cb:div type="huimin-notes">\n'
-			r += '<head>惠敏法師 校註</head>\n'
-		elif k=='ihp':
-			r += '<cb:div type="ihp-notes">\n'
-			r += '<head>中央研究院歷史語言研究所 校註</head>\n'
-		elif k=='LüCheng':
-			r += '<cb:div type="lüCheng-notes">\n'
-			r += '<head>呂澂佛學著作集 校註</head>\n'
-		elif k=='NanChuan':
-			r += '<cb:div type="nanchuan-notes">\n'
-			r += '<head>漢譯南傳大藏經 校註</head>\n'
-		elif k=='NCLRareBook':
-			r += '<cb:div type="ncl-notes">\n'
-			r += '<head>國家圖書館善本佛典 校註</head>\n'
-		#elif k=='Northern Yongle Edition of the Canon':
-		elif k=='Taisho':
-			r += '<cb:div type="taisho-notes">\n'
-			r += '<head>大正 校註</head>\n'
-		elif k=='TaiXu':
-			r += '<cb:div type="taixu-notes">\n'
-			r += '<head>太虛大師全書 校註</head>\n'
-		elif k=='Xuzangjing':
-			r += '<cb:div type="xuzang-notes">\n'
-			r += '<head>卍續藏 校註</head>\n'
-		elif k=='Yonglebei':
-			r += '<cb:div type="yongle-notes">\n'
-			r += '<head>永樂北藏 校註</head>\n'
-		elif k=='ZangWai':
-			r += '<cb:div type="zangwai-notes">\n'
-			r += '<head>方廣錩 校註</head>\n'
-		elif k=='釋印順':
-			r += '<cb:div type="yinshun-notes">\n'
-			r += '<head>印順法師 校註</head>\n'
-		elif k=='正聞出版社':
-			r += '<cb:div type="zhengwen-notes">\n'
-			r += '<head>正聞出版社 校註</head>\n'
+			r += '<head>正史佛教資料類編 校注</head>\n'
 		elif k=='equivalent':
 			r += '<cb:div type="equiv-notes">\n'
 			r += '<head>相對應巴利文書名</head>\n'
+		elif k=='Huimin':
+			r += '<cb:div type="huimin-notes">\n'
+			r += '<head>惠敏法師著作集 校注</head>\n'
+		elif k=='ihp':
+			r += '<cb:div type="ihp-notes">\n'
+			r += '<head>中央研究院歷史語言研究所 校注</head>\n'
+		elif k=='LüCheng':
+			r += '<cb:div type="lüCheng-notes">\n'
+			r += '<head>呂澂佛學著作集 校注</head>\n'
+		elif k=='NanChuan':
+			r += '<cb:div type="nanchuan-notes">\n'
+			r += '<head>漢譯南傳大藏經 校注</head>\n'
+		elif k=='NCLRareBook':
+			r += '<cb:div type="ncl-notes">\n'
+			r += '<head>國家圖書館善本佛典 校注</head>\n'
+		#elif k=='Northern Yongle Edition of the Canon':
 		elif k=='rest':
 			if t.back_notes[k] =='':
 				continue
 			r += '<cb:div type="rest-notes">\n'
-			r += '<head>其他校註</head>\n'
+			r += '<head>其他校注</head>\n'
+		elif k=='Taisho':
+			r += '<cb:div type="taisho-notes">\n'
+			r += '<head>大正藏 校注</head>\n'
+		elif k=='TaiXu':
+			r += '<cb:div type="taixu-notes">\n'
+			r += '<head>太虛大師全書 校注</head>\n'
+		elif k=='Xuzangjing':
+			r += '<cb:div type="xuzang-notes">\n'
+			r += '<head>卍續藏 校注</head>\n'
+		elif k=='Yonglebei':
+			r += '<cb:div type="yongle-notes">\n'
+			r += '<head>永樂北藏 校注</head>\n'
+		elif k=='ZangWai':
+			r += '<cb:div type="zangwai-notes">\n'
+			r += '<head>方廣錩 校注</head>\n'
+		elif k=='Zhiyu':
+			r += '<cb:div type="zhiyu-notes">\n'
+			r += '<head>智諭法師全集 校注</head>\n'
+		elif k=='釋印順':
+			r += '<cb:div type="yinshun-notes">\n'
+			r += '<head>印順法師全集 校注</head>\n'
+		elif k=='正聞出版社':
+			r += '<cb:div type="zhengwen-notes">\n'
+			r += '<head>正聞出版社 校注</head>\n'
 		else:
 			sys.exit('error 1000: ' + k)
 		r += '<p>\n'
