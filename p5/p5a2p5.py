@@ -3352,7 +3352,7 @@ if options.vol_start is not None:
 
 # 讀取設定檔 cbwork_bin.ini
 config = configparser.ConfigParser()
-config.read('../cbwork_bin.ini')
+config.read('../cbwork_bin.ini', 'UTF-8')
 CBTEMP = config.get('default', 'temp')
 cbwork_dir = config.get('default', 'cbwork')
 JING = config.get('default', 'jing.jar_file')

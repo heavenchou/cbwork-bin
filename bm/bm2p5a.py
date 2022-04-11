@@ -1773,7 +1773,7 @@ ed = mo.group()
 
 # 讀取 設定檔 cbwork_bin.ini
 config = configparser.ConfigParser()
-config.read('../cbwork_bin.ini')
+config.read('../cbwork_bin.ini','UTF-8')
 gaijiMdb = config.get('default', 'gaiji-m.mdb_file')
 cbwork_dir = config.get('default', 'cbwork')
 BMLaiYuan = cbwork_dir + '/bm/{ed}/{vol}/source.txt'.format(vol=vol, ed=ed)

@@ -411,11 +411,11 @@ def fileHeader(tree):
 	p=tree.xpath("//projectDesc/p[@lang='en']")
 	globals['ly_en']=p[0].text
 	globals['ebib']=tree.findtext('.//sourceDesc//bibl')	# T08n0236a.xml 在 <bibl> 之前還有 <p> , 故用 //bibl
-	globals['ebib']=re.sub("No. 0*","No. ",globals['ebib'])
-	globals['ebib']=re.sub("Vol. 0*","Vol. ",globals['ebib'])
-	if globals['collection'] == 'T':
-		globals['ebib']=re.sub(r"No. 220[a-z]","No. 220",globals['ebib'])
-	globals['ebib']=re.sub("\s*$","",globals['ebib'])
+	# globals['ebib']=re.sub("No. 0*","No. ",globals['ebib'])
+	# globals['ebib']=re.sub("Vol. 0*","Vol. ",globals['ebib'])
+	# if globals['collection'] == 'T':
+	# 	globals['ebib']=re.sub(r"No. 220[a-z]","No. 220",globals['ebib'])
+	# globals['ebib']=re.sub("\s*$","",globals['ebib'])
 	globals['eFormat']='Normalized Version'
 	return fileHeadTemplate.substitute(globals)
 
@@ -495,7 +495,7 @@ parser.add_option("-z", action="store_false", dest="gaijiNormalize", default=Tru
 
 # 讀取 設定檔 cbwork_bin.ini
 config = configparser.ConfigParser()
-config.read('../cbwork_bin.ini')
+config.read('../cbwork_bin.ini','UTF-8')
 xmlP5Base = config.get('p5totxt', 'xml_p5')
 outBase = config.get('p5totxt', 'output_dir')
 
