@@ -12,12 +12,6 @@ require 'nokogiri'
 require 'slop'
 
 COLLECTION_NAME = {
-  "T"  => "大正新脩大藏經",
-  "X"  => "卍新纂大日本續藏經",
-  "J"  => "嘉興大藏經（新文豐版）",
-  "ZS" => "正史佛教資料類編",
-  "ZW" => "藏外佛教文獻",
-  "I"  => "北朝佛教石刻拓片百品",
   "A"  => "趙城金藏",
   "B"  => "大藏經補編",
   "C"  => "中華大藏經（中華書局版）",
@@ -27,6 +21,9 @@ COLLECTION_NAME = {
   "G"  => "佛教大藏經",
   "GA" => "中國佛寺史志彙刊",
   "GB" => "中國佛寺志叢刊",
+  "HM" => "惠敏法師著作集",
+  "I"  => "北朝佛教石刻拓片百品",
+  "J"  => "嘉興大藏經（新文豐版）",
   "K"  => "高麗大藏經（新文豐版）",
   "L"  => "乾隆大藏經（新文豐版）",
   "M"  => "卍正藏經（新文豐版）",
@@ -34,8 +31,13 @@ COLLECTION_NAME = {
   "P"  => "永樂北藏",
   "Q"  => "磧砂大藏經（新文豐版）",
   "S"  => "宋藏遺珍（新文豐版）",
+  "T"  => "大正新脩大藏經",
+  "TX" => "大虛大師全書",
   "U"  => "洪武南藏",
+  "X"  => "卍新纂大日本續藏經",
   "Y"  => "印順法師佛學著作集",
+  "ZS" => "正史佛教資料類編",
+  "ZW" => "藏外佛教文獻",
   "ZY" => "智諭老和尚著作全集",
 }
 
@@ -401,7 +403,7 @@ def handle_sutra(src, dest)
   
   read_char_info(doc)
 
-  if !$opts[:file_header]    # 是否要印出卷首資訊    
+  if !$opts[:no_file_header]    # 是否要印出卷首資訊    
     if basename.match(/^T07n0220[d-z]/)
       # T07n0220d 之後的不要印出詳細卷首
       tmp = file_header(doc)  # 還是要先執行, 以取得需要的資料
@@ -459,7 +461,6 @@ def handle_vol
   end
 end
 
-
 # 從 teiHeader 中讀入缺字資訊
 def read_char_info(doc)
   $zuzishi = {}
@@ -478,10 +479,10 @@ end
 def read_command_line_arguments
   opts = Slop.parse do |o|
     o.bool '-h', '--help', '顯示說明'
-    o.bool '-a', '--file_header', '檔頭資訊'
-    o.bool '-k', '--footnote_anchor', '顯示校勘符號'
-    o.bool '-u', '--split_by_juan', "一卷一檔, 預設是一經一檔"
-    o.bool '-z', '--no_nor', '不使用通用字'
+    o.bool '-a', '--no-file-header', '檔頭資訊'
+    o.bool '-k', '--footnote-anchor', '顯示校勘符號'
+    o.bool '-u', '--split-by-juan', "一卷一檔, 預設是一經一檔"
+    o.bool '-z', '--no-nor', '不使用通用字'
     o.string '-v', '--vol', "指定要轉換哪一冊"
     o.integer "-x", "--siddham", "悉曇字呈現方法: 0=轉寫(預設), 1=entity &SD-xxxx, 2=◇【◇】", default: 0
   end
@@ -515,7 +516,7 @@ def split_by_juan(source, folder_out)
   # 最後再寫入最後一卷
   
   header = ''
-  if !$opts[:file_header]    # 是否要印出卷首資訊
+  if !$opts[:no_file_header]    # 是否要印出卷首資訊
     header = short_file_header  # 第二卷之後的卷首
   end
   
