@@ -37,11 +37,11 @@ my $runningpath = "";
 find(\&findfile, $path);	# 處理所有檔案
 if($vol)
 {
-	open OUT, ">:utf8", "comp_result_${vol}.txt";
+	open OUT, ">:utf8", "__comp_result_${vol}.txt";
 }
 else
 {
-	open OUT, ">:utf8", "comp_result.txt";	
+	open OUT, ">:utf8", "__comp_result.txt";	
 }
 print OUT $output;
 close OUT;

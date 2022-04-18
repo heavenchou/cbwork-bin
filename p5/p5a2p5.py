@@ -1789,8 +1789,8 @@ def handle_resp(resp):
 	resps = resp.split()
 	result = []
 	for r in resps:
-		result.append(resp_id[r])
-	return '#' + ' '.join(result)
+		result.append("#"+resp_id[r])
+	return ' '.join(result)
 
 ####################################
 # 讀取所有的 wit 屬性
@@ -2165,7 +2165,7 @@ class MyTransformer():
 			resp = lem.get('resp')
 			if resp is not None:
 				node.attrib['resp'] = resp
-			type = e.get('cb:type')
+			type = e.get('type')
 			if type is not None:
 				node.attrib['cb:type'] = type
 			self.back['app'] += node.open_tag()
@@ -2630,7 +2630,7 @@ class MyTransformer():
 			else:
 				r += edition_txt.replace("XML TEI P5a", "XML TEI P5")
 			r += node.end_tag()
-			for k, v in sorted(resp_id.items(), key=lambda a: a[1]):
+			for k, v in sorted(resp_id.items(), key=lambda a: int(a[1][4:],10)):
 				r += '\n\t\t\t<respStmt xml:id="{}"><resp>corrections</resp><name>{}</name></respStmt>'.format(v, k)
 		elif tag=='encodingDesc':
 			node = MyNode(e)

@@ -12,19 +12,19 @@ echo catalog.bat -see   : run seeland
 exit /B
 
 :run_all
-copy catalog.txt catalog_bak.txt
+copy catalog.txt __catalog_bak.txt
 perl create_catalog.pl
 cd ../gaiji2word
 perl gaiji2word.pl catalog
 cd ../catalog
-fc catalog.txt catalog_bak.txt
+fc catalog.txt __catalog_bak.txt
 exit /B
 
 :run_seeland
-copy catalog_see.txt catalog_see_bak.txt
+copy catalog_see.txt __catalog_see_bak.txt
 perl create_catalog.pl see
 cd ../gaiji2word
 perl gaiji2word.pl catalog_see
 cd ../catalog
-fc catalog_see.txt catalog_see_bak.txt
+fc catalog_see.txt __catalog_see_bak.txt
 exit /B

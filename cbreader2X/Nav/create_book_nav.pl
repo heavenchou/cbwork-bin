@@ -17,6 +17,7 @@ if($infile eq "")
     exit;
 }
 $outfile =~ s/\.txt/_gaiji.xhtml/;
+$outfile = "__" . $outfile;
 
 my $sutralist = SutraList->new;
 my $book_nav = BookNav->new;

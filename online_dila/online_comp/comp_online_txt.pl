@@ -39,7 +39,7 @@ else
 my $output = "";
 my $runningpath = "";
 find(\&findfile, $path);	# 處理所有檔案
-open OUT, ">:utf8", "comp_result_$vol.txt";
+open OUT, ">:utf8", "__comp_result_$vol.txt";
 print OUT $output;
 close OUT;
 

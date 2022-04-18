@@ -1,74 +1,77 @@
+ã€åƒè€ƒè³‡æ–™ã€‘
 
-¡i¤u§@¬yµ{¡j
+åƒè€ƒè³‡æ–™è«‹è¦‹ D:\CBETA\epubé›»å­æ›¸
 
-a.¥Ñ CBReader ¨ú¥X¥ş³¡ªº HTML ÀÉ, ®æ¦¡½Ğ¬İ 2.cbrhtm2epub.pl ³Ì«e­±ªºµù¸Ñ¤º®e, ©ñ¦b c:\release\cbr_out_epub
-b.¥Î make_cover ¥Ø¿ı¤¤ªºµ{¦¡²£¥Í¦U¸g«Ê­±¹ÏÀÉ, ©ñ¦b c:\release\epub_cover
+ã€å·¥ä½œæµç¨‹ã€‘
 
-1.¥Î 1.make_epub_all.bat ²£¥Í¦U¸gªº toc.ncx , TableOfContents.xhtml , content.opf , CoverPage.xhtml ¦Ü c:\release\epub_unzip_toc
-2.¥Î 2.cbrhtm2epub.pl	±N cbr ªº html Âà´«¦¨ epub ©Ò»İ­nªº®æ¦¡, ©ñ¦Ü c:\release\epub_unzip . ¦¹µ{¦¡·|¦P®É½Æ»s¹ÏÀÉ, ¦]¦¹¹ÏÀÉ½Ğ©ñ¸m¦b«ü©w¦ì¸m.
-3.±N c:\release\epub_unzip_toc ªº¸ê®Æ copoy ¨ì c:\release\epub_unzip , ¦A¥Î 3.mv_same_tag ±N c:\release\epub_unzip ­«ÂĞªº³sµ²°µ¤@¨Ç³B²z.
-  (¦]¬°²Ä 1 ¨BÆJ²£¥Í c:\release\epub_unzip_toc ¤ñ¸ûºC, ­Y²Ä 3 ¨B¥¢±Ñ¤F, ª½±µ¦A¦¸ copy ²Ä 1 ¨BÆJ, µM«á­«°µ²Ä 2 ¨BÆJ, ¤ñ¸û¬Ù®É¶¡)
-4.¥Î 4.zip_epub_all.bat ±N©Ò¦³¸ê®ÆÀ£ÁY¦¨ epub ÀÉ c:\release\epub_zip
-5.¥Î 5.check_all.bat ÀË¬d¦³¨S¦³¿ù»~
+a.ç”± CBReader å–å‡ºå…¨éƒ¨çš„ HTML æª”, æ ¼å¼è«‹çœ‹ 2.cbrhtm2epub.pl æœ€å‰é¢çš„è¨»è§£å…§å®¹, æ”¾åœ¨ c:\release\cbr_out_epub
+b.ç”¨ make_cover ç›®éŒ„ä¸­çš„ç¨‹å¼ç”¢ç”Ÿå„ç¶“å°é¢åœ–æª”, æ”¾åœ¨ c:\release\epub_cover
+
+1.ç”¨ 1.make_epub_all.bat ç”¢ç”Ÿå„ç¶“çš„ toc.ncx , TableOfContents.xhtml , content.opf , CoverPage.xhtml è‡³ c:\release\epub_unzip_toc
+2.ç”¨ 2.cbrhtm2epub.pl	å°‡ cbr çš„ html è½‰æ›æˆ epub æ‰€éœ€è¦çš„æ ¼å¼, æ”¾è‡³ c:\release\epub_unzip . æ­¤ç¨‹å¼æœƒåŒæ™‚è¤‡è£½åœ–æª”, å› æ­¤åœ–æª”è«‹æ”¾ç½®åœ¨æŒ‡å®šä½ç½®.
+3.å°‡ c:\release\epub_unzip_toc çš„è³‡æ–™ copoy åˆ° c:\release\epub_unzip , å†ç”¨ 3.mv_same_tag å°‡ c:\release\epub_unzip é‡è¦†çš„é€£çµåšä¸€äº›è™•ç†.
+  (å› ç‚ºç¬¬ 1 æ­¥é©Ÿç”¢ç”Ÿ c:\release\epub_unzip_toc æ¯”è¼ƒæ…¢, è‹¥ç¬¬ 3 æ­¥å¤±æ•—äº†, ç›´æ¥å†æ¬¡ copy ç¬¬ 1 æ­¥é©Ÿ, ç„¶å¾Œé‡åšç¬¬ 2 æ­¥é©Ÿ, æ¯”è¼ƒçœæ™‚é–“)
+4.ç”¨ 4.zip_epub_all.bat å°‡æ‰€æœ‰è³‡æ–™å£“ç¸®æˆ epub æª” c:\release\epub_zip
+5.ç”¨ 5.check_all.bat æª¢æŸ¥æœ‰æ²’æœ‰éŒ¯èª¤
 
 -------------------------------------------------------------------------------
-¡iePub ³W®æ¡j
+ã€ePub è¦æ ¼ã€‘
 
-³oÃä¦³ ePub ¤ä´©ªº Tag ²M³æ
+é€™é‚Šæœ‰ ePub æ”¯æ´çš„ Tag æ¸…å–®
 http://www.idpf.org/2007/ops/OPS_2.0_0.984_draft.html#Section2.2
 http://idpf.org/epub/20/spec/OPS_2.0.1_draft.htm#Section2.2
 -------------------------------------------------------------------------------
 
-¡i¥Ø¿ı®æ¦¡¡j
+ã€ç›®éŒ„æ ¼å¼ã€‘
 
-[CBR ¥Ø¿ı]
+[CBR ç›®éŒ„]
 
-<name>JB267 ªª¶³©M©|ñûÂN§O¶° (14¨÷)</name><book>J</book><vol>31</vol><sutra>B267</sutra>
+<name>JB267 ç‰§é›²å’Œå°šå¬¾é½‹åˆ¥é›† (14å·)</name><book>J</book><vol>31</vol><sutra>B267</sutra>
 <UL>
-  <name>¥Ø¿ı</name>
+  <name>ç›®éŒ„</name>
   <UL>
-    <name>±Ô</name><book>J</book><vol>31</vol><juan>1</juan><pageline>0529a01</pageline>
-    <name>§Ç</name><book>J</book><vol>31</vol><juan>1</juan><pageline>0529a21</pageline>
+    <name>æ•˜</name><book>J</book><vol>31</vol><juan>1</juan><pageline>0529a01</pageline>
+    <name>åº</name><book>J</book><vol>31</vol><juan>1</juan><pageline>0529a21</pageline>
     <UL><!-- Level 1 -->
-      <name>½×</name><book>J</book><vol>31</vol><juan>1</juan><pageline>0538a05</pageline>
+      <name>è«–</name><book>J</book><vol>31</vol><juan>1</juan><pageline>0538a05</pageline>
       <UL><!-- Level 2 -->
-        <name>Æ[­W¤J¹D½×</name><book>J</book><vol>31</vol><juan>1</juan><pageline>0538a06</pageline>
+        <name>è§€è‹¦å…¥é“è«–</name><book>J</book><vol>31</vol><juan>1</juan><pageline>0538a06</pageline>
       </UL><!-- 1267 end of Level 2 -->
     </UL><!-- 1284 end of Level 1 -->
   </UL><!-- end of Mulu -->
-  <name>¨÷</name><value>1</value>
+  <name>å·</name><value>1</value>
   <UL>
-    <name>²Ä¤@</name><book>J</book><vol>31</vol><juan>1</juan><pageline>0538a01</pageline>
-    <name>²Ä¤G</name><book>J</book><vol>31</vol><juan>2</juan><pageline>0545c01</pageline>
+    <name>ç¬¬ä¸€</name><book>J</book><vol>31</vol><juan>1</juan><pageline>0538a01</pageline>
+    <name>ç¬¬äºŒ</name><book>J</book><vol>31</vol><juan>2</juan><pageline>0545c01</pageline>
   </UL><!-- end of Juan -->
 </UL><!-- end of Jing -->
 
-[epub ¥Ø¿ı]
+[epub ç›®éŒ„]
 
 	 <navMap>
 			<navPoint id="navPoint-1" playOrder="1">
 				<navLabel>
-					 <text>¥Ø¿ı</text>
+					 <text>ç›®éŒ„</text>
 				</navLabel>
 				<content src="TableOfContents.xhtml" />
 			</navPoint>
 			
 			<navPoint id="navPoint-2" playOrder="2">                 ============>   <UL>
 				<navLabel>                                           ============>        <name>
-					 <text>³¹¸`</text>
+					 <text>ç« ç¯€</text>
 				</navLabel>                                          ============>        </name>
 				<content src="TableOfContents.xhtml#chapter" />      ============>           <pageline>......</pageline>
 				
 					 <navPoint id="navPoint-3" playOrder="3">        ============>        <UL>
 					 <navLabel>                                      ============>          <name>
-								<text>¦ò°ê«~²Ä¤@</text>
+								<text>ä½›åœ‹å“ç¬¬ä¸€</text>
 					 </navLabel>                                     ============>          </name>
 					 <content src="T14n0475-001.xhtml#p0537a06" />   ============>          <pageline>......</pageline>
 					 </navPoint>                                     ============>        </UL>
 					 
 					 <navPoint id="navPoint-4" playOrder="4">
 					 <navLabel>
-								<text>¤è«K«~²Ä¤G</text>
+								<text>æ–¹ä¾¿å“ç¬¬äºŒ</text>
 					 </navLabel>
 					 <content src="T14n0475-001.xhtml#p0539a07" />
 					 </navPoint>
@@ -76,31 +79,31 @@ http://idpf.org/epub/20/spec/OPS_2.0.1_draft.htm#Section2.2
 			</navPoint>
 			<navPoint id="navPoint-17" playOrder="17">
 				<navLabel>
-					 <text>¨÷¦¸</text>
+					 <text>å·æ¬¡</text>
 				</navLabel>
 				<content src="TableOfContents.xhtml#juan" />
 					 <navPoint id="navPoint-18" playOrder="18">
 					 <navLabel>
-								<text>¨÷¤W</text>
+								<text>å·ä¸Š</text>
 					 </navLabel>
 					 <content src="T14n0475-001.xhtml" />
 					 </navPoint>
 					 <navPoint id="navPoint-19" playOrder="19">
 					 <navLabel>
-								<text>¨÷¤¤</text>
+								<text>å·ä¸­</text>
 					 </navLabel>
 					 <content src="T14n0475-002.xhtml" />
 					 </navPoint>
 					 <navPoint id="navPoint-20" playOrder="20">
 					 <navLabel>
-								<text>¨÷¤U</text>
+								<text>å·ä¸‹</text>
 					 </navLabel>
 					 <content src="T14n0475-003.xhtml" />
 					 </navPoint>
 			</navPoint>
 			<navPoint id="navPoint-21" playOrder="21">
 				<navLabel>
-					 <text>ÃÙ§U</text>
+					 <text>è´ŠåŠ©</text>
 				</navLabel>
 				<content src="donate.xhtml" />
 			</navPoint>
@@ -108,54 +111,54 @@ http://idpf.org/epub/20/spec/OPS_2.0.1_draft.htm#Section2.2
 
 -------------------------------------------------------------------------------
 
-¡iePub ÀË¬d¡j
+ã€ePub æª¢æŸ¥ã€‘
 
-³o¸Ì¦³¨â­Óµ{¦¡¥i¥HÀË¬dePubÀÉ®×¤º®e:
+é€™è£¡æœ‰å…©å€‹ç¨‹å¼å¯ä»¥æª¢æŸ¥ePubæª”æ¡ˆå…§å®¹:
 
-1. http://code.google.com/p/epubcheck/ (¤@­Ópythonµ{¦¡)
-2. http://www.threepress.org/document/epub-validate/ (½u¤Wª©ªºePub ÀË¬d)
+1. http://code.google.com/p/epubcheck/ (ä¸€å€‹pythonç¨‹å¼)
+2. http://www.threepress.org/document/epub-validate/ (ç·šä¸Šç‰ˆçš„ePub æª¢æŸ¥)
 
 -------------------------------------------------------------------------------
 
-¡i«Ê­±¹ÏÀÉ¦³³o¨Ç¦r­n¥Î¦Û¤v³B²zªº¦r¡j
+ã€å°é¢åœ–æª”æœ‰é€™äº›å­—è¦ç”¨è‡ªå·±è™•ç†çš„å­—ã€‘
 
-T,16,0710,1,·O¤óµĞÂÄ©Ò»¡¤j­¼½t¥Í½_[¢Í/·F]³ë¸g,¡i­ğ ¤£ªÅÄ¶¡j
-T,18,0913,1,¤õ[¦X*¤û]¨Ñ¾i»ö­y,¡i¡j
-T,20,1115,1,Æ[¦Û¦bµĞÂÄªü»ò[¾¦*¨Ó]ªk,¡i¡j
-T,20,1159A,1,[Î¢-¤j+(¥ø-¤î)]µ¢¤j¹D¤ßÅXµ¦ªk,¡i¡j
-T,21,1238,1,ªü¦\±C[¤û*¥y]°­¯«¤j±N¤W¦òªûÃ¹¥§¸g,¡i¥¢Ä¶¡j
-T,21,1240,1,ªü¦\Á¡[¤û*¥y]¥IÅñ©G,¡i¡j
+T,16,0710,1,æ…ˆæ°è©è–©æ‰€èªªå¤§ä¹˜ç·£ç”Ÿç¨»[å„/å¹¹]å–»ç¶“,ã€å” ä¸ç©ºè­¯ã€‘
+T,18,0913,1,ç«[åˆ*ç‰›]ä¾›é¤Šå„€è»Œ,ã€ã€‘
+T,20,1115,1,è§€è‡ªåœ¨è©è–©é˜¿éº¼[é½’*ä¾†]æ³•,ã€ã€‘
+T,20,1159A,1,[å³š-å¤§+(ä¼-æ­¢)]çª–å¤§é“å¿ƒé©…ç­–æ³•,ã€ã€‘
+T,21,1238,1,é˜¿å’å©†[ç‰›*å¥]é¬¼ç¥å¤§å°‡ä¸Šä½›é™€ç¾…å°¼ç¶“,ã€å¤±è­¯ã€‘
+T,21,1240,1,é˜¿å’è–„[ç‰›*å¥]ä»˜å›‘å’’,ã€ã€‘
 -------------------------------------------------------------------------------
 
-¡i¥Ø¿ı¨ú¥N¥Î¦r¡j
+ã€ç›®éŒ„å–ä»£ç”¨å­—ã€‘
 
-[¤ı*Ä_] => ¬Ã
-[çÙ-¤S] => ±I
-[ª÷/(¤g*¤g)] => ? ¡]¨Ì¤º¤å¥Î¦r¡^
-[°ò-¤g+ÂÎ] => ? ¡]¨Ì¤º¤å¥Î¦r¡^
-[¤ı*©µ] => Öp ¡]¨Ì¤º¤å¥Î¦r¡^
-[¥Ø*­³] = İÂ ¡]¨Ì¤º¤å¥Î¦r¡^
-[¤Ì*É_] => ? ¡]°Ñ¦Ò¨ä¥L¦U¥»¥Î¦r¡^
-[ªê-¨à+¥C] ¡]²Õ¦r¿ù»~¡^ => [ªê-¤I+¥C] => ?
-[¨i-¥Î+(ÉI@(©¯-¤g))] ¡]²Õ¦r­×­q¡^=>	[¨i-¥Î+(°ë-¤g)] => ?
-== ¥H¤U¦³ unicode ext-b ¦r¤¸ ==
-[¢Í/·F] =>¡iUnicode: 26F2E ??¡j
-[¦X*¤û] =>¡iUnicode: 24656 ??¡j
-[¾¦*¨Ó] =>¡iUnicode: 2A628 ??¡j
-[¤û*¥y] =>¡iUnicode: 2463D ??¡j
-== ¥H¤U¨S¦³¥ô¦ó¹ïÀ³¦r¤¸ ==
-[Î¢-¤j+(¥ø-¤î)]
+[ç‹*å¯¶] => ç
+[è«”-åˆ] => å¯‚
+[é‡‘/(åœŸ*åœŸ)] => ? ï¼ˆä¾å…§æ–‡ç”¨å­—ï¼‰
+[åŸº-åœŸ+èŸ²] => ? ï¼ˆä¾å…§æ–‡ç”¨å­—ï¼‰
+[ç‹*å»¶] => ç½ ï¼ˆä¾å…§æ–‡ç”¨å­—ï¼‰
+[ç›®*éŸ‹] = æš ï¼ˆä¾å…§æ–‡ç”¨å­—ï¼‰
+[å„*æ®³] => ? ï¼ˆåƒè€ƒå…¶ä»–å„æœ¬ç”¨å­—ï¼‰
+[è™-å…’+ä¸˜] ï¼ˆçµ„å­—éŒ¯èª¤ï¼‰ => [è™-å„¿+ä¸˜] => ?
+[ç”¬-ç”¨+(å›—@(å¹¸-åœŸ))] ï¼ˆçµ„å­—ä¿®è¨‚ï¼‰=>	[ç”¬-ç”¨+(åœ‰-åœŸ)] => ?
+== ä»¥ä¸‹æœ‰ unicode ext-b å­—å…ƒ ==
+[å„/å¹¹] =>ã€Unicode: 26F2E ??ã€‘
+[åˆ*ç‰›] =>ã€Unicode: 24656 ??ã€‘
+[é½’*ä¾†] =>ã€Unicode: 2A628 ??ã€‘
+[ç‰›*å¥] =>ã€Unicode: 2463D ??ã€‘
+== ä»¥ä¸‹æ²’æœ‰ä»»ä½•å°æ‡‰å­—å…ƒ ==
+[å³š-å¤§+(ä¼-æ­¢)]
 -------------------------------------------------------------------------------
 
-¡i«İ¿ì¨Æ¶µ¡j
+ã€å¾…è¾¦äº‹é …ã€‘
 
-V 1. html ³\¦h </a> «İ¸É¤W, ¥D­n¬O«~¦W¤@¶}©l.
-V 2. ¨÷¦Wªº <p> ¨S¦³ </p> µ²§À
-V 2. ePub ²Ä¤@­ÓÀÉ®×¤£¯àÀ£ÁY, ¦Ó¥B«ü©w¬O­n³o­ÓÀÉ®× mimetype
-V 3. html ¦h¾l javascript ½X­n²¾°£.
-V 4. <a name ­n§ï¦¨ <a id="pxxxx">
-5. ²Õ¦r¦¡¥ı´«¦¨ unicode (¥Ø¿ı³¡¥÷)
-6. <span class="w"><div>....·|¦³°İÃD, ¤j·§ div ¤£¯à¦b span ¸Ì­± (p ¦n¹³¤]¤£¯à¦b span ¸Ì­±)
+V 1. html è¨±å¤š </a> å¾…è£œä¸Š, ä¸»è¦æ˜¯å“åä¸€é–‹å§‹.
+V 2. å·åçš„ <p> æ²’æœ‰ </p> çµå°¾
+V 2. ePub ç¬¬ä¸€å€‹æª”æ¡ˆä¸èƒ½å£“ç¸®, è€Œä¸”æŒ‡å®šæ˜¯è¦é€™å€‹æª”æ¡ˆ mimetype
+V 3. html å¤šé¤˜ javascript ç¢¼è¦ç§»é™¤.
+V 4. <a name è¦æ”¹æˆ <a id="pxxxx">
+5. çµ„å­—å¼å…ˆæ›æˆ unicode (ç›®éŒ„éƒ¨ä»½)
+6. <span class="w"><div>....æœƒæœ‰å•é¡Œ, å¤§æ¦‚ div ä¸èƒ½åœ¨ span è£¡é¢ (p å¥½åƒä¹Ÿä¸èƒ½åœ¨ span è£¡é¢)
 
 -------------------------------------------------------------------------------
 

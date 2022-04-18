@@ -18,31 +18,31 @@ $gaiji->load_access_db();
 
 if($argv eq "nav")
 {
-    $infile = "/cbwork/bin/cbreader2x/nav/simple_nav_gaiji.xhtml";
+    $infile = "/cbwork/bin/cbreader2x/nav/__simple_nav_gaiji.xhtml";
     $outfile = "/cbwork/bin/cbreader2x/nav/simple_nav.xhtml"; 
     runfile();
-    $infile = "/cbwork/bin/cbreader2x/nav/advance_nav_gaiji.xhtml";
+    $infile = "/cbwork/bin/cbreader2x/nav/__advance_nav_gaiji.xhtml";
     $outfile = "/cbwork/bin/cbreader2x/nav/advance_nav.xhtml"; 
     runfile();
-    $infile = "/cbwork/bin/cbreader2x/nav/bulei_nav_gaiji.xhtml";
+    $infile = "/cbwork/bin/cbreader2x/nav/__bulei_nav_gaiji.xhtml";
     $outfile = "/cbwork/bin/cbreader2x/nav/bulei_nav.xhtml"; 
     runfile();
 }
 elsif($argv eq "nav_see")
 {
-    $infile = "/cbwork/bin/cbreader2x/nav/seeland_nav_gaiji.xhtml";
+    $infile = "/cbwork/bin/cbreader2x/nav/__seeland_nav_gaiji.xhtml";
     $outfile = "/cbwork/bin/cbreader2x/nav/seeland_nav.xhtml"; 
     runfile();
 }
 elsif($argv eq "catalog")
 {
-    $infile = "/cbwork/bin/cbreader2x/catalog/catalog_gaiji.txt";
+    $infile = "/cbwork/bin/cbreader2x/catalog/__catalog_gaiji.txt";
     $outfile = "/cbwork/bin/cbreader2x/catalog/catalog.txt"; 
     runfile();
 }
 elsif($argv eq "catalog_see")
 {
-    $infile = "/cbwork/bin/cbreader2x/catalog/catalog_see_gaiji.txt";
+    $infile = "/cbwork/bin/cbreader2x/catalog/__catalog_see_gaiji.txt";
     $outfile = "/cbwork/bin/cbreader2x/catalog/catalog_see.txt"; 
     runfile();
 }
