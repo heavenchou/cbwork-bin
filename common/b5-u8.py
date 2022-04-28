@@ -28,6 +28,7 @@ b5-u8.py
 作者: 周邦信 2009.05.26
 
 Heaven 修改:
+2022/04/28 cbwork_bin.ini 改成支援 utf8 版
 2020/11/24 增加日本長音 'ー' 的處理法
 2017/10/29 增加許多參數 --xxx , 控制轉換的內容, 詳見功能說明
 2017/10/28 修改缺字的讀取, 原本讀取 MS Access 資料庫改成讀純文字 csv 檔, 速度快很多
@@ -590,7 +591,7 @@ parser.add_option("--nor", action="store_true", dest="NoRussia", help="不處理
 
 # 讀取設定檔 cbwork_bin.ini
 config = configparser.SafeConfigParser()
-config.read('../cbwork_bin.ini')
+config.read('../cbwork_bin.ini', 'UTF-8')
 gaiji = config.get('default', 'gaiji-m.mdb_file')
 gaiji_txt = gaiji.replace('gaiji-m.mdb', "gaiji-m_u8.txt")
 
