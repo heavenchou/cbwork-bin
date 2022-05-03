@@ -228,8 +228,10 @@ def out(s):
 
 # 處理傳入的資料至 buf1
 def out1(s):
-	global buf1
-	buf1 += s
+	# global buf1
+	# buf1 += s
+	global buf11
+	buf11.append(s)
 
 # 當 globals['head_start'] 為真時, div_head 及 buf 都要記錄下來
 def out2(s):
@@ -605,6 +607,7 @@ def start_inline_n(tag):
 	record_open('form')
 
 def close_n(tag):
+	global div_type_note
 	closeTags('p', 'cb:def', 'entry')
 	close_div(opens['div'])
 	div_type_note = 0
@@ -837,14 +840,12 @@ def inline_tag(tag):
 		start_inline_byline(tag)
 	elif tag=='<bold>':
 		out('<seg rend="bold">')
-		record_open('seg')
 	elif tag=='</bold>':
-		closeTags('seg')	
+		out('</seg>')	
 	elif tag=='<border>':
 		out('<seg rend="border">')
-		record_open('seg')
 	elif tag=='</border>':
-		closeTags('seg')
+		out('</seg>')
 	elif re.match(r'<c[\d\s>]', tag):
 		start_inline_c(tag)
 	elif tag=='<corr>':
@@ -874,9 +875,8 @@ def inline_tag(tag):
 		close_F(tag)
 	elif tag=='<hei>':
 		out('<seg rend="heiti">')
-		record_open('seg')
 	elif tag=='</hei>':
-		closeTags('seg')
+		out('</seg>')
 	elif tag.startswith('<h'):
 		start_inline_h(tag)
 	elif tag.startswith('</h'):
@@ -889,9 +889,8 @@ def inline_tag(tag):
 		out2('</note>')
 	elif tag=='<it>':
 		out('<seg rend="italic">')
-		record_open('seg')
 	elif tag=='</it>':
-		closeTags('seg')
+		out('</seg>')
 	elif tag =='<j>':
 		closeTags('p')
 		out('<cb:juan fun="close"><cb:jhead>')
@@ -901,9 +900,8 @@ def inline_tag(tag):
 		start_J(tag)
 	elif tag=='<kai>':
 		out('<seg rend="kaiti">')
-		record_open('seg')
 	elif tag=='</kai>':
-		closeTags('seg')
+		out('</seg>')
 	elif tag=='<L_sp>':
 		start_inline_Lsp(tag)		
 	elif tag.startswith('<lem'):
@@ -919,11 +917,11 @@ def inline_tag(tag):
 			closeTag('item', 'list')
 	elif tag=='<ming>':
 		out('<seg rend="mingti">')
-		record_open('seg')
 	elif tag=='</ming>':
-		closeTags('seg')
+		out('</seg>')
 	elif tag.startswith('<mj'):
 		closeTags('byline', 'cb:jhead', 'cb:juan')
+
 		#n=get_number(tag)
 		mo = re.search(r'\d+', tag)
 		if mo!=None: globals['juan_num'] = int(mo.group())
@@ -1009,9 +1007,8 @@ def inline_tag(tag):
 		closeTags('term')
 	elif tag=='<song>':
 		out('<seg rend="songti">')
-		record_open('seg')
 	elif tag=='</song>':
-		closeTags('seg')
+		out('</seg>')
 	elif tag=='<space quantity="0"/>':
 		out2(tag)
 	elif tag=='<sub>':
@@ -1443,10 +1440,8 @@ def do_line_head(tag, text):
 		if(globals['inr'] == False):	# 第一個 r 才需要處理成 <p xml:id="xxx" cb:type="pre">
 			globals['inr'] = True
 			start_p(tag)	# 依 p 的方式處理
-	elif 'S' in tag: 
-		start_S(tag)
-	elif 's' in tag:
-		text = text + "</S>"
+	elif 'S' in tag: start_S(tag)
+	elif 's' in tag: text = text + "</S>"
 	elif 'x' in tag: start_x(tag)
 	elif 'Z' in tag: start_p(tag)
 	else: 
@@ -1459,7 +1454,7 @@ def do_line_head(tag, text):
 
 # 結束一部經, 全部印出來
 def close_sutra(num):
-	global buf1
+	global buf11
 	today=datetime.date.today().strftime('%Y-%m-%d')
 	out_path = dir_out+'/'+vol+num+'.xml'
 	print('out_path:', out_path)
@@ -1486,6 +1481,7 @@ def close_sutra(num):
 	mo = re.search(r'\D+(\d+)', vol)
 	v = mo.group(1)
 	v = v.lstrip('0')
+	if (v == ''): v = '0'
 	s += '''\t\t<publicationStmt>
 			<idno type="CBETA">
 				<idno type="canon">{ed}</idno>.<idno type="vol">{v}</idno>.<idno type="no">{n}</idno>
@@ -1565,6 +1561,7 @@ def close_sutra(num):
 	
 	#最後的要處理一些特例
 	#移除 <head></head> 及將 <ref cRef="PTS.Vin.3.110"/></head> 換成 <ref cRef="PTS.Vin.3.110"/>
+	buf1 = ''.join(buf11)
 	buf1 = re.sub('<head>((?:<ref cRef="PTS.[^>]*>)?)</head>',r'\1',buf1)
 	
 	buf1 = buf1.replace('&', '&amp;')	# 把 & 換成 &amp;  - 2013/09/24
@@ -1573,6 +1570,7 @@ def close_sutra(num):
 	
 	fo.write(buf1)
 	buf1 = ''
+	buf11 = []
 	fo.write('\n</body></text></TEI>\n')
 ##############################################
 # P5a 的版本不需要底下的校勘記
@@ -1625,7 +1623,6 @@ def convert():
 		if num!=globals['sutraNumber']:
 			sutraInit(num)
 		pb=pb.lstrip('p')
-		
 		# 換行時, 發現前一行是 head , 而且沒有延續到本行, 就要印出相關文字
 		if globals['head_start'] and not re.search(r'Q\d?=', head_tag) and not re.search(r'<Q\d?=', text):
 			close_head()
@@ -1680,7 +1677,6 @@ def convert():
 				
 		# 處理一般文字
 		do_text(text)
-
 	close_sutra(globals['sutraNumber'])
 	f1.close()
 
@@ -1792,6 +1788,7 @@ debug = True
 
 buf = ''			# 似乎是放 <lb> <pb> 及 head 的內容
 buf1 = ''
+buf11 = []
 char_count = 1
 fo = ''
 head_tag = ''
