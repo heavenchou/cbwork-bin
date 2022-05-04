@@ -1,12 +1,21 @@
 @echo off
-:: ==========================================================
+:: ============================================================
 :: 程式說明：XML P5a 版轉成 XML P5 版
 :: 參數說明：
-:: 　執行單冊: p5a2p5.py -v T01
-:: 　執行全部大正藏: p5a2p5.py -c T
-:: 　執行全部大正藏, 從第二冊開始: p5a2p5.py -c T -s T02
+:: 　執行單冊: ruby p5a2p5.rb -v T01
+:: 　執行全部大正藏: ruby p5a2p5.rb -c T
+:: 　執行全部大正藏, 從第二冊開始: ruby p5a2p5.rb -c T -s T02
 :: 設定檔：相關設定由 ../cbwork_bin.ini 取得
-:: ==========================================================
+::
+:: 注：原本是 python 版的 p5a2p5.py，2022-05-04 正式改成 ruby 版
+::     python 未來應該不會維護了
+:: ============================================================
+
+set nv=
+IF "%1"=="-n" (
+    set nv=--nv
+    shift
+)
 
 IF "%1"=="" call :show_help
 IF "%1"=="-h" call :show_help
@@ -18,6 +27,8 @@ goto END
 
 :show_help
 echo p5a2p5.bat -h     : help
+echo p5a2p5.bat -n     : no valid
+echo p5a2p5.bat -n -a  : run all no valid
 echo p5a2p5.bat -a     : run all
 echo p5a2p5.bat -see   : run seeland
 echo p5a2p5.bat -c T   : run T
@@ -25,43 +36,46 @@ echo p5a2p5.bat -v T01 : run T01
 exit /B
 
 :run_all
-p5a2p5.py -c A
-p5a2p5.py -c B
-p5a2p5.py -c C
-p5a2p5.py -c D
-p5a2p5.py -c F
-p5a2p5.py -c G
-p5a2p5.py -c GA
-p5a2p5.py -c GB
-p5a2p5.py -c I
-p5a2p5.py -c J
-p5a2p5.py -c K
-p5a2p5.py -c L
-p5a2p5.py -c LC
-p5a2p5.py -c M
-p5a2p5.py -c N
-p5a2p5.py -c P
-p5a2p5.py -c S
-p5a2p5.py -c T
-p5a2p5.py -c U
-p5a2p5.py -c X
-p5a2p5.py -c Y
-p5a2p5.py -c ZS
-p5a2p5.py -c ZW
+call :run_coll A
+call :run_coll B
+call :run_coll C
+call :run_coll D
+call :run_coll F
+call :run_coll G
+call :run_coll GA
+call :run_coll GB
+call :run_coll I
+call :run_coll J
+call :run_coll K
+call :run_coll L
+call :run_coll LC
+call :run_coll M
+call :run_coll N
+call :run_coll P
+call :run_coll S
+call :run_coll T
+call :run_coll TX
+call :run_coll U
+call :run_coll X
+call :run_coll Y
+call :run_coll ZS
+call :run_coll ZW
 exit /B
 
 :run_seeland
-p5a2p5.py -c DA
-p5a2p5.py -c HM
-p5a2p5.py -c ZY
+call :run_coll DA
+call :run_coll HM
+call :run_coll ZY
 exit /B
 
 :run_coll
-p5a2p5.py -c %1
+ruby p5a2p5.rb %nv% -c %1
 exit /B
 
 :run_vol
-p5a2p5.py -v %1
+ruby p5a2p5.rb %nv% -v %1
 exit /B
 
 :END
+rem shutdown /s /t 30
+rem shutdown /h

@@ -1,10 +1,10 @@
-# P5 XML 轉成純文字格式     Ray Chou 2022-04-09
-# 
-# 詳細說明執行 ruby .\p5totxt.rb -h
+# CBETA XML P5 轉成純文字格式
+# 設定檔: ../cbwork_bin.ini
+# 詳細說明執行 ruby p5totxt.rb -h
+# 作者: 周邦信(Ray Chou) 2022-04-09
 #
-# 版本歷史：
+# Heaven 修改：
 # 2022-04-12 Heaven 修改比對完成
-# 2022-04-09 Ray Chou 由 Python 版修改
 
 require 'fileutils'
 require 'inifile'
