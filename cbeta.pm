@@ -313,7 +313,9 @@ Unicode 9.0：2016年6月
 Unicode 10.0：2017年6月
 Unicode 11.0：2018年6月
 Unicode 12.0：2019年3月
-Unicode 12.1：2019年5月
+Unicode 12.1：2019年5月 https://www.unicode.org/versions/Unicode12.1.0/
+Unicode 13.0：2020年3月10日 https://www.unicode.org/versions/Unicode13.0.0/
+Unicode 14.0：2021年9月14日 https://www.unicode.org/versions/Unicode14.0.0/
 
 # 底下用這符號■開頭的是來自 http://ubuntu-rubyonrails.blogspot.tw/2009/06/unicode.html
 # 詳細資料
@@ -420,24 +422,38 @@ Unicode 12.1：2019年5月
 #33DE～33DF：CJK Compatibility 多英文組成一字 (Unicode 4.0)
 #33E0～33FE：CJK Compatibility 1日~31日 (Unicode 1.1)
 #33FF：CJK Compatibility 'gal' 組成一字 (Unicode 4.0)
-■3400～4DFFh：中日韓認同表意文字擴充A區，總計收容6,582個中日韓漢字。
+
+■3400～4DBF：中日韓認同表意文字擴充A區，總計收容6,592個中日韓漢字。
 #3400～4DB5：CJK Extension A 中日韓統一表意文字擴充 A 區。(6582 字, Unicode 3.0 , 1999)
+#4DB6～4DBF：CJK Extension A 中日韓統一表意文字擴充 A 區。(10 字, Unicode 13.0 , 2020)
+
 #4DC0～4DFF：易經六十四卦符號。(64 字, Unicode 4.0)
-■4E00～9FFFh：中日韓認同表意文字區，總計收容20,902個中日韓漢字。
-#4E00～9FA5：CJK Unified Ideographs (Han) 中日韓統一表意文字區 (原本標準是到 9FCC)。(20,902 字, Unicode 1.0 , 1993)
+
+■4E00～9FFF：中日韓認同表意文字區，總計收容20,992個中日韓漢字。
+#4E00～9FA5：CJK Unified Ideographs (Han) 中日韓統一表意文字區。(20,902 字, Unicode 1.1 , 1993)
 #9FA6～9FBB：14 個香港增補字符集的用字和 8 個 GB 18030 用字 (22 字, Unicode 4.1 , 2005)
 #9FBC～9FC3：7 個日語漢字及 U+9FC3 (8 字, Unicode 5.1 , 2008)
 #9FC4～9FCB：2 個日語用漢字, 1 個新增漢字, 5 個香港漢字 (8 字, Unicode 5.2 , 2009)
 #9FCC：1 個漢字 (1 字, Unicode 6.1 , 2012)
-■A000～A4FFh：彝族文字區，收容中國南方彝族文字和字根。
+#9FCD～9FD5：(9 字, Unicode 8.0 , 2015)
+#9FD6～9FEA：(21 字, Unicode 10.0 , 2017)
+#9FEB～9FEF：(5 字, Unicode 11.0 , 2018)
+#9FF0～9FFC：(13 字, Unicode 13.0 , 2020)
+#9FFD～9FFF：(3 字, Unicode 14.0 , 2021)
+
+■A000～A4FF：彝族文字區，收容中國南方彝族文字和字根。
 #A000～A48C：Yi Syllables 彝族文字區 (Unicode 3.0)
-■AC00～D7FFh：韓文拼音組合字區，收容以韓文音符拼成的文字。
+■AC00～D7FF：韓文拼音組合字區，收容以韓文音符拼成的文字。
 #AC00～D7A3：Hangul Syllables 韓文拼音 (Unicode 2.0)
 ■E000～F8FF：私人造字區
-■F900～FAFFh：中日韓兼容表意文字區，總計收容302個中日韓漢字。
-#F900～FA2D：CJK Compatibility Ideographs 相容表意字 (Unicode 1.0 , 1993)
-#FA30～FA6A：CJK Compatibility Ideographs 相容表意字 (Unicode 3.2)
+
+■F900～FAD9：中日韓兼容表意文字區，總計收容472個中日韓漢字。
+#F900～FA2D：CJK Compatibility Ideographs 相容表意字 (302 字, Unicode 1.1 , 1993)
+#FA2E～FA2F：CJK Compatibility Ideographs 相容表意字 (2 字, Unicode 6.1)
+#FA30～FA6A：CJK Compatibility Ideographs 相容表意字 (59 字, Unicode 3.2)
+#FA6B～FA6D：CJK Compatibility Ideographs 相容表意字 (3 字, Unicode 5.2)
 #FA70～FAD9：CJK Compatibility Ideographs 相容表意字 - 106個來自北韓的相容漢字 (106 字, Unicode 4.1 , 2005)
+
 ■FB00～FFFDh：文字表現形式區，收容組合拉丁文字、希伯來文、阿拉伯文、中日韓直式標點、小符號、半角符號、全角符號等。 
 #FE10～FE19：Vertical Forms 中文直排標點 (Unicode 4.1)
 #FE20～FE23：Combining Half Marks (Unicode 1.1)
@@ -456,11 +472,21 @@ Unicode 12.1：2019年5月
 #1F100～1F1FF：Enclosed Alphanumeric Supplement 括號及圓圈各種數字英文補充
 ■
 #20000～2A6D6：CJK Unified Ideographs Extension B 中日韓統一表意文字擴展 B 區 (42711 字, Unicode 3.1 , 2001)
+#2A6D7～2A6DD：CJK Unified Ideographs Extension B 中日韓統一表意文字擴展 B 區 (7 字, Unicode 13.0 , 2020)
+#2A6DE～2A6DF：CJK Unified Ideographs Extension B 中日韓統一表意文字擴展 B 區 (2 字, Unicode 14.0 , 2021)
+
 #2A700～2B734：CJK Unified Ideographs Extension C 中日韓統一表意文字擴展 C 區 (4149 字, Unicode 5.2 , 2009)
+#2B735～2B738：CJK Unified Ideographs Extension C 中日韓統一表意文字擴展 C 區 (4 字, Unicode 14.0 , 2021)
+
 #2B740～2B81D：CJK Unified Ideographs Extension D 中日韓統一表意文字擴展 D 區 (222 字, Unicode 6.0 , 2010)
-#2B820～2CEA1：CJK Unified Ideographs Extension E 中日韓統一表意文字擴展 E 區 (Unicode 8.0)
-#2CEB0～2EBE0：CJK Unified Ideographs Extension F 中日韓統一表意文字擴展 F 區 (Unicode 10.0)
+
+#2B820～2CEA1：CJK Unified Ideographs Extension E 中日韓統一表意文字擴展 E 區 (5762 字, Unicode 8.0 , 2015)
+
+#2CEB0～2EBE0：CJK Unified Ideographs Extension F 中日韓統一表意文字擴展 F 區 (7473 字, Unicode 10.0 , 2017)
+
 #2F800～2FA1D：CJK Compatibility Ideographs Supplement 相容表意字補充 - 台灣的相容漢字 (542 字, Unicode 3.1 , 2001)
+
+#30000～3134A：CJK Unified Ideographs Extension G 中日韓統一表意文字擴展 G 區 (4939 字, Unicode 13.0 , 2020)
   
 =cut
 
@@ -486,6 +512,7 @@ sub get_unicode_ver
     return "1.1" if($uni >= 0x3000 and $uni <= 0x3037);
     return "1.1" if($uni <= 0x01F5);
     return "3.0" if($uni >= 0x3400 and $uni <= 0x4DB5);
+    return "13.0" if($uni >= 0x4DB6 and $uni <= 0x4DBF);
     return "3.1" if($uni >= 0x20000 and $uni <= 0x2A6D6);
 	# 相容表意字補充 - 台灣的相容漢字
 	return "3.1" if($uni >= 0x2F800 and $uni <= 0x2FA1D);
@@ -1332,6 +1359,7 @@ sub get_unicode_ver
 	return "1.1" if($uni >= 0x33E0 and $uni <= 0x33FE);
 	return "4.0" if($uni == 0x33FF);
 	return "3.0" if($uni >= 0x3400 and $uni <= 0x4DB5);
+    return "13.0" if($uni >= 0x4DB6 and $uni <= 0x4DBF);
 	return "4.0" if($uni >= 0x4DC0 and $uni <= 0x4DFF);
 	return "1.1" if($uni >= 0x4E00 and $uni <= 0x9FA5);
 	return "4.1" if($uni >= 0x9FA6 and $uni <= 0x9FBB);
@@ -1341,6 +1369,8 @@ sub get_unicode_ver
 	return "8.0" if($uni >= 0x9FCD and $uni <= 0x9FD5);
 	return "10.0" if($uni >= 0x9FD6 and $uni <= 0x9FEA);
 	return "11.0" if($uni >= 0x9FEB and $uni <= 0x9FEF);
+	return "13.0" if($uni >= 0x9FF0 and $uni <= 0x9FFC);
+	return "14.0" if($uni >= 0x9FFD and $uni <= 0x9FFF);
 	return "3.0" if($uni >= 0xA000 and $uni <= 0xA48C);
 	return "3.0" if($uni >= 0xA490 and $uni <= 0xA4A1);
 	return "3.2" if($uni >= 0xA4A2 and $uni <= 0xA4A3);
@@ -1996,11 +2026,16 @@ sub get_unicode_ver
 	return "12.0" if($uni >= 0x1FA90 and $uni <= 0x1FA95);
 	return "2.0" if($uni >= 0x1FFFE and $uni <= 0x1FFFF);
 	return "3.1" if($uni >= 0x20000 and $uni <= 0x2A6D6);
+	return "13.0" if($uni >= 0x2A6D7 and $uni <= 0x2A6DD);
+	return "14.0" if($uni >= 0x2A6DE and $uni <= 0x2A6DF);
 	return "5.2" if($uni >= 0x2A700 and $uni <= 0x2B734);
+	return "14.0" if($uni >= 0x2B735 and $uni <= 0x2B738);
 	return "6.0" if($uni >= 0x2B740 and $uni <= 0x2B81D);
 	return "8.0" if($uni >= 0x2B820 and $uni <= 0x2CEA1);
 	return "10.0" if($uni >= 0x2CEB0 and $uni <= 0x2EBE0);
 	return "3.1" if($uni >= 0x2F800 and $uni <= 0x2FA1D);
+	return "13.0" if($uni >= 0x30000 and $uni <= 0x3134A);
+
 	return "2.0" if($uni >= 0x2FFFE and $uni <= 0x2FFFF);
 	return "2.0" if($uni >= 0x3FFFE and $uni <= 0x3FFFF);
 	return "2.0" if($uni >= 0x4FFFE and $uni <= 0x4FFFF);

@@ -435,7 +435,9 @@ class P5aToP5Converter
       if g.include?('unicode')
         code = g['unicode']
         return g['uni_char'] if @unihan.ver(code) <= 2.0
-
+        if id.nil?
+          puts e
+        end
         @gaijis << id
         node = p5_node(e)
         return node.open_tag[0..-2] + "/>" if @p5b_format
@@ -445,6 +447,9 @@ class P5aToP5Converter
       end
     end
 
+    if id.nil?
+      puts e
+    end
     @gaijis << id
     node = p5_node(e)
     return node.open_tag[0..-2] + "/>" if @p5b_format
@@ -1005,6 +1010,10 @@ class P5aToP5Converter
           else
             r += %(<g ref="##{cb}">#{c}</g>)
           end
+          
+            if cb.nil?
+              puts r
+            end
           @gaijis << cb
         end
       else
@@ -1033,7 +1042,7 @@ class P5aToP5Converter
 
   def prepare_char_decl(gaijis)
     r = ''
-
+    
     @gaijis.to_a.sort.each do |cb|
       r += prepare_char_decl_char(cb)
     end

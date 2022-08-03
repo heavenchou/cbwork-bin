@@ -20,6 +20,11 @@ my $cover_page_path = "./cover_update_TX/";	# 輸出圖檔的目錄
 #my $cover_page_path2 = "./cover/";	# 檢查結果用的
 my $cover_page_path2 = "./cover_update_TX/";	# 檢查結果用的
 
+
+#$db_file = "database_update.txt";	# 經名資料庫
+#$cover_page_path = "./cover_update/";	# 輸出圖檔的目錄
+#$cover_page_path2 = "./cover_update/";	# 檢查結果用的
+
 my $font_size_title = 55;				# 經名字體大小 (python 的大小好像是 px, 這裡好像是 pt)
 my $font_size_small = 30;				# 譯者字體大小 (python 的大小好像是 px, 這裡好像是 pt)
 my $font_size_byline = 30;				# 譯者字體大小 (python 的大小好像是 px, 這裡好像是 pt)

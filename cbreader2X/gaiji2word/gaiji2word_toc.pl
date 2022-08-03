@@ -91,8 +91,8 @@ sub runfile
         if(/<g/)
         {
             # 在 <cbline ..> 後面加空格, 以避免標記後第一個字是 ext-b, Mac parser 會錯誤
-            $_ =~ s/(<cblink[^>]*?>)(<g)/$1 $2/g;   
-            $_ =~ s/(<span>)(<g)/$1 $2/g;
+            #$_ =~ s/(<cblink[^>]*?>)(<g)/$1 $2/g;   
+            #$_ =~ s/(<span>)(<g)/$1 $2/g;
 
             $_ = change_gaiji($_);
         }

@@ -139,19 +139,35 @@ sub des2uni
 		my $uniword = $gaiji->cb2uniword($cb);
 		if($uniword)
 		{
-			return $uniword;
+			# 不要超過 unicode 10.0
+			my $ver = $gaiji->get_unicode_ver($gaiji->cb2uni($cb));
+			if($ver !~ /^1[1-9]\./) {
+				return $uniword;
+			}
+			
 		}
 		my $noruniword = $gaiji->cb2noruniword($cb);
 		if($noruniword)
 		{
-			return $noruniword;
+			# 不要超過 unicode 10.0
+			my $ver = $gaiji->get_unicode_ver($gaiji->cb2noruni($cb));
+			if($ver !~ /^1[1-9]\./) {
+				return $noruniword;
+			}
 		}
 		my $norword = $gaiji->cb2nor($cb);
 		if($norword)
 		{
 			return $norword;
 		}
-
+		if($uniword)
+		{
+			return $uniword;
+		}
+		if($noruniword)
+		{
+			return $noruniword;
+		}
 	}
 	return $_;
 }

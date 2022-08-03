@@ -60,7 +60,7 @@ class CbetaEpub
 
   # 將某個 xml 轉為一個 EPUB
   # @param input_path [String] 輸入 XML 檔路徑
-  # @param output_paath [String] 輸出 EPUB 檔路徑
+  # @param output_path [String] 輸出 EPUB 檔路徑
   def convert_file(input_path, output_path)
     return false unless input_path.end_with? '.xml'
       
