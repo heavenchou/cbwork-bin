@@ -6,6 +6,7 @@
 # 作者: 周邦信(Ray Chou) 2022-04-20
 #
 # Heaven 修改：
+# 2022-08-10 如果行首標記是 Ff3，就要輸出 <table style="margin-left:3em;">
 # 2022-05-04 正式使用，找不到的說明可試著找 bm2p5a.py
 
 require 'fileutils'
@@ -1236,7 +1237,13 @@ def start_F(tag, text)
   close_tags('byline','p')
   # 計算一行有多少個 c 標記
   i = count_c_from_line(text)
-  out %(<table cols="#{i}"><row>)
+  # 如果是 tag 是 Ff3，就要輸出 style="margin-left:3em;"
+  style = ""
+  m = tag.match(/Ff(\d)/)
+  if not m.nil?
+    style = %( style="margin-left:#{m[1]}em;")
+  end
+  out %(<table cols="#{i}"#{style}><row>)
   $opens['table'] += 1
   $opens['row'] += 1
 end
