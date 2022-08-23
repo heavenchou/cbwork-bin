@@ -6,6 +6,7 @@
 # pushsign.pl 簡單標記版.txt 舊的xml.xml 結果檔xml.xml > 記錄檔.txt
 #
 ########################################################
+# 2022/08/23 : 處理正規式沒考慮到的錯誤。
 # 2021/06/25 : 處理 <o><P> 遇到原來就有 <p> 的情況，會有重複的 <p> 和 </p> 要去除。
 # 2021/05/02 : 支援 BM 標記 <o><u>...</u>
 # 2021/05/02 : 支援 BM 標記 <I1><I2>...</L>
@@ -1270,7 +1271,7 @@ sub check_2_word
 	
 	# 檢查是不是行首
 	
-	if($word2 =~ /<lb/ and $word2 =~ /$word1/) { return 1; }
+	if($word2 =~ /<lb/ and $word2 =~ /\Q$word1\E/) { return 1; }
 	if($word2 =~ /&CB.*?;/ and $word1 =~ /\[/) { return 1; }		# P4 版缺字, 待判斷
 	if($word2 =~ /<g ref="#CB\d{5}"\/>/ and $word1 =~ /\[/) { return 1; }		# P5 版缺字, 待判斷	
 	if($word2 =~ /<g ref="#CB\d{5}"\/>/ and $word1 =~ /./) { return 1; }	# BM 可能是unicode
