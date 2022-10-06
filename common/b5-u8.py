@@ -28,6 +28,7 @@ b5-u8.py
 作者: 周邦信 2009.05.26
 
 Heaven 修改:
+2022/10/06 ①~⑩ 及 ⑴~⑽ 這些字 python 認為有 big5 版，所以要另外處理
 2022/04/28 cbwork_bin.ini 改成支援 utf8 版
 2020/11/24 增加日本長音 'ー' 的處理法
 2017/10/29 增加許多參數 --xxx , 控制轉換的內容, 詳見功能說明
@@ -590,7 +591,7 @@ parser.add_option("--nor", action="store_true", dest="NoRussia", help="不處理
 (options, args) = parser.parse_args()
 
 # 讀取設定檔 cbwork_bin.ini
-config = configparser.SafeConfigParser()
+config = configparser.ConfigParser()
 config.read('../cbwork_bin.ini', 'UTF-8')
 gaiji = config.get('default', 'gaiji-m.mdb_file')
 gaiji_txt = gaiji.replace('gaiji-m.mdb', "gaiji-m_u8.txt")

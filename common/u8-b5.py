@@ -37,6 +37,7 @@ u8-b5.py
 2009.12.02 Ray: 從 Unicode 網站取得 Unihan.txt, 取出裏面的異寫字資訊 kCompatibilityVariant, 放在 variant
 
 Heaven 修改:
+2022/10/06 ①~⑩ 及 ⑴~⑽ 這些字 python 認為有 big5 版，所以要另外處理
 2022/04/28 cbwork_bin.ini 改成支援 utf8 版
 2020/11/24 增加日本長音 'ー' 的處理法
 2020/10/16 加上特殊字'々'的處理，這種字 python 認為有 big5 可以轉. 
@@ -1477,6 +1478,10 @@ def trans_file(fn1, fn2):
 			try:
 				if c == '々':
 					new += '[?夕]'
+				elif c >= '①' and c <= '⑩':	# 這些會嘗試轉成 big5
+					new += u8tob5(c)
+				elif c >= '⑴' and c <= '⑽':
+					new += u8tob5(c)
 				else:
 					temp = c.encode('cp950') # 測試能否編碼為 cp950
 					new += c
@@ -1718,7 +1723,7 @@ parser.add_option("-r", dest="roma", help="羅馬拼音: -r d 先組字後編碼
 (options, args) = parser.parse_args()
 
 # 讀取設定檔 cbwork_bin.ini
-config = configparser.SafeConfigParser()
+config = configparser.ConfigParser()
 config.read('../cbwork_bin.ini', 'UTF-8')
 gaiji = config.get('default', 'gaiji-m.mdb_file')
 gaiji_txt = gaiji.replace('gaiji-m.mdb', "gaiji-m_u8.txt")
