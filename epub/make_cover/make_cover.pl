@@ -94,6 +94,7 @@ sub draw_picture
 	my $image = GD::Image->newFromJpeg("default.jpg", 1);	# 1 表示為 TrueColor
 
 	my $font = "./li.ttc";	# 指定字型
+	#my $font = "./NotoSansSiddham-Regular.ttf";	# 指定字型
 
 
 	# 將各字串畫出來, 傳回的 $y 是下一行的建議值

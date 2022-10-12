@@ -44,10 +44,19 @@ class P5aToP5Converter
       read_all_wit
     end
 
-    text = <<~XML
-      <?xml version="1.0" encoding="UTF-8"?>
-      <TEI xmlns="http://www.tei-c.org/ns/1.0" xmlns:cb="http://www.cbeta.org/ns/1.0" xml:id="#{@file_id}">
-    XML
+    if @p5b_format
+      text = <<~XML
+        <?xml version="1.0" encoding="UTF-8"?>
+        <?xml-model href="https://raw.githubusercontent.com/cbeta-git/xml-p5a/master/schema/cbeta-p5a.rnc" type="application/relax-ng-compact-syntax"?>
+        <TEI xmlns="http://www.tei-c.org/ns/1.0" xmlns:cb="http://www.cbeta.org/ns/1.0" xml:id="#{@file_id}">
+      XML
+    else
+      text = <<~XML
+        <?xml version="1.0" encoding="UTF-8"?>
+        <?xml-model href="https://raw.githubusercontent.com/cbeta-org/xml-p5/master/schema/cbeta-p5.rnc" type="application/relax-ng-compact-syntax"?>
+        <TEI xmlns="http://www.tei-c.org/ns/1.0" xmlns:cb="http://www.cbeta.org/ns/1.0" xml:id="#{@file_id}">
+      XML
+    end
 
     # mode = body , 表示處理的都在 body 區, 
     # 若遇到校勘, mode 換成 back , 表示接下來的資料都是在 back 區的

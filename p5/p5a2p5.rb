@@ -4,6 +4,7 @@
 # 作者: 周邦信(Ray Chou) 2022-04-15
 #
 # Heaven 修改：
+# 2022-10-13 取消二段式的處理，不再使用暫存檔
 # 2022-05-04 正式使用，找不到的說明可試著找 p5a2p5.py
 
 require 'fileutils'
@@ -36,23 +37,35 @@ def do1vol
   time_begin = Time.now
   puts time_begin
   
-  # phase- 1 #################################  
-  puts "#{$vol} phase-1"
+  # 底下二個整合成一個，不用暫存檔
+  # # phase- 1 #################################  
+  # puts "#{$vol} phase-1"
+
+  # src = "#{$in_p5a}/#{$canon}/#{$vol}"
+  # puts "read #{src}/*.xml"
+
+  # dest1 = File.join($phase1_base, $canon, $vol)
+  # FileUtils.makedirs(dest1)
+
+  # Dir["#{src}/*.xml"].each { |p| phase1(p) }
+    
+  # # phase- 2 #################################
+  # puts "#{$vol} phase-2"
+  # dest2 = File.join($out_p5, $canon, $vol)
+  # FileUtils.makedirs(dest2)
+  # Dir["#{dest1}/*.xml"].each { |p| phase2(p, dest2) }
+  
+  # phase- 3 #################################  
+  puts "#{$vol} phase-1,2"
 
   src = "#{$in_p5a}/#{$canon}/#{$vol}"
   puts "read #{src}/*.xml"
 
-  dest1 = File.join($phase1_base, $canon, $vol)
-  FileUtils.makedirs(dest1)
-
-  Dir["#{src}/*.xml"].each { |p| phase1(p) }
-    
-  # phase- 2 #################################
-  puts "#{$vol} phase-2"
   dest2 = File.join($out_p5, $canon, $vol)
   FileUtils.makedirs(dest2)
-  Dir["#{dest1}/*.xml"].each { |p| phase2(p, dest2) }
-  
+
+  Dir["#{src}/*.xml"].each { |p| phase3(p, dest2) }
+
   # 驗證 #################################
   unless $opts.dont_validate?
     Dir["#{dest2}/*.xml"].each { |p| validate(p) }
@@ -64,7 +77,44 @@ def do1vol
   $log.puts s
 end
 
-def phase1(src)
+
+def phase3(src, dest)
+  puts "phase1 read #{src}"
+  $log.puts src      # ex. src = c:/cbwork/xml-p5a/N/N10\N10n0003.xml
+
+  s = $converter.convert(src, $wit)
+
+  puts "phase2 vol=#{$vol} src=#{src}"
+
+  s.sub!(/\n(<teiHeader>)/, '\1')
+  
+  # P5b 不要移到 <l> 裡, 不然會有巢狀錯誤
+  unless $opts.p5b_format?
+    s = move_text_under_lg_to_first_l(s)
+    s = keep_nested_between_anchors(s)
+  end
+  
+  # 把 <anchor> 前後多餘的換行去掉
+  s.gsub!(/\n+(<anchor )/, '\1')
+  s.gsub!(/(<anchor [^>]*>)\n+/, '\1')
+  
+  # lb, pb 之前要換行
+  s.gsub!(/>(<lb[^>]*?ed="#{$canon})/, ">\n\\1")
+  s.gsub!(/([^\n])<pb /, "\\1\n<pb ")
+  
+  # type="old" 的 lb 和 pb 不換行 (印順導師全集才有的)
+  s.gsub!(/\n(<[lp]b[^>]*type="old")/, '\1')
+  
+  # 如果 sourceDesc 下有 <p> 的話, listWit 要放在 p 裡面.
+  s.gsub!(/(<\/p>)\s*(<listWit>.*?<\/listWit>)/m, "\n\\2\\1")
+
+  fn = File.join(dest, File.basename(src))
+  puts "write #{fn}"
+  File.write(fn, s)
+end
+
+# 不用了
+def _phase1(src)
   puts "phase1 read #{src}"
   $log.puts src      # ex. src = c:/cbwork/xml-p5a/N/N10\N10n0003.xml
 
@@ -138,7 +188,8 @@ def keep_nested_between_anchors(s)
   end
 end
 
-def phase2(p, dest)
+# 不用了
+def _phase2(p, dest)
   puts "phase2 vol=#{$vol} p=#{p}"
   s = File.read(p)
 
