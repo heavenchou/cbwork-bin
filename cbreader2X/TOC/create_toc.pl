@@ -198,10 +198,13 @@ sub parseNode
 	if ($nodeTypeName eq "ELEMENT_NODE") 
     {
         # 處理標記
-        my $tag_name = $node->getNodeName();	# 取得標記名稱     
-        if($tag_name eq "lb") { $text = tag_lb($node); }
-        if($tag_name eq "cb:mulu") { $text = tag_mulu($node); }
-        if($tag_name eq "milestone") { $text = tag_milestone($node); }
+        my $tag_name = $node->getNodeName();	# 取得標記名稱  
+        if($tag_name eq "lb") { $text = tag_lb($node); }    
+        elsif($tag_name eq "g") { $text = tag_g($node); }   
+        elsif($tag_name eq "note") { $text = tag_note($node); }
+        elsif($tag_name eq "cb:mulu") { $text = tag_mulu($node); }
+        elsif($tag_name eq "milestone") { $text = tag_milestone($node); }
+        elsif($tag_name eq "unclear") { $text = tag_unclear($node); }
         else { $text = tag_default($node); }				# 處理一般標記
     }
 	elsif ($nodeTypeName eq "TEXT_NODE") 
@@ -251,6 +254,19 @@ sub text_handler
 
 # 處理 xx 標記
 
+# <g ref="#CB08016"/>
+sub tag_g
+{
+    my $node = shift;
+	# 處理屬性 a="x"
+	my $att_ref = $node->getAttributeNode("ref");	# 取得屬性
+	if($att_ref)
+    {
+		my $ref = $att_ref->getValue();	# 取得屬性內容
+		return "<g ref=\"$ref\"/>";
+    }	
+}
+
 # <lb>
 # <lb n="0001a02" ed="T"/>
 sub tag_lb
@@ -285,6 +301,26 @@ sub tag_lb
 		my $n = $att_n->getValue();	# 取得屬性內容
 		$toc->lb($n);
     }
+}
+
+
+# <note>
+# <note place="inline">阿耨達秦言無惱熱</note>
+sub tag_note
+{
+    my $node = shift;
+	my $place = "";
+	# 處理標記
+    my $att_place = $node->getAttributeNode("place");	# 取得屬性
+	if($att_place) {
+		$place = $att_place->getValue();	# 取得屬性內容
+    }
+    # 處理內容
+    my $text = parseChild($node);
+	if($place eq "inline") {
+		$text = "($text)";
+	}
+    return $text;
 }
 
 # <mulu>
@@ -394,6 +430,22 @@ sub tag_milestone
 	}
 }
 
+
+# <unclear/>
+sub tag_unclear
+{
+    my $node = shift;
+    
+    # 處理內容
+    my $text = parseChild($node);
+
+	if($text eq "") {
+		return "▆";
+	} 
+	return $text;
+}
+
+
 # 處理預設標記
 # <tag a="x">abc</tag>
 sub tag_default
@@ -402,12 +454,15 @@ sub tag_default
 	# 處理標記 <tag>
     my $tag_name = $node->getNodeName();
 	# 處理屬性 a="x"
-	my $attr_text = node_get_attr_text($node); 
-    # 處理內容
+	#my $attr_text = node_get_attr_text($node); 
+    
+	# 處理內容
     my $child_text = parseChild($node);
 	# 處理標記結束 </tag>
-	my $text = get_full_tag($tag_name,$attr_text,$child_text);
-    return $text;
+	
+	#my $text = get_full_tag($tag_name,$attr_text,$child_text);
+    #return $text;
+	return "<$tag_name>";
 }
 
 # node 取回指定屬性

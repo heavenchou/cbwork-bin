@@ -58,9 +58,13 @@ class XML2EPUB
     r[:git_cbr2x]     = "/cbwork/CBReader2X/Bookcase/CBETA"
     # r[:ebook_convert] = '/usr/bin/ebook-convert'
 
-    # windows 7z 壓縮命令， 7z0 表示不壓縮
+    
+    # mimetype 先改名為 !mimetype
+    # 7z 的處理法，要先把 !mimetype 壓縮進去，再壓其它，再把 !mimetype 改回 mimetype 才行。
+    # windows 7z 壓縮命令， 7z0 表示不壓縮， rn 表示改名
     r[:zip0] = '"C:/Program Files/7-Zip/7z" a -mx0 '
-    r[:zip]  = '"C:/Program Files/7-Zip/7z" a -x!mimetype '
+    r[:zip]  = '"C:/Program Files/7-Zip/7z" a -x!!mimetype '
+    r[:ziprn]  = '"C:/Program Files/7-Zip/7z" rn '
     # mac 版的 zip 壓縮命令， zip0 表示不壓縮
     # r[:zip0]  = 'zip -0Xq '
     # r[:zip]   = 'zip -Xr9Dq '

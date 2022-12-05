@@ -67,9 +67,10 @@ def do1vol
   Dir["#{src}/*.xml"].each { |p| phase3(p, dest2) }
 
   # 驗證 #################################
-  unless $opts.dont_validate?
-    Dir["#{dest2}/*.xml"].each { |p| validate(p) }
-  end
+  # 取消驗證
+  # unless $opts.dont_validate?
+  #   Dir["#{dest2}/*.xml"].each { |p| validate(p) }
+  # end
 
   s = spend_time(Time.now - time_begin)
   s = "#{$vol} #{s}"

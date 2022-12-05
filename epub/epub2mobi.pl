@@ -7,8 +7,8 @@ use utf8;
 use Cwd;
 use strict;
 
-my $SourcePath = "d:/cbeta.www/download/epub/cbeta_epub_2022q3";			# 初始目錄, 最後不用加斜線 /
-my $OutputPath = "d:/cbeta.www/download/mobi/cbeta_mobi_2022q3";		# 目地初始目錄, 如果有需要的話. 最後不用加斜線 /
+my $SourcePath = "d:/cbeta.www/download/epub/cbeta_epub_2022q4";			# 初始目錄, 最後不用加斜線 /
+my $OutputPath = "d:/cbeta.www/download/mobi/cbeta_mobi_2022q4";		# 目地初始目錄, 如果有需要的話. 最後不用加斜線 /
 # $SourcePath = "d:/cbwork/cbeta-api/public/download/epub";			# 初始目錄, 最後不用加斜線 /
 # $OutputPath = "d:/cbwork/cbeta-api/public/download/mobi";		# 目地初始目錄, 如果有需要的話. 最後不用加斜線 /
 my $MakeOutputPath = 1;		# 1 : 產生對應的輸出目錄

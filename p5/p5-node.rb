@@ -83,6 +83,8 @@ class P5Node
       r = "cb:#{k}" if @tag == 'foreign'
     when 'id', 'lang'
       r = "xml:#{k}"
+    when 'note_key'
+      r = 'cb:note_key' if @tag == 'note'
     when 'place'
       r = 'cb:place' if %w[entry foreign lg].include?(@tag)
     when 'provider'

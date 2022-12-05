@@ -356,9 +356,11 @@ eos
         # 如果沒有羅馬轉寫就顯示圖檔
         src = File.join(@settings[:sd_gif], gid[3..4], gid+'.gif')
         basename = File.basename(src)
-        copy_oebps_file(src, "images/#{basename}")
-        add_image(basename)
-        return "<img src='../images/#{basename}' />"
+        if !File.exist? File.join(@temp_folder, 'OEBPS', "images/#{basename}")
+          copy_oebps_file(src, "images/#{basename}")
+          add_image(basename)
+        end
+        return "<img src='../images/#{basename}' alt='#{basename}' />"
       end
     end
     
@@ -376,9 +378,11 @@ eos
         # 如果沒有羅馬轉寫就顯示圖檔
         src = File.join(@settings[:rj_gif], gid[3..4], gid+'.gif')
         basename = File.basename(src)
-        copy_oebps_file(src, "images/#{basename}")
-        add_image(basename)
-        return "<img src='../images/#{basename}' />"
+        if !File.exist? File.join(@temp_folder, 'OEBPS', "images/#{basename}")
+          copy_oebps_file(src, "images/#{basename}")
+          add_image(basename)
+        end
+        return "<img src='../images/#{basename}' alt='#{basename}' />"
       end
     end
 
@@ -395,9 +399,10 @@ eos
       src = File.join(@settings[:figures], url)
     end
     basename = File.basename(src)
-    copy_oebps_file(src, "images/#{basename}")    
-    add_image(basename)
-    
+    if !File.exist? File.join(@temp_folder, 'OEBPS', "images/#{basename}")
+      copy_oebps_file(src, "images/#{basename}")    
+      add_image(basename)
+    end
     "<img src='../images/#{basename}' alt='#{basename}' />"
   end
 
@@ -415,14 +420,14 @@ eos
   end
 
   def e_juan(e)
-    "\n<p class='juan'>%s</p>" % traverse(e)
+    "\n<div class='juan'>%s</div>" % traverse(e)
   end
 
   # 2018-07-16 email maha:
   # 偈頌方面，限於手機寬度，可以讓文字自動折行，但句子與句子之間要有空格。
   def e_l(e)
     s = traverse(e)
-    "<div class='lg-row'>#{s}</div>\n"
+    "<span class='lg-row'>#{s}</span>\n"
   end
 
   def e_lb(e)
@@ -460,7 +465,11 @@ eos
     r = ''
     w = e['wit']
     if w.include? '【CB】' and not w.include? @orig
-      r = "<span class='corr'>%s</span>" % traverse(e)
+      if e.at_xpath('p') || e.at_xpath('table') || e.at_xpath('list') || e.at_xpath('juan') || e.at_xpath('div')
+        r = "<div class='corr'>%s</div>" % traverse(e)
+      else
+        r = "<span class='corr'>%s</span>" % traverse(e)
+      end
     else
       r = traverse(e)
     end
@@ -472,7 +481,7 @@ eos
     @lg_type = e['type']
 
     if @lg_type != 'regular'
-      node = HtmlNode.new('p')
+      node = HtmlNode.new('span')
       node.content = traverse(e)
       node['style'] = e['style'] if e.key? 'style'
       classes = ['lg-abnormal']
@@ -482,7 +491,11 @@ eos
     end
 
     @first_l = true
-    node = HtmlNode.new('div')
+    if e.at_xpath('head') # 有些偈頌開始有 head
+      node = HtmlNode.new('div')
+    else
+      node = HtmlNode.new('span')
+    end
 
     classes = ['lg']
     classes << e['rend'] if e.key? 'rend'
@@ -500,8 +513,16 @@ eos
   def e_list(e)
     doc = Nokogiri::XML::Document.new
     node = doc.create_element('ul')
-    node.inner_html = traverse(e)
+    inner_html = traverse(e)
+    list_head = ''
+    # 有時後面有 head 要移到前面 <list><head>...</head><item>....</item></list>
 
+    if inner_html.match(/(\A\s*<p(.|\n)*?)<li/)
+      inner_html = inner_html.sub(/(\A\s*<p(.|\n)*?)<li/, '<li')
+      list_head = $1
+    end
+
+    node.inner_html = inner_html
     classes = []
     if e.key? 'rendition'
       classes << e['rendition']
@@ -513,7 +534,7 @@ eos
 
     node['class'] = classes.join(' ')
 
-    "\n" + to_html(node)
+    "\n" + list_head + to_html(node)
   end
 
   def e_milestone(e)
@@ -556,7 +577,7 @@ eos
     "<a id='mulu#{@mulu_count}' />"
   end
 
-  def e_note(e)
+  def e_note(e, mode='html')
     n = e['n']
     if e.has_attribute?('type')
       t = e['type']
@@ -575,11 +596,19 @@ eos
     if e.has_attribute?('place')
       if %w[inline inline2 interlinear].include?(e['place'])
         r = traverse(e)
-        return "<span class='note-inline'>(#{r})</span>"
+        if mode == 'txt'
+          return "(#{r})"
+        else
+          if e.at_xpath('p') || e.at_xpath('list') 
+            return "<div class='note-inline'>(#{r})</div>"
+          else
+            return "<span class='note-inline'>(#{r})</span>"
+          end
+        end
       end
     end
     
-    traverse(e)
+    traverse(e, mode)
   end
 
   def e_p(e)
@@ -587,7 +616,7 @@ eos
     content = traverse(e)
     @p_type = nil
 
-    if e.at_xpath('figure')
+    if e.at_xpath('figure') || e.at_xpath('table') || e.at_xpath('//byline')  # table, byline(<p>) 不能在 p 中
       node = HtmlNode.new('div')
     else
       node = HtmlNode.new('p')
@@ -688,7 +717,7 @@ eos
     when 'lg'        then e_lg(e)
     when 'list'      then e_list(e)
     when 'mulu'      then e_mulu(e)
-    when 'note'      then e_note(e)
+    when 'note'      then e_note(e, mode)
     when 'milestone' then e_milestone(e)
     when 'p'         then e_p(e)
     when 'rdg'       then ''
@@ -733,7 +762,7 @@ eos
     text = parse_xml(xml_fn)
 
     # 註標移到 lg-cell 裡面，不然以 table 呈現 lg 會有問題
-    text.gsub!(/(<a class='noteAnchor'[^>]*><\/a>)(<div class="lg-cell"[^>]*>)/, '\2\1')
+    text.gsub!(/(<a class='noteAnchor'[^>]*><\/a>)(<((div)|(span)) class="lg-cell"[^>]*>)/, '\2\1')
     
     @main_text += text    
   end
@@ -927,7 +956,7 @@ eos
   end
   
   def prepare_mimetype
-    fn = File.join(@temp_folder, 'mimetype')
+    fn = File.join(@temp_folder, '!mimetype') # 因為 7z 壓縮要放在第一位，所以檔名要加 !
     File.write(fn, 'application/epub+zip')
   end
   
@@ -1019,11 +1048,18 @@ eos
     path = File.expand_path(fn)
     File.delete fn if File.exist? path
     Dir.chdir(@temp_folder) do
-      # system "\"C:/Program Files/7-Zip/7z\" a -mx0 #{path} mimetype"
-      # system "\"C:/Program Files/7-Zip/7z\" a -x!mimetype #{path} *"
-      system @settings[:zip0] + "#{path} mimetype > nul"
+      # mimetype 先改名為 !mimetype
+      # 7z 的處理法，要先把 !mimetype 壓縮進去，再壓其它，再把 !mimetype 改回 mimetype 才行。
+      
+      # system "C:/Program Files/7-Zip/7z" a -mx0 #{path} !mimetype
+      # system "C:/Program Files/7-Zip/7z" a -x!!mimetype #{path} *
+      # system "C:/Program Files/7-Zip/7z" rn #{path} !mimetype mimetype
+
+      # File.rename("mimetype", "!mimetype")  # 不用改名了，前面一開始檔名就加上!了。
+      system @settings[:zip0] + "#{path} !mimetype > nul"
       system @settings[:zip] + "#{path} * > nul"
+      system @settings[:ziprn] + "#{path} !mimetype mimetype > nul"
+      # File.rename("!mimetype", "mimetype") # 暫存檔會自動刪除
     end
   end
-  
 end

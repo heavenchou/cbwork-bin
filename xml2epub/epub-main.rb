@@ -20,7 +20,8 @@ class CbetaEbook
       sd_gif: File.join(config[:git_cbr2x], 'sd-gif'),
       rj_gif: File.join(config[:git_cbr2x], 'rj-gif'),
       zip0: config[:zip0],
-      zip: config[:zip]
+      zip: config[:zip],
+      ziprn: config[:ziprn]
     }
     @converter = CbetaEpub.new(options)
     @xml_base = config[:xml]

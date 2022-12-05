@@ -10,15 +10,16 @@ div.div-orig {
 div.div-w {
   color: #0000A0;
 }
-div.lg {
+.lg {
    /* display: table; */
   color: #008040;
   margin-bottom: 1.5em;
 }
-div.lg-row {
+.lg-row {
   margin-left: 1em;
+  display: block;
 }
-div.lg-cell {
+.lg-cell {
   display: table-cell;
   padding-right: 1em;
 }
@@ -111,7 +112,7 @@ span.bold {
 span.border {
   border: 1px black solid
 }
-span.corr {
+.corr {
   color: red;
 }
 span.note-inline {
