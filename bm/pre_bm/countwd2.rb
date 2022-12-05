@@ -3,7 +3,7 @@
 ################################################################
 
 # 參數
-infile = "a_out.txt"		# 來源檔名
+infile = "abc.txt"		# 來源檔名
 outfile = "wordcount.txt"	# 輸出檔名
 
 hash = Hash.new
@@ -17,6 +17,9 @@ fin.close
 # 輸出結果
 fout = File.open(outfile, 'w')
 hash.sort.each { |key,value| 
-    fout.puts "%06d\t%05X\t#{key}\t%08d" % [key.ord, key.ord, value]
+    out = "%06d\t%05X\t" % [key.ord, key.ord]
+    out += "#{key}\t"
+    out += "%08d" % value
+    fout.puts out
 }
 fout.close
