@@ -25,16 +25,15 @@ fin = File.open($infile)
 fout = File.open($outfile, 'w')
 
 fin.each_line { |line|
-
 	# p0001a 就是頁碼
 	
 	if line.match(/^(p.\d{3}[a-z])/)
 		$page = $1
 		$line = 0
-	elsif line.match(/^vol:(.*)/)
+	elsif line.match(/^.?vol:(.*)/)
 		$vol = $1
 	elsif line.match(/^N(\d+)([a-zA-Z]?)/)
-		$sutra = "%04d" % $1
+		$sutra = "%04d" % $1.to_i
 		$other = $2
 		if $other == ""
 			$sutra += "_"
@@ -54,7 +53,6 @@ fin.each_line { |line|
 				$sutra += $other;
 			end
 		end
-		 
 		$outtxt += $vol + "n" + $sutra + $page + "%02d" % $line  + "︴" + line;
 	end
 }
