@@ -6,6 +6,9 @@
 # 作者: 周邦信(Ray Chou) 2022-04-20
 #
 # Heaven 修改：
+# 2022-12-06 1.支援 <del>,<under>,<over> 標記
+#            2.新增Ａ<㊣Ｂ>「正字標記」，表示原書Ａ的正字為Ｂ。xml 作 <orig reg="Ｂ">Ａ</orig>
+#            3.組字式優先呈現 unicode，其次才是 <g> 標記
 # 2022-08-10 如果行首標記是 Ff3，就要輸出 <table style="margin-left:3em;">
 # 2022-05-04 正式使用，找不到的說明可試著找 bm2p5a.py
 
@@ -739,7 +742,7 @@ end
 # 處理經文中的標記
 def inline_tag(tag)
   case tag
-  when /^<app/, '</app>', '<corr>', '</corr>', /^<choice/, '</choice>', /^<lem/, '</lem>', /^<note/, '</note>', '<orig>', '</orig>', '</quote>', /^<rdg/, '</rdg>', '<reg>', '</reg>', '<sic>', '</sic>'
+  when /^<app/, '</app>', '<corr>', '</corr>', /^<choice/, '</choice>', /^<lem/, '</lem>', /^<note/, '</note>', /^<orig/, '</orig>', '</quote>', /^<rdg/, '</rdg>', '<reg>', '</reg>', '<sic>', '</sic>'
     # 直接輸出, 例：<choice cb:resp="CBETA.maha"><corr>Ｂ</corr><sic>Ａ</sic></choice>
     out(tag)
   when /^<(\[(([\da-zA-Z]{2,3})|＊)\])>/	
@@ -772,6 +775,8 @@ def inline_tag(tag)
   when /<c[\d\s>]/ then start_inline_c(tag)
   when '<d>'       then start_inline_d(tag)
   when '<date>'    then start_inline_date(tag)
+  when '<del>'  then out('<seg rend="del">')
+  when '</del>' then out('</seg>')
   when '<e>'       then start_inline_e(tag)
   when '</e>'      then close_e(tag)
   when '<event>'   then start_inline_event(tag)
@@ -818,6 +823,8 @@ def inline_tag(tag)
   when '</n>'      then close_n(tag)
   when '<o>'       then start_inline_o(tag)
   when '</o>'      then close_div_by_type('orig')
+  when '<over>'  then out('<seg rend="over">')
+  when '</over>' then out('</seg>')
   when /<PTS./ then start_PTS(tag)
   when /^<p/   then start_inline_p(tag)
   when '</p>'  then close_tags('p')
@@ -850,6 +857,8 @@ def inline_tag(tag)
     close_tags('l', 'lg')
   when '<u>'         then start_inline_u(tag)
   when '</u>'        then close_div_by_type('commentary')
+  when '<under>'  then out('<seg rend="under">')
+  when '</under>' then out('</seg>')
   when /^<w>/ then start_inline_w(tag)
   when /^<a>/ then start_inline_a(tag)
   when '</w>' then close_tags('p','sp','cb:dialog')
@@ -904,7 +913,9 @@ def gaiji(zuzi)
   return zuzi if zuzi=='[＊]'
   return zuzi if zuzi.match?(/\[\d+\]/)
   
-  if $des2cb.key?(zuzi)
+  if $des2uni.key?(zuzi)
+    return $des2uni[zuzi]
+  elsif $des2cb.key?(zuzi)
     return %(<g ref="##{$des2cb[zuzi]}"/>)
   else
     puts "組字式找不到: #{zuzi}"
@@ -1453,6 +1464,9 @@ def convert_line(s)
   # 因為 Ａ 與 Ｂ 也有可能是組字式或校勘數字, 例如 [千[金*本]=千[金*本]經]
 
   do_corr_normalize(text)
+
+  # 把 Ａ<㊣Ｂ> 換成 <orig reg="Ｂ">Ａ</orig>
+  text = text.gsub(/((?:\[[^\]]+\])|(?:[^\]]))<㊣(.*?)>/, '<orig reg="\2">\1</orig>')
       
   '''
   把這種
@@ -1545,17 +1559,21 @@ def read_all_gaijis
   fn = File.join(base, 'cbeta_gaiji.json')
   $all_gaijis = JSON.load_file(fn)
 
-  $unicode2cb = {}
+  # $unicode2cb = {}
   $all_gaijis.each do |cb, v|
     des = v['composition']
     if not des.nil? and not des.empty?
       $des2cb[des] = cb
+      uni_char = v['uni_char']
+      if not uni_char.nil? and not uni_char.empty?
+        $des2uni[des] = uni_char
+      end
     end
 
-    uni = v['unicode']
-    if not uni.nil? and not uni.empty?
-      $unicode2cb[uni] = cb
-    end
+    # uni = v['unicode']
+    # if not uni.nil? and not uni.empty?
+    #   $unicode2cb[uni] = cb
+    # end
   end
 end
   
@@ -1588,7 +1606,8 @@ def read_config
   $head_tag = ''
   $div_head = ''
   $des2cb = {}
-  $unicode2cb = {}
+  $des2uni = {}
+  # $unicode2cb = {}
   $line_num = ''
   $opens = Hash.new(0)	# 記錄每一個標記的層次, 預設值為 0
   $opens['div'] = 0
