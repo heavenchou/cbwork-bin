@@ -162,6 +162,7 @@ sub default {
 sub init_handler
 {       
 	$result .= "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+	$result .= "<?xml-model href=\"https://raw.githubusercontent.com/cbeta-git/xml-p5a/master/schema/cbeta-p5a.rnc\" type=\"application/relax-ng-compact-syntax\"?>\n";
 	$lb="";
 	$ent_declare = '';
 	$para_ent = "";
