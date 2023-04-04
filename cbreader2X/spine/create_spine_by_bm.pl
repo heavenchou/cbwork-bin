@@ -124,7 +124,7 @@ sub ParserXML
 		{
 			my $juan = $1;
 
-			if(/^(\D+)(\d+)n(.\d+[a-zA-Z]?)_?p(.\d{3}[a-z]\d\d)/)
+			if(/^(?:\x{FEFF})?(\D+)(\d+)n(.\d+[a-zA-Z]?)_?p(.\d{3}[a-z]\d\d)/)
 			{
 				$book = $1;
 				$volnum = $2;

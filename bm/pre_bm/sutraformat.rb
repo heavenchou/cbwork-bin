@@ -13,6 +13,7 @@ $outfile = "a_out.txt"	# 輸出檔名
 
 # 行首資訊
 
+$vol = ""
 $sutra = "0000_"
 $page = ''
 $line = 0
@@ -26,7 +27,6 @@ fout = File.open($outfile, 'w')
 
 fin.each_line { |line|
 	# p0001a 就是頁碼
-	
 	if line.match(/^(p.\d{3}[a-z])/)
 		$page = $1
 		$line = 0

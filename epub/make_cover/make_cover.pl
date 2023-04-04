@@ -14,11 +14,11 @@ use GD;
 
 # 參數
 
-my $db_file = "database_XXa.txt";	# 經名資料庫
+my $db_file = "database_2023Q1.txt";	# 經名資料庫
 #my $cover_page_path = "c:/release/epub_cover_ud3/";	# 輸出圖檔的目錄
-my $cover_page_path = "./cover_update_XXa/";	# 輸出圖檔的目錄
+my $cover_page_path = "./cover_update_2023Q1/";	# 輸出圖檔的目錄
 #my $cover_page_path2 = "./cover/";	# 檢查結果用的
-my $cover_page_path2 = "./cover_update_XXa/";	# 檢查結果用的
+my $cover_page_path2 = "./cover_update_2023Q1/";	# 檢查結果用的
 
 
 #$db_file = "database_update.txt";	# 經名資料庫

@@ -12,9 +12,14 @@
 #
 # 設定檔：相關設定由 ../cbwork_bin.ini 取得
 #
-# Copyright (C) 1998-2022 CBETA
-# Copyright (C) 1999-2022 Heaven Chou
+# Copyright (C) 1998-2023 CBETA
+# Copyright (C) 1999-2023 Heaven Chou
 ########################################################################
+
+# 2023/04/04 支援 <p,c>, <p,r>, <Q1,c>, <Q1,r> 等格式 (c 置中，r 靠右)
+# 2023/04/01 忽略 <del>,<under>,<over> 標記
+# 2023/01/18 支援處理 <㊣X> 標記
+##########################################################
 # 2022/10/13 修改標記的判斷
 # 2022/03/31 數字不能用 \d 判斷了，要用 [0-9]，因為全型數字也會被視為 \d，但組字式有這種 [１２．] = ⒓
 ##########################################################
@@ -1722,13 +1727,15 @@ s之後的第一個Ｐ：變成二個空格。（是否是不管之前的繼承�
 	#<p_c> 段落置中, 空格比照 <p,4>
 	s/<p_r>/<p,8>/g;
 	s/<p_c>/<p,4>/g;
+	s/<p,r>/<p,8>/g;
+	s/<p,c>/<p,4>/g;
 	
 	# <Qn m=...><xx> 要先換成 <xx> 即可, 忽略 <Qn m=...>
 	# <Qn m=...> 及 <p=hn> 比照 <Qn> 空格
 	
-	s/(<Q\d+ m=[^>]*>)+(<.*?>)/$2/g;
+	s/(<Q\d+(?:,[cr])?[, ]m=[^>]*>)+(<.*?>)/$2/g;
 	#s/(<Q\d+ m=[^>]*>)+(Ａ)/$2/g;
-	s/(<Q\d+) m=[^>]*>/$1>/g;
+	s/(<Q\d+)(?:,[cr])?[, ]m=[^>]*>/$1>/g;
 	#s/<p=h(\d)>/<Q$1>/g;
 	
 	#<p=h1> 對應到 <p,2>
@@ -1756,14 +1763,13 @@ s之後的第一個Ｐ：變成二個空格。（是否是不管之前的繼承�
 	s/<p=h2[147]>/<p,4>/g;
 	s/<p=h2[258]>/<p,2>/g;
 
-
-
-	
 	if($sign =~ /f/) {$ctag_num = 0;}	# <r> 也是比照處理
 	
 	# 先處理行首的一些問題
 
-	if(/^<p,?(-?[\d\.]*),?(-?[\d\.]*)>/)		# 行首發現小p標記
+	# <p,c> <p,r> <p,x,y,c> <p,c,x,y> c: 置中, r: 靠右
+
+	if(/^<p(?:,[cr])?,?(-?[\d\.]*),?(-?[\d\.]*)(?:,[cr])?>/)		# 行首發現小p標記
 	{
 		$smallp1 = $1;
 		$smallp2 = $2;
@@ -1786,7 +1792,7 @@ s之後的第一個Ｐ：變成二個空格。（是否是不管之前的繼承�
 		
 		my $space = "　" x ($smallp1+$smallp2);
 
-		s/^<p,?(-?[\d\.]*),?(-?[\d\.]*)>/$space/;
+		s/^<p(?:,[cr])?,?(-?[\d\.]*),?(-?[\d\.]*)(?:,[cr])?>/$space/;
 	}
 	else
 	{
@@ -1837,8 +1843,9 @@ s之後的第一個Ｐ：變成二個空格。（是否是不管之前的繼承�
 		}
 		
 		# 處理小寫的 p 標記 (<p,x,y> , x : 整段縮排, y : 行首縮排)
+		# <p,c> <p,r> <p,x,y,c> <p,c,x,y> c: 置中, r: 靠右
 
-		if($thistag =~ /<p,?(-?[\d\.]*),?(-?[\d\.]*)>/)	
+		if($thistag =~ /<p(?:,[cr])?,?(-?[\d\.]*),?(-?[\d\.]*)(?:,[cr])?>/)	
 		{
 			$smallp1 = $1;
 			$smallp2 = $2;
@@ -1859,7 +1866,7 @@ s之後的第一個Ｐ：變成二個空格。（是否是不管之前的繼承�
 			$myspace = 1 if($myspace == 0 and $pretagtmp ne "" and $pretagtmp !~ /$fullspace$/);
 			
 			my $space = "　" x $myspace;
-			s/<p,?(-?[\d\.]*),?(-?[\d\.]*)>/$space/;
+			s/<p(?:,[cr])?,?(-?[\d\.]*),?(-?[\d\.]*)(?:,[cr])?>/$space/;
 			
 			# <p> 在行中, 所以先處理空格, 再處理繼承
 			
@@ -1958,36 +1965,37 @@ s之後的第一個Ｐ：變成二個空格。（是否是不管之前的繼承�
 			next;
 		}
 
-		if($thistag =~ /(<Q\d*=?>)/)		# 標記型的 I
+		if($thistag =~ /(<Q\d*(,[cr])?=?>)/)		# 標記型的 I
 		{
 			my $Qtag = $1;
 			$Qtag =~ s/=//;	# 把 = 去掉
-			if($Qtag eq "<Q>")  {s/<Q=?>/$fullspace2/;}
-			elsif($Qtag eq "<Q1>") {s/<Q1=?>/$fullspace2/;}
-			elsif($Qtag eq "<Q2>") {s/<Q2=?>/$fullspace3/;}
-			elsif($Qtag eq "<Q3>") {s/<Q3=?>/$fullspace4/;}
-			elsif($Qtag eq "<Q4>") {s/<Q4=?>/$fullspace2/;}
-			elsif($Qtag eq "<Q5>") {s/<Q5=?>/$fullspace3/;}
-			elsif($Qtag eq "<Q6>") {s/<Q6=?>/$fullspace4/;}
-			elsif($Qtag eq "<Q7>") {s/<Q7=?>/$fullspace2/;}
-			elsif($Qtag eq "<Q8>") {s/<Q8=?>/$fullspace3/;}
-			elsif($Qtag eq "<Q9>") {s/<Q9=?>/$fullspace4/;}
-			elsif($Qtag eq "<Q10>") {s/<Q10=?>/$fullspace2/;}
-			elsif($Qtag eq "<Q11>") {s/<Q11=?>/$fullspace3/;}
-			elsif($Qtag eq "<Q12>") {s/<Q12=?>/$fullspace4/;}
-			elsif($Qtag eq "<Q13>") {s/<Q13=?>/$fullspace2/;}
-			elsif($Qtag eq "<Q14>") {s/<Q14=?>/$fullspace3/;}
-			elsif($Qtag eq "<Q15>") {s/<Q15=?>/$fullspace4/;}
-			elsif($Qtag eq "<Q16>") {s/<Q16=?>/$fullspace2/;}
-			elsif($Qtag eq "<Q17>") {s/<Q17=?>/$fullspace3/;}
-			elsif($Qtag eq "<Q18>") {s/<Q18=?>/$fullspace4/;}
-			elsif($Qtag eq "<Q19>") {s/<Q19=?>/$fullspace2/;}
-			elsif($Qtag eq "<Q20>") {s/<Q20=?>/$fullspace3/;}
-			elsif($Qtag eq "<Q21>") {s/<Q21=?>/$fullspace4/;}
-			elsif($Qtag eq "<Q22>") {s/<Q22=?>/$fullspace2/;}
-			elsif($Qtag eq "<Q23>") {s/<Q23=?>/$fullspace3/;}
-			elsif($Qtag eq "<Q24>") {s/<Q24=?>/$fullspace4/;}
-			elsif($Qtag eq "<Q25>") {s/<Q25=?>/$fullspace2/;}
+			$Qtag =~ s/,[cr]//;	# 把 ,[cr] 去掉
+			if($Qtag eq "<Q>")  {s/<Q(,[cr])?=?>/$fullspace2/;}
+			elsif($Qtag eq "<Q1>") {s/<Q1(,[cr])?=?>/$fullspace2/;}
+			elsif($Qtag eq "<Q2>") {s/<Q2(,[cr])?=?>/$fullspace3/;}
+			elsif($Qtag eq "<Q3>") {s/<Q3(,[cr])?=?>/$fullspace4/;}
+			elsif($Qtag eq "<Q4>") {s/<Q4(,[cr])?=?>/$fullspace2/;}
+			elsif($Qtag eq "<Q5>") {s/<Q5(,[cr])?=?>/$fullspace3/;}
+			elsif($Qtag eq "<Q6>") {s/<Q6(,[cr])?=?>/$fullspace4/;}
+			elsif($Qtag eq "<Q7>") {s/<Q7(,[cr])?=?>/$fullspace2/;}
+			elsif($Qtag eq "<Q8>") {s/<Q8(,[cr])?=?>/$fullspace3/;}
+			elsif($Qtag eq "<Q9>") {s/<Q9(,[cr])?=?>/$fullspace4/;}
+			elsif($Qtag eq "<Q10>") {s/<Q10(,[cr])?=?>/$fullspace2/;}
+			elsif($Qtag eq "<Q11>") {s/<Q11(,[cr])?=?>/$fullspace3/;}
+			elsif($Qtag eq "<Q12>") {s/<Q12(,[cr])?=?>/$fullspace4/;}
+			elsif($Qtag eq "<Q13>") {s/<Q13(,[cr])?=?>/$fullspace2/;}
+			elsif($Qtag eq "<Q14>") {s/<Q14(,[cr])?=?>/$fullspace3/;}
+			elsif($Qtag eq "<Q15>") {s/<Q15(,[cr])?=?>/$fullspace4/;}
+			elsif($Qtag eq "<Q16>") {s/<Q16(,[cr])?=?>/$fullspace2/;}
+			elsif($Qtag eq "<Q17>") {s/<Q17(,[cr])?=?>/$fullspace3/;}
+			elsif($Qtag eq "<Q18>") {s/<Q18(,[cr])?=?>/$fullspace4/;}
+			elsif($Qtag eq "<Q19>") {s/<Q19(,[cr])?=?>/$fullspace2/;}
+			elsif($Qtag eq "<Q20>") {s/<Q20(,[cr])?=?>/$fullspace3/;}
+			elsif($Qtag eq "<Q21>") {s/<Q21(,[cr])?=?>/$fullspace4/;}
+			elsif($Qtag eq "<Q22>") {s/<Q22(,[cr])?=?>/$fullspace2/;}
+			elsif($Qtag eq "<Q23>") {s/<Q23(,[cr])?=?>/$fullspace3/;}
+			elsif($Qtag eq "<Q24>") {s/<Q24(,[cr])?=?>/$fullspace4/;}
+			elsif($Qtag eq "<Q25>") {s/<Q25(,[cr])?=?>/$fullspace2/;}
 			else
 			{
 				print "<Qxx> too much, ask heaven to update program.";
@@ -2103,10 +2111,11 @@ s之後的第一個Ｐ：變成二個空格。（是否是不管之前的繼承�
 			s/<\/?su[bp]>//;
 			next;
 		}
+		# 忽略 <del>,<under>,<over> 標記
 		# 忽略 <it> <bold> <kai> <ming> <hei> <song>
-		if($thistag =~ /<\/?((it)|(bold)|(kai)|(ming)|(hei)|(song))>/)
+		if($thistag =~ /<\/?((it)|(bold)|(kai)|(ming)|(hei)|(song)|(del)|(under)|(over))>/)
 		{
-			s/<\/?((it)|(bold)|(kai)|(ming)|(hei)|(song))>//;
+			s/<\/?((it)|(bold)|(kai)|(ming)|(hei)|(song)|(del)|(under)|(over))>//;
 			next;
 		}
 		
@@ -2260,6 +2269,11 @@ s之後的第一個Ｐ：變成二個空格。（是否是不管之前的繼承�
 		if($thistag =~ /<\/?border>/)
 		{
 			s/<\/?border>//;
+			next;
+		}	
+		if($thistag =~ /<㊣.*?>/)
+		{
+			s/<㊣.*?>//;
 			next;
 		}	
 		

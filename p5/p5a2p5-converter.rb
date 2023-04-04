@@ -998,6 +998,7 @@ class P5aToP5Converter
     return '' if e.nil?
 
     text = e.content
+
     text.gsub!("\n", '') if mode.include?(:back)
     text.gsub!('&', '&amp;')
     text.gsub!('<', '&lt;')

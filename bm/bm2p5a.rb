@@ -6,6 +6,11 @@
 # 作者: 周邦信(Ray Chou) 2022-04-20
 #
 # Heaven 修改：
+# 2023-04-05 1.支援 <c,4> 這種格式，表示此格內縮 4 個字 => <cell rend="pl-4">
+#            2.支援 <p,c><p,r><Q1,c><Q1,r> 等格式，c 表示置中 rend="text-center", r 表示靠右 rend="text-right"
+#              過去有支援 <p_r>,<p_c>
+#            3.支援 <Q1,c><Q1,r><Q1,c m=封面><Q1,c=>，c 表示置中 rend="text-center", r 表示靠右 rend="text-right"
+#            4.支援 <[ABCEY],[cr]> 同上
 # 2022-12-06 1.支援 <del>,<under>,<over> 標記
 #            2.新增Ａ<㊣Ｂ>「正字標記」，表示原書Ａ的正字為Ｂ。xml 作 <orig reg="Ｂ">Ａ</orig>
 #            3.組字式優先呈現 unicode，其次才是 <g> 標記
@@ -182,6 +187,9 @@ def start_p(tag)
   $opens['p'] = 1
 end
 
+# <p,1,2>
+# <p,1,2,c> or <p,c,1,2> c 置中，r 靠右
+
 def start_inline_p(tag)
   close_tags('cb:jhead', 'cb:juan', 'p', 'byline')
   close_head
@@ -196,12 +204,12 @@ def start_inline_p(tag)
   end
   
   # 處理 <p,1,2> 這種格式
-  tag.match(/<[pz],(\-?[\d\.]+),(\-?[\d\.]+)>/) do
+  tag.match(/<[pz](?:,[cr])?,(\-?[\d\.]+),(\-?[\d\.]+)/) do
     s << %( style="margin-left:#{$1}em;text-indent:#{$2}em")
   end
   
-  # 處理 <p,1> 這種格式
-  tag.match(/<[pz],(\-?[\d\.]+)>/) do
+  # 處理 <p,1> <p,1,c> 這種格式
+  tag.match(/<[pz](?:,[cr])?,(\-?[\d\.]+)((,[cr])|(>))/) do
     s << %( style="margin-left:#{$1}em")
   end
     
@@ -225,6 +233,15 @@ def start_inline_p(tag)
     s << %( rend="text-right")
   end
 
+	# 處理 <p,c> , <p,r> - 2023-04-05
+
+  tag.match(/,c[,>]/) do
+    s << %( rend="text-center")
+  end
+  tag.match(/,r[,>]/) do
+    s << %( rend="text-right")
+  end
+
   s << '>'
   out(s)
   $opens['p'] = 1
@@ -243,8 +260,13 @@ def start_div(level, type)
   end
 end
 
+# <Q1>
+# <Q1 m="abc">
+# <Q1=>
+# <Q1,c> <Q1,c m="abc"> <Q1,c=> c 表示置中 rend="text-center", r 表示靠右 rend="text-right"
+
 def start_inline_q(tag)
-  return if tag.match?(/<Q\d?=/)	# <Q3=> 這一種的表示是延續上一行的 <Q3>
+  return if tag.match?(/<Q\d*(,[cr])?=/)	# <Q3=> 這一種的表示是延續上一行的 <Q3>
 
   close_head
   close_tags('l', 'lg', 'p', 'sp', 'cb:dialog', 'cb:event', 'form', 'cb:def', 'entry')
@@ -265,8 +287,20 @@ def start_inline_q(tag)
     start_inline_q_label($1, level)
   end
 
-  $head_start = true
-  $buf << '<head>'
+  $head_start = true	
+
+  $buf << '<head'
+
+  # 處理 <Q1,c> , <Q1,r> , <Q1,c m="xxx"> - 2023-04-05
+  tag.match(/,c[ ,>]/) do
+    $buf << %( rend="text-center")
+  end
+  tag.match(/,r[ ,>]/) do
+    $buf << %( rend="text-right")
+  end
+  
+  $buf << '>'
+
   $opens['head'] = 1
 end
 
@@ -398,6 +432,7 @@ end
 # <c3> => <cell cols="3">
 # <c r3> => <cell rows="3">
 # <c3 r3> => <cell cols="3" rows="3">
+# <c,1><c3,1><c r3,1><c3 r3,1> => <cell rend="pl-1">...<cell cols="3" rows="3" rend="pl-1">
 def start_inline_c(tag)
   close_tags('p', 'cell')
 
@@ -413,9 +448,16 @@ def start_inline_c(tag)
     rows = $1
   end
 
+  # 檢查有沒有 ,\d 這種格式
+  rend = ''
+  tag.match(/,(\d+)/) do
+    rend = $1
+  end
+
   out '<cell'
   out %( cols="#{cols}") unless cols.empty?
   out %( rows="#{rows}") unless rows.empty?
+  out %( rend="pl-#{rend}") unless rend.empty?
   out('>')
   $opens['cell'] += 1
 end
@@ -767,12 +809,12 @@ def inline_tag(tag)
     # <cb:event><date>ＸＸＸ</date><p,1>ＹＹＹ</p></cb:event>
     start_inline_annals(tag)
   when '</annals>' then close_annals(tag)
-  when /<[ABCEY]>/ then start_inline_byline(tag)
+  when /<[ABCEY](,[cr])?>/ then start_inline_byline(tag)
   when '<bold>'    then out('<seg rend="bold">')
   when '</bold>'   then out('</seg>')
   when '<border>'  then out('<seg rend="border">')
   when '</border>' then out('</seg>')
-  when /<c[\d\s>]/ then start_inline_c(tag)
+  when /<c[,\d\s>]/ then start_inline_c(tag)
   when '<d>'       then start_inline_d(tag)
   when '<date>'    then start_inline_date(tag)
   when '<del>'  then out('<seg rend="del">')
@@ -1190,14 +1232,25 @@ def start_inline_byline(tag)
   close_head
 
   type = case tag
-  when '<A>' then "author"
-  when '<B>' then "other"
-  when '<C>' then "collector"
-  when '<E>' then "editor"
-  when '<Y>' then "translator"
+  when /<A/ then "author"
+  when /<B/ then "other"
+  when /<C/ then "collector"
+  when /<E/ then "editor"
+  when /<Y/ then "translator"
   end
 
-  out %(<byline cb:type="#{type}">)
+  out %(<byline cb:type="#{type}")
+
+	# 處理 <A,c> , <B,r> - 2023-04-05
+
+  tag.match(/,c[,>]/) do
+    out %( rend="text-center")
+  end
+  tag.match(/,r[,>]/) do
+    out %( rend="text-right")
+  end
+
+  out '>'
   $opens['byline'] = 1
 end
 
@@ -1227,13 +1280,13 @@ def start_x(tag)
 end
 
 # 計算一行有多少 <c> 標記
-# <c> 算 1 個
+# <c>, <c,2> 算 1 個
 # <c3> 算 3 個
 # <c4 r3> 算 4 個
 # <c r3> 算 1 個
 def count_c_from_line(text)
-  # 算有多少個 <c> 或 <c r3>
-  r = text.scan(/<c[\s>]/).size
+  # 算有多少個 <c> 或 或 <c,2> 或 <c r3>
+  r = text.scan(/<c[,\s>]/).size
   
   # 算有多少個 <c3> 或 <c3 r3>
   text.scan(/<c(\d+)/) do 
@@ -1415,7 +1468,7 @@ def convert_line(s)
   pb.delete_prefix!('p')
   
   # 換行時, 發現前一行是 head , 而且沒有延續到本行, 就要印出相關文字
-  if $head_start and not $head_tag.match?(/Q\d?=/) and not text.match?(/<Q\d?=/)
+  if $head_start and not $head_tag.match?(/Q\d*(,[cr])?=/) and not text.match?(/<Q\d*(,[cr])?=/)
     close_head
   end
   

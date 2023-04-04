@@ -462,7 +462,7 @@ sub tag_default
 	
 	#my $text = get_full_tag($tag_name,$attr_text,$child_text);
     #return $text;
-	return "<$tag_name>";
+	return $child_text;
 }
 
 # node 取回指定屬性
