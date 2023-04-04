@@ -10,7 +10,7 @@
 #            2.支援 <p,c><p,r><Q1,c><Q1,r> 等格式，c 表示置中 rend="text-center", r 表示靠右 rend="text-right"
 #              過去有支援 <p_r>,<p_c>
 #            3.支援 <Q1,c><Q1,r><Q1,c m=封面><Q1,c=>，c 表示置中 rend="text-center", r 表示靠右 rend="text-right"
-#            4.支援 <[ABCEY],[cr]> 同上
+#            4.支援 <[ABCEY],[crl]> 同上, l 是靠左 rend="text-left"
 # 2022-12-06 1.支援 <del>,<under>,<over> 標記
 #            2.新增Ａ<㊣Ｂ>「正字標記」，表示原書Ａ的正字為Ｂ。xml 作 <orig reg="Ｂ">Ａ</orig>
 #            3.組字式優先呈現 unicode，其次才是 <g> 標記
@@ -1248,6 +1248,9 @@ def start_inline_byline(tag)
   end
   tag.match(/,r[,>]/) do
     out %( rend="text-right")
+  end
+  tag.match(/,l[,>]/) do
+    out %( rend="text-left")
   end
 
   out '>'
