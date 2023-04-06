@@ -3,6 +3,7 @@
 # 格式介紹在最底下
 #
 # 修訂記錄：
+# 2023/04/06 : 處理 <c,2> => <cell rend="pl-2">、處理 <bold>, <it> .... 等格式
 # 2020/06/01 : 加入 ZW 藏外的資料
 # 2019/12/25 : 更換缺字處理模組, 修訂取消 <app> 和 <choice>
 # 2019/09/04 : 加入 LC 呂澂的資料
@@ -54,6 +55,11 @@ elsif($ed eq "GB")
 {
 	$source_ename = "DILA";		# resp="xxx" 的名稱
 	$source_cname = "志叢";			#<rdg wit="xxxx"> 的名稱
+}
+elsif($ed eq "HM")
+{
+	$source_ename = "Huimin";		# resp="xxx" 的名稱
+	$source_cname = "惠敏";			#<rdg wit="xxxx"> 的名稱
 }
 elsif($ed eq "LC")
 {
@@ -204,6 +210,7 @@ for (my $i=0; $i<= $#lines; $i++)
 	
 	$notedata = run_corr($notedata);	# 處理修訂
 	$notedata = run_des($notedata);		# 處理組字式及●符號
+	$notedata = run_style($notedata);		# 處理特殊格式，例如 <bold>
 	$notedata =~ s/<([^>]*?).gif>/<figure entity="Fig$1"\/>/g;	# <B06p0461_05.gif> 換成 <figure entity="FigB06p0461_05"/>
 	
 	# 檢查有沒有分成 orig 與 mod
@@ -389,52 +396,81 @@ sub run_des
 	return $_;
 }
 
+# 處理特殊格式，例如 <bold>
+sub run_style
+{
+	local $_ = shift;
+
+	s/<bold>/<seg rend="bold">/g;
+	s/<it>/<seg rend="italic">/g;
+	s/<ming>/<seg rend="mingti">/g;
+	s/<kai>/<seg rend="kaiti">/g;
+	s/<hei>/<seg rend="heiti">/g;
+	s/<over>/<seg rend="over">/g;
+	s/<del>/<seg rend="del">/g;
+	s/<under>/<seg rend="under">/g;
+	s/<border>/<seg rend="border">/g;
+
+	s/<\/bold>/<\/seg>/g;
+	s/<\/it>/<\/seg>/g;
+	s/<\/ming>/<\/seg>/g;
+	s/<\/kai>/<\/seg>/g;
+	s/<\/hei>/<\/seg>/g;
+	s/<\/over>/<\/seg>/g;
+	s/<\/del>/<\/seg>/g;
+	s/<\/under>/<\/seg>/g;
+	s/<\/border>/<\/seg>/g;
+	
+	return $_;
+}
+
 # 檢查是否有表格標記, 要先處理, 因為一行是一個 <row>, 接起來就看不出每一行的位置了
 #<F> => <table cols="5"><row>
 #每一行前後要加 <row>
 #<c> => <cell></cell>
+#<c,3> => <cell rend="pl-3"></cell>
 #<c2> => <cell cols="2">
 #<c r2> => <cell rows="2">
+#<c2 r2> => <cell cols="2" rows="2">
+#<c2 r2,3> => <cell cols="2" rows="2" rend="pl-3">
 sub check_table()
 {
 	local $_ = shift;
 	
-	if(/^<F>/)
-	{
+	if(/^<F>/) {
 		# 要算有幾個 <c>
 		my $count = 0;
 		my $tmp = $_;
+
+		# <c> <c,1> <c r2>
+		while(/<c[, >]/) {
+			s/<c[, >]//;
+			$count++;
+		}
 		
-		while(/<c>/)
-		{
-			s/<c>//;
-			$count++;
-		}
-		while(/<c\d+>/)
-		{
-			s/<c(\d+)>//;
+		# <c3> <c3 r2> <c3,1> <c3 r2,1>
+		while(/<c\d+/) {
+			s/<c(\d+)//;
 			$count += $1;
-		}
-		while(/<c r\d+>/)
-		{
-			s/<c r\d+>//;
-			$count++;
 		}
 		
 		$_ = $tmp;
 		s/^<F>(.*)/<table cols="$count"><row>$1<\/cell><\/row>/;
 	}
 	
-	if(/^<c( r)?\d*>/)
-	{
+	# 換行
+	if(/^<c[, \d>]/) {
 		$_ = "<row>" . $_ . "<\/cell><\/row>";
 	}
 	
-	s/<c>/<\/cell><cell>/g;
-	s/<c(\d+)>/<\/cell><cell cols="$1">/g;
-	s/<c r(\d+)>/<\/cell><cell rows="$1">/g;
+	s/<c(,\d+)?>/<\/cell><cell$1>/g;
+	s/<c(\d+)(,\d+)?>/<\/cell><cell$2 cols="$1">/g;
+	s/<c r(\d+)(,\d+)?>/<\/cell><cell$2 rows="$1">/g;
+	s/<c(\d+) r(\d+)(,\d+)?>/<\/cell><cell$3 cols="$1" rows="$2">/g;
+
+	s/<cell(,(\d+))([^>]*)>/<cell$3 rend="pl-$2">/g;
+
 	s/<\/F><\/cell><\/row>/<\/cell><\/row><\/table>/;
-	
 	s/<row><\/cell>/<row>/;
 	
 	return $_;
