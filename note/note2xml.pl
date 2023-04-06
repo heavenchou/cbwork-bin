@@ -238,6 +238,8 @@ for (my $i=0; $i<= $#lines; $i++)
 			$notemod =~ s/<table /<\/p><table /g;	# <table> 前面要加上 </p> 結束
 			$notemod =~ s/<\/table><\/p>/<\/table>/g; #</table> 後面的 </p> 移除
 		}
+		# 因為前面有在 <cell> 後面加上 <p>, 因此會變成 <cell></p><p>, 所以要移除 </p>
+		$notemod =~ s/(<cell[^>]*>)<\/p>/$1/g;	
 	}
 	
 	if($notedata =~ /<p(,\d+)?>/)
@@ -251,6 +253,8 @@ for (my $i=0; $i<= $#lines; $i++)
 			$notedata =~ s/<table /<\/p><table /g;	# <table> 前面要加上 </p> 結束
 			$notedata =~ s/<\/table><\/p>/<\/table>/g; #</table> 後面的 </p> 移除
 		}
+		# 因為前面有在 <cell> 後面加上 <p>, 因此會變成 <cell></p><p>, 所以要移除 </p>
+		$notedata =~ s/(<cell[^>]*>)<\/p>/$1/g;
 	}
 	
 	# 印出資料
@@ -473,6 +477,35 @@ sub check_table()
 	s/<\/F><\/cell><\/row>/<\/cell><\/row><\/table>/;
 	s/<row><\/cell>/<row>/;
 	
+	# 處理 <cell> 中的 <p> 標記
+	# <cell>...<p>...</cell> 先變成 <cell><p>...<p>...</p></cell>
+
+	s/(<cell.*?<\/cell>)/p_in_cell($1)/ge;
+
+	return $_;
+}
+
+# 處理 <cell> 中的 <p> 標記
+# <cell>...<p>...</cell> 先變成 <cell><p>...<p>...</p></cell>
+sub p_in_cell
+{
+	local $_ = shift;
+	if(/<p[, >]/) {
+		# 有 <p> 則最前面加 <p>
+		s/^(<cell.*?>)/$1<p>/;
+		# 最後加 </p>
+		s/<\/cell>/<\/p><\/cell>/;
+	}
+
+	# 有時可能一開始就處理好了
+	# <cell><p,1>...</p><p>...</p></cell>
+	# 則上面的處理就變成
+	# <cell><p><p,1>...</p><p>...</p></p></cell>
+	# 所以移除重複的 <p><p> 和 </p></p>
+
+	s/^(<cell.*?>)<p>(<p[>, ])/$1$2/;
+	s/<\/p><\/p>/<\/p>/;
+
 	return $_;
 }
 
