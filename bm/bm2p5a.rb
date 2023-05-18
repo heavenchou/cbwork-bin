@@ -6,6 +6,7 @@
 # 作者: 周邦信(Ray Chou) 2022-04-20
 #
 # Heaven 修改：
+# 2023-05-16 1.支援 <tag,1,2,bold,sup,..> 處理成 <tag rend="bold sup .." style="margin-left:1em; text-indent:2em;">
 # 2023-04-05 1.支援 <c,4> 這種格式，表示此格內縮 4 個字 => <cell rend="pl-4">
 #            2.支援 <p,c><p,r><Q1,c><Q1,r> 等格式，c 表示置中 rend="text-center", r 表示靠右 rend="text-right"
 #              過去有支援 <p_r>,<p_c>
@@ -42,6 +43,7 @@ $collection_en = {
   'A'  => 'Jin Edition of the Canon',
   'B'  => 'Supplement to the Dazangjing',
   'C'  => 'Zhonghua Canon - Zhonghua shuju Edition',
+  'CB'  => 'CBETA Test Ver',
   'D'  => 'Selections from the Taipei National Central Library Buddhist Rare Book Collection',
   'DA' => 'the Complete Works of Ven Daoan',
   'F'  => 'Fangshan shijing',
@@ -115,136 +117,324 @@ def out2(s)
   end
 end
 
-def start_i(tag)
-  level = 1
-  tag.match(/(\d+)/) do
-    level = $1.to_i
+# 處理行首標記, 會變更 text 的內容
+def do_line_head(tag, text)
+  tag = tag.clone     # 若不 clone，底下改變 tag 的行為會影響傳入原始的 tag
+  if tag.include?('W')
+    tag.gsub!('W', '')
+    if not $inw
+      $inw = true
+      if not tag.include?('Q') and not tag.include?('x')
+        # 如果 W## 接著 <Q , 也不用執行 start_div, 因為 <Q 會執行
+        start_div(1, 'w') if not text.match?(/^<Q/)
+      end
+    end
+  elsif $inw
+    $inw = false
   end
-
-  close_tags('cb:jhead', 'cb:juan', 'p')
-  close_head
-
-  while level < $opens['list']
-    out1('</item></list>')
-    $opens['list'] -= 1
-    $opens['item'] -= 1
-  end
-
-  if level == $opens['list']
-    out1('</item>')
-    $opens['item'] -= 1
-  end
-
-  if level > $opens['list']
-    $opens['list'] += 1
-    if $l_type == 'simple'
-      out('<list rend="no-marker">')
-    else
-      out('<list>')
+    
+  $inr = false if not tag.include?('r')
+  
+  case tag
+  when /[ABCEY]/ then start_byline(tag)
+  when /F/ then text = start_F(tag, text)
+  # when /f/ then start_f(tag)    # f 不再處理了，最底下會處理，會交給 start_inline_row
+  when /I/
+    start_i(tag)
+    start_p(tag) if tag.include?('P')
+  when /J/ then start_J(tag)
+  when /j/ then start_j(tag)
+  when /P/ then start_p(tag)
+  when /Q/ then start_q(tag)
+  when /r/ then start_r(tag)
+  when /S/ then start_S(tag)
+    # text.gsub!("　　", "</l><l>")
+    # text.gsub!("　", "<l>")
+    # text << "</l>\n"
+  when /s/ then text << "</S>"
+    # start_s(tag)
+    # text.gsub!("　　", "</l><l>")
+    # text.gsub!("　", "<l>")
+    # text << "</l></lg>\n"
+    # # 把 </Qx> 移到後面, 例: B10n0068_p0839b03s##　能令清淨諸儀軌　　如智者論顯了說</Q1>
+    # text.gsub!(/(<\/Q\d*>)(<\/l><\/lg>)$/, '\2\1')
+  when /x/ then start_x(tag)
+  when /Z/ then start_p(tag)
+  else
+    tag.gsub!(/[#_kf\d]/, '')
+    unless tag.empty?
+      puts "#{$old_pb}#{$line_num} 未處理的行首標記: '#{tag}'"
     end
   end
 
-  s = %(<item xml:id="item#{$vol}p#{$old_pb}#{$line_num}%02d">) % $char_count
-  out(s)
-  $opens['item'] += 1
-end  
-
-# 處理 PTS 標記 BM版:<PTS.Vin.1.101> => XML:<ref cRef="PTS.Vin.1.101"/>
-def start_PTS(tag)
-  tag.match(/<(PTS.*?)>/) do
-    $buf << %(<ref cRef="#{$1}"/>)
+  # $opens['table'] > 0 ，又沒有 <table> or <row> or <F> 則要加入 <row>
+  if $opens['table'] > 0
+    if !text.match(/<((table)|(row)|(F[,>]))/)
+      text = '<row>' + text
+    end
   end
-  
-  # ##################################################################
-  # 不可用 out(s) , 也不可用 out1(s), 說明如下:
-  #
-  # out(s) 會先印出 buf 中的 <lb> 等標記, 會有如下結果
-  # <lb ed="N" n="0009a06"/>久住，拘樓孫佛、拘那含牟尼佛、迦葉佛之梵行久住也。」
-  # <lb ed="N" n="0009a07"/><ref cRef="PTS.Vin.8.8"/></p></cb:div><cb:div type="other">
-  #
-  # out1(s) 直接加入 buf1 中, 會有如下結果
-  # <lb ed="N" n="0009a06"/>久住，拘樓孫佛、拘那含牟尼佛、迦葉佛之梵行久住也。」<ref cRef="PTS.Vin.8.8"/></p></cb:div>
-  # <lb ed="N" n="0009a07"/><cb:div type="other">（二）
-  # ##################################################################
+  return text
 end
 
-# BM 版 : <trans-mark,a'> => XML P5 版 : <label type="translation-mark">a'</label>
-def start_trans_mark(tag)
-  tag.match(/<trans-mark,(.*?)>/) do
-    out %(<label type="translation-mark">#{$1}</label>)
+# 處理經文中的標記
+def inline_tag(tag)
+  case tag
+  when /^<app/, '</app>', '<corr>', '</corr>', /^<choice/, '</choice>', /^<lem/, '</lem>', /^<note/, '</note>', /^<orig/, '</orig>', '</quote>', /^<rdg/, '</rdg>', '<reg>', '</reg>', '<sic>', '</sic>'
+    # 直接輸出, 例：<choice cb:resp="CBETA.maha"><corr>Ｂ</corr><sic>Ａ</sic></choice>
+    out(tag)
+  when /^<(\[(([\da-zA-Z]{2,3})|＊)\])>/	
+    # 在 do_corr_normalize 處理過的校勘數字 , 原來為 <[01]> , 要直接處理成 [01]
+    out $1
+  when /^\[([\da-zA-Z]+?)\]/	# 處理校勘數字
+    out %(<anchor xml:id="fn#{$vol}p#{$old_pb}#{$1}"/>)
+  when /^\[[^>\[ ]+?\]/		# 處理組字式
+    $char_count += 1
+    out2(gaiji(tag))
+  when '<□>'							# 未知字
+    out('<unclear/>')
+  when '('
+    out2('<note place="inline">')
+  when /^<a>/ then start_inline_a(tag)
+  when /<[ABCEY][\s,>]/ then start_inline_byline(tag)
+  when '<annals>'
+    # J01nA042_p0793a14_##<Q2 m=哲宗><annals><date><p>哲宗皇帝元祐四年[已>己]巳
+    # J01nA042_p0793a15_##<event><p,1>師宣州寧國縣人也姓奚氏其母初夢神人衛一
+    # ... </annals>
+    # 還有 <Q> <annals> 也可以結束 <annals>
+    # <event> 是用來結束 <date> 的
+    # 轉成
+    # <cb:event><date>ＸＸＸ</date><p,1>ＹＹＹ</p></cb:event>
+    start_inline_annals(tag)
+  when '</annals>' then close_tags('p', 'cb:event')
+  when '<bold>'    then out('<hi rend="bold">')
+  when '</bold>'   then out('</hi>')
+  when '<border>'  then out('<hi rend="border">')
+  when '</border>' then out('</hi>')
+  when /<c[,\d\s>]/ then start_inline_c(tag) # <c> <c3> <c r3> <c,1> <c,bold>
+  when '<d>'       then start_inline_d(tag)
+  when '<date>'    then start_inline_date(tag)
+  when '<del>'  then out('<hi rend="del">')
+  when '</del>' then out('</hi>')
+  when '<e>'       then start_inline_e(tag)
+  when '</e>'      then close_tags('p', 'cb:def', 'entry')
+  when '<event>'   then start_inline_event(tag)
+  when /<F[,>]/   then start_inline_table(tag)
+  when '</F>'      then close_table(tag)
+  when '<formula>' then out('<formula>')
+  when '</formula>' then out2("</formula>")
+  when '<hei>'    then out('<hi rend="heiti">')
+  when '</hei>'   then out('</hi>')
+  when /^<h[\d\s,>]/     then start_inline_h(tag)
+  when /^<\/h[\d]*>/     then close_h(tag)
+  when /<hi[,>]/   then start_inline_hi(tag)
+  when '</hi>'     then out('</hi>')
+  when /<I\d*[,>]/    then start_i(tag)
+  when '<i>('       then out2('<note place="interlinear">')
+  when /^\)(<\/i>)?/ then out2('</note>')
+  when '<it>'    then out('<hi rend="italic">')
+  when '</it>'   then out('</hi>')
+  when '<j>'    then start_inline_j(tag)
+  when /^<J/      then start_J(tag)
+  when '<kai>'    then out('<hi rend="kaiti">')
+  when '</kai>'   then out('</hi>')
+  when /<L[,>]/    then start_inline_L(tag)
+  when /<L_sp/    then start_inline_L(tag)
+  when '</l>'     then close_tags('l')  # 行首標記有 S 及 s 時, 會在行中自動將空格變成 <l></l></lg> 等標記
+  when '</L>'     then close_L(tag)
+  when '<larger>'  then out('<hi rend="larger">')
+  when '</larger>' then out('</hi>')
+  when '<ming>'    then out('<hi rend="mingti">')
+  when '</ming>'   then out('</hi>')
+  when /^<mj/      then start_inline_mj(tag)
+  when '<no_chg>'  then out('<term cb:behaviour="no-norm">')
+  when '</no_chg>' then out('</term>')
+  when '<no-bold>'    then out('<hi rend="no-bold">')
+  when '</no-bold>'   then out('</hi>')
+  when '<no-it>'    then out('<hi rend="no-it">')
+  when '</no-it>'   then out('</hi>')
+  when '<nosp>'    then start_inline_space(tag)
+  when /^　/       then start_inline_space(tag)
+  when /^<n/       then start_inline_n(tag)
+  when '</n>'      then close_n(tag)
+  when '<o>'       then start_inline_o(tag)
+  when '</o>'      then close_div_by_type('orig')
+  when '<over>'  then out('<hi rend="over">')
+  when '</over>' then out('</hi>')
+  when /<PTS./ then start_PTS(tag)
+  when /^<p/   then start_inline_p(tag)
+  when '</p>'  then close_tags('p')
+  when '</P>'  then close_tags('p')
+  when /<quote (.*?)>/	
+    # 出處連結, 例如 : 
+    # ZY01n0001_p0020a02_##...經中說，<quote T09n0262_p0007c07-09>舍利弗！汝等...</quote>
+    # 要做成 <quote source="CBETA.T09n0262_p0007c07-09">
+    out %(<quote source="CBETA.#{$1}">)
+  when /^<Q/   then start_inline_q(tag)
+  when /^<\/Q/ then close_q(tag)
+  when /<row/   then start_inline_row(tag)
+  when /<S[,>]/ then start_inline_S(tag)
+  when '</S>'
+		$normal_lg = false
+		close_tags('l','lg')
+  when '<sd>'
+    out('<term xml:lang="sa-Sidd">')
+    $opens['term'] = 1
+  when '</sd>' then close_tags('term')
+  when /<seg[,>]/ then start_inline_seg(tag)
+  when '</seg>' then out('</seg>')
+  when '<smaller>'    then out('<hi rend="smaller">')
+  when '</smaller>'   then out('</hi>')
+  when '<space quantity="0"/>' then out2(tag)
+  when '<sub>'  then out('<hi rend="sub">')
+  when '</sub>' then out2("</hi>")
+  when '<sup>'  then out('<hi rend="sup">')
+  when '</sup>' then out2("</hi>")
+  when /<table/ then start_inline_table(tag)
+  when '</table>'      then close_table(tag)
+  when /<trans-mark/ then start_trans_mark(tag)
+  when /^<T[,>]/     then start_inline_T(tag)
+  when /^<TL[,>]/    then start_inline_TL(tag)
+  when '</T>' , '</TL>' 
+    $TL_count = 0
+    close_tags('l', 'lg')
+  when '<u>'         then start_inline_u(tag)
+  when '</u>'        then close_div_by_type('commentary')
+  when '<under>'  then out('<hi rend="under">')
+  when '</under>' then out('</hi>')
+  when /^<w>/ then start_inline_w(tag)
+  when '</w>' then close_tags('p','sp','cb:dialog')
+  when /^<z/  then start_inline_p(tag)	# 和 <p 一樣的處理法    
+  when '</z>' then close_tags('p')
+  when /&((SD)|(RJ))\-\w{4};/	then start_inline_SDRJ(tag) # 悉曇字或蘭札字
+  when '&' then out2("&")
+  else
+    puts "#{$old_pb}#{$line_num} 未處理的標記: '#{tag}'"
   end
 end
 
-def start_p(tag)
-  close_tags('cb:jhead', 'cb:juan', 'p', 'byline', 'head')
-  close_tags('l', 'lg')
-  r = get_number(tag)
-  out %(<p xml:id="p#{$vol}p#{$old_pb}#{$line_num}01")
-  out ' cb:type="pre"' if $head_tag.include?('r')
-  out ' cb:type="dharani"' if $head_tag.include?('Z')
-  out %( style="margin-left:#{r}em") unless r.empty?
-  out '>'
-  $opens['p'] = 1
+def start_inline_a(tag)
+  close_tags('p','sp')
+  out('<sp cb:type="answer">')
+  $opens['sp'] = 1
 end
 
-# <p,1,2>
-# <p,1,2,c> or <p,c,1,2> c 置中，r 靠右
+# J01nA042_p0793a14_##<Q2 m=哲宗><annals><date><p>哲宗皇帝元祐四年[已>己]巳
+# J01nA042_p0793a15_##<event><p,1>師宣州寧國縣人也姓奚氏其母初夢神人衛一
+# ... </annals>
+# 還有 <Q> <annals> 也可以結束 <annals>
+# <event> 是用來結束 <date> 的
+# 轉成
+# <cb:event><date>ＸＸＸ</date><p,1>ＹＹＹ</p></cb:event>
 
-def start_inline_p(tag)
-  close_tags('cb:jhead', 'cb:juan', 'p', 'byline')
+# <annals> 裡面也可能沒有 <event> , 所以 <annals> 也可以結束 <date>
+# <annals><date>......
+# <event><p>..........
+# <annals><date>......
+# <annals><date>......
+
+def start_inline_annals(tag)
   close_head
-  close_tags('l', 'lg')
+  close_tags('date', 'p', 'cb:event')
+  out('<cb:event>')
+  $opens['cb:event'] = 1
+end
 
-  s = %(<p xml:id="p#{$vol}p#{$old_pb}#{$line_num}%02d") % $char_count
+def start_byline(tag)
+  return if tag.include?('=')
+
+  close_tags('p', 'byline', 'cb:jhead', 'cb:juan')
+
+  type = case tag
+  when /A/ then 'author'
+  when /B/ then 'other'
+  when /C/ then 'collector'
+  when /E/ then 'editor'
+  when /Y/ then 'translator'
+  end
+  out %(<byline cb:type="#{type}">)
+
+  $opens['byline'] = 1
+end
+
+def start_inline_byline(tag)
+  close_tags('byline', 'cb:jhead', 'cb:juan', 'p')
+  close_head
+
+  type = case tag
+  when /<A/ then "author"
+  when /<B/ then "other"
+  when /<C/ then "collector"
+  when /<E/ then "editor"
+  when /<Y/ then "translator"
+  end
+
+  out %(<byline cb:type="#{type}")
+
+	# 處理 <A,c> , <B,r> - 2023-04-05
+  style, rend = get_style_rend(tag)
+
+  # tag.match(/,c[,>]/) do
+  #   out %( rend="text-center")
+  # end
+  # tag.match(/,r[,>]/) do
+  #   out %( rend="text-right")
+  # end
+  # tag.match(/,l[,>]/) do
+  #   out %( rend="text-left")
+  # end
+  out style
+  out rend
+  out '>'
+  $opens['byline'] = 1
+end
+
+# 表格中的 cell , 有這些形式
+# <c> => <cell>
+# <c3> => <cell cols="3">
+# <c r3> , <c,r3> => <cell rows="3">
+# <c3 r3> => <cell cols="3" rows="3">
+# <c,1><c3,1><c r3,1><c3 r3,1> => <cell rend="pl-1">...<cell cols="3" rows="3" rend="pl-1">
+# <c,1><c3,1><c r3,1><c3 r3,1,bold,...> =><cell cols="3" rows="3" rend="pl-1 bold ...">
+def start_inline_c(tag)
+  close_tags('p', 'cell')
+
+  # 檢查有沒有 c3 這種格式
+  cols = ''
+  tag.match(/<c(\d+)/) do
+    cols = $1
+    tag = tag.sub(/<c(\d+)/,'<c')
+  end
+
+  # 檢查有沒有 r3 這種格式
+  rows = ''
+  tag.match(/[\s,]r(\d+)/) do
+    rows = $1
+    tag = tag.sub(/[\s,]r(\d+)/,'')
+  end
+
+  # <c,1> 這種有數字在 cell 處理法不同，會轉成
+  # rend="pl-1"
+
+  style, rend = get_style_rend(tag)
+
+  out '<cell'
+  out %( cols="#{cols}") unless cols.empty?
+  out %( rows="#{rows}") unless rows.empty?
+  out style
+  out rend
+  out('>')
+  $opens['cell'] += 1
+end
   
-  # 如果 tag 是 <z 開頭的, 就要變成
-  #<p xml:id="pxxxxxxxx" cb:type="dharani"
-  tag.match(/<z/) do
-    s << ' cb:type="dharani"'
-  end
-  
-  # 處理 <p,1,2> 這種格式
-  tag.match(/<[pz](?:,[cr])?,(\-?[\d\.]+),(\-?[\d\.]+)/) do
-    s << %( style="margin-left:#{$1}em;text-indent:#{$2}em")
-  end
-  
-  # 處理 <p,1> <p,1,c> 這種格式
-  tag.match(/<[pz](?:,[cr])?,(\-?[\d\.]+)((,[cr])|(>))/) do
-    s << %( style="margin-left:#{$1}em")
-  end
-    
-  # 若都沒有 <p,1 這種格式, 又是在行中, 則用 rend="inline"
-  #mo = re.search(r'<[pz],(\-?[\d\.]+)', tag)
-  #if mo==None:
-  #	if char_count>1: s += ' rend="inline"'  
-  s << ' cb:place="inline"' if $char_count > 1
-  
-  # 處理 <p=h1> 這種格式	- 2013/09/11
-  tag.match(/<p=h(\d+)>/) do
-    s << %( cb:type="head#{$1}")
-  end
+def start_inline_d(tag)
+  close_tags('form')
+  out('<cb:def>')
+  $opens['cb:def'] += 1
+end
 
-	# 處理 <p_c> , <p_r> - 2022-03-29
-	
-  tag.match(/<[pz]_c/) do
-    s << %( rend="text-center")
-  end
-  tag.match(/<[pz]_r/) do
-    s << %( rend="text-right")
-  end
-
-	# 處理 <p,c> , <p,r> - 2023-04-05
-
-  tag.match(/,c[,>]/) do
-    s << %( rend="text-center")
-  end
-  tag.match(/,r[,>]/) do
-    s << %( rend="text-right")
-  end
-
-  s << '>'
-  out(s)
-  $opens['p'] = 1
+def start_inline_date(tag)
+  out('<date>')
+  $opens['date'] = 1
 end
 
 def start_div(level, type)
@@ -260,63 +450,60 @@ def start_div(level, type)
   end
 end
 
-# <Q1>
-# <Q1 m="abc">
-# <Q1=>
-# <Q1,c> <Q1,c m="abc"> <Q1,c=> c 表示置中 rend="text-center", r 表示靠右 rend="text-right"
-
-def start_inline_q(tag)
-  return if tag.match?(/<Q\d*(,[cr])?=/)	# <Q3=> 這一種的表示是延續上一行的 <Q3>
-
-  close_head
-  close_tags('l', 'lg', 'p', 'sp', 'cb:dialog', 'cb:event', 'form', 'cb:def', 'entry')
-  $div_head = ''
-
-  level = 0
-  tag.match(/<Q(\d+)/) do
-    level = $1.to_i
+def close_div(level)
+  while $opens['div'] >= level
+    out1('</cb:div>')
+    $opens['div'] -= 1
   end
-  
-  start_div(level, 'other')
-
-  mo = tag.match(/m=(.*?)>/)
-  if mo.nil?
-    $mulu_start = true
-    $mulu_type = $head_tag.include?('W') ? '附文' : '其他'
-  else
-    start_inline_q_label($1, level)
-  end
-
-  $head_start = true	
-
-  $buf << '<head'
-
-  # 處理 <Q1,c> , <Q1,r> , <Q1,c m="xxx"> - 2023-04-05
-  tag.match(/,c[ ,>]/) do
-    $buf << %( rend="text-center")
-  end
-  tag.match(/,r[ ,>]/) do
-    $buf << %( rend="text-right")
-  end
-  
-  $buf << '>'
-
-  $opens['head'] = 1
 end
 
-def start_inline_q_label(label, level)
-  # 標題也可能會有組字式
-  label2 = replace_zuzi(label)
-  
-  unless label2.empty?
-    type = $head_tag.include?('W') ? '附文' : '其他'
-    out %(<cb:mulu type="#{type}" level="#{level}">#{label2}</cb:mulu>)
+def close_div_by_type(type)
+  close_tags('byline','p')
+  out1('</cb:div>')
+  $opens['div'] -= 1
+  $opens[type] -= 1
+end
+
+def start_inline_e(tag)
+  close_head()
+  close_tags('p', 'cb:def', 'entry')
+  out('<entry')
+  out(' cb:place="inline"') if $char_count > 1  # 若是行中段落, 則加上 inline
+  out('><form>')
+  $opens['entry'] += 1
+  $opens['form'] += 1
+end
+
+# 參考 <annals> 標記, 此標記是用來結束 <date> 用的
+def start_inline_event(tag)
+  close_tags('p', 'date')
+end
+
+# 處理表格 F 表格開始
+# 20230503 表格有二種處理法，一種是行首標記用 Ff3 這種格式。
+#          一種是用 <table,3> 這種格式
+#          如果行首有數字，table 無數字，以行首為主。table 有數字則以 table 為主。
+#
+#          每一行都應該有 f，沒有就表示結束。如果是用 <F> 或 <table> 開始，就可以不用 f ，但一定要有 </table> 或 </F> 
+
+def start_F(tag, text)
+  table = ''
+  # 先檢查 text 有沒有 <table> 標記
+  if text.match(/(<table.*?>)/)
+    table = $1
+  else
+    table = '<table>'
+    text = table + text
   end
 
-  # 取消 cb:mulu 的空標記 2016/04/11	
-  # else:
-  # 	out('<cb:mulu type="其他" level="%d"/>' % (level))
-  $mulu_start = false
+  # 檢查有沒有行首數字
+  if tag.match(/(\d)/)
+    space = $1
+    if !table.match(/\d/)
+      text = text.sub(/<table/,"<table,#{space}")
+    end
+  end
+  return text
 end
 
 # 2013/11/15 新增
@@ -362,155 +549,6 @@ def start_inline_h_label(label, level)
   $mulu_start = false
 end
 
-def close_div(level)
-  while $opens['div'] >= level
-    out1('</cb:div>')
-    $opens['div'] -= 1
-  end
-end
-
-def start_q(tag)
-  return if $head_tag.include?('=')
-  
-  close_tags('l', 'lg', 'sp', 'cb:dialog', 'form', 'cb:def', 'entry')
-  $div_head = ''
-
-  level = 0
-  tag.match(/\d+/) do
-    level = $&.to_i
-  end
-      
-  $mulu_start = true
-  $head_start = true
-  
-  if $head_tag.include?('W')
-    $mulu_type = '附文'
-    start_div(level, 'w')
-  else
-    $mulu_type = '其他'
-    start_div(level, 'other')
-  end
-
-  $buf << '<head>'
-  $opens['head'] = 1
-end
-
-# 悉曇字或蘭札字
-# &SD-CFC5; => <g ref="#SD-CFC5"/>
-def start_inline_SDRJ(tag)
-  tag.match(/&(((SD)|(RJ))\-\w{4});/) do
-    out2 %(<g ref="##{$1}"/>)
-    $char_count+=1
-  end
-end
-
-######################################################
-# P5a 的版本在修訂不是傳回 <anchor , 而是直接傳回 <choice
-#	globals['backApp'] += s + '\n'
-#	r = '<anchor xml:id="{}" type="cb-app"/>'.format(id1)
-#	r += mo[2]
-#	r += '<anchor xml:id="{}"/>'.format(id2)
-#	return r
-######################################################
-  
-# 計算經文的長度
-def my_length(s)
-  r = 0
-  #s = re.sub(r'\[[^>\]]*?>(.*?)\]', r'\1', s)
-  #s = re.sub(r'\[[^>\]]*?\]', '缺', s) # 將組字式取代為單個字
-
-  s.each_char do |c|
-    next if '◎。，、；：「」『』（）？！—…《》〈〉．“”　〔〕【】()'.include?(c)
-    r += 1
-  end
-
-  r
-end
-
-# 表格中的 cell , 有這些形式
-# <c> => <cell>
-# <c3> => <cell cols="3">
-# <c r3> => <cell rows="3">
-# <c3 r3> => <cell cols="3" rows="3">
-# <c,1><c3,1><c r3,1><c3 r3,1> => <cell rend="pl-1">...<cell cols="3" rows="3" rend="pl-1">
-def start_inline_c(tag)
-  close_tags('p', 'cell')
-
-  # 檢查有沒有 c3 這種格式
-  cols = ''
-  tag.match(/c(\d+)/) do
-    cols = $1
-  end
-
-  # 檢查有沒有 r3 這種格式
-  rows = ''
-  tag.match(/r(\d+)/) do
-    rows = $1
-  end
-
-  # 檢查有沒有 ,\d 這種格式
-  rend = ''
-  tag.match(/,(\d+)/) do
-    rend = $1
-  end
-
-  out '<cell'
-  out %( cols="#{cols}") unless cols.empty?
-  out %( rows="#{rows}") unless rows.empty?
-  out %( rend="pl-#{rend}") unless rend.empty?
-  out('>')
-  $opens['cell'] += 1
-end
-  
-def start_inline_d(tag)
-  close_tags('form')
-  out('<cb:def>')
-  $opens['cb:def'] += 1
-end
-
-def start_inline_e(tag)
-  close_head()
-  close_tags('p', 'cb:def', 'entry')
-  out('<entry')
-  out(' cb:place="inline"') if $char_count > 1  # 若是行中段落, 則加上 inline
-  out('><form>')
-  $opens['entry'] += 1
-  $opens['form'] += 1
-end
-
-def start_r(tag)
-  # 第一個 r 才需要處理成 <p xml:id="xxx" cb:type="pre">
-  return if $inr
-
-  $inr = true
-  start_p(tag) # 依 p 的方式處理
-end
-
-def close_annals(tag)
-  close_tags('p', 'cb:event')
-end
-
-def close_e(tag)
-  close_tags('p', 'cb:def', 'entry')
-end
-  
-def close_F(tag)
-  close_tags('p', 'cell', 'row', 'table')
-end
-  
-def close_q(tag)
-  close_tags('byline', 'cb:jhead', 'cb:juan', 'p')
-  close_head()
-
-  m = tag.match(/<\/Q(\d+)/)
-  if m.nil?
-    abort "Error: #{tag}, Line: #{__LINE__}"
-  else
-    level = m[1].to_i
-    close_div(level)
-  end
-end
-
 # 2013/11/15 新增
 def close_h(tag)
   close_tags('cb:jhead', 'cb:juan', 'p')
@@ -518,10 +556,134 @@ def close_h(tag)
   #level = int(tag[3:-1])
   #close_div(level)
 end
+
+# TEI:<hi> (顯目標示) 標誌其字型外觀上和週遭文字有所區別的字詞，但不指出顯目原因。
+def start_inline_hi(tag)
+  style, rend = get_style_rend(tag)
+  out "<hi#{style}#{rend}>"
+end
+
+def start_i(tag)
+  level = 1
+  tag.match(/(\d+)/) do
+    level = $1.to_i
+  end
+
+  close_tags('cb:jhead', 'cb:juan', 'p')
+  close_head
+
+  while level < $opens['list']
+    out1('</item></list>')
+    $opens['list'] -= 1
+    $opens['item'] -= 1
+  end
+
+  if level == $opens['list']
+    out1('</item>')
+    $opens['item'] -= 1
+  end
+
+  # 新的層次，要處理 list 標記
+  if level > $opens['list']
+    $opens['list'] += 1
+
+    # 先檢查有沒有 list 標記
+    if $last_list_tag.empty?
+      out '<list>'
+    else
+      out $last_list_tag
+    end
+  end
+
+  style, rend = get_style_rend(tag)
+  s = %(<item xml:id="item#{$vol}p#{$old_pb}#{$line_num}%02d") % $char_count
+  out "#{s}#{style}#{rend}>"
+  $opens['item'] += 1
+end  
+
+def start_J(tag)
+  return if $head_tag.include?('=')
+
+  close_tags('p')
+
+  i = get_number_i(tag)
+  $juan_num = i unless i.nil?
+
+  out %(<cb:juan fun="open" n="#{$juan_num}"><cb:jhead>)
+  $opens['cb:juan'] += 1
+  $opens['cb:jhead'] += 1
+end
+
+def start_j(tag)
+  close_tags('p')
+  out %(<cb:juan fun="close" n="#{$juan_num}"><cb:jhead>)
+  $opens['cb:juan'] += 1
+  $opens['cb:jhead'] += 1
+end
+
+def start_inline_j(tag)
+  close_tags('p')
+  out('<cb:juan fun="close"><cb:jhead>')
+  $opens['cb:juan'] += 1
+  $opens['cb:jhead'] += 1
+end
+
+# list <L> 的處理法
+# 最早期用行首標記 I 來處理，由層次來判斷是否要加 <list>
+# 也可以用 <I> 來處理，由層次來判斷是否要加 <list>
+# 後來為了在 <list> 加屬性，所以 <L> 也可能會出現
+# 規則是，若有 <L>，就不能用 I 行首標記，一定要用 <I> 標記，才不會錯亂。
+# 處理法：
+# 1. 遇到行首標記 I，表示不會有 <L> 標記，XML 就自行加 <list> 
+# 2. 遇到 <L> 標記，就先存在 $last_list_tag 中
+# 3. 遇到 <I> 標記，如果是某一層第一個 <I> 就要加 <list>，就檢查有沒有 $last_list_tag，有就用，沒有就用預設 <list>
+# 4. 每一層的 list 都使用同一組 <L>
+# 5. </L> 結束時，才將 $last_list_tag 清掉。
+
+def start_inline_L(tag)
+  #close_head()
+  tag = tag.sub(/<L_sp/,'<L,sp')
   
-def start_inline_Lsp(tag)
-  close_head()
-  $l_type = 'simple'
+  style, rend = get_style_rend(tag)
+  $last_list_tag = "<list#{style}#{rend}>"
+end
+
+def close_L(tag)
+  close_tags('p')
+  $last_list_tag = ''
+  while $opens['list'] > 0
+    close_tag('item', 'list')
+  end
+end
+
+def start_inline_mj(tag)
+  close_tags('byline', 'cb:jhead', 'cb:juan')
+
+  #n=get_number(tag)
+  m = tag.match(/\d+/)
+  if !m.nil?
+    $juan_num = $&.to_i
+  else
+    $juan_num += 1
+  end
+
+  #out('<milestone unit="juan" n="{}"/>'.format(globals['juan_num']))		# 若用 out() , 會有一堆 </p></cb:div> 標記出現在 <milestone> 後面
+
+  m = $buf.match(/(<pb [^>]*>\n?)?<lb [^>]*>\n?\z/)
+  if m.nil?
+    abort "milestone must after <pb><lb> #{tag}  Line: #{__LINE__}"
+  else
+    # <milestone> 要移到 <pb><lb> 之前
+    $buf.sub!(/(?:<pb [^>]*>\n?)?<lb [^>]*>\n?\z/) do
+      %(<milestone unit="juan" n="#{$juan_num}"/>\n#{$&})
+    end
+  end
+
+  # 原本 <cb:mulu type="卷" n="{}"/> 是在 <J> 或 Ｊ卷標記處理, 只有南傳在 <mj> 處理, 
+  # 現在全部移到 <mj> 處理, 因為有卷沒有卷標記
+  unless $canon == 'TX'
+    $buf << %(<cb:mulu type="卷" n="#{$juan_num}"/>)
+  end
 end
 
 def start_inline_n(tag)
@@ -560,6 +722,209 @@ def start_inline_o(tag)
   $opens['orig'] = 1
 end
 
+def start_p(tag)
+  close_tags('cb:jhead', 'cb:juan', 'p', 'byline', 'head')
+  close_tags('l', 'lg')
+  r = get_number(tag)
+  out %(<p xml:id="p#{$vol}p#{$old_pb}#{$line_num}01")
+  out ' cb:type="pre"' if $head_tag.include?('r')
+  out ' cb:type="dharani"' if $head_tag.include?('Z')
+  out %( style="margin-left:#{r}em") unless r.empty?
+  out '>'
+  $opens['p'] = 1
+end
+# <p=h1,1,2,c,bold>
+# <p,h1,1,2,c,it>
+# <p,1,2,c> or <p,c,1,2> c 置中，r 靠右，l 靠左
+# <p,1,2,c,bold,kai,...> 支援許多格式
+
+def start_inline_p(tag)
+  close_tags('cb:jhead', 'cb:juan', 'p', 'byline')
+  close_head
+  close_tags('l', 'lg')
+
+  s = %(<p xml:id="p#{$vol}p#{$old_pb}#{$line_num}%02d") % $char_count
+  
+  # 如果 tag 是 <z 開頭的, 就要變成
+  #<p xml:id="pxxxxxxxx" cb:type="dharani"
+  tag.match(/<z/) do
+    s << ' cb:type="dharani"'
+  end
+    
+  # 若都沒有 <p,1 這種格式, 又是在行中, 則用 rend="inline"
+  #mo = re.search(r'<[pz],(\-?[\d\.]+)', tag)
+  #if mo==None:
+  #	if char_count>1: s += ' rend="inline"'  
+  s << ' cb:place="inline"' if $char_count > 1
+  
+	# 處理 <p_c> , <p_r> - 2022-03-29
+  # <p_[clr] 換成 <p,[clr]
+	
+  tag = tag.gsub(/<[pz]_([crl])/,'<p,\1')
+
+  # 處理 <p=h1> 這種格式	- 2013/09/11
+  # 處理 <p,h1 這種格式
+  tag.match(/[=,]h(\d+)/) do
+    s << %( cb:type="head#{$1}")
+    tag = tag.sub(/[=,]h(\d+)/,'')
+  end
+
+  # 取得 style 和 rend 字串
+  style, rend = get_style_rend(tag)
+  s << style
+  s << rend
+  s << '>'
+  out(s)
+  $opens['p'] = 1
+end
+
+# 處理 PTS 標記 BM版:<PTS.Vin.1.101> => XML:<ref cRef="PTS.Vin.1.101"/>
+def start_PTS(tag)
+  tag.match(/<(PTS.*?)>/) do
+    $buf << %(<ref cRef="#{$1}"/>)
+  end
+  
+  # ##################################################################
+  # 不可用 out(s) , 也不可用 out1(s), 說明如下:
+  #
+  # out(s) 會先印出 buf 中的 <lb> 等標記, 會有如下結果
+  # <lb ed="N" n="0009a06"/>久住，拘樓孫佛、拘那含牟尼佛、迦葉佛之梵行久住也。」
+  # <lb ed="N" n="0009a07"/><ref cRef="PTS.Vin.8.8"/></p></cb:div><cb:div type="other">
+  #
+  # out1(s) 直接加入 buf1 中, 會有如下結果
+  # <lb ed="N" n="0009a06"/>久住，拘樓孫佛、拘那含牟尼佛、迦葉佛之梵行久住也。」<ref cRef="PTS.Vin.8.8"/></p></cb:div>
+  # <lb ed="N" n="0009a07"/><cb:div type="other">（二）
+  # ##################################################################
+end
+
+def start_q(tag)
+  return if $head_tag.include?('=')
+  
+  close_tags('l', 'lg', 'sp', 'cb:dialog', 'form', 'cb:def', 'entry')
+  $div_head = ''
+
+  level = 0
+  tag.match(/\d+/) do
+    level = $&.to_i
+  end
+      
+  $mulu_start = true
+  $head_start = true
+  
+  if $head_tag.include?('W')
+    $mulu_type = '附文'
+    start_div(level, 'w')
+  else
+    $mulu_type = '其他'
+    start_div(level, 'other')
+  end
+
+  $buf << '<head>'
+  $opens['head'] = 1
+end
+
+# <Q1>
+# <Q1 m="abc">
+# <Q1=>
+# <Q1,c> <Q1,c m="abc"> <Q1,c=> c 表示置中 rend="text-center", r 表示靠右 rend="text-right"
+# <Q1,c,bold,it...> <Q1,c,bold,m="abc"> <Q1,c=> c 表示置中 , r 表示靠右
+
+def start_inline_q(tag)
+  return if tag.match?(/<Q.*?=>/)	# <Q3=> 這一種的表示是延續上一行的 <Q3>
+
+  close_head
+  close_tags('l', 'lg', 'p', 'sp', 'cb:dialog', 'cb:event', 'form', 'cb:def', 'entry')
+  $div_head = ''
+
+  level = 0
+  tag.match(/<Q(\d+)/) do
+    level = $1.to_i
+  end
+  
+  start_div(level, 'other')
+
+  mo = tag.match(/[,\s]m=(.*?)[,>]/)
+  if mo.nil?
+    $mulu_start = true
+    $mulu_type = $head_tag.include?('W') ? '附文' : '其他'
+  else
+    start_inline_q_label($1, level)
+    tag = tag.sub(/[,\s]m=(.*?)([,>])/,'\2')
+  end
+
+  $head_start = true	
+
+  $buf << '<head'
+
+  # 處理 <Q1,c> , <Q1,r> , <Q1,c m="xxx"> - 2023-04-05
+  # 處理 <Q1,c,bold> , <Q1,r,it> , <Q1,c,hei,m="xxx"> - 2023-04-05
+
+  style,rend = get_style_rend(tag)
+  $buf << style
+  $buf << rend
+  $buf << '>'
+
+  $opens['head'] = 1
+end
+
+def start_inline_q_label(label, level)
+  # 標題也可能會有組字式
+  label2 = replace_zuzi(label)
+  
+  unless label2.empty?
+    type = $head_tag.include?('W') ? '附文' : '其他'
+    out %(<cb:mulu type="#{type}" level="#{level}">#{label2}</cb:mulu>)
+  end
+
+  # 取消 cb:mulu 的空標記 2016/04/11	
+  # else:
+  # 	out('<cb:mulu type="其他" level="%d"/>' % (level))
+  $mulu_start = false
+end
+
+def close_q(tag)
+  close_tags('byline', 'cb:jhead', 'cb:juan', 'p')
+  close_head()
+
+  m = tag.match(/<\/Q(\d+)/)
+  if m.nil?
+    abort "Error: #{tag}, Line: #{__LINE__}"
+  else
+    level = m[1].to_i
+    close_div(level)
+  end
+end
+
+def start_r(tag)
+  # 第一個 r 才需要處理成 <p xml:id="xxx" cb:type="pre">
+  return if $inr
+
+  $inr = true
+  start_p(tag) # 依 p 的方式處理
+end
+
+def start_inline_row(tag)	
+  close_tags('p', 'cell', 'row')
+  style,rend = get_style_rend(tag)
+  out("<row#{style}#{rend}>")
+  $opens['row'] += 1
+end
+
+def start_S(tag)
+  if $opens['lg'] == 0
+    close_tags('cb:jhead', 'cb:juan', 'byline', 'p')
+    close_head
+    $lg_marginleft = 1
+    $opens['lg'] = 1
+    $normal_lg = true
+    out %(<lg xml:id="lg#{$vol}p#{$old_pb}#{$line_num}01">)
+  end
+  #close_tags('l')
+end
+
+def start_s(tag)
+  $opens['lg'] = 0
+end
 
 def start_inline_S(tag)	
 	if $opens['lg'] == 1
@@ -571,41 +936,52 @@ def start_inline_S(tag)
 		$opens['lg'] = 1
   end
 	$lg_marginleft = 1
-  mo = tag.match(/<S,?(\d*),?(\-?\d*),?(\d*)>/)
-	if !mo.nil?
-		$normal_lg = true
-		# <lg xml:id="..."
-		out(%(<lg xml:id="lg#{$vol}p#{$old_pb}#{$line_num}%02d) % $char_count)
-		# style="..."
-		if(mo[1] != '' and mo[1] != '1') or (mo[2] != '' and mo[2] != '0')
-			out(' style="')
-			if mo[1] != '' and mo[1] != '1'
-				out("margin-left:#{mo[1]}em;")
-				$lg_marginleft = mo[1].to_i
-      end
-			if mo[2] != '' and mo[2] != '0'
-				out("text-indent:#{mo[2]}em;")
-      end
-			out('"')
-    end
-		# cb:place="..."
-		if $char_count > 1
-      out(' cb:place="inline"')		# 若是行中段落, 則加上 cb:place="inline"
-    end
-		out('>')
+  $normal_lg = true
+  l_text_indent = ''
 
-		# <l style="...">'
-		if mo[3] != '' and mo[3] != '0'
-			out(%(<l style="text-indent:#{mo[3]}em;">))
-		else
-			out('<l>')
-    end
-		$opens['l'] = 1
-		$lg_space_count = 1
-	else
-		out("<err S 標記不合法 #{tag}>")
-		puts "錯誤 : S 標記不合法 #{tag}"
+  # <lg xml:id="..."
+  out(%(<lg xml:id="lg#{$vol}p#{$old_pb}#{$line_num}%02d") % $char_count)
+  
+  # cb:place="..."
+  if $char_count > 1
+    out(' cb:place="inline"')		# 若是行中段落, 則加上 cb:place="inline"
   end
+
+  tag.match(/\d+,\-?\d+,(\d+)/) do
+    l_text_indent = $1
+    tag = tag.sub(/(\d+,\-?\d+),\d+/,'\1')  # 移除第三組數字
+  end
+
+  style, rend = get_style_rend(tag)
+
+  style.match(/margin-left:\s*(\d+)\s*em/) do
+    $lg_marginleft = $1.to_i
+  end
+  out "#{style}#{rend}>"
+
+  # <l style="...">'
+  if l_text_indent != '' and l_text_indent != '0'
+    out %(<l style="text-indent:#{l_text_indent}em;">)
+  else
+    out '<l>'
+  end
+  $opens['l'] = 1
+  $lg_space_count = 1
+end
+
+# 悉曇字或蘭札字
+# &SD-CFC5; => <g ref="#SD-CFC5"/>
+def start_inline_SDRJ(tag)
+  tag.match(/&(((SD)|(RJ))\-\w{4});/) do
+    out2 %(<g ref="##{$1}"/>)
+    $char_count+=1
+  end
+end
+
+# TEI:<seg> (隨機分割) 包含文件中任何隨機字詞層次的單元 (包括其他分割元素)。
+def start_inline_seg(tag)
+  style, rend = get_style_rend(tag)
+  out "<seg#{style}#{rend}>"
 end
 
 # 處理空白, 主要是針對偈頌的空白
@@ -636,7 +1012,7 @@ def start_inline_space(tag)
 			$opens['l'] += 1
 			$lg_space_count += 1
 		else
-			# 其他空白要處理成 <casesura>
+			# 其他空白要處理成 <caesura>
 			if space_length == 2
 				out('<caesura/>')
 			else
@@ -661,55 +1037,9 @@ def start_inline_T(tag)
 	  close_head
   end
 
-	moTL = tag.match(/<TL,?(\d*),?(\-?\d*),?(\d*)>/)
 	moT = tag.match(/<T,?(\d*)>/)
 	
-	if !moTL.nil?
-	 	if $TL_count == 0
-	 		# 第一個 TL
-				
-	 		# <lg xml:id="..."
-      n = "%02d" % $char_count
-      out(%(<lg xml:id="lg#{$vol}p#{$old_pb}#{$line_num}#{n}"))
-	 		# style="..."
-	 		if (moTL[1] != '' and moTL[1] != '1') or (moTL[2] != '' and moTL[2] != '0')
-	 			out(' style="')
-	 			if moTL[1] != '' and moTL[1] != '1'
-	 				out("margin-left:#{moTL[1]}em;")
-	 				$lg_marginleft = moTL[1].to_i
-        end
-        if moTL[2] != '' and moTL[2] != '0'
-	 				out("text-indent:#{moTL[2]}em;")
-        end
-	 			out '"'
-      end
-	 		# cb:place="..."
-	 		if $char_count > 1
-        out(' cb:place="inline"')		# 若是行中段落, 則加上 cb:place="inline"
-      end
-	 		out '>'
-
-	 		# <l style="...">'
-	 		if moTL[3] != '' and moTL[3] != '0'
-	 			out(%(<l style="text-indent:#{moTL[3]}em;">))
-	 		else
-	 			out('<l>')
-      end
-	 		$opens['lg'] = 1
-      $opens['l'] += 1
-	 		$TL_count += 1
-	 	else
-	 		# 第二個 TL
-	 		close_tags('l')
-	 		# <l style="...">'
-	 		if moTL[1] != '' and moTL[1] != '0'
-	 			out(%(<l style="text-indent:#{moTL[1]}em;">))
-	 		else
-	 			out('<l>')
-      end
-      $opens['l'] += 1
-    end
-  elsif !moT.nil?
+  if !moT.nil?
 	 	# <T,x>
 	 	# <caesura style="..."/>'
 	 	if moT[1] == ''
@@ -754,6 +1084,121 @@ def start_inline_T_old(tag)
   $opens['l'] += 1
 end
 
+# 處理表格 F 表格開始
+# 20230503 表格有二種處理法，一種是行首標記用 Ff3 這種格式。
+#          一種是用 <table,3> 這種格式
+#          如果行首有數字，table 無數字，以行首為主。table 有數字則以 table 為主。
+#
+#          每一行都應該有 f，沒有就表示結束。如果是用 <F> 或 <table> 開始，就可以不用 f ，但一定要有 </table> 或 </F> 
+
+def start_inline_table(tag)
+  close_tags('byline','p')
+  # 計算一行有多少個 c 標記
+  i = count_c_from_line($line_text)
+  style,rend = get_style_rend(tag)
+  out %(<table cols="#{i}"#{style}#{rend}>)
+  $opens['table'] += 1
+
+  # <table> 要加上 <row>
+  if !$line_text.match(/<row/)
+    start_inline_row('<row>')
+  end
+
+end
+
+# 計算一行有多少 <c> 標記
+# <c>, <c,2> 算 1 個
+# <c3> 算 3 個
+# <c4 r3> 算 4 個
+# <c r3> 算 1 個
+def count_c_from_line(text)
+  # 算有多少個 <c> 或 或 <c,2> 或 <c r3>
+  r = text.scan(/<c[,\s>]/).size
+  
+  # 算有多少個 <c3> 或 <c3 r3>
+  text.scan(/<c(\d+)/) do 
+    r += $1.to_i
+  end
+
+  r
+end 
+
+def close_table(tag)
+  close_tags('p', 'cell', 'row', 'table')
+end
+
+def start_inline_TL(tag)
+
+	# global globals, opens
+	# if not 'lg' in opens: opens['lg'] = 0
+	# if not 'TL_count' in globals: globals['TL_count'] = 0
+	# if not 'lg_marginleft' in globals: globals['lg_marginleft'] = 0
+
+	if $opens['lg'] == 0
+	  close_tags('cb:jhead', 'cb:juan', 'byline', 'p')
+	  close_head
+  end
+  $lg_marginleft = 1
+  $opens['lg'] = 1
+  l_text_indent = ''
+
+  tag.match(/\d+,\-?\d+,(\d+)/) do
+    l_text_indent = $1
+    tag = tag.sub(/(\d+,\-?\d+),\d+/,'\1')  # 移除第三組數字
+  end
+	
+  if $TL_count == 0
+    # 第一個 TL
+      
+    # <lg xml:id="..."
+    out(%(<lg xml:id="lg#{$vol}p#{$old_pb}#{$line_num}%02d") % $char_count)
+
+    # cb:place="..."
+    if $char_count > 1
+      out(' cb:place="inline"')		# 若是行中段落, 則加上 cb:place="inline"
+    end
+
+    # style="..."  
+    style, rend = get_style_rend(tag)
+
+    style.match(/margin-left:\s*(\d+)\s*em/) do
+      $lg_marginleft = $1.to_i
+    end
+    out "#{style}#{rend}>"
+
+    # <l style="...">'
+    if l_text_indent != '' and l_text_indent != '0'
+      out %(<l style="text-indent:#{l_text_indent}em;">)
+    else
+      out '<l>'
+    end
+    $opens['l'] += 1
+    $TL_count += 1
+  else
+    # 第二個 TL
+    close_tags('l')
+    # <l style="...">'
+
+    # 因為第一個 <TL,x> = <TL,x,0> => <lg x,0><l>
+    # 第二個 <TL,x> = <TL,0,x> => <l,x>
+    # 所以要把 TL 換成 TL2 才能辨識
+
+    tag = tag.sub('<TL','<TL2')
+
+    style, rend = get_style_rend(tag)
+    out "<l#{style}#{rend}>"
+    
+    $opens['l'] += 1
+  end
+end
+
+# BM 版 : <trans-mark,a'> => XML P5 版 : <label type="translation-mark">a'</label>
+def start_trans_mark(tag)
+  tag.match(/<trans-mark,(.*?)>/) do
+    out %(<label type="translation-mark">#{$1}</label>)
+  end
+end
+
 def start_inline_u(tag)
   close_tags('byline', 'p')
   close_head()
@@ -775,179 +1220,278 @@ def start_inline_w(tag)
   $opens['sp'] = 1
 end
 
-def start_inline_a(tag)
-  close_tags('p','sp')
-  out('<sp cb:type="answer">')
-  $opens['sp'] = 1
+def start_x(tag)
+  start_div(1, 'xu')
+  $buf << '<head>'
+  $opens['head'] = 1
+  $mulu_start = True
+  $head_start = True
+  $div_head = ''
 end
 
-# 處理經文中的標記
-def inline_tag(tag)
-  case tag
-  when /^<app/, '</app>', '<corr>', '</corr>', /^<choice/, '</choice>', /^<lem/, '</lem>', /^<note/, '</note>', /^<orig/, '</orig>', '</quote>', /^<rdg/, '</rdg>', '<reg>', '</reg>', '<sic>', '</sic>'
-    # 直接輸出, 例：<choice cb:resp="CBETA.maha"><corr>Ｂ</corr><sic>Ａ</sic></choice>
-    out(tag)
-  when /^<(\[(([\da-zA-Z]{2,3})|＊)\])>/	
-    # 在 do_corr_normalize 處理過的校勘數字 , 原來為 <[01]> , 要直接處理成 [01]
-    out $1
-  when /^\[([\da-zA-Z]+?)\]/	# 處理校勘數字
-    out %(<anchor xml:id="fn#{$vol}p#{$old_pb}#{$1}"/>)
-  when /^\[[^>\[ ]+?\]/		# 處理組字式
-    $char_count += 1
-    out2(gaiji(tag))
-  when '<□>'							# 未知字
-    out('<unclear/>')
-  when '('
-    out2('<note place="inline">')
-  when '<annals>'
-    # J01nA042_p0793a14_##<Q2 m=哲宗><annals><date><p>哲宗皇帝元祐四年[已>己]巳
-    # J01nA042_p0793a15_##<event><p,1>師宣州寧國縣人也姓奚氏其母初夢神人衛一
-    # ... </annals>
-    # 還有 <Q> <annals> 也可以結束 <annals>
-    # <event> 是用來結束 <date> 的
-    # 轉成
-    # <cb:event><date>ＸＸＸ</date><p,1>ＹＹＹ</p></cb:event>
-    start_inline_annals(tag)
-  when '</annals>' then close_annals(tag)
-  when /<[ABCEY](,[cr])?>/ then start_inline_byline(tag)
-  when '<bold>'    then out('<seg rend="bold">')
-  when '</bold>'   then out('</seg>')
-  when '<border>'  then out('<seg rend="border">')
-  when '</border>' then out('</seg>')
-  when /<c[,\d\s>]/ then start_inline_c(tag)
-  when '<d>'       then start_inline_d(tag)
-  when '<date>'    then start_inline_date(tag)
-  when '<del>'  then out('<seg rend="del">')
-  when '</del>' then out('</seg>')
-  when '<e>'       then start_inline_e(tag)
-  when '</e>'      then close_e(tag)
-  when '<event>'   then start_inline_event(tag)
-  when '<formula>' then out('<formula>')
-  when '</formula>' then out2("</formula>")
-  when '</F>'      then close_F(tag)
-  when '<hei>'    then out('<seg rend="heiti">')
-  when '</hei>'   then out('</seg>')
-  when /^<h/       then start_inline_h(tag)
-  when /^<\/h/     then close_h(tag)
-  when /<I\d*>/    then start_i(tag)
-  when '<i>('       then out2('<note place="interlinear">')
-  when /^\)(<\/i>)?/ then out2('</note>')
-  when '<it>'    then out('<seg rend="italic">')
-  when '</it>'   then out('</seg>')
-  when '<j>'
-    close_tags('p')
-    out('<cb:juan fun="close"><cb:jhead>')
-    $opens['cb:juan'] += 1
-    $opens['cb:jhead'] += 1
-  when /^<J/    then start_J(tag)
-  when '<kai>'    then out('<seg rend="kaiti">')
-  when '</kai>'   then out('</seg>')
-  when '<L_sp>' then start_inline_Lsp(tag)
-  when '<l>'
-    out('<l>')	# 行首標記有 S 及 s 時, 會在行中自動將空格變成 <l></l></lg> 等標記
-  when '</l>' then close_tags('l')  # 行首標記有 S 及 s 時, 會在行中自動將空格變成 <l></l></lg> 等標記
-  when '</lg>'
-    out('</lg>')	# 行首標記有 S 及 s 時, 會在行中自動將空格變成 <l></l></lg> 等標記
-  when '</L>'
-    close_tags('p')
-    $l_type = ""
-    while $opens['list'] > 0
-      close_tag('item', 'list')
+
+# 處理一些屬性
+#   二組數字 x,y => margin-left:xem;text-indent:yem;
+#   單一數字 x => margin-left:xem;
+#   粗體：<bold>
+#   斜體：<it>
+#   明體：<ming>
+#   楷體：<kai>
+#   黑體：<hei>
+#   上標字：<sup>（不能跨行）
+#   下標字：<sub>（不能跨行）
+#   上橫線：<over>（不能跨行）
+#   下底線：<under>（不能跨行）
+#   加外框：<border>（不能跨行）
+#   加刪除線：<del>（不能跨行）
+# c 置中
+# r 靠右
+# l 靠左
+# t3 => text-indent:3em;
+# <c,1> 這種有數字在 cell 處理法不同，會轉成
+# rend="pl-1"
+# .........還有很多....
+# 詳見 https://docs.google.com/document/d/1zPxQRNPUd3tbU69krYT4Zr9i-LkqAfvui0TUu1ZK7K4/edit#
+# 及 https://docs.google.com/document/d/1bHSnOvvMqpC-IQoKjaBlUU1dh_muz0khhCJidDHHXbQ/edit#
+
+def get_style_rend(tag)
+  tag_name = ''
+  tag.match(/<([A-Za-z_\d]+)/) do  # 會有 <TL2>
+    tag_name = $1
+  end
+
+  style = get_style(tag_name, tag)
+  rend = get_rend(tag_name, tag)
+  return [style,rend]
+end
+
+# 傳入 <p,x,y> 等格式
+# 傳回 style="margin-left:xem; text-indent:yem;"
+def get_style(tag_name, tag)
+  
+  # 傳入數字有三種狀況
+  # <t> => <t>
+  # <t,1> => <t,m1>
+  # <t,1,2> => <t,m1,t2>
+  # 不可同時存在 數字 及 mx tx，例如不可以用 <t,1,t2> <t,m1,2>，否則不易判斷
+
+  # 預設情況，有 mx 才處理 margin-left:xem;
+  #          有 ty 才處理 text-indent:yem;
+
+  # 特殊情況
+  # 1. <S> 標記在 m=1 和 t=0 時則不呈現
+  # 2. <TL> 標記在 m=0 和 t=0 時則不呈現
+  # 3. <TL2>（第二組 TL）,<l> , <hi>, <seg>, 只有一組數字，要轉成 t 而不是 m
+  # 4. <c,1> 這種有數字在 cell 處理法不同，會轉成 rend="pl-1"，不在此處理
+
+  if tag_name == "c"
+    return ''
+  end
+
+  style = ''
+  rend = ''
+  tag = tag.gsub(/\s*,\s*/,',')  # 移除逗號前後不必要空白
+
+  m_num = ''
+  t_num = ''
+
+  # 二組數字 x,y => margin-left:xem;text-indent:yem;
+  tag.match(/,(\-?[\d\.]+),(\-?[\d\.]+)/) do
+    m_num = $1
+    t_num = $2
+    tag = tag.sub(/,(\-?[\d\.]+),(\-?[\d\.]+)/,'')
+  end
+  # 單一數字 x => margin-left:xem;
+  # 取出 m
+  tag.match(/,m?(\-?[\d\.]+)/) do
+    m_num = $1
+    tag = tag.sub(/,m?(\-?[\d\.]+)/,'')
+  end
+  # 取出 t
+  tag.match(/,t(\-?[\d\.]+)/) do
+    t_num = $1
+    tag = tag.sub(/,t(\-?[\d\.]+)/,'')
+  end
+
+  # 特殊情況
+  # 1. <S> 標記在 m=1 和 t=0 時則不呈現
+  if tag_name == "S"
+    m_num = '' if m_num == '1'
+    t_num = '' if t_num == '0'
+  end
+  # 2. <TL> 標記在 m=0 和 t=0 時則不呈現
+  if tag_name == "TL"
+    m_num = '' if m_num == '0'
+    t_num = '' if t_num == '0'
+  end
+  # 3. <TL2>（第二組 TL）,<l> , <hi>, <seg>, 只有一組數字，要轉成 t 而不是 m
+  if tag_name == "TL2" || tag_name == "l" || tag_name == "hi" || tag_name == "seg"
+    if !m_num.empty? && t_num.empty?
+      t_num = m_num
+      m_num = ''
     end
-  when '<ming>'    then out('<seg rend="mingti">')
-  when '</ming>'   then out('</seg>')
-  when /^<mj/      then start_inline_mj(tag)
-  when '<no_chg>'  then out('<term cb:behaviour="no-norm">')
-  when '</no_chg>' then out('</term>')
-  when '<nosp>'    then start_inline_space(tag)
-  when /^　/       then start_inline_space(tag)
-  when /^<n/       then start_inline_n(tag)
-  when '</n>'      then close_n(tag)
-  when '<o>'       then start_inline_o(tag)
-  when '</o>'      then close_div_by_type('orig')
-  when '<over>'  then out('<seg rend="over">')
-  when '</over>' then out('</seg>')
-  when /<PTS./ then start_PTS(tag)
-  when /^<p/   then start_inline_p(tag)
-  when '</p>'  then close_tags('p')
-  when '</P>'  then close_tags('p')
-  when /<quote (.*?)>/	
-    # 出處連結, 例如 : 
-    # ZY01n0001_p0020a02_##...經中說，<quote T09n0262_p0007c07-09>舍利弗！汝等...</quote>
-    # 要做成 <quote source="CBETA.T09n0262_p0007c07-09">
-    out %(<quote source="CBETA.#{$1}">)
-  when /^<Q/   then start_inline_q(tag)
-  when /^<\/Q/ then close_q(tag)
-  when '<S>' then start_inline_S(tag)
-  when /<S,/ then start_inline_S(tag)
-  when '</S>'
-		$normal_lg = false
-		close_tags('lg')
-  when '<sd>'
-    out('<term xml:lang="sa-Sidd">')
-    $opens['term'] = 1
-  when '</sd>' then close_tags('term')
-  when '<space quantity="0"/>' then out2(tag)
-  when '<sub>'  then out('<hi style="vertical-align:sub">')
-  when '</sub>' then out2("</hi>")
-  when '<sup>'  then out('<hi style="vertical-align:super">')
-  when '</sup>' then out2("</hi>")
-  when /<trans-mark/ then start_trans_mark(tag)
-  when /^<T/         then start_inline_T(tag)
-  when '</T>' || '</TL>' 
-    $TL_count = 0
-    close_tags('l', 'lg')
-  when '<u>'         then start_inline_u(tag)
-  when '</u>'        then close_div_by_type('commentary')
-  when '<under>'  then out('<seg rend="under">')
-  when '</under>' then out('</seg>')
-  when /^<w>/ then start_inline_w(tag)
-  when /^<a>/ then start_inline_a(tag)
-  when '</w>' then close_tags('p','sp','cb:dialog')
-  when /^<z/  then start_inline_p(tag)	# 和 <p 一樣的處理法    
-  when '</z>' then close_tags('p')
-  when /&((SD)|(RJ))\-\w{4};/	then start_inline_SDRJ(tag) # 悉曇字或蘭札字
-  when '&' then out2("&")
-  else
-    puts "#{$old_pb}#{$line_num} 未處理的標記: '#{tag}'"
-  end
-end
-
-def close_div_by_type(type)
-  close_tags('byline','p')
-  out1('</cb:div>')
-  $opens['div'] -= 1
-  $opens[type] -= 1
-end
-
-def start_inline_mj(tag)
-  close_tags('byline', 'cb:jhead', 'cb:juan')
-
-  #n=get_number(tag)
-  m = tag.match(/\d+/)
-  if !m.nil?
-    $juan_num = $&.to_i
-  else
-    $juan_num += 1
+    t_num = '' if t_num == '0'
   end
 
-  #out('<milestone unit="juan" n="{}"/>'.format(globals['juan_num']))		# 若用 out() , 會有一堆 </p></cb:div> 標記出現在 <milestone> 後面
+  # margin-left:
+  if !m_num.empty?
+    style << "margin-left:#{m_num}em;"
+  end
+  # text-indent
+  if !t_num.empty?
+    style << "text-indent:#{t_num}em;"
+  end
 
-  m = $buf.match(/(<pb [^>]*>\n?)?<lb [^>]*>\n?\z/)
-  if m.nil?
-    abort "milestone must after <pb><lb> #{tag}  Line: #{__LINE__}"
-  else
-    # <milestone> 要移到 <pb><lb> 之前
-    $buf.sub!(/(?:<pb [^>]*>\n?)?<lb [^>]*>\n?\z/) do
-      %(<milestone unit="juan" n="#{$juan_num}"/>\n#{$&})
+  # 做出結果字串
+  if !style.empty?
+    style = %( style="#{style}")
+  end
+
+  style
+end
+
+# 傳入 <p,bold,it> 等格式
+# 傳回 rend="bold italic"
+def get_rend(tag_name, tag)
+  rend = ''
+  tag = tag.gsub(/\s*,\s*/,',')  # 移除逗號前後不必要空白
+
+  # 粗體：<bold>
+  # 還原粗體：<no-bold>
+  tag.match(/,((no\-)?bold)[,>]/) do
+    rend << "#{$1} "
+  end
+  # 斜體：<it>
+  # 還原斜體：<no-it>
+  tag.match(/,((no\-)?it)[,>]/) do
+    rend << "#{$1}alic "
+  end
+  # 明體：<ming>
+  # 楷體：<kai>
+  # 黑體：<hei>
+  tag.match(/,((ming)|(kai)|(hei))[,>]/) do
+    rend << "#{$1}ti "
+  end
+  # 上標字：<sup>（不能跨行）
+  # 下標字：<sub>（不能跨行）
+  tag.match(/,((sup)|(sub))[,>]/) do
+    rend << "#{$1} "
+  end
+  # 上橫線：<over>（不能跨行）
+  # 下底線：<under>（不能跨行）
+  # 刪除線：<del>（不能跨行）
+  tag.match(/,((over)|(under)|(del))[,>]/) do
+    rend << "#{$1} "
+  end
+  # 外框：<border>（不能跨行）
+  # 表格無框
+  tag.match(/,((no\-)?border)[,>]/) do
+    rend << "#{$1} "
+  end
+  # 上框線：border-top（不能跨行）
+  # 下框線：border-top（不能跨行）
+  # 左框線：border-top（不能跨行）
+  # 右框線：border-top（不能跨行）
+  tag.match(/,(border\-((top)|(bottom)|(left)|(right)))[,>]/) do
+    rend << "#{$1} "
+  end
+  # l 靠左 
+  tag.match(/,l[,>]/) do
+    rend << 'text-left '
+  end
+  # c 置中
+  tag.match(/,c[,>]/) do
+    rend << 'text-center '
+  end
+  # r 靠右
+  tag.match(/,r[,>]/) do
+    rend << 'text-right '
+  end
+  # 各種字體
+  tag.match(/,((larger)|(smaller)|(small)|(medium)|(large))[,>]/) do
+    rend << "#{$1} "
+  end
+  tag.match(/,(xx?\-small)[,>]/) do
+    rend << "#{$1} "
+  end
+  tag.match(/,(xx?\-large)[,>]/) do
+    rend << "#{$1} "
+  end
+  # 列表不使用圓點符號
+  tag.match(/,sp[,>]/) do
+    rend << 'no-marker '
+  end
+  # 上方加圈點
+  tag.match(/,circle\-above[,>]/) do
+    rend << 'circle-above '
+  end
+  # 表格移位
+  # <c,2> 或 <c,m2> 這種有數字在 cell 處理法不同，會轉成 rend="pl-2"
+  if tag_name == "c"
+    tag.match(/,m?(\d+)[,>]/) do
+      rend << "pl-#{$1} "
     end
   end
 
-  # 原本 <cb:mulu type="卷" n="{}"/> 是在 <J> 或 Ｊ卷標記處理, 只有南傳在 <mj> 處理, 
-  # 現在全部移到 <mj> 處理, 因為有卷沒有卷標記
-  unless $canon == 'TX'
-    $buf << %(<cb:mulu type="卷" n="#{$juan_num}"/>)
+  # 做出結果字串
+  if !rend.empty?
+    rend = rend.strip
+    rend = %( rend="#{rend}")
   end
+
+  rend
+end
+
+def close_tag(*tags)
+  tags.each do |t|
+    next unless $opens.key?(t)
+    out1("</#{t}>")
+    $opens[t] -= 1
+  end
+end  
+
+def close_tags(*tags)
+  tags.each do |t|
+    next unless $opens.key?(t)
+    while $opens[t] > 0
+      out1("</#{t}>")
+      $opens[t] -= 1
+    end
+  end
+end
+
+def close_head
+  return unless $head_start
+
+  if $mulu_start
+    unless $div_head.empty?
+      out1 %(<cb:mulu type="#{$mulu_type}" level="#{$opens['div']}">#{$div_head}</cb:mulu>)
+    end
+    # 取消 cb:mulu 的空標記 2016/04/11
+    # else:
+    #	out1('<cb:mulu type="{}" level="{}"/>'.format(globals['muluType'], opens['div']))
+    $mulu_start = false
+  end
+
+  out('')
+  close_tags('head')
+  $head_start = false
+end
+
+######################################################################################################
+
+# 計算經文的長度
+def my_length(s)
+  r = 0
+  #s = re.sub(r'\[[^>\]]*?>(.*?)\]', r'\1', s)
+  #s = re.sub(r'\[[^>\]]*?\]', '缺', s) # 將組字式取代為單個字
+
+  s.each_char do |c|
+    next if '◎。，、；：「」『』（）？！—…《》〈〉．“”　〔〕【】()'.include?(c)
+    r += 1
+  end
+
+  r
 end
 
 def gaiji(zuzi)
@@ -1085,11 +1629,11 @@ end
 # 把這種
 # T04n0213_p0794a23D##[>法集要頌經樂品第三十]<S>　[06]忍勝則怨賊，　　自負則自鄙，
 # 把 <S> 後面的空格換成 <l></l>
-def do_tag_s(text)
-  text.gsub!(/(<S>.*)　　/, '\1</l><l>')
-  text.gsub!(/(<S>.*)　/, '\1<l>')
-  text << "</l>\n" if text.match?(/<S>/)
-end
+#def do_tag_s(text)
+#  text.gsub!(/(<S>.*)　　/, '\1</l><l>')
+#  text.gsub!(/(<S>.*)　/, '\1<l>')
+#  text << "</l>\n" if text.match?(/<S>/)
+#end
   
 # 分析每一行經文
 def do_text(s)
@@ -1116,30 +1660,13 @@ def do_text(s)
       .
     )
   /x
-
+  
+  $line_text = s    # 整行存起來，有時會用到
   s.scan(regexp) do |t|      
     if t.match?(/[<\(\)\[&　]/)
       inline_tag(t) 
     else
       do_chars(t)
-    end
-  end
-end
-  
-def close_tag(*tags)
-  tags.each do |t|
-    next unless $opens.key?(t)
-    out1("</#{t}>")
-    $opens[t] -= 1
-  end
-end  
-
-def close_tags(*tags)
-  tags.each do |t|
-    next unless $opens.key?(t)
-    while $opens[t] > 0
-      out1("</#{t}>")
-      $opens[t] -= 1
     end
   end
 end
@@ -1157,222 +1684,8 @@ def get_number_i(s)
     return $&.to_i
   end
   nil
-end
+end 
 
-# J01nA042_p0793a14_##<Q2 m=哲宗><annals><date><p>哲宗皇帝元祐四年[已>己]巳
-# J01nA042_p0793a15_##<event><p,1>師宣州寧國縣人也姓奚氏其母初夢神人衛一
-# ... </annals>
-# 還有 <Q> <annals> 也可以結束 <annals>
-# <event> 是用來結束 <date> 的
-# 轉成
-# <cb:event><date>ＸＸＸ</date><p,1>ＹＹＹ</p></cb:event>
-
-# <annals> 裡面也可能沒有 <event> , 所以 <annals> 也可以結束 <date>
-# <annals><date>......
-# <event><p>..........
-# <annals><date>......
-# <annals><date>......
-
-def start_inline_annals(tag)
-  close_head
-  close_tags('date', 'p', 'cb:event')
-  out('<cb:event>')
-  $opens['cb:event'] = 1
-end
-
-def start_inline_date(tag)
-  out('<date>')
-  $opens['date'] = 1
-end
-
-# 參考 <annals> 標記, 此標記是用來結束 <date> 用的
-def start_inline_event(tag)
-  close_tags('p', 'date')
-end
-  
-def start_J(tag)
-  return if $head_tag.include?('=')
-
-  close_tags('p')
-
-  i = get_number_i(tag)
-  $juan_num = i unless i.nil?
-
-  out %(<cb:juan fun="open" n="#{$juan_num}"><cb:jhead>)
-  $opens['cb:juan'] += 1
-  $opens['cb:jhead'] += 1
-end
-
-def start_j(tag)
-  close_tags('p')
-  out %(<cb:juan fun="close" n="#{$juan_num}"><cb:jhead>)
-  $opens['cb:juan'] += 1
-  $opens['cb:jhead'] += 1
-end
-
-def start_byline(tag)
-  return if tag.include?('=')
-
-  close_tags('p', 'byline', 'cb:jhead', 'cb:juan')
-
-  type = case tag
-  when /A/ then 'author'
-  when /B/ then 'other'
-  when /C/ then 'collector'
-  when /E/ then 'editor'
-  when /Y/ then 'translator'
-  end
-  out %(<byline cb:type="#{type}">)
-
-  $opens['byline'] = 1
-end
-
-def start_inline_byline(tag)
-  close_tags('byline', 'cb:jhead', 'cb:juan', 'p')
-  close_head
-
-  type = case tag
-  when /<A/ then "author"
-  when /<B/ then "other"
-  when /<C/ then "collector"
-  when /<E/ then "editor"
-  when /<Y/ then "translator"
-  end
-
-  out %(<byline cb:type="#{type}")
-
-	# 處理 <A,c> , <B,r> - 2023-04-05
-
-  tag.match(/,c[,>]/) do
-    out %( rend="text-center")
-  end
-  tag.match(/,r[,>]/) do
-    out %( rend="text-right")
-  end
-  tag.match(/,l[,>]/) do
-    out %( rend="text-left")
-  end
-
-  out '>'
-  $opens['byline'] = 1
-end
-
-def start_S(tag)
-  if $opens['lg'] == 0
-    close_tags('cb:jhead', 'cb:juan', 'byline', 'p')
-    close_head
-    $lg_marginleft = 1
-    out %(<lg xml:id="lg#{$vol}p#{$old_pb}#{$line_num}01">)
-    $opens['lg'] = 1
-    $normal_lg = true
-  end
-  close_tags('l')
-end
-
-def start_s(tag)
-  $opens['lg'] = 0
-end
-
-def start_x(tag)
-  start_div(1, 'xu')
-  $buf << '<head>'
-  $opens['head'] = 1
-  $mulu_start = True
-  $head_start = True
-  $div_head = ''
-end
-
-# 計算一行有多少 <c> 標記
-# <c>, <c,2> 算 1 個
-# <c3> 算 3 個
-# <c4 r3> 算 4 個
-# <c r3> 算 1 個
-def count_c_from_line(text)
-  # 算有多少個 <c> 或 或 <c,2> 或 <c r3>
-  r = text.scan(/<c[,\s>]/).size
-  
-  # 算有多少個 <c3> 或 <c3 r3>
-  text.scan(/<c(\d+)/) do 
-    r += $1.to_i
-  end
-
-  r
-end  
-
-# 處理表格 F 表格開始
-def start_F(tag, text)
-  close_tags('byline','p')
-  # 計算一行有多少個 c 標記
-  i = count_c_from_line(text)
-  # 如果是 tag 是 Ff3，就要輸出 style="margin-left:3em;"
-  style = ""
-  m = tag.match(/Ff(\d)/)
-  if not m.nil?
-    style = %( style="margin-left:#{m[1]}em;")
-  end
-  out %(<table cols="#{i}"#{style}><row>)
-  $opens['table'] += 1
-  $opens['row'] += 1
-end
-
-# 處理表格 f 表示 <row> 的範圍
-def start_f(tag)
-  close_tags('p', 'cell', 'row')
-  out('<row>')
-  $opens['row'] += 1
-end
-
-# 處理行首標記, 會變更 text 的內容
-def do_line_head(tag, text)
-  tag = tag.clone     # 若不 clone，底下改變 tag 的行為會影響傳入原始的 tag
-  if tag.include?('W')
-    tag.gsub!('W', '')
-    if not $inw
-      $inw = true
-      if not tag.include?('Q') and not tag.include?('x')
-        # 如果 W## 接著 <Q , 也不用執行 start_div, 因為 <Q 會執行
-        start_div(1, 'w') if not text.match?(/^<Q/)
-      end
-    end
-  elsif $inw
-    $inw = false
-  end
-    
-  $inr = false if not tag.include?('r')
-  
-  case tag
-  when /[ABCEY]/ then start_byline(tag)
-  when /F/ then start_F(tag, text)
-  when /f/ then start_f(tag)
-  when /I/
-    start_i(tag)
-    start_p(tag) if tag.include?('P')
-  when /J/ then start_J(tag)
-  when /j/ then start_j(tag)
-  when /P/ then start_p(tag)
-  when /Q/ then start_q(tag)
-  when /r/ then start_r(tag)
-  when /S/ then start_S(tag)
-    # text.gsub!("　　", "</l><l>")
-    # text.gsub!("　", "<l>")
-    # text << "</l>\n"
-  when /s/ then text << "</S>"
-    # start_s(tag)
-    # text.gsub!("　　", "</l><l>")
-    # text.gsub!("　", "<l>")
-    # text << "</l></lg>\n"
-    # # 把 </Qx> 移到後面, 例: B10n0068_p0839b03s##　能令清淨諸儀軌　　如智者論顯了說</Q1>
-    # text.gsub!(/(<\/Q\d*>)(<\/l><\/lg>)$/, '\2\1')
-  when /x/ then start_x(tag)
-  when /Z/ then start_p(tag)
-  else
-    tag.gsub!(/[#_k\d]/, '')
-    unless tag.empty?
-      puts "#{$old_pb}#{$line_num} 未處理的行首標記: '#{tag}'"
-    end
-  end
-end
-  
 # 結束一部經, 全部印出來
 def close_sutra(num)
   # 加上 l, lg -- 2013/09/30 
@@ -1485,8 +1798,7 @@ def convert_line(s)
   $buf << ' type="honorific"' if $head_tag.include?('k') # 強迫換行
   $buf << %( ed="#{$canon}" n="#{pb}#{$line_num}"/>)
   
-  # 因為 S 標記會把空格處理成 <l></l>, text 內容 會被變更
-  do_line_head($head_tag, text)	
+  text = do_line_head($head_tag, text)	
 
   $lg_space_count = 0	# 每一行的空格數歸0
 
@@ -1501,13 +1813,11 @@ def convert_line(s)
   end
 
   if ($opens['lg'] == 1 and $normal_lg == true) or text.include?('<S') # <S 會在行中
-    if text.end_with?("</S>")
-      text[-4..] = "</l></S>"
-    else
+    if !text.end_with?("</S>")
       text << "</l>"
     end
     # 把 </Qx> 移到後面, 例: 	B10n0068_p0839b03s##　能令清淨諸儀軌　　如智者論顯了說</Q1>
-    text.sub!(/(<\/Q\d*>)(<\/l><\/S>)$/, '\2\1')
+    text.sub!(/(<\/Q\d*>)(<\/S>)$/, '\2\1')
   end
 
   # 先把 [Ａ>Ｂ] 換成
@@ -1530,26 +1840,7 @@ def convert_line(s)
   把 <S> 後面的空格換成 <l></l>
   '''
   #do_tag_s(text)
-  
   do_text(text)
-end
-  
-def close_head
-  return unless $head_start
-
-  if $mulu_start
-    unless $div_head.empty?
-      out1 %(<cb:mulu type="#{$mulu_type}" level="#{$opens['div']}">#{$div_head}</cb:mulu>)
-    end
-    # 取消 cb:mulu 的空標記 2016/04/11
-    # else:
-    #	out1('<cb:mulu type="{}" level="{}"/>'.format(globals['muluType'], opens['div']))
-    $mulu_start = false
-  end
-
-  out('')
-  close_tags('head')
-  $head_start = false
 end
   
 def read_source
@@ -1664,12 +1955,12 @@ def read_config
   $des2cb = {}
   $des2uni = {}
   # $unicode2cb = {}
+  $last_list_tag = ''
   $line_num = ''
   $opens = Hash.new(0)	# 記錄每一個標記的層次, 預設值為 0
   $opens['div'] = 0
   $old_pb = ''
   $sutras = {}
-  $l_type = ""		# 記錄 <L> 的type , 若是 <L_sp> 則 L_type="simple"
   $div_type_note = 0 # 記錄是否有在 <cb:div type="note"> 之中
   $TL_count = 0
   $lg_marginleft = 0
