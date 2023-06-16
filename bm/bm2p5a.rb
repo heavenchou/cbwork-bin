@@ -6,6 +6,7 @@
 # 作者: 周邦信(Ray Chou) 2022-04-20
 #
 # Heaven 修改：
+# 2023-06-12 1.支援 CC、CBETA選集、CBETA Selected Collection
 # 2023-05-16 1.支援 <tag,1,2,bold,sup,..> 處理成 <tag rend="bold sup .." style="margin-left:1em; text-indent:2em;">
 # 2023-04-05 1.支援 <c,4> 這種格式，表示此格內縮 4 個字 => <cell rend="pl-4">
 #            2.支援 <p,c><p,r><Q1,c><Q1,r> 等格式，c 表示置中 rend="text-center", r 表示靠右 rend="text-right"
@@ -26,6 +27,7 @@ require_relative '../common'
   
 $collection_zh = {
   'B' => '大藏經補編',
+  'CC' => 'CBETA選集',
   'DA' => '道安法師著作全集',
   'GA' => '中國佛寺史志彙刊',
   'GB' => '中國佛寺志叢刊',
@@ -44,6 +46,7 @@ $collection_en = {
   'B'  => 'Supplement to the Dazangjing',
   'C'  => 'Zhonghua Canon - Zhonghua shuju Edition',
   'CB'  => 'CBETA Test Ver',
+  'CC'  => 'CBETA Selected Collection',
   'D'  => 'Selections from the Taipei National Central Library Buddhist Rare Book Collection',
   'DA' => 'the Complete Works of Ven Daoan',
   'F'  => 'Fangshan shijing',
@@ -250,7 +253,7 @@ def inline_tag(tag)
   when '</no_chg>' then out('</term>')
   when '<no-bold>'    then out('<hi rend="no-bold">')
   when '</no-bold>'   then out('</hi>')
-  when '<no-it>'    then out('<hi rend="no-it">')
+  when '<no-it>'    then out('<hi rend="no-italic">')
   when '</no-it>'   then out('</hi>')
   when '<nosp>'    then start_inline_space(tag)
   when /^　/       then start_inline_space(tag)

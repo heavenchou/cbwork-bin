@@ -130,6 +130,15 @@ th, td {
   word-break: break-all;
   text-indent: 0;
 }
+.under {
+  text-decoration: underline;
+}
+.over {
+  text-decoration: overline;
+}
+.del {
+  text-decoration: line-through;
+}
 
 /* 因為有的 list 層次很深，例如 JB269，內縮太多會超出頁面範圍，所以把內縮調小。 */
 ul {

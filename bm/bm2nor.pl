@@ -16,6 +16,7 @@
 # Copyright (C) 1999-2023 Heaven Chou
 ########################################################################
 
+# 2023/06/12 支援 CC、CBETA選集、CBETA Selected Collection
 # 2023/05/18 支援 <tag,1,2,bold,it> 等格式
 # 2023/04/05 支援 <[ABCEY],[crl]> 等格式 (c 置中，r 靠右，l 靠左)
 # 2023/04/04 支援 <p,c>, <p,r>, <Q1,c>, <Q1,r> 等格式 (c 置中，r 靠右)
@@ -669,6 +670,11 @@ sub print_jun_head()
 	{
 		$sutraver_c = "中華大藏經（中華書局版）";
 		$sutraver_e = "Zhonghua Canon (Chunghwa Book Edition)";
+	}
+	elsif($vol_head eq "CC")
+	{
+		$sutraver_c = "CBETA選集";
+		$sutraver_e = "CBETA Selected Collection";
 	}
 	elsif($vol_head eq "D")
 	{
