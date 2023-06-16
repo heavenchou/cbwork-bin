@@ -6,7 +6,7 @@
 # 作者: 周邦信(Ray Chou) 2022-04-20
 #
 # Heaven 修改：
-# 2023-06-12 1.支援 CC、CBETA選集、CBETA Selected Collection
+# 2023-06-12 1.支援 CC、CBETA 選集、CBETA Selected Collection
 # 2023-05-16 1.支援 <tag,1,2,bold,sup,..> 處理成 <tag rend="bold sup .." style="margin-left:1em; text-indent:2em;">
 # 2023-04-05 1.支援 <c,4> 這種格式，表示此格內縮 4 個字 => <cell rend="pl-4">
 #            2.支援 <p,c><p,r><Q1,c><Q1,r> 等格式，c 表示置中 rend="text-center", r 表示靠右 rend="text-right"
@@ -27,7 +27,7 @@ require_relative '../common'
   
 $collection_zh = {
   'B' => '大藏經補編',
-  'CC' => 'CBETA選集',
+  'CC' => 'CBETA 選集',
   'DA' => '道安法師著作全集',
   'GA' => '中國佛寺史志彙刊',
   'GB' => '中國佛寺志叢刊',
