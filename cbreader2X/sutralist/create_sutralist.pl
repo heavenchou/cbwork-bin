@@ -83,6 +83,10 @@ sub SearchDir
 				next;
 			}
 		}
+		# CB01 是測試用的資料
+		if($file =~ /CB/) {
+			next;
+		}
 
 		my $NewDir = $ThisDir . "/" . $file ;
 		my $NewOutputDir = $ThisOutputDir . "/" . $file ; 

@@ -80,10 +80,10 @@ sub SearchDir
 	chdir($ThisDir);
 	my @files = glob($FilePattern);
 	chdir($myPath);				# 回到目前路徑
-	
+
 	foreach my $file (sort(@files))
 	{
-		next if($file =~ /^\./);		# 不要 . 與 ..
+		next if($file =~ /^\./);
 		my $NewFile = $ThisDir . "/" . $file ;
 		if (-f $NewFile)
 		{
@@ -115,6 +115,30 @@ sub run_all_files
 {
 	my $pre_sutra = "";
 	my $pre_book = "";
+
+
+	# 因為檔案有這些
+	# B15n0088.xml
+	# B15na014.xml
+	# B16n0088.xml
+	# B16na015.xml
+	# 所以排序會造成 B15n0088 和 B16n0088 分開，造成 toc 只産生 16 冊的內容
+
+	# 因此檔案要先把 naxxx.xml 另外排序
+
+	my @sorted_files = ();
+	# 先排除 naxxx.xml
+	foreach my $file (sort(@all_files)) {
+		next if($file =~ /na.{3,4}\.xml/);
+		push(@sorted_files, $file);
+	}
+	# 再處理 naxxx.xml
+	foreach my $file (sort(@all_files)) {
+		if($file =~ /na.{3,4}\.xml/) {
+			push(@sorted_files, $file);
+		}
+	}
+	@all_files = @sorted_files;
 
     for(my $i=0; $i<=$#all_files; $i++)
     {

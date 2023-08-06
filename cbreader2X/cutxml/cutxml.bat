@@ -34,6 +34,7 @@ exit /B
 call :run_coll A
 call :run_coll B
 call :run_coll C
+call :run_coll CC
 call :run_coll D
 call :run_coll F
 call :run_coll G

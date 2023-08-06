@@ -121,7 +121,7 @@ sub create_body
                     my $link = $sutralist->link->[$index];
                     my $name = $sutralist->name->[$index];
                     $name =~ s/\(第.*?卷\)$//;  # 去除卷數
-                    $name =~ s/（上）$// if($name !~ /紀念集（上）/); # ZY47 特例
+                    $name =~ s/（上）$// if($name !~ /((編輯說明)|(紀念集))（上）/); # ZY47 , Ba014 特例
                     $name =~ s/（一）$// if($name !~ /華雨集（一）/); # 特例
                     $key =~ s/^T0220a$/T0220/; # 特例 
                     $link =~ s/T05n0220a_001/T05n0220_001/; # 特例

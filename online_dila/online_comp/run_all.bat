@@ -9,6 +9,9 @@ perl comp_online_txt.pl B
 perl online2txt.pl C
 perl comp_online_txt.pl C
 
+perl online2txt.pl CC
+perl comp_online_txt.pl CC
+
 perl online2txt.pl D
 perl comp_online_txt.pl D
 
