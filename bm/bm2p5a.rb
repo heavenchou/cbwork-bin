@@ -6,6 +6,7 @@
 # 作者: 周邦信(Ray Chou) 2022-04-20
 #
 # Heaven 修改：
+# 2023-09-21 1.支援 <date> 後面不再有 <p>，改成 <date> 裡面要自動加 <p>
 # 2023-06-12 1.支援 CC、CBETA 選集、CBETA Selected Collection
 # 2023-05-16 1.支援 <tag,1,2,bold,sup,..> 處理成 <tag rend="bold sup .." style="margin-left:1em; text-indent:2em;">
 # 2023-04-05 1.支援 <c,4> 這種格式，表示此格內縮 4 個字 => <cell rend="pl-4">
@@ -200,7 +201,10 @@ def inline_tag(tag)
   when /^<a>/ then start_inline_a(tag)
   when /<[ABCEY][\s,>]/ then start_inline_byline(tag)
   when '<annals>'
-    # J01nA042_p0793a14_##<Q2 m=哲宗><annals><date><p>哲宗皇帝元祐四年[已>己]巳
+    ## J01nA042_p0793a14_##<Q2 m=哲宗><annals><date><p>哲宗皇帝元祐四年[已>己]巳
+
+    # <date> 後面 <p> 在 BM 移除，改成自動加入
+    # J01nA042_p0793a14_##<Q2 m=哲宗><annals><date>哲宗皇帝元祐四年[已>己]巳
     # J01nA042_p0793a15_##<event><p,1>師宣州寧國縣人也姓奚氏其母初夢神人衛一
     # ... </annals>
     # 還有 <Q> <annals> 也可以結束 <annals>
@@ -208,7 +212,7 @@ def inline_tag(tag)
     # 轉成
     # <cb:event><date>ＸＸＸ</date><p,1>ＹＹＹ</p></cb:event>
     start_inline_annals(tag)
-  when '</annals>' then close_tags('p', 'cb:event')
+  when '</annals>' then close_tags('p', 'date', 'p', 'cb:event')
   when '<bold>'    then out('<hi rend="bold">')
   when '</bold>'   then out('</hi>')
   when '<border>'  then out('<hi rend="border">')
@@ -321,7 +325,10 @@ def start_inline_a(tag)
   $opens['sp'] = 1
 end
 
-# J01nA042_p0793a14_##<Q2 m=哲宗><annals><date><p>哲宗皇帝元祐四年[已>己]巳
+## J01nA042_p0793a14_##<Q2 m=哲宗><annals><date><p>哲宗皇帝元祐四年[已>己]巳
+
+# <date> 後面 <p> 在 BM 移除，改成自動加入
+# J01nA042_p0793a14_##<Q2 m=哲宗><annals><date>哲宗皇帝元祐四年[已>己]巳
 # J01nA042_p0793a15_##<event><p,1>師宣州寧國縣人也姓奚氏其母初夢神人衛一
 # ... </annals>
 # 還有 <Q> <annals> 也可以結束 <annals>
@@ -337,7 +344,7 @@ end
 
 def start_inline_annals(tag)
   close_head
-  close_tags('date', 'p', 'cb:event')
+  close_tags('p', 'date', 'p', 'cb:event')
   out('<cb:event>')
   $opens['cb:event'] = 1
 end
@@ -438,6 +445,8 @@ end
 def start_inline_date(tag)
   out('<date>')
   $opens['date'] = 1
+  # date 後面要自動加上 <p>
+  start_inline_p('<p>')
 end
 
 def start_div(level, type)
@@ -836,7 +845,7 @@ def start_inline_q(tag)
   return if tag.match?(/<Q.*?=>/)	# <Q3=> 這一種的表示是延續上一行的 <Q3>
 
   close_head
-  close_tags('l', 'lg', 'p', 'sp', 'cb:dialog', 'cb:event', 'form', 'cb:def', 'entry')
+  close_tags('l', 'lg', 'p', 'date', 'p', 'sp', 'cb:dialog', 'cb:event', 'form', 'cb:def', 'entry')
   $div_head = ''
 
   level = 0
