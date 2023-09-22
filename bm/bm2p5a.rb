@@ -6,6 +6,7 @@
 # 作者: 周邦信(Ray Chou) 2022-04-20
 #
 # Heaven 修改：
+# 2023-09-22 1.支援等寬的明體、楷體、黑體標記 mono-ming,mono-kai,mono-hei
 # 2023-09-21 1.支援 <date> 後面不再有 <p>，改成 <date> 裡面要自動加 <p>
 # 2023-06-12 1.支援 CC、CBETA 選集、CBETA Selected Collection
 # 2023-05-16 1.支援 <tag,1,2,bold,sup,..> 處理成 <tag rend="bold sup .." style="margin-left:1em; text-indent:2em;">
@@ -253,6 +254,12 @@ def inline_tag(tag)
   when '<ming>'    then out('<hi rend="mingti">')
   when '</ming>'   then out('</hi>')
   when /^<mj/      then start_inline_mj(tag)
+  when '<mono-hei>'    then out('<hi rend="mono-heiti">')
+  when '<mono-kai>'    then out('<hi rend="mono-kaiti">')
+  when '<mono-ming>'   then out('<hi rend="mono-mingti">')
+  when '</mono-hei>'   then out('</hi>')
+  when '</mono-kai>'   then out('</hi>')
+  when '</mono-ming>'  then out('</hi>')
   when '<no_chg>'  then out('<term cb:behaviour="no-norm">')
   when '</no_chg>' then out('</term>')
   when '<no-bold>'    then out('<hi rend="no-bold">')
@@ -1381,7 +1388,10 @@ def get_rend(tag_name, tag)
   # 明體：<ming>
   # 楷體：<kai>
   # 黑體：<hei>
-  tag.match(/,((ming)|(kai)|(hei))[,>]/) do
+  # 等寬明體：<mono-ming>
+  # 等寬楷體：<mono-kai>
+  # 等寬黑體：<mono-hei>
+  tag.match(/,(((mono\-)?ming)|((mono\-)?kai)|((mono\-)?hei))[,>]/) do
     rend << "#{$1}ti "
   end
   # 上標字：<sup>（不能跨行）
