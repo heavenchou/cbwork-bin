@@ -1897,7 +1897,7 @@ def read_source_line(line, laiyuan)
   return if fields.size < 5
 
   # 例: T0001-01-p0001
-  return unless fields[1].match?(/[A-Z]/)
+  return unless fields[1].match?(/[A-Z]{1,3}\d{3}/)
 
   # 藏經 ID 後 取5碼
   # ZY0001_01_p0017
