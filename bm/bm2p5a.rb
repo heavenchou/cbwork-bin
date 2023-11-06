@@ -6,6 +6,7 @@
 # 作者: 周邦信(Ray Chou) 2022-04-20
 #
 # Heaven 修改：
+# 2023-11-06 1.支援 <circle>,<tag,circle> 外框加圓圈
 # 2023-09-22 1.支援等寬的明體、楷體、黑體標記 mono-ming,mono-kai,mono-hei
 # 2023-09-21 1.支援 <date> 後面不再有 <p>，改成 <date> 裡面要自動加 <p>
 # 2023-06-12 1.支援 CC、CBETA 選集、CBETA Selected Collection
@@ -219,6 +220,8 @@ def inline_tag(tag)
   when '<border>'  then out('<hi rend="border">')
   when '</border>' then out('</hi>')
   when /<c[,\d\s>]/ then start_inline_c(tag) # <c> <c3> <c r3> <c,1> <c,bold>
+  when '<circle>'  then out('<hi rend="circle">')
+  when '</circle>' then out('</hi>')
   when '<d>'       then start_inline_d(tag)
   when '<date>'    then start_inline_date(tag)
   when '<del>'  then out('<hi rend="del">')
@@ -1415,6 +1418,10 @@ def get_rend(tag_name, tag)
   # 左框線：border-top（不能跨行）
   # 右框線：border-top（不能跨行）
   tag.match(/,(border\-((top)|(bottom)|(left)|(right)))[,>]/) do
+    rend << "#{$1} "
+  end
+  # 外框加圓圈：<circle>（不能跨行）
+  tag.match(/,(circle)[,>]/) do
     rend << "#{$1} "
   end
   # l 靠左 
