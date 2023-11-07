@@ -1341,11 +1341,11 @@ def get_style(tag_name, tag)
     m_num = '' if m_num == '1'
     t_num = '' if t_num == '0'
   end
-  # 2. <TL> 標記在 m=0 和 t=0 時則不呈現
-  if tag_name == "TL"
-    m_num = '' if m_num == '0'
-    t_num = '' if t_num == '0'
-  end
+  # 2. <TL> 標記在 m=0 和 t=0 時則不呈現 (lg 沒有 abnormal 了，所以取消這個規則)
+  # if tag_name == "TL"
+  #   m_num = '' if m_num == '0'
+  #   t_num = '' if t_num == '0'
+  # end
   # 3. <TL2>（第二組 TL）,<l> , <hi>, <seg>, 只有一組數字，要轉成 t 而不是 m
   if tag_name == "TL2" || tag_name == "l" || tag_name == "hi" || tag_name == "seg"
     if !m_num.empty? && t_num.empty?

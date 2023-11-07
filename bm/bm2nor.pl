@@ -16,6 +16,7 @@
 # Copyright (C) 1999-2023 Heaven Chou
 ########################################################################
 
+# 2023/11/07 支援 <circle> 標記
 # 2023/06/12 支援 CC、CBETA選集、CBETA Selected Collection
 # 2023/05/18 支援 <tag,1,2,bold,it> 等格式
 # 2023/04/05 支援 <[ABCEY],[crl]> 等格式 (c 置中，r 靠右，l 靠左)
@@ -2321,6 +2322,11 @@ s之後的第一個Ｐ：變成二個空格。（是否是不管之前的繼承�
 		if($thistag =~ /<\/?border>/)
 		{
 			s/<\/?border>//;
+			next;
+		}	
+		if($thistag =~ /<\/?circle>/)
+		{
+			s/<\/?circle>//;
 			next;
 		}	
 		if($thistag =~ /<㊣.*?>/)
