@@ -6,6 +6,7 @@
 # 作者: 周邦信(Ray Chou) 2022-04-20
 #
 # Heaven 修改：
+# 2024-03-07 1.支援 wavy 波浪線屬性，要搭配上橫線、下底線或刪除線使用。
 # 2023-11-06 1.支援 <circle>,<tag,circle> 外框加圓圈
 # 2023-09-22 1.支援等寬的明體、楷體、黑體標記 mono-ming,mono-kai,mono-hei
 # 2023-09-21 1.支援 <date> 後面不再有 <p>，改成 <date> 裡面要自動加 <p>
@@ -1405,7 +1406,12 @@ def get_rend(tag_name, tag)
   # 上橫線：<over>（不能跨行）
   # 下底線：<under>（不能跨行）
   # 刪除線：<del>（不能跨行）
+  # 波浪線：<wavy>（不能跨行）
   tag.match(/,((over)|(under)|(del))[,>]/) do
+    rend << "#{$1} "
+  end
+  # 波浪線：<wavy>（不能跨行）
+  tag.match(/,(wavy)[,>]/) do
     rend << "#{$1} "
   end
   # 外框：<border>（不能跨行）
