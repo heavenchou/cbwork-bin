@@ -12,17 +12,20 @@
 #
 # 設定檔：相關設定由 ../cbwork_bin.ini 取得
 #
-# Copyright (C) 1998-2023 CBETA
-# Copyright (C) 1999-2023 Heaven Chou
+# Copyright (C) 1998-2024 CBETA
+# Copyright (C) 1999-2024 Heaven Chou
 ########################################################################
 
-# 2023/11/07 支援 <circle> 標記
-# 2023/06/12 支援 CC、CBETA選集、CBETA Selected Collection
-# 2023/05/18 支援 <tag,1,2,bold,it> 等格式
-# 2023/04/05 支援 <[ABCEY],[crl]> 等格式 (c 置中，r 靠右，l 靠左)
-# 2023/04/04 支援 <p,c>, <p,r>, <Q1,c>, <Q1,r> 等格式 (c 置中，r 靠右)
-# 2023/04/01 忽略 <del>,<under>,<over> 標記
-# 2023/01/18 支援處理 <㊣X> 標記
+# 2024-13-10 1.支援 <sanot> 北印體標記，或 <hi,sanot>
+# 2024-03-10 處理 ⏑⏓ 這二個特殊字, 雖然大於 unicode 2.0 , 但要直接呈現
+# 2024-03-07 支援 <p,bold,kai> 這類標記
+# 2023-11-07 支援 <circle> 標記
+# 2023-06-12 支援 CC、CBETA選集、CBETA Selected Collection
+# 2023-05-18 支援 <tag,1,2,bold,it> 等格式
+# 2023-04-05 支援 <[ABCEY],[crl]> 等格式 (c 置中，r 靠右，l 靠左)
+# 2023-04-04 支援 <p,c>, <p,r>, <Q1,c>, <Q1,r> 等格式 (c 置中，r 靠右)
+# 2023-04-01 忽略 <del>,<under>,<over> 標記
+# 2023-01-18 支援處理 <㊣X> 標記
 ##########################################################
 # 2022/10/13 修改標記的判斷
 # 2022/03/31 數字不能用 \d 判斷了，要用 [0-9]，因為全型數字也會被視為 \d，但組字式有這種 [１２．] = ⒓
@@ -1854,7 +1857,7 @@ s之後的第一個Ｐ：變成二個空格。（是否是不管之前的繼承�
 		# 處理小寫的 p 標記 (<p,x,y> , x : 整段縮排, y : 行首縮排)
 		# <p,c> <p,r> <p,x,y,c> <p,c,x,y> c: 置中, r: 靠右
 
-		if($thistag =~ /<p(?:,[cr])?,?(-?[\d\.]*),?(-?[\d\.]*)(?:,[cr])?>/)	
+		if($thistag =~ /<p(?:,[a-z]*)?,?(-?[\d\.]*),?(-?[\d\.]*)(?:,[a-z]*)?>/)	
 		{
 			$smallp1 = $1;
 			$smallp2 = $2;
@@ -1875,7 +1878,7 @@ s之後的第一個Ｐ：變成二個空格。（是否是不管之前的繼承�
 			$myspace = 1 if($myspace == 0 and $pretagtmp ne "" and $pretagtmp !~ /$fullspace$/);
 			
 			my $space = "　" x $myspace;
-			s/<p(?:,[cr])?,?(-?[\d\.]*),?(-?[\d\.]*)(?:,[cr])?>/$space/;
+			s/<p(?:,[a-z]*)?,?(-?[\d\.]*),?(-?[\d\.]*)(?:,[a-z]*)?>/$space/;
 			
 			# <p> 在行中, 所以先處理空格, 再處理繼承
 			
@@ -2156,9 +2159,10 @@ s之後的第一個Ｐ：變成二個空格。（是否是不管之前的繼承�
 		}
 		# 忽略 <del>,<under>,<over> 標記
 		# 忽略 <it> <bold> <kai> <ming> <hei> <song>
-		if($thistag =~ /<\/?((it)|(bold)|(no\-it)|(no\-bold)|(kai)|(ming)|(hei)|(song)|(del)|(under)|(over)|(larger)|(smaller))>/)
+		# 忽略 <sanot>
+		if($thistag =~ /<\/?((it)|(bold)|(no\-it)|(no\-bold)|(kai)|(ming)|(hei)|(song)|(del)|(under)|(over)|(larger)|(smaller)|(sanot))>/)
 		{
-			s/<\/?((it)|(bold)|(no\-it)|(no\-bold)|(kai)|(ming)|(hei)|(song)|(del)|(under)|(over)|(larger)|(smaller))>//;
+			s/<\/?((it)|(bold)|(no\-it)|(no\-bold)|(kai)|(ming)|(hei)|(song)|(del)|(under)|(over)|(larger)|(smaller)|(sanot))>//;
 			next;
 		}
 		
@@ -2788,7 +2792,7 @@ sub select_normal
 					$out .= $word;		# 直接呈現 $word
 					next;
 				}
-				elsif($word =~ /[ȧ]/)
+				elsif($word =~ /[ȧ⏑⏓]/)
 				{
 					# 特殊字, 直接呈現
 					$out .= $word;		# 直接呈現 $word

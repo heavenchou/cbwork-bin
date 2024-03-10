@@ -6,6 +6,7 @@
 # 作者: 周邦信(Ray Chou) 2022-04-20
 #
 # Heaven 修改：
+# 2024-13-10 1.支援 <sanot> 北印體標記，或 <hi,sanot>
 # 2024-03-07 1.支援 wavy 波浪線屬性，要搭配上橫線、下底線或刪除線使用。
 # 2023-11-06 1.支援 <circle>,<tag,circle> 外框加圓圈
 # 2023-09-22 1.支援等寬的明體、楷體、黑體標記 mono-ming,mono-kai,mono-hei
@@ -294,6 +295,8 @@ def inline_tag(tag)
   when '</S>'
 		$normal_lg = false
 		close_tags('l','lg')
+  when '<sanot>'  then out('<hi rend="sanot">')
+  when '</sanot>' then out('</hi>')
   when '<sd>'
     out('<term xml:lang="sa-Sidd">')
     $opens['term'] = 1
@@ -1397,6 +1400,10 @@ def get_rend(tag_name, tag)
   # 等寬黑體：<mono-hei>
   tag.match(/,(((mono\-)?ming)|((mono\-)?kai)|((mono\-)?hei))[,>]/) do
     rend << "#{$1}ti "
+  end
+  # 北印體 <sanot>
+  tag.match(/,(sanot)[,>]/) do
+    rend << "#{$1} "
   end
   # 上標字：<sup>（不能跨行）
   # 下標字：<sub>（不能跨行）
