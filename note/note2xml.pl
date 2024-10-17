@@ -49,7 +49,7 @@ elsif($ed eq "B")
 }
 elsif($ed eq "G")
 {
-	$source_ename = "Fojiao";		# resp="xxx" 的名稱
+	$source_ename = "FoJiao";		# resp="xxx" 的名稱
 	$source_cname = "佛教";			#<rdg wit="xxxx"> 的名稱
 }
 elsif($ed eq "GA")
