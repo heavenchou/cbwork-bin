@@ -3,6 +3,7 @@
 # 格式介紹在最底下
 #
 # 修訂記錄：
+# 2024/10/17 : 加入 佛教大藏經 的資料
 # 2023/04/06 : 處理 <c,2> => <cell rend="pl-2">、處理 <bold>, <it> .... 等格式
 # 2020/06/01 : 加入 ZW 藏外的資料
 # 2019/12/25 : 更換缺字處理模組, 修訂取消 <app> 和 <choice>
@@ -45,6 +46,11 @@ elsif($ed eq "B")
 {
 	$source_ename = "BuBian";		# resp="xxx" 的名稱
 	$source_cname = "補編";			#<rdg wit="xxxx"> 的名稱
+}
+elsif($ed eq "G")
+{
+	$source_ename = "Fojiao";		# resp="xxx" 的名稱
+	$source_cname = "佛教";			#<rdg wit="xxxx"> 的名稱
 }
 elsif($ed eq "GA")
 {
