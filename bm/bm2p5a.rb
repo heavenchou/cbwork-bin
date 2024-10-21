@@ -6,7 +6,8 @@
 # 作者: 周邦信(Ray Chou) 2022-04-20
 #
 # Heaven 修改：
-# 2024-13-10 1.支援 <sanot> 北印體標記，或 <hi,sanot>
+# 2024-10-22 1.支援 <small>, <large>
+# 2024-03-10 1.支援 <sanot> 北印體標記，或 <hi,sanot>
 # 2024-03-07 1.支援 wavy 波浪線屬性，要搭配上橫線、下底線或刪除線使用。
 # 2023-11-06 1.支援 <circle>,<tag,circle> 外框加圓圈
 # 2023-09-22 1.支援等寬的明體、楷體、黑體標記 mono-ming,mono-kai,mono-hei
@@ -254,6 +255,8 @@ def inline_tag(tag)
   when /<L_sp/    then start_inline_L(tag)
   when '</l>'     then close_tags('l')  # 行首標記有 S 及 s 時, 會在行中自動將空格變成 <l></l></lg> 等標記
   when '</L>'     then close_L(tag)
+  when '<large>'  then out('<hi rend="large">')
+  when '</large>' then out('</hi>')
   when '<larger>'  then out('<hi rend="larger">')
   when '</larger>' then out('</hi>')
   when '<ming>'    then out('<hi rend="mingti">')
@@ -303,6 +306,8 @@ def inline_tag(tag)
   when '</sd>' then close_tags('term')
   when /<seg[,>]/ then start_inline_seg(tag)
   when '</seg>' then out('</seg>')
+  when '<small>'    then out('<hi rend="small">')
+  when '</small>'   then out('</hi>')
   when '<smaller>'    then out('<hi rend="smaller">')
   when '</smaller>'   then out('</hi>')
   when '<space quantity="0"/>' then out2(tag)
