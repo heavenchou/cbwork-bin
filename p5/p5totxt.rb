@@ -4,6 +4,7 @@
 # 作者: 周邦信(Ray Chou) 2022-04-09
 #
 # Heaven 修改：
+# 2024-04-27 支援 -p 段落格式，-n 呈現 Unicode （若無 -z 則優先使用unicode通用字，其次一般通用字)
 # 2022-04-12 Heaven 修改比對完成
 
 require 'fileutils'
@@ -90,6 +91,16 @@ def e_anchor(e)
   ''
 end
 
+def e_byline(e)
+  r = traverse(e)
+  r = "\n\n" + r if $opts[:para_format]
+  r
+end
+
+def e_cell(e)
+  "　" + traverse(e)
+end
+
 def e_g(e)
   ref = e['ref'].sub(/^#(.*)$/, '\1')
   if ref.start_with?('SD') or ref.start_with?('RJ')
@@ -106,6 +117,16 @@ def e_g(e)
     end
   end
 
+  # 優先使用通用字，其次通用 unicode
+  if $opts[:unicode]
+    if $unicode.key?(ref)
+      return $unicode[ref]
+    end
+    if not $opts[:no_nor] and $normal_unicode.key?(ref) and $no_nor == 0
+      return $normal_unicode[ref]
+    end
+  end
+
   if not $opts[:no_nor] and $gaiji_normal.key?(ref) and $no_nor == 0
     return $gaiji_normal[ref]
   end
@@ -119,13 +140,28 @@ end
 
 def e_head(e)
   return '' if e['type'] =='added'
-  traverse(e)
+  r = traverse(e)
+  r = "\n\n" + r if $opts[:para_format]
+  r
 end
 
 def e_item(e)
   r = ''
+  r += "\n" if $opts[:para_format]
   r += e['n'] if e.key?('n')
   r + traverse(e)
+end
+
+def e_jhead(e)
+  r = traverse(e)
+  r = "\n\n" + r if $opts[:para_format]
+  r
+end
+
+def e_l(e)
+  r = traverse(e)
+  r = "\n" + r if $opts[:para_format]
+  r
 end
 
 def e_lb(e)
@@ -134,10 +170,13 @@ def e_lb(e)
   return '' if e.key?('ed') and e['ed'].start_with?('R')
   return '' if e['type'] == "old"
 
-  r = "\n#{$vol}n#{$sutra_no}"
+  r = ""
+  if !$opts[:para_format]
+    r += "\n#{$vol}n#{$sutra_no}"
 
-  r += '_' if $sutra_no.size < 5
-  r += "p#{$lb}║"
+    r += '_' if $sutra_no.size < 5
+    r += "p#{$lb}║"
+  end
   r += $next_line_buf
   $next_line_buf = ''
 
@@ -150,6 +189,12 @@ def e_lg(e)
   type = e['subtype']
   return "(#{r})" if type=='note2' or type=='note1'
 
+  r
+end
+
+def e_list(e)
+  r = traverse(e)
+  r = "\n" + r if $opts[:para_format]
   r
 end
 
@@ -178,9 +223,22 @@ def e_local_name(id, node)
   end
 end
 
+def e_mapping_unicode(id, node)
+  # <mapping type="unicode">U+47FD</mapping>
+  if node['type'] == 'unicode'
+    u = node.text[2..-1]
+    $unicode[id] = [u.to_i(16)].pack('U')
+  end
+  # <mapping type="normal_unicode">U+28114</mapping>
+  if node['type'] == 'normal_unicode'
+    u = node.text[2..-1]
+    $normal_unicode[id] = [u.to_i(16)].pack('U')
+  end
+end
+
 def e_milestone(e)
   if e['unit'] == 'juan' and $opts[:split_by_juan]
-    return "\njuan #{e['n']}"
+    return "\njuan #{e['n']}\n"
   end
   ''
 end
@@ -200,6 +258,12 @@ def e_note(e)
   traverse(e)
 end
 
+def e_p(e)
+  r = traverse(e)
+  r = "\n\n" + r if $opts[:para_format]
+  r
+end
+
 def e_ref(e)
   # 漢譯南傳大藏經 : <ref target="#PTS.Vin.3.2"></ref> (舊版)
   # 漢譯南傳大藏經 : <ref cRef="PTS.Vin.3.2"></ref> (新版 2018/08/18)
@@ -217,6 +281,12 @@ def e_ref(e)
   traverse(e)
 end
 
+def e_row(e)
+  r = traverse(e)
+  r = "\n" + r if $opts[:para_format]
+  r
+end
+
 def e_t(e)
   content = traverse(e)
 
@@ -230,6 +300,12 @@ def e_t(e)
 
   $next_line_buf += content
   ''
+end
+
+def e_table(e)
+  r = traverse(e)
+  r = "\n" + r if $opts[:para_format]
+  r
 end
 
 def e_term(e)
@@ -366,17 +442,26 @@ def handle_node(e)
 
   r = case e.name
   when 'anchor' then e_anchor(e)
+  when 'byline'      then e_byline(e)
+  when 'caesura'      then '　　'
+  when 'cell'      then e_cell(e)
   when 'figure' then '【圖】'
   when 'g'      then e_g(e)
   when 'head'   then e_head(e)
   when 'item'   then e_item(e)
+  when 'jhead'   then e_jhead(e)
+  when 'l'      then e_l(e)
   when 'lb'     then e_lb(e)
   when 'lg'     then e_lg(e)
+  when 'list'     then e_list(e)
   when 'milestone' then e_milestone(e)
   when 'mulu'   then ''
   when 'note'   then e_note(e)
+  when 'p'      then e_p(e)
+  when 'row'      then e_row(e)
   when 'sg'     then '(' + traverse(e) + ')'
   when 't'      then e_t(e)
+  when 'table'      then e_table(e)
   when 'unclear' then e_unclear(e)
   when 'ref'     then e_ref(e)
   when 'term'    then e_term(e)
@@ -468,11 +553,16 @@ def read_char_info(doc)
   $siddham = {}
   $siddham_big5 = {}
   $gaiji_normal = {}
+  $unicode = {}
+  $normal_unicode = {}
 
   doc.xpath('//charDecl/char').each do |e|
     id = e['id']
     e.xpath('.//localName').each do |n|
       e_local_name(id, n)
+    end
+    e.xpath('mapping').each do |n|
+      e_mapping_unicode(id, n)
     end
   end
 end
@@ -484,6 +574,8 @@ def read_command_line_arguments
     o.bool '-k', '--footnote-anchor', '顯示校勘符號'
     o.bool '-u', '--split-by-juan', "一卷一檔, 預設是一經一檔"
     o.bool '-z', '--no-nor', '不使用通用字'
+    o.bool '-p', '--para-format', '段落呈現'
+    o.bool '-n', '--unicode', '使用 unicode'
     o.string '-v', '--vol', "指定要轉換哪一冊"
     o.integer "-x", "--siddham", "悉曇字呈現方法: 0=轉寫(預設), 1=entity &SD-xxxx, 2=◇【◇】", default: 0
   end
@@ -539,7 +631,7 @@ def split_by_juan(source, folder_out)
       juan_txt = header # 新的一卷的起始內容
       next
     else
-      juan_txt += line unless line == "\n"
+      juan_txt += line unless line == "\n" && !$opts[:para_format]
     end
   end
   

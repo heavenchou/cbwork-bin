@@ -1009,7 +1009,7 @@ class P5aToP5Converter
     text.each_codepoint do |code|
       c = text[i]
       if @unihan.ver(code) > 2.0
-        if code == 0x227  # 特例 ȧ
+        if code == 0x227 || code == 0x23D1 || code == 0x23D3  # 特例 ȧ⏑⏓
           r += c
         else
           hex = '%X' % code
@@ -1021,10 +1021,13 @@ class P5aToP5Converter
             r += %(<g ref="##{cb}">#{c}</g>)
           end
           
-            if cb.nil?
-              puts r
-            end
-          @gaijis << cb
+          if cb.nil?
+            puts "error:找不到 CB 「#{c}」 在「#{r}」"
+            puts "任意鍵繼續..."
+            STDIN.gets
+          else
+            @gaijis << cb
+          end
         end
       else
         r += c
