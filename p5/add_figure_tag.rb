@@ -30,31 +30,36 @@ def run(input_dir)
     # 讀取檔案
     lines = File.readlines(file_path, encoding: 'UTF-8')
 
-      # 逐行處理
-      modified_lines = lines.map do |line|
-        # 初始化流水號
+    # 初始化流水號
+    counter = 1
+    # 逐行處理
+    modified_lines = lines.map do |line|
+
+      # 流水號歸 1
+      if line.match(/<pb .*?>/)
         counter = 1
-
-        # <lb ed="GA" n="b003a01"/>
-        page = "xxx"
-        if line.match(/<lb.*?n="(....)/)
-          page = $1
-        end
-
-        # 使用 gsub 的區塊功能來替換 "【圖】"
-        line.gsub("【圖】") do
-          # 格式化流水號為兩位數字
-          graphic_number = format('%02d', counter)
-          counter += 1
-          if page.size != 4
-            puts "行首 <lb> 有誤，找不到行號：#{line}"
-            puts "按 enter 繼續"
-            gets
-          end
-          # 生成替換字串
-          "<figure><graphic url=\"../figures/#{ed}/#{input_dir}p#{page}_#{graphic_number}.gif\"/></figure>"
-        end
       end
+
+      # <lb ed="GA" n="b003a01"/>
+      page = "xxx"
+      if line.match(/<lb.*?n="(....)/)
+        page = $1
+      end
+
+      # 使用 gsub 的區塊功能來替換 "【圖】"
+      line.gsub("【圖】") do
+        # 格式化流水號為兩位數字
+        graphic_number = format('%02d', counter)
+        counter += 1
+        if page.size != 4
+          puts "行首 <lb> 有誤，找不到行號：#{line}"
+          puts "按 enter 繼續"
+          gets
+        end
+        # 生成替換字串
+        "<figure><graphic url=\"../figures/#{ed}/#{input_dir}p#{page}_#{graphic_number}.gif\"/></figure>"
+      end
+    end
 
     # 取得檔名並寫入 output 目錄
     file_name = File.basename(file_path)
