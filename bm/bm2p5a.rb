@@ -6,6 +6,7 @@
 # 作者: 周邦信(Ray Chou) 2022-04-20
 #
 # Heaven 修改：
+# 2024-11-09 1.支援經號為 a 開頭的說明文件
 # 2024-10-22 1.支援 <small>, <large>
 # 2024-03-10 1.支援 <sanot> 北印體標記，或 <hi,sanot>
 # 2024-03-07 1.支援 wavy 波浪線屬性，要搭配上橫線、下底線或刪除線使用。
@@ -1915,7 +1916,7 @@ def read_source_line(line, laiyuan)
   return if fields.size < 5
 
   # 例: T0001-01-p0001
-  return unless fields[1].match?(/[A-Z]{1,3}\d{3}/)
+  return unless fields[1].match?(/[A-Z]{1,3}a?\d{3}/)
 
   # 藏經 ID 後 取5碼
   # ZY0001_01_p0017
