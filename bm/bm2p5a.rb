@@ -6,6 +6,7 @@
 # 作者: 周邦信(Ray Chou) 2022-04-20
 #
 # Heaven 修改：
+# 2025-01-30 1.支援新的 XML 檔頭，詳見新的 p5a-template.xml
 # 2024-11-09 1.支援經號為 a 開頭的說明文件
 # 2024-10-22 1.支援 <small>, <large>
 # 2024-03-10 1.支援 <sanot> 北印體標記，或 <hi,sanot>
@@ -1754,6 +1755,14 @@ def close_sutra(num)
   n = num.delete_prefix('n')
   n0 = n.sub(/^0*(.*)$/, '\1')
   title = $sutras[n]['title']
+  sourcedesc = $sutras[n]['sourcedesc']
+  if sourcedesc.nil?
+    sourcedesc = $collection_zh[$canon]
+  end
+  punctuation = $sutras[n]['punctuation']
+  if punctuation.nil?
+    punctuation = '原書標點'
+  end
 
   data = {
     id: "#{$vol}#{num}",
@@ -1767,6 +1776,8 @@ def close_sutra(num)
     bibl_s: $collection_en[$canon],
     bibl_s_zh: $collection_zh[$canon],
     bibl_m: $sutras[n]['title'],
+    sourcedesc: sourcedesc,
+    punctuation: punctuation,
     laiyuan_e: $sutras[n]['laiyuan_e'],
     laiyuan_c: $sutras[n]['laiyuan_c'],
     wit: WITS[$canon],
@@ -1890,7 +1901,29 @@ def convert_line(s)
   #do_tag_s(text)
   do_text(text)
 end
-  
+
+# teiheader.json 格式為
+# {
+# "0001":{"sourcedesc":"《比丘尼傳暨續比丘尼傳》（大千出版社，2006）","punctuation":"原書標點"}
+# }
+# 要全部轉成
+# $sutras['0001']['sourcedesc'] = "《比丘尼傳暨續比丘尼傳》"
+# $sutras['0001']['punctuation'] = "原書標點"
+
+def read_teiheader
+  teiheader_file = File.join($bm_dir, $canon, $vol, "teiheader.json")
+  # 判斷檔案是否存在
+  if File.exists?(teiheader_file)
+    teiheader = JSON.load_file(teiheader_file)
+    teiheader.each do |k, v|
+      # 第一組 "type":"CC" 是不需要的, 所以要過濾掉
+      next if k == "type"
+      $sutras[k]['sourcedesc'] = v['sourcedesc']
+      $sutras[k]['punctuation'] = v['punctuation']
+    end
+  end
+end
+
 def read_source
   bm_laiyuan = File.join($bm_dir, $canon, $vol, "source.txt")
   laiyuan = {}
@@ -1945,7 +1978,7 @@ def read_source_line(line, laiyuan)
   $sutras[n]['laiyuan_c'] = a1.join('，')
   $sutras[n]['laiyuan_e'] = a2.join(', ')
 end
-  
+
 def read_all_gaijis
   base = $config['default']['gaiji']
   if base == nil
@@ -2033,4 +2066,5 @@ read_config
 read_all_gaijis
 
 read_source
+read_teiheader
 convert
