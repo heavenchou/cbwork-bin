@@ -27,6 +27,9 @@ if($argv eq "nav")
     $infile = "/cbwork/bin/cbreader2x/nav/__bulei_nav_gaiji.xhtml";
     $outfile = "/cbwork/bin/cbreader2x/nav/bulei_nav.xhtml"; 
     runfile();
+    $infile = "/cbwork/bin/cbreader2x/nav/__SutraList_gaiji.json";
+    $outfile = "/cbwork/bin/cbreader2x/nav/SutraList.json"; 
+    runfile();
 }
 elsif($argv eq "nav_see")
 {

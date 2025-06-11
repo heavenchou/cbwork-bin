@@ -7,8 +7,8 @@ use utf8;
 use Cwd;
 use strict;
 
-my $SourcePath = "d:/cbeta.www/download/epub/cbeta_epub_2023q3";			# 初始目錄, 最後不用加斜線 /
-my $OutputPath = "d:/cbeta.www/download/mobi/cbeta_mobi_2023q3";		# 目地初始目錄, 如果有需要的話. 最後不用加斜線 /
+my $SourcePath = "d:/cbeta.www/download/epub/cbeta_epub_2025r1";			# 初始目錄, 最後不用加斜線 /
+my $OutputPath = "d:/cbeta.www/download/mobi/cbeta_mobi_2025r1";		# 目地初始目錄, 如果有需要的話. 最後不用加斜線 /
 # $SourcePath = "d:/cbwork/cbeta-api/public/download/epub";			# 初始目錄, 最後不用加斜線 /
 # $OutputPath = "d:/cbwork/cbeta-api/public/download/mobi";		# 目地初始目錄, 如果有需要的話. 最後不用加斜線 /
 my $MakeOutputPath = 1;		# 1 : 產生對應的輸出目錄
@@ -83,7 +83,7 @@ sub SearchFile
 	# SimSun
 
 	#my $cmd = "\"c:/Program Files/Calibre2/ebook-convert.exe\" $file $outfile --paper-size a4 --pdf-serif-family DFKai-SB --pdf-mono-family DFKai-SB --pdf-sans-family DFKai-SB --pdf-standard-font serif --input-encoding UTF-8 --uncompressed-pdf --embed-all-fonts --subset-embedded-fonts";
-	my $cmd = "\"c:/App/Calibre5.14/Calibre Portable/Calibre/ebook-convert.exe\" $file $outfile --mobi-file-type both";
+	my $cmd = "\"c:/App/Calibre5.14/Calibre Portable/Calibre/ebook-convert.exe\" $file $outfile --mobi-file-type both --filter-css color,background-color";
 
 	print $cmd . "\n";
 	system($cmd);

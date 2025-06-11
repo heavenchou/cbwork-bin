@@ -455,7 +455,7 @@ eos
     end
 
     unless @next_line_buf.empty?
-      r += @next_line_buf
+      r += "<br/>" + @next_line_buf + "<br/>"
       @next_line_buf = ''
     end
     r
@@ -781,7 +781,7 @@ eos
     # 所以要逐字檢查是否在 Unicode 2.0 範圍裡
     r = ''
     s.each_char do |c|
-      if @us.level1?(c)
+      if @us.level1?(c) || c == '⏑' || c == '⏓'
         r += c
       else
         cb = @gaijis.unicode_to_cb(c)
@@ -914,11 +914,21 @@ eos
     @pass = [false]
 
     doc = open_xml(xml_fn)
-        
-    e = doc.xpath("//titleStmt/title")[0]
-    @title = traverse(e, 'txt')
-    @title = @title.split()[-1]
-    
+    @title = ''
+
+    # 2025.R1 新版 XML
+    e = doc.at_xpath("//titleStmt/title[@lang='zh-Hant'][@level='m']")
+    @title = traverse(e, 'txt') if e
+
+    if @title.nil? || @title.empty?
+      # 舊版 XML，2024.R3 以及之前版本
+      puts "error, no title!"
+      STDIN.gets
+      e = doc.xpath("//titleStmt/title")[0]
+      @title = traverse(e, 'txt')
+      @title = @title.split().last
+    end
+
     node = doc.at_xpath("//titleStmt/author")
     @author = node.nil? ? '' : node.text
     
@@ -990,8 +1000,22 @@ eos
       add_xhtml('back', 'back.xhtml')
     end
     
-    src = File.join(@settings[:template], 'epub.css')
+    src = File.join(@settings[:template], 'cbeta.css')
     copy_oebps_file(src, 'cbeta.css')
+    src = File.join(@settings[:template], 'cbeta_logo.png')
+    copy_oebps_file(src, 'cbeta_logo.png')
+    src = File.join(@settings[:template], 'mail24t.png')
+    copy_oebps_file(src, 'mail24t.png')
+    src = File.join(@settings[:template], 'call24t.png')
+    copy_oebps_file(src, 'call24t.png')
+    src = File.join(@settings[:template], 'home24t.png')
+    copy_oebps_file(src, 'home24t.png')
+    src = File.join(@settings[:template], 'online24t.png')
+    copy_oebps_file(src, 'online24t.png')
+    src = File.join(@settings[:template], 'volunteer24t.png')
+    copy_oebps_file(src, 'volunteer24t.png')
+    src = File.join(@settings[:template], 'qrcode.png')
+    copy_oebps_file(src, 'qrcode.png')
     
     template = File.read(File.join(@settings[:template], 'content.opf.erb'))
     renderer = ERB.new(template)

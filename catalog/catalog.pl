@@ -7,13 +7,13 @@
 
 use utf8;
 use File::Copy;
-use Win32::ODBC;
+#use Win32::ODBC;
 
 ##################################################################
 # 常數
 ##################################################################
 
-my $xml_path = "c:/cbwork/xml-p5";		# xml 經文的目錄
+my $xml_path = "d:/cbwork/xml-p5";		# xml 經文的目錄
 
 ##################################################################
 # 變數
@@ -42,6 +42,7 @@ foreach $vol (sort(@vols))
 	$vol =~ /^(\D+)(.*)/;
 	$book = $1;
 	$volnum = $2;
+	print $vol . "\n";
 	dodir($vol);
 }
 
@@ -83,7 +84,7 @@ sub dodir
 	my @allfiles = grep(/^${vol}n.{4,5}\.xml$/i, readdir(INDIR));
 	closedir INDIR;
 	
-	open JUAN , ">juandata/${vol}.txt" || die "open $vol juan line error!";
+	open JUAN , ">:utf8", "juandata/${vol}.txt" || die "open $vol juan line error!";
 	foreach $file (sort @allfiles)
 	{
 		do1file($dir . $file);
@@ -113,9 +114,9 @@ sub do1file
 	while (<IN>)
 	{
 		# <title>Taisho Tripitaka, Electronic version, No. 0001 長阿含經</title>
-		if (/<title>.*No. ([AB]?)(\d+)([A-Za-z])?\s*(\S.*)<\/title/)
+		if (/<title>.*No. ([ABa]?)(\d+)([A-Za-z])?\s*(\S.*)<\/title/)
 		{
-			my $j = $1;			# 嘉興藏特有經號
+			my $j = $1;			# AB 嘉興藏特有經號,a 新增經號
 			my $num  = $2;		# 經號
 			my $other = $3;		# 別本
 			$name = $4;			# 經名
@@ -171,22 +172,30 @@ sub do1file
 	# 接著讀取各卷的資料 #########################################
 	
 	my $juan_count = 0;		# 卷的數量
+	my $find_milestone = 0;
+	my $ms = 0;
 	while (<IN>)
 	{
 		# <lb n="0001a02" ed="T"/>
 		if (/^<lb\s[^>]*n="(\w{7})"/)
 		{
 			$lb = $1;
+
+			if($find_milestone == 1) {
+				# 列出每一卷的開頭頁欄行
+				print JUAN "${vol}n${number},$book,$volnum,$number,$juan_count,$ms,$lb\n";
+				$find_milestone = 0;
+			}
 		}
 		
 		# <milestone unit="juan" n="10"/> , <milestone n="1" unit="juan"/>
 		if (/<milestone\s[^>]*n="(.*?)"/)
 		{
-			my $ms = $1;
+			$ms = $1;
 			$juan_count++;
 			$normal_juan = 0 if($juan_count != $ms);	# 若卷數不同, 就表示為不連續卷
-			
-			print JUAN "${vol}n${number},$book,$volnum,$number,$juan_count,$ms,$lb\n";		# 列出每一卷的開頭頁欄行
+
+			$find_milestone = 1;
 		}
 	}
 	

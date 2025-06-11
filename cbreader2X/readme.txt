@@ -13,6 +13,8 @@
     6. 產生經文目錄 catalog  ----> 手動處理大般若經, 部別, <g> 缺字
     7. 產生經文流水順序 spine
     8. 別忘了要做新增經文的 epub 封面圖檔
+	9. 依更新流程，通知 Authority 需更新的佛典資訊
+	   https://docs.google.com/document/d/1Zd9XYobPY8hDEahxiiIJwc-aAz8OIGoWgiZwsv0r4hI/edit
 
 其中 sutralist , catalog 的資料都要同時包含跨冊的記錄, 例如
 
@@ -61,14 +63,14 @@ catalog 雖然有多份, 但都連結到同一卷嗎? 例 點 A121n1565 經, 要
 
 	西蓮專案不用
 
-■ 產生導覽目錄 nav
+■ 產生導覽目錄 nav 以及 全文檢索單經範圍列表 SutraList.json
 
-	若有新的典籍加入，要處理 simple_nav.xlsx, advance_nav.xlsx , 並貼成對應的純文字檔
+	若有新的典籍加入，要處理 simple_nav.xlsx , advance_nav.xlsx , SutraList.xlsx , 並貼成對應的純文字檔
 	西蓮專案則是 seeland_nav.xlsx
 
 	【執行 nav.bat , 西蓮版執行 nav.bat -see】
 	
-	產生如下三個檔案
+	產生如下四個檔案
 	
 	1. bulei_nav.xhtml
 
@@ -80,13 +82,14 @@ catalog 雖然有多份, 但都連結到同一卷嗎? 例 點 A121n1565 經, 要
 	3. simple_nav.xhtml
 
 	以原書結構為主的經目樹狀列表
+
+	4. SutraList.json
+
+	這是全文檢索單經範圍的列表
 	
 	這是有經過缺字處理的版本
 
 ■ 產生各經的目錄 toc
-
-	（不需要了）重要 : 因為 mac 在 parser XML 時, 標記中的第一個字不能是 unicode ext-b 的字, 
-	因此最好全部空一格. 目前這是在 gaiji2word 步驟遇缺字才處理, 未來應該在產生時全部統一處理.
 
 	【執行 toc.bat 可看參數】
 	toc.bat -a 全部執行

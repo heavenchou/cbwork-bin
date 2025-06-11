@@ -316,6 +316,8 @@ Unicode 12.0：2019年3月
 Unicode 12.1：2019年5月 https://www.unicode.org/versions/Unicode12.1.0/
 Unicode 13.0：2020年3月10日 https://www.unicode.org/versions/Unicode13.0.0/
 Unicode 14.0：2021年9月14日 https://www.unicode.org/versions/Unicode14.0.0/
+Unicode 15.0：2022年9月13日 https://www.unicode.org/versions/Unicode15.0.0/
+Unicode 15.1：2023年9月12日 https://www.unicode.org/versions/Unicode15.1.0/
 
 # 底下用這符號■開頭的是來自 http://ubuntu-rubyonrails.blogspot.tw/2009/06/unicode.html
 # 詳細資料
@@ -477,6 +479,7 @@ Unicode 14.0：2021年9月14日 https://www.unicode.org/versions/Unicode14.0.0/
 
 #2A700～2B734：CJK Unified Ideographs Extension C 中日韓統一表意文字擴展 C 區 (4149 字, Unicode 5.2 , 2009)
 #2B735～2B738：CJK Unified Ideographs Extension C 中日韓統一表意文字擴展 C 區 (4 字, Unicode 14.0 , 2021)
+#2B739：CJK Unified Ideographs Extension H 中日韓統一表意文字擴展 H 區 (1 字, Unicode 15.0 , 2022)
 
 #2B740～2B81D：CJK Unified Ideographs Extension D 中日韓統一表意文字擴展 D 區 (222 字, Unicode 6.0 , 2010)
 
@@ -484,9 +487,13 @@ Unicode 14.0：2021年9月14日 https://www.unicode.org/versions/Unicode14.0.0/
 
 #2CEB0～2EBE0：CJK Unified Ideographs Extension F 中日韓統一表意文字擴展 F 區 (7473 字, Unicode 10.0 , 2017)
 
+#2EBF0～2EE5D：CJK Unified Ideographs Extension I 中日韓統一表意文字擴展 I 區 (622 字, Unicode 15.1 , 2023)
+
 #2F800～2FA1D：CJK Compatibility Ideographs Supplement 相容表意字補充 - 台灣的相容漢字 (542 字, Unicode 3.1 , 2001)
 
 #30000～3134A：CJK Unified Ideographs Extension G 中日韓統一表意文字擴展 G 區 (4939 字, Unicode 13.0 , 2020)
+
+#31350～323AF：CJK Unified Ideographs Extension H 中日韓統一表意文字擴展 H 區 (4192 字, Unicode 15.0 , 2022)
   
 =cut
 
@@ -2030,11 +2037,15 @@ sub get_unicode_ver
 	return "14.0" if($uni >= 0x2A6DE and $uni <= 0x2A6DF);
 	return "5.2" if($uni >= 0x2A700 and $uni <= 0x2B734);
 	return "14.0" if($uni >= 0x2B735 and $uni <= 0x2B738);
+	return "15.0" if($uni == 0x2B739);
 	return "6.0" if($uni >= 0x2B740 and $uni <= 0x2B81D);
 	return "8.0" if($uni >= 0x2B820 and $uni <= 0x2CEA1);
 	return "10.0" if($uni >= 0x2CEB0 and $uni <= 0x2EBE0);
+	return "15.1" if($uni >= 0x2EBF0 and $uni <= 0x2EE5D);
+
 	return "3.1" if($uni >= 0x2F800 and $uni <= 0x2FA1D);
 	return "13.0" if($uni >= 0x30000 and $uni <= 0x3134A);
+	return "15.0" if($uni >= 0x31350 and $uni <= 0x323AF);
 
 	return "2.0" if($uni >= 0x2FFFE and $uni <= 0x2FFFF);
 	return "2.0" if($uni >= 0x3FFFE and $uni <= 0x3FFFF);

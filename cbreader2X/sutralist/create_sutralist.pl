@@ -106,6 +106,7 @@ sub SearchFile
 	my $file = shift;
 	my $findbody = 0;	# 找到 <body> 才設為 1, 才開始檢查 <lb> , 以免查到註解中的 <lb>
 	my $name = "";	# 經名
+	my $name2 = "";	# 經名
 	my $byline = "";	# 作譯者
 	my $book = "";	# 藏經 T
 	my $volnum = ""; 	# 冊數 01
@@ -212,17 +213,17 @@ sub SearchFile
 			# <title level="m" xml:lang="zh-Hant">般泥洹經</title>
 			if(/<title level="m" xml:lang="zh-Hant">(.*?)<\/title>/)
 			{
-				my $n = $1;
-				if($name ne $n)
-				{
-					print STDERR "error : name ne n : $name $n\n";
-					<>;
-				}
+				$name2 = $1;
 				$new_xml_head_count++;
 			}
 		}
 		if($findbody == 1)
 		{
+			if($name ne $name2)
+			{
+				print STDERR "error : name ne name2 : $name vs $name2\n";
+				<>;
+			}
 			if($new_xml_head_count != 4)
 			{
 				print STDERR "new XML head error, count != 4: $new_xml_head_count\n";

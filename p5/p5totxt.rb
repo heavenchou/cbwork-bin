@@ -414,7 +414,17 @@ def get_jk_mark(e)
 
   # jk = jk[-3:]
   # note_orig 也會有 ABC... , 原書有同樣的校勘數字, 所以要大寫英文區分 : X18n0338_p0700a14
-  jk.sub!(/.*(.\d\d[A-Z]?-?\d*)$/, '\1')  # -\d* 上一行先移除了, 
+
+  # xml:id="nkr_note_add_0364c1701" => 移除 0364c17 , 剩下 01
+  # xml:id="nkr_note_orig_0835003" => 移除 0835 , 剩下 003
+  # xml:id="nkr_note_editor_0836001" => 移除 0836 , 剩下 001
+
+  jk.sub!(/nkr_note_add_.{7}/, '')
+  jk.sub!(/nkr_note_orig_.{4}/, '')
+  jk.sub!(/nkr_note_editor_.{4}/, '')
+
+  # jk.sub!(/.*(\d\d[A-Z]?-?\d*)$/, '\1')  # -\d* 上一行先移除了, 
+  # jk.sub!(/.*?(\d?\d\d[A-Z]?)$/, '\1')  # -\d* 前面先移除了, 
   jk.sub!(/0(\d\d)/, '\1')    # 如果有三個數字且<100 , 第一個 0 移除
   
   # 處理 kbj => 【科】 【標】 【解】

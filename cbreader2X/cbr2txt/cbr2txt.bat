@@ -30,6 +30,7 @@ exit /B
 perl cbr2txt.pl A
 perl cbr2txt.pl B
 perl cbr2txt.pl C
+perl cbr2txt.pl CC
 perl cbr2txt.pl D
 perl cbr2txt.pl F
 perl cbr2txt.pl G

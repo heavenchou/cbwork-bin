@@ -15,6 +15,8 @@ exit /B
 perl create_bulei_nav.pl 
 perl create_book_nav.pl simple_nav.txt
 perl create_book_nav.pl advance_nav.txt
+rem CBReader 全文檢索單經搜尋用的檔案
+perl create_book_slr.pl SutraList.txt
 cd ../gaiji2word
 perl gaiji2word.pl nav
 cd ../nav

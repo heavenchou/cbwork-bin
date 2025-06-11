@@ -227,6 +227,12 @@ sub output
 		$outfile2 = $outfile;
 		$outfile2 =~ s/X39/X40/;
 	}
+	if($outfile =~ /GA0037_002\.txt/) {
+		$text =~ s/(GA037n0037_p.*)//s;
+		$text2 = $1;
+		$outfile2 = $outfile;
+		$outfile2 =~ s/GA036/GA037/;
+	}
 
 	open OUT, ">:utf8", $outfile;
 	print OUT $text;

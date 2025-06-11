@@ -79,6 +79,17 @@ sub getcb
 	{
 		return $gaiji->cb2nor($cb);
 	}
+	# 4. 不管版本，使用 unicode
+	elsif($uni ne "")
+	{
+		return $gaiji->cb2uniword($cb);
+	}
+	# 5. 不管版本，使用 unicode 通用字
+	elsif($noruni ne "")
+	{
+		return $gaiji->cb2noruniword($cb);
+	}
+	# 6. 最後用組字式
 	else
 	{
 		return $gaiji->cb2des($cb);

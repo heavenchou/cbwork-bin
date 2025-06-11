@@ -141,9 +141,11 @@ sub des2uni
 		{
 			# 不要超過 unicode 10.0
 			my $ver = $gaiji->get_unicode_ver($gaiji->cb2uni($cb));
-			if($ver !~ /^1[1-9]\./) {
-				return $uniword;
-			}
+			#if($ver !~ /^1[1-9]/) {
+			#	if($ver !~ /^[2-9][0-9]/) {
+					return $uniword;
+			#	}
+			#}
 			
 		}
 		my $noruniword = $gaiji->cb2noruniword($cb);
@@ -151,9 +153,11 @@ sub des2uni
 		{
 			# 不要超過 unicode 10.0
 			my $ver = $gaiji->get_unicode_ver($gaiji->cb2noruni($cb));
-			if($ver !~ /^1[1-9]\./) {
-				return $noruniword;
-			}
+			#if($ver !~ /^1[1-9]/) {
+			#	if($ver !~ /^[2-9][0-9]/) {
+					return $noruniword;
+			#	}
+			#}
 		}
 		my $norword = $gaiji->cb2nor($cb);
 		if($norword)
@@ -184,6 +188,7 @@ sub getfile
 	{
 		chomp;
 		next if($_ eq "");	# 忽略空白行
+		s/\[王\*　\]/⺩/g;	# 先處理有空白的組字
 		s/　//g;	# 忽略全型空白
 
 		#s/\[A\d+\]/[A]/g;	# 忽略自訂校勘
