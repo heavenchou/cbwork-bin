@@ -30,25 +30,25 @@ $line6 = 0	# 行數 (六位數)
 $hanbook_msg = "#{$infile} :   : found 1 => ︴"
 
 def main
-	fin = File.open($infile)
+	lines = File.readlines($infile)  # 一次讀入所有行
 	fout = File.open($outfile, 'w')
 
-	fin.each_line { |line|
+	lines.each_with_index { |line, index|
 		$line_num += 1
 		$line6 = "%06d" % $line_num
-		check_this_line line
+		is_last = (index == lines.length - 1)
+		check_this_line(line, is_last)
 	}
 
 	fout.write $errtxt
 	fout.write $hanbook_msg
 
 	fout.close
-	fin.close
 end
 
 # 開始檢查
 
-def check_this_line(line)
+def check_this_line(line, is_last)
 	
 	if line.match(/^(\D{1,3})(\d{2,3})n([AB]?\d{3,4}[a-zA-Z_]?)p(.\d{3})([a-z])(\d{2,})/)
 		$ed = $1;
@@ -77,8 +77,27 @@ def check_this_line(line)
 			if $p_line.to_i < $min_line
 				$errtxt += "#{$p_line6}:行數 #{$p_line} 小於最小限制 #{$min_line} \n"
 			end
+
+			if $page.to_i > $p_page.to_i + 1
+				$errtxt += "#{$p_line6}:頁碼 #{$p_page} 不連續\n"
+				$errtxt += "#{$line6}:頁碼 #{$page} 不連續\n"
+			end
 		end
 		
+		# 檢查最後一行
+
+		if is_last
+			$line6 = "%06d" % ($line_num)
+			
+			if $line.to_i > $max_line
+				$errtxt += "#{$line6}:行數 #{$line} 超過最大限制 #{$max_line} \n"
+			end
+			
+			if $line.to_i < $min_line
+				$errtxt += "#{$line6}:行數 #{$line} 小於最小限制 #{$min_line} \n"
+			end
+		end
+
 		if $ed != $p_ed
 			$errtxt += "#{$line6}:書本版本 #{$ed} 與前一行不同\n"
 		end
