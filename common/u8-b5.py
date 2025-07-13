@@ -1457,7 +1457,7 @@ def trans_file(fn1, fn2):
 			#處理日文
 			line=trans_jep_x(line)
 			#處理俄文
-			line = line.replace('Ф', "&#xU0424;")
+			line = line.replace('Ф', "&#x0424;")
 			line = line.replace('Д', "&#x0414;")
 			line = line.replace('х', "&#x0445;")  			
 		else:
