@@ -31,6 +31,7 @@ b5-u8.rb
 作者: 周邦信 2009.05.26
 
 Heaven 修改:
+2025/07/20 修正處理羅馬轉寫字 unicode 的問題
 2025/07/12 使用 Claude Sonnet 4 改成 ruby 版
 2022/10/06 ①~⑩ 及 ⑴~⑽ 這些字 python 認為有 big5 版，所以要另外處理
 2022/04/28 cbwork_bin.ini 改成支援 utf8 版
@@ -132,7 +133,8 @@ class Big5ToUtf8Converter
           # 羅馬轉寫字
           if nor && !nor.empty?
             @romas[nor] = [uni.to_i(16)].pack('U')
-          elsif des && !des.empty?
+          end
+          if des && !des.empty?
             @des2u8[des] = [uni.to_i(16)].pack('U')
           end
         end
