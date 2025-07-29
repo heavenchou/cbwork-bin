@@ -416,10 +416,12 @@ def get_jk_mark(e)
   # note_orig 也會有 ABC... , 原書有同樣的校勘數字, 所以要大寫英文區分 : X18n0338_p0700a14
 
   # xml:id="nkr_note_add_0364c1701" => 移除 0364c17 , 剩下 01
+  # xml:id="nkr_note_add_0001001" => Y 有這種的，要移除 0001 , 剩下 001
   # xml:id="nkr_note_orig_0835003" => 移除 0835 , 剩下 003
   # xml:id="nkr_note_editor_0836001" => 移除 0836 , 剩下 001
 
-  jk.sub!(/nkr_note_add_.{7}/, '')
+  jk.sub!(/nkr_note_add_.{7}(\d\d)/, '\1')
+  jk.sub!(/nkr_note_add_.{4}(\d\d\d)/, '\1')
   jk.sub!(/nkr_note_orig_.{4}/, '')
   jk.sub!(/nkr_note_editor_.{4}/, '')
 

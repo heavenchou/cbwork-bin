@@ -12,10 +12,11 @@
 #
 # 設定檔：相關設定由 ../cbwork_bin.ini 取得
 #
-# Copyright (C) 1998-2024 CBETA
-# Copyright (C) 1999-2024 Heaven Chou
+# Copyright (C) 1998-2025 CBETA
+# Copyright (C) 1999-2025 Heaven Chou
 ########################################################################
 
+# 2025-07-27 將 T42n1828 的空白行忽略，以利比對
 # 2024-03-17 支援 <p,1,bold,kai> 這類標記
 # 2024-13-10 1.支援 <sanot> 北印體標記，或 <hi,sanot>
 # 2024-03-10 處理 ⏑⏓ 這二個特殊字, 雖然大於 unicode 2.0 , 但要直接呈現
@@ -518,7 +519,18 @@ sub makefile()
 		#{
 		#	print "$filename : $_";
 		#}		
-		print OUT "$_";
+
+		# T42n1828_p0772b07║
+		# 這一段要忽略
+		# T42n1828_p0772c01║
+
+		if($T_vol eq "T42" and $sutra_num eq "1828_") {
+			if($_ !~ /^T42n1828_p0772[bc]..║$/) {
+				print OUT "$_";
+			}
+		} else {
+			print OUT "$_";
+		}
     }
 	close OUT;
 	$prefile_sutra = $sutra_num;    #記錄這一個檔的經號
