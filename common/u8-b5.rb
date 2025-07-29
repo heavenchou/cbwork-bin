@@ -4,7 +4,7 @@
 =begin
 u8-b5.rb
 功能: 
-	將目錄下(含子目錄)所有 utf-8 檔案轉為 CP950
+	將目錄下(含子目錄)所有 utf-8 檔案轉為 big5
 
 使用說明:
 	
@@ -40,6 +40,7 @@ u8-b5.rb
 2009.12.02 Ray: 從 Unicode 網站取得 Unihan.txt, 取出裏面的異寫字資訊 kCompatibilityVariant, 放在 variant
 
 Heaven 修改:
+2025/07/29 將 cp950 改成 big5，cp950 會有問題，它會把相容字直接轉成 big5，例如「鶴」直接轉成「鶴」而不是「[鴳-女+隹]」
 2025/07/12 使用 Claude Sonnet 4 改成 ruby 版
 2022/10/06 ①~⑩ 及 ⑴~⑽ 這些字 python 認為有 big5 版，所以要另外處理
 2022/04/28 cbwork_bin.ini 改成支援 utf8 版
@@ -614,7 +615,7 @@ class U8ToB5Converter
 
   def can_encode_big5?(char)
     begin
-      char.encode('cp950')
+      char.encode('Big5')
       true
     rescue Encoding::UndefinedConversionError
       false
@@ -625,8 +626,8 @@ class U8ToB5Converter
     @high_word = 0
     puts "#{fn1} => #{fn2}"
     
-    File.open(fn1, 'r:utf-8') do |f1|
-      File.open(fn2, 'w:cp950') do |f2|
+    File.open(fn1, 'r:bom|utf-8') do |f1|
+      File.open(fn2, 'w:big5') do |f2|
         f1.each_line do |line|
           # 修改版本
           line = line.gsub('(UTF-8) 普及版', '(Big5) 普及版')
