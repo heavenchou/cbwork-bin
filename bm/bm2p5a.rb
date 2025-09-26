@@ -6,17 +6,18 @@
 # 作者: 周邦信(Ray Chou) 2022-04-20
 #
 # Heaven 修改：
-# 2025-06-12 1.支援 A,C,G 等藏經
-# 2025-01-30 1.支援新的 XML 檔頭，詳見新的 p5a-template.xml
-# 2024-11-09 1.支援經號為 a 開頭的說明文件
-# 2024-10-22 1.支援 <small>, <large>
-# 2024-03-10 1.支援 <sanot> 北印體標記，或 <hi,sanot>
-# 2024-03-07 1.支援 wavy 波浪線屬性，要搭配上橫線、下底線或刪除線使用。
-# 2023-11-06 1.支援 <circle>,<tag,circle> 外框加圓圈
-# 2023-09-22 1.支援等寬的明體、楷體、黑體標記 mono-ming,mono-kai,mono-hei
-# 2023-09-21 1.支援 <date> 後面不再有 <p>，改成 <date> 裡面要自動加 <p>
-# 2023-06-12 1.支援 CC、CBETA 選集、CBETA Selected Collection
-# 2023-05-16 1.支援 <tag,1,2,bold,sup,..> 處理成 <tag rend="bold sup .." style="margin-left:1em; text-indent:2em;">
+# 2025-09-26 支援《演培法師全集》
+# 2025-06-12 支援 A,C,G 等藏經
+# 2025-01-30 支援新的 XML 檔頭，詳見新的 p5a-template.xml
+# 2024-11-09 支援經號為 a 開頭的說明文件
+# 2024-10-22 支援 <small>, <large>
+# 2024-03-10 支援 <sanot> 北印體標記，或 <hi,sanot>
+# 2024-03-07 支援 wavy 波浪線屬性，要搭配上橫線、下底線或刪除線使用。
+# 2023-11-06 支援 <circle>,<tag,circle> 外框加圓圈
+# 2023-09-22 支援等寬的明體、楷體、黑體標記 mono-ming,mono-kai,mono-hei
+# 2023-09-21 支援 <date> 後面不再有 <p>，改成 <date> 裡面要自動加 <p>
+# 2023-06-12 支援 CC、CBETA 選集、CBETA Selected Collection
+# 2023-05-16 支援 <tag,1,2,bold,sup,..> 處理成 <tag rend="bold sup .." style="margin-left:1em; text-indent:2em;">
 # 2023-04-05 1.支援 <c,4> 這種格式，表示此格內縮 4 個字 => <cell rend="pl-4">
 #            2.支援 <p,c><p,r><Q1,c><Q1,r> 等格式，c 表示置中 rend="text-center", r 表示靠右 rend="text-right"
 #              過去有支援 <p_r>,<p_c>
@@ -48,6 +49,7 @@ $collection_zh = {
   'N' => '漢譯南傳大藏經（元亨寺版）',
   'TX' => '太虛大師全書',
   'Y' => '印順法師佛學著作集',
+  'YP' => '演培法師全集',
   'ZS' => '正史佛教資料類編',
   'ZW' => '藏外佛教文獻',
   'ZY' => '智諭法師著作全集'
@@ -84,6 +86,7 @@ $collection_en = {
   'W'  => 'Buddhist Texts not contained in the Tripiṭaka',
   'X'  => 'Manji Shinsan Dainihon Zokuzōkyō',
   'Y'  => 'Corpus of Venerable Yin Shun\'s Buddhist Studies',
+  'YP'  => 'The Complete Works of Venerable Yen Pei',
   'Z'  => 'Manji Dainihon Zokuzōkyō',
   'ZS' => 'Passages concerning Buddhism from the Official Histories',
   'ZW' => 'Buddhist Texts not contained in the Tripiṭaka',

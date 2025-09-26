@@ -17,22 +17,24 @@ my $input = shift;
 
 # 參數
 
+$yearver = "2025R2";	# 版本號 <==== 這裡要改
+
+
 my $db_file = "database_2023Q4.txt";	# 經名資料庫
 $db_file = "database_2023Q4_twoline.txt";	# 經名資料庫，這是多行版本
 $db_file = "database_2023Q4_newname.txt";	# 經名資料庫，這是特定經名
 $db_file = "database_2023Q4_nonebig5_kai.txt";	# 經名資料庫，這是非 big5 的版本，楷書可用
 $db_file = "database_2023Q4_nonebig5.txt";	# 經名資料庫，這是非 big5 的版本
-
 $db_file = "database_2024R1_update.txt";	# 經名資料庫
-$db_file = "database_2024R2.txt";	# 經名資料庫
-$db_file = "database_2024R3.txt";	# 經名資料庫
-$db_file = "database_2025R1.txt";	# 經名資料庫
 
-my $db_check_file = "database_2025R1_check.txt";	# 要檢查的資料
+# $db_file = "database_2025R2.txt";	# 經名資料庫
+$db_file = "database_${yearver}.txt";	# 經名資料庫
+
+my $db_check_file = "database_${yearver}_check.txt";	# 要檢查的資料
 #my $cover_page_path = "c:/release/epub_cover_ud3/";	# 輸出圖檔的目錄
-my $cover_page_path = "./cover_update_2025R1/";	# 輸出圖檔的目錄
+my $cover_page_path = "./cover_update_${yearver}/";	# 輸出圖檔的目錄
 #my $cover_page_path2 = "./cover/";	# 檢查結果用的
-my $cover_page_path2 = "./cover_update_2025R1/";	# 檢查結果用的
+my $cover_page_path2 = "./cover_update_${yearver}/";	# 檢查結果用的
 
 
 #$db_file = "database_update.txt";	# 經名資料庫

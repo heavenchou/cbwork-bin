@@ -16,6 +16,7 @@
 # Copyright (C) 1999-2025 Heaven Chou
 ########################################################################
 
+# 2025-09-26 支援《演培法師全集》
 # 2025-07-27 將 T42n1828 的空白行忽略，以利比對
 # 2024-03-17 支援 <p,1,bold,kai> 這類標記
 # 2024-13-10 1.支援 <sanot> 北印體標記，或 <hi,sanot>
@@ -638,6 +639,7 @@ sub print_jun_head()
 # S 宋藏遺珍(新文豐版) (Songzang yizhen(Xinwenfeng Edition)) 　 【宋遺】
 # U 洪武南藏 (Southern Hongwu Edition of the Canon) （初刻南藏） 【洪武】
 # Y 印順法師佛學著作集 (Corpus of Venerable Yin Shun's Buddhist Studies) 【印順】
+# YP 演培法師全集 (The Complete Works of Venerable Yen Pei) 【演培】
 # Z 卍大日本續藏經 (Manji Dainihon Zokuzokyo)
 # ZY 智諭老和尚全集 (the Complete Works of Ven Zhiyu) 【智諭】
 		
@@ -780,7 +782,12 @@ sub print_jun_head()
 		$sutraver_c = "印順法師佛學著作集";
 		$sutraver_e = "Corpus of Venerable Yin Shun's Buddhist Studies";
 	}
-	
+	elsif($vol_head eq "YP")
+	{
+		$sutraver_c = "演培法師全集";
+		$sutraver_e = "The Complete Works of Venerable Yen Pei";
+	}
+
 	$content[0] =~ /^\D+(\d+)n(.{5})/;
 	my $vol = $1;
 	my $full_sutra = $2;

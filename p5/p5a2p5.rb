@@ -4,6 +4,7 @@
 # 作者: 周邦信(Ray Chou) 2022-04-15
 #
 # Heaven 修改：
+# 2025-09-26 支援《演培法師全集》
 # 2022-10-13 取消二段式的處理，不再使用暫存檔
 # 2022-05-04 正式使用，找不到的說明可試著找 p5a2p5.py
 
@@ -20,6 +21,7 @@ RESPS = {
   'D' => 'NCLRareBook',
   'J' => 'Jiaxing',
   'T' => 'Taisho',
+  'YP' => 'Yenpei',
   'X' => 'Xuzangjing',
   'ZS' => 'Dudoucheng',
   'ZW' => 'ZangWai'
