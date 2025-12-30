@@ -33,6 +33,7 @@ require 'fileutils'
 require 'inifile'
 require 'json'
 require 'slop'
+# 要注意更新 ../common.rb 這個檔案
 require_relative '../common'
   
 $collection_zh = {
@@ -1744,6 +1745,8 @@ end
 
 # 結束一部經, 全部印出來
 def close_sutra(num)
+  return if num.nil? || num.empty?
+  puts "  結束經文: #{num}"
   # 加上 l, lg -- 2013/09/30 
   # 加上 cb:jhead 2014/06/06
   close_tags('l','lg','byline','cb:jhead','p')
@@ -1798,12 +1801,14 @@ def close_sutra(num)
   xml << "\n</body></text></TEI>\n"
 
   out_path = File.join($dir_out, "#{$vol}#{num}.xml")
-  puts "out_path: #{out_path}"
-  File.write(out_path, xml)  
+  puts "  輸出檔案: #{out_path}"
+  File.write(out_path, xml)
+  puts "  檔案寫入成功"  
 end
     
 # 初值化
 def sutra_init(new_sutra_number)
+  puts "\n  開始處理新經: #{new_sutra_number}"
   close_sutra($sutra_number) unless $sutra_number.empty?
   $anchor_count = 0
   $back_app = ''
@@ -1817,13 +1822,25 @@ end
   
 def convert
   bm_jingwen = File.join($bm_dir, $canon, $vol, "new.txt")
+  puts "  經文檔案: #{bm_jingwen}"
   $log.puts "bm_jingwen: #{bm_jingwen}"    
   $sutra_number = ''
 
+  unless File.exist?(bm_jingwen)
+    puts "  錯誤：找不到經文檔案 #{bm_jingwen}"
+    abort "找不到經文檔案: #{bm_jingwen}"
+  end
+
+  line_count = 0
+  puts "  開始逐行處理經文..."
   File.foreach(bm_jingwen) do |line|
+    line_count += 1
+    puts "  處理第 #{line_count} 行..." if line_count % 100 == 0
     convert_line(line)
   end
 
+  puts "  共處理 #{line_count} 行"
+  puts "  結束最後一部經..."
   close_sutra($sutra_number)
 end
 
@@ -1839,6 +1856,9 @@ def convert_line(s)
 
   mo = aline.match(/([A-Z]+\d{2,3})(n.\d+.)(p.\d{3}[a-z])(\d\d)(.+)$/)
   if mo.nil?
+    puts "\n錯誤：行首格式不正確"
+    puts "  行內容: #{line}"
+    puts "  行首部分: #{aline}"
     abort "行首有錯: #{aline}"
   else
     vol, num, pb, $line_num, $head_tag = mo[1..5]
@@ -1920,7 +1940,7 @@ end
 def read_teiheader
   teiheader_file = File.join($bm_dir, $canon, $vol, "teiheader.json")
   # 判斷檔案是否存在
-  if File.exists?(teiheader_file)
+  if File.exist?(teiheader_file)
     teiheader = JSON.load_file(teiheader_file)
     teiheader.each do |k, v|
       # 第一組 "type":"CC" 是不需要的, 所以要過濾掉
@@ -1935,7 +1955,11 @@ def read_source
   bm_laiyuan = File.join($bm_dir, $canon, $vol, "source.txt")
   laiyuan = {}
 
-  puts "read #{bm_laiyuan}"
+  puts "  讀取來源檔案: #{bm_laiyuan}"
+  unless File.exist?(bm_laiyuan)
+    puts "  錯誤：找不到來源檔案 #{bm_laiyuan}"
+    abort "找不到來源檔案: #{bm_laiyuan}"
+  end
   File.foreach(bm_laiyuan) do |line|
     line.rstrip!
     line.sub!(/　*$/,'')  # python 的 rstrip 會移除全型空白, ruby 不會
@@ -2063,15 +2087,38 @@ end
 
 # main
 
+puts "=" * 60
+puts "程式開始執行: bm2p5a.rb"
+puts "=" * 60
+
 # 讀取 命令列參數
+puts "\n[步驟 1] 讀取命令列參數..."
 $opts = read_command_line_arguments
+puts "  冊數: #{$opts[:vol]}"
+puts "  輸出目錄: #{$opts[:output]}"
 
 # 讀取 設定檔, 並做初始設定
+puts "\n[步驟 2] 讀取設定檔並初始化..."
 read_config
+puts "  BM 目錄: #{$bm_dir}"
+puts "  輸出目錄: #{$dir_out}"
 
 # 預設改為直接開啟 GitHub 上的 缺字 JSON 資料庫
+puts "\n[步驟 3] 讀取組字資料..."
 read_all_gaijis
+puts "  組字資料載入完成，共 #{$all_gaijis.size} 筆"
 
+puts "\n[步驟 4] 讀取來源資料..."
 read_source
+puts "  來源資料載入完成，共 #{$sutras.size} 部經"
+
+puts "\n[步驟 5] 讀取 TEI Header 資料..."
 read_teiheader
+puts "  TEI Header 資料載入完成"
+
+puts "\n[步驟 6] 開始轉換經文..."
 convert
+
+puts "\n" + "=" * 60
+puts "程式執行完成！"
+puts "=" * 60
