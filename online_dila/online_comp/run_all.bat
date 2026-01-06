@@ -55,6 +55,8 @@ perl online2txt.pl X
 perl comp_online_txt.pl X
 perl online2txt.pl Y
 perl comp_online_txt.pl Y
+perl online2txt.pl YP
+perl comp_online_txt.pl YP
 perl online2txt.pl ZS
 perl comp_online_txt.pl ZS
 perl online2txt.pl ZW

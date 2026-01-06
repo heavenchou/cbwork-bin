@@ -17,7 +17,7 @@ my $input = shift;
 
 # 參數
 
-$yearver = "2025R2";	# 版本號 <==== 這裡要改
+$yearver = "2025R3";	# 版本號 <==== 這裡要改
 
 
 my $db_file = "database_2023Q4.txt";	# 經名資料庫

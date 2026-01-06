@@ -52,6 +52,8 @@ rem perl online2txt.pl X
 perl comp_online_txt.pl X
 rem perl online2txt.pl Y
 perl comp_online_txt.pl Y
+rem perl online2txt.pl YP
+perl comp_online_txt.pl YP
 rem perl online2txt.pl ZS
 perl comp_online_txt.pl ZS
 rem perl online2txt.pl ZW

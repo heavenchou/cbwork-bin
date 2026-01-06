@@ -52,7 +52,8 @@ class CbetaEpub
     }
     @settings.merge!(opts)
     @cbeta = CBETA.new
-    @gaijis = CBETA::Gaiji.new(@settings[:gaiji_base])
+    #@gaijis = CBETA::Gaiji.new(@settings[:gaiji_base]) # ruby 3.1 
+    @gaijis = CBETA::Gaiji.new()  # ruby 3.4 gaiji_base 參數已移除
     
     @us = UnicodeService.new
     @ncx_template = File.read(File.join(@settings[:template], 'toc.ncx.erb'))

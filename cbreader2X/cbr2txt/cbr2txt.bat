@@ -50,6 +50,7 @@ perl cbr2txt.pl TX
 perl cbr2txt.pl U
 perl cbr2txt.pl X
 perl cbr2txt.pl Y
+perl cbr2txt.pl YP
 perl cbr2txt.pl ZS
 perl cbr2txt.pl ZW
 exit /B

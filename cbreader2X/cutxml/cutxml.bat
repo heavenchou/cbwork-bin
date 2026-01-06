@@ -54,6 +54,7 @@ call :run_coll TX
 call :run_coll U
 call :run_coll X
 call :run_coll Y
+call :run_coll YP
 call :run_coll ZS
 call :run_coll ZW
 exit /B
