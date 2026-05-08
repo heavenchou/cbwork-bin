@@ -1011,7 +1011,7 @@ class P5aToP5Converter
     text.each_codepoint do |code|
       c = text[i]
       if @unihan.ver(code) > 2.0
-        if code == 0x227 || code == 0x23D1 || code == 0x23D3  # 特例 ȧ⏑⏓
+        if code == 0x227 || code == 0x23D1 || code == 0x23D3 || code == 0x3251  # unicode 特例 ȧ⏑⏓㉑
           r += c
         else
           hex = '%X' % code

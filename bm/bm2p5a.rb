@@ -712,7 +712,9 @@ def start_inline_mj(tag)
 
   m = $buf.match(/(<pb [^>]*>\n?)?<lb [^>]*>\n?\z/)
   if m.nil?
-    abort "milestone must after <pb><lb> #{tag}  Line: #{__LINE__}"
+    puts "buffer 中的內容：" + $buf
+    puts "buffer1 中的內容：" + $buf1[-300..-1]
+    abort "\nmilestone must after <pb><lb> #{tag}  Line: #{__LINE__}"
   else
     # <milestone> 要移到 <pb><lb> 之前
     $buf.sub!(/(?:<pb [^>]*>\n?)?<lb [^>]*>\n?\z/) do

@@ -782,7 +782,7 @@ eos
     # 所以要逐字檢查是否在 Unicode 2.0 範圍裡
     r = ''
     s.each_char do |c|
-      if @us.level1?(c) || c == '⏑' || c == '⏓'
+      if @us.level1?(c) || c == '⏑' || c == '⏓'|| c == '㉑'
         r += c
       else
         cb = @gaijis.unicode_to_cb(c)

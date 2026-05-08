@@ -113,6 +113,19 @@ def e_g(e)
       return "&#{ref};"
     when 1
       return "&#{ref};"
+    when 3
+      # word 版的悉曇字先列漢字，用 () 包起來轉寫字, 梵漢對照不處理。
+      output = ""
+      # 有big5 字的先列 big5 字，再列漢字，再列羅馬轉寫字
+      if $siddham_big5.key?(ref)
+        output += $siddham_big5[ref]
+      elsif $siddham_han.key?(ref)
+        output += $siddham_han[ref]
+      end
+      #output += $siddham_han[ref] if $siddham_han.key?(ref)
+      output += "(#{$siddham[ref]})" if $siddham.key?(ref)
+      return output unless output.empty?
+      return "&#{ref};"
     else
       # 有一種悉曇字是有 big5 字的 -- 2013/08/01
       return '◇' # 想想, 還是直接用 ◇ , 未來應該直接用羅馬轉寫字來比對
@@ -207,13 +220,19 @@ def e_local_name(id, node)
     if name == 'Romanized form in Unicode transcription'
       # 沒有羅馬轉寫的字怎麼辦? T54n2132.xml 的 SD-CFC3 ??????
       $siddham[id] = value
+    elsif name == 'Character in the Siddham font' or name == 'rjchar'
+      #	<charProp>
+			# 	<localName>Character in the Siddham font</localName>
+			# 	<value>箎</value>
+		  # </charProp>
+      $siddham_han[id] = value
+    elsif name == 'big5'
       # 有一種悉曇字是有 big5 字的 -- 2013/08/01
       # <char xml:id="SD-E347">
       #   <charName>CBETA CHARACTER SD-E347</charName>
       #   <charProp>
       #     <localName>big5</localName>
       #     <value>□</value>
-    elsif name == 'big5'
       $siddham_big5[id] = value
     end
   else
@@ -291,6 +310,25 @@ end
 
 def e_t(e)
   content = traverse(e)
+  if $opts[:word] # word 版不做隔行處理，直接呈現內容
+    if e['lang'] && e['lang'].include?('sa')
+      # 要梵漢對照的情況才處理
+      if e.parent['place']!='inline' and e.parent['type']!='single-line'
+        # content 有時是多個梵字，如「梵(ma)梵(ra)」或「梵(ma)梵」
+        # 則要將梵字全部集中到前面，轉寫字放在後面，如「梵梵(ma)(ra)」或「梵梵(ma)」
+        # 處理方式，將所有的 (轉寫字) 都取出來放在 roma 變數中，然後將 content 中的 (轉寫字) 都移除，最後再將 roma 變數中的轉寫字加到 content 後面
+        # 有一個情況，只有轉寫要處理，有一些漢字註解，例如 T19n0956有 (此是梵本一字之呪)
+        # 或 T54n2133A 有一堆這種 (（？）) 都要避開
+        # roma = content.scan(/(\(.*?\))/).flatten.join
+        # 漢字的正規式如何處理？
+        
+        roma = content.scan(/(\([^？\p{Han}]*?\))/).flatten.join
+        content.gsub!(/\([^？\p{Han}]*?\)/, '')
+        content += roma unless roma.empty?
+      end
+    end
+    return content 
+  end
 
   # <cb:tt> 裏面的第一個 <cb:t> 在第一行, 第2個 <cb:t> 要顯示在下一行.
   return content if child_index(e) == 0
@@ -565,6 +603,7 @@ end
 def read_char_info(doc)
   $zuzishi = {}
   $siddham = {}
+  $siddham_han = {} # 漢字字元，搭配字型就會變成悉曇字
   $siddham_big5 = {}
   $gaiji_normal = {}
   $unicode = {}
@@ -591,7 +630,8 @@ def read_command_line_arguments
     o.bool '-p', '--para-format', '段落呈現'
     o.bool '-n', '--unicode', '使用 unicode'
     o.string '-v', '--vol', "指定要轉換哪一冊"
-    o.integer "-x", "--siddham", "悉曇字呈現方法: 0=轉寫(預設), 1=entity &SD-xxxx, 2=◇【◇】", default: 0
+    o.integer "-x", "--siddham", "悉曇字呈現方法: 0=轉寫(預設), 1=entity &SD-xxxx, 2=◇【◇】, 3=word版()內為轉寫字", default: 0
+    o.bool '-w', '--word', 'word 版，悉曇用 () 包起來，裡面是轉寫字, 梵漢對照不處理。'
   end
 
   if opts[:help]
@@ -679,6 +719,11 @@ $opts = read_command_line_arguments
 config = IniFile.load('../cbwork_bin.ini')
 $xml_base = config['p5totxt']['xml_p5']
 $out_base = config['p5totxt']['output_dir']
+
+#word output path 不同
+if $opts[:word]
+  $out_base += '_word'
+end
 puts "Input XML P5 Folder: #{$xml_p5}"
 puts "Output Normal Folder: #{$out_base}"
 

@@ -6,6 +6,30 @@ require 'fileutils'
 SRC_ROOT = 'd:/Temp/wordxml_xml/'
 OUT_ROOT = 'd:/Temp/wordxml_out_txt/'
 
+# 由 sutra_list.txt 讀取經號與目錄的關係
+# 其結構為 T01,T0001_001
+# 表示經號 T0001_001 在 T01 目錄下
+# 可處理為 $Vol = $Sutra2Vol['T0001_001'] , 傳回 'T01'
+
+$Sutra2Vol = {}
+def sutra2vol()
+  file_path = File.join(File.dirname(__FILE__), 'sutra_list.txt')
+  return unless File.exist?(file_path)
+  
+  File.foreach(file_path) do |line|
+    line = line.strip
+    next if line.empty?
+    
+    parts = line.split(/,/)
+    if parts.size >= 2
+      vol = parts[0].strip
+      sutra = parts[1].strip
+      $Sutra2Vol[sutra] = vol
+    end
+  end
+end
+#sutra2vol()
+
 # 將檔名轉換為 T0001_001.txt 這種樣式
 def convert_filename(xml_filename)
   if xml_filename =~ /([A-Z]{1,2})\d{2,3}n(.*?)_(\d{3})\.xml/i
@@ -34,12 +58,15 @@ def body_to_txt(xml, basename)
 
   # 根據 <!-- lb: xxx --> 分割
   # (允許一行有多個。前一個片段如果沒 lb 標記，補個首段)
-  lines = raw_xml.split(/<!--\s*lb:\s*([a-zA-Z\d]+)\s*-->/)
+  # <!-- lb: T02n0131_p0854b04 -->
+  # <!-- lb: T02n0142ap0863c13 -->
+  lines = raw_xml.split(/<!--\s*lb:\s*([a-zA-Z\d_]+)\s*-->/)
   # lines 會是: ["<p>首段內容</p>", "0001a01", "<p>有lb內容</p>", "0001a02", ...]
   result = []
   i = 1
   while i < lines.size
-    lb = lines[i].strip # 0001a01
+    lb = lines[i].strip # T02n0131_p0854b04
+    $lb = lb
     content = lines[i+1].to_s
     # 有些空白要先移除
     #  <item><p>天帝釋問品</p></item>
@@ -56,6 +83,21 @@ def body_to_txt(xml, basename)
       content.gsub!(/<graphic.*?\/>/, '【圖】')
       content.gsub!(/<graphic.*?<\/graphic>/, '【圖】')
     end
+
+    # 有一種情況，在 row 前有空格，要去除
+    if content.include?('<row')
+      content.gsub!(/^\s+<row/, '<row') 
+    end
+
+    # 20260413 新版悉曇字要移除
+    # <!-- lb: T18n0850_p0083b19 -->
+    # 一切諸法影像不可得故。<font name="sidd">介</font>(ja)惹字門，一切諸法
+    # 一切諸法影像不可得故。ja惹字門，一切諸法
+    #if content.include?('<font name="sidd">')
+      #puts "Found sidd font in #{basename}p#{lb}#{content}, removing sidd font"
+      #content.gsub!(/<font name="sidd">.*?<\/font>\((.*?)\)/, '\1') 
+    #end
+
 
     # 梵漢對照在行中會有 <lb/> 標記，這種要留下來，暫時換成 [-lb-]
     # 但偈頌的 <lb/> 標記要去掉
@@ -84,7 +126,8 @@ def body_to_txt(xml, basename)
     text = text.gsub(/【經文資訊】.*/, '')
 
     # 組合處理
-    line_label = "#{basename}p#{lb}"
+    #line_label = "#{basename}p#{lb}"
+    line_label = "#{lb}"
     result << "#{line_label}║#{text}"
 
     i += 2
@@ -103,13 +146,22 @@ Find.find(SRC_ROOT) do |path|
   next unless File.file?(path)
   next unless path =~ /\.xml$/i
 
+
+
   # 擷取資料夾 T/T01 與檔名 T01n0001_001.xml
-  m = path.match(%r{wordxml_xml/([A-Z]{1,2})/([^/]+)/([^/]+)/(.+\.xml)}i)
+  # d:\Temp\wordxml_xml\T\T01\T01n0001\T01n0001_001.xml
+  # m = path.match(%r{wordxml_xml/([A-Z]{1,2})/([^/]+)/([^/]+)/(.+\.xml)}i)
+  # d:\Temp\wordxml_xml\T\T0001\T0001_001.xml
+  m = path.match(%r{wordxml_xml/([A-Z]{1,2})/([^/]+)/(.+\.xml)}i)
   if ARGV.size > 0
     # 如果有參數，則只處理該參數的資料夾
     # 例如：ruby wordxml2txt.rb T01 
     # 會處理 wordxml_xml/T/T01/ 下的所有檔案
-    m = path.match(%r{wordxml_xml/([A-Z]{1,2})/(#{Regexp.escape($argv)})/([^/]+)/(.+\.xml)}i)
+    # d:\Temp\wordxml_xml\T\T01\T01n0001\T01n0001_001.xml
+    # m = path.match(%r{wordxml_xml/([A-Z]{1,2})/(#{Regexp.escape($argv)})/([^/]+)/(.+\.xml)}i)
+    # d:\Temp\wordxml_xml\T\T0001\T0001_001.xml
+    # m = path.match(%r{wordxml_xml/([A-Z]{1,2})/(#{Regexp.escape($argv)})/(.+\.xml)}i)
+    m = path.match(%r{wordxml_xml/([A-Z]{1,2})/(#{$argv})/(.+\.xml)}i)
   end
 
   unless m
@@ -118,10 +170,9 @@ Find.find(SRC_ROOT) do |path|
   end
 
   # subdir=T, series=T01, (T01n0001), filename=T01n0001_001.xml
-  subdir, serdir, _, xmlfile = m[1], m[2], m[3], m[4]
-  # 輸出路徑：d:/Temp/wordxml_out_txt/T/T01
-  outdir = File.join(OUT_ROOT, subdir, serdir)
-  FileUtils.mkdir_p(outdir)
+  # subdir, serdir, _, xmlfile = m[1], m[2], m[3], m[4]
+  # subdir=T, sernum=T01n0001, filename=T0001_001.xml
+  subdir, sernum, xmlfile = m[1], m[2], m[3]
 
   # 新檔名稱
   outname = convert_filename(xmlfile)
@@ -145,6 +196,21 @@ Find.find(SRC_ROOT) do |path|
   # 讀取、處理、寫出
   xml = Nokogiri::XML(File.read(path))
   content = body_to_txt(xml, basename_txt)
+
+
+  #serdir = $Sutra2Vol[sernum]
+  #
+  serdir = ""
+  if $lb =~ /([A-Z]+\d+)n/
+    serdir = $1 # T01
+  end
+  p $lb
+  p serdir
+  # 輸出路徑：d:/Temp/wordxml_out_txt/T/T01
+  outdir = File.join(OUT_ROOT, subdir, serdir)
+  FileUtils.mkdir_p(outdir)
+
+
   File.write(File.join(outdir, outname), content)
   puts "Output: #{File.join(outdir, outname)}"
 end

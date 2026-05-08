@@ -105,7 +105,7 @@ sub output_mulu
         $link[$i] = $3;
     }
     print OUT "<nav type=\"catalog\">\n";
-    print OUT "<h1>目錄</h1>\n";
+    print OUT "<h1>目次</h1>\n";
     # 輸出
 
     my $pre_level = 0;
