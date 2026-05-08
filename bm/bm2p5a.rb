@@ -1267,8 +1267,8 @@ def start_x(tag)
   start_div(1, 'xu')
   $buf << '<head>'
   $opens['head'] = 1
-  $mulu_start = True
-  $head_start = True
+  $mulu_start = true
+  $head_start = true
   $div_head = ''
 end
 
@@ -1922,11 +1922,10 @@ def convert_line(s)
   # 把 Ａ<㊣Ｂ> 換成 <orig reg="Ｂ">Ａ</orig>
   text = text.gsub(/((?:\[[^\]]+\])|(?:[^\]]))<㊣(.*?)>/, '<orig reg="\2">\1</orig>')
       
-  '''
-  把這種
-  T04n0213_p0794a23D##[>法集要頌經樂品第三十]<S>　[06]忍勝則怨賊，　　自負則自鄙，
-  把 <S> 後面的空格換成 <l></l>
-  '''
+  # 把這種
+  # T04n0213_p0794a23D##[>法集要頌經樂品第三十]<S>　[06]忍勝則怨賊，　　自負則自鄙，
+  # 把 <S> 後面的空格換成 <l></l>
+
   #do_tag_s(text)
   do_text(text)
 end

@@ -5,6 +5,7 @@ __*
 /bm/bm2nor.bat
 /catalog/juandata
 /catalog/juandata_2014
+/catalog/juandata_2016
 /catalog/juandata_p4
 /cbreader/cutxml/cutxml.bat
 /cbreader/index/wordindex.ndx
@@ -26,6 +27,7 @@ __*
 /note/*/*.xml
 /note/note2xml.bat
 /note/note_into_p5a.bat
+/online_dila/wordxml_comp/old
 /p5/b5-u8.bat
 /p5/get_mulu.bat
 /p5/juan.bat
