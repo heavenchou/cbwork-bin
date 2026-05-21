@@ -96,37 +96,35 @@ sub initial
     # 如果沒有子層, 則本層只留下經號
     my $bulei_id = -1;
 
-    for(my $i=0; $i<=$#datas; $i++)
-    {
+    for(my $i=0; $i<=$#datas; $i++) {
         # 先判斷是否有換部類
-        if($levels[$i] == 1)
-        {
+        if($levels[$i] == 1) {
             $bulei_id = $self->get_bulei_id_and_name($datas[$i]);
         }
 
-        if($i == $#datas || $levels[$i] >= $levels[$i+1])
-        {
+        if($i == $#datas || $levels[$i] >= $levels[$i+1]) {
             # T0001 , T0001a
-            if($datas[$i] =~ /^([A-Z]+a?\d+[A-Za-z]?)\s/) 
-            {
+            if($datas[$i] =~ /^([A-Z]+a?\d+[A-Za-z]?)\s/) {
                 $datas[$i] = $1;
                 $types[$i] = "C";   # 表示這一筆是 CBETA 經文
                 $links[$i] = "";
                 # 部類名會重複, 以第一筆為主
-                if(not defined($bulei_hash{$datas[$i]}))
-                {
+                if(not defined($bulei_hash{$datas[$i]})) {
                     $bulei_hash{$datas[$i]} = $bulei_id;    # $bulei_hash{"T0001"} = 0
                 }
             }
+            # T0001_001 (帶卷數) , T0001_001..005 (有範圍的卷數)
+            elsif($datas[$i] =~ /^([A-Z]+a?\d+[A-Za-z]?_\d\d\d(?:\.\.\d\d\d)?)[ \t]+(.*)$/) {
+                $links[$i] = $1;
+                $datas[$i] = $2;
+                $types[$i] = "J";   # 表示這一筆是指定卷數的 CBETA 經文
+            }
             # xxx.html , xxx.htm
-            elsif($datas[$i] =~ /^(\S+\.html?)[ \t]+(.*)$/i) # [ \t]+ 不能用 \s+ 因為可能有全型空格
-            {
+            elsif($datas[$i] =~ /^(\S+\.html?)[ \t]+(.*)$/i) { # [ \t]+ 不能用 \s+ 因為可能有全型空格
                 $links[$i] = $1;
                 $datas[$i] = $2;
                 $types[$i] = "L";   # 表示這一筆是一般連結
-            }
-            else
-            {
+            } else {
                 $types[$i] = "";
                 $links[$i] = "";
                 print "error format " . $datas[$i] . "\n";

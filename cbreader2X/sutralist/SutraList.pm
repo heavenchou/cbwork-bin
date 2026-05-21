@@ -117,9 +117,22 @@ sub initial
     close IN;
 }
 
-# 傳入範圍, 例如 T01,T02 or T0001,T0005, 傳回所有符合的 sutraid 
+# 傳入範圍字串，支援逗號列舉與 .. 區間的混合語法，傳回所有符合的 sutraid
 # 放在 keys 陣列中
 # ex : $sutralist->get_keys(\@keys, $book_nav->data->[$i])
+#
+# range 的語法：
+#   逗號(,) 為列舉分隔符
+#   兩個點(..) 為區間符號
+#
+# 範例：
+#   T                          全藏
+#   T01                        單冊
+#   T01..T05                   冊區間（T01 到 T05）
+#   T0001                      單經
+#   T0001..T0005               經區間（T0001 到 T0005）
+#   T0001,T0003,T0005..T0007,T0010  混合列舉與區間
+
 sub get_keys
 {
     my $self = shift;
@@ -127,51 +140,44 @@ sub get_keys
     my $range = shift;
     local $_;
 
-    my $from = "";  # 範圍
-    my $to = "";
+    # 以逗號切出各 token，每個 token 可能是單項或 .. 區間
+    my @tokens = split(/,/, $range);
 
-    # range 的種類有
-    # 1. T  全藏
-    # 2. T01 全冊
-    # 3. T01,T02 冊範圍
-    # 4. T0001 單經
-    # 5. T0001,T0005 經範圍
-
-    if($range =~ /^([^,]+),?(.*)$/)
+    for my $token (@tokens)
     {
-        $from = $1;
-        $to = $2;
-    }
-
-    if($to eq "")
-    {
-        if($from =~ /^\D+$/)
+        if($token =~ /^(.+)\.\.(.+)$/)
         {
-            # T 全藏
-            $self->get_keys_by_book($keys,$from);
+            # .. 區間，例如 T01..T05 或 T0001..T0005
+            my ($from, $to) = ($1, $2);
+            if($from =~ /^\D+\d{2,3}$/ && $from !~ /^J[AB]\d{3}$/)
+            {
+                # 冊區間
+                $self->get_keys_by_vols($keys, $from, $to);
+            }
+            elsif($from =~ /^\D+a?\d{3,4}.?$/)
+            {
+                # 經區間
+                $self->get_keys_by_sutras($keys, $from, $to);
+            }
         }
-        elsif($from =~ /^[A-Z]+\d{2,3}$/ && $from !~ /^J[AB]\d{3}$/)
+        else
         {
-            # T01 全冊
-            $self->get_keys_by_vol($keys,$from);
-        }
-        elsif($from =~ /^[A-Z]+a?\d{3,4}.?$/)
-        {
-            # T0001 , JA001 , T0001a 全經
-            $self->get_keys_by_sutra($keys,$from);
-        }
-    }
-    else
-    {
-        if($from =~ /^\D+\d{2,3}$/ && $from !~ /^J[AB]\d{3}$/)
-        {
-            # T01,T02 冊範圍
-            $self->get_keys_by_vols($keys,$from,$to);
-        }
-        elsif($from =~ /^\D+\d{3,4}.?$/)
-        {
-            # T0001,T0005 經範圍
-            $self->get_keys_by_sutras($keys,$from,$to);
+            # 單項
+            if($token =~ /^\D+$/)
+            {
+                # T 全藏
+                $self->get_keys_by_book($keys, $token);
+            }
+            elsif($token =~ /^[A-Z]+\d{2,3}$/ && $token !~ /^J[AB]\d{3}$/)
+            {
+                # T01 全冊
+                $self->get_keys_by_vol($keys, $token);
+            }
+            elsif($token =~ /^[A-Z]+a?\d{3,4}.?$/)
+            {
+                # T0001、JA001、T0001a 單經
+                $self->get_keys_by_sutra($keys, $token);
+            }
         }
     }
 }

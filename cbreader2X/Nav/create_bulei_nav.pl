@@ -97,6 +97,42 @@ sub create_body
             #$sutraid =~ s/^T0220a$/T0220/; # 部類的版本不取消 a
             $link =~ s/(T0[567]n0220)[a-z]/$1/; # 特例
             $xhtml .= "<cblink href=\"" . $link . "\">" . $sutraid . " " . $name . "</cblink>";
+        } elsif($bulei_type->[$i] eq "J") {
+            # 指定卷數的 CBETA 經文
+            # T0001_001 (帶卷數) , T0001_001..005 (有範圍的卷數)
+            $bulei_link->[$i] =~ /([A-Z]+a?\d+[A-Za-z]?)_(\d\d\d)/;
+            my $sutraid = $1;
+            my $juan = $2;
+
+            # 處理大般若經的特例
+            if($sutraid eq "T0220" && $juan eq "001") { $sutraid = "T0220a"; }
+            if($sutraid eq "T0220" && $juan eq "201") { $sutraid = "T0220b"; }
+            if($sutraid eq "T0220" && $juan eq "401") { $sutraid = "T0220c"; }
+            if($sutraid eq "T0220" && $juan eq "538") { $sutraid = "T0220d"; }
+            if($sutraid eq "T0220" && $juan eq "566") { $sutraid = "T0220e"; }
+            if($sutraid eq "T0220" && $juan eq "574") { $sutraid = "T0220f"; }
+            if($sutraid eq "T0220" && $juan eq "576") { $sutraid = "T0220g"; }
+            if($sutraid eq "T0220" && $juan eq "577") { $sutraid = "T0220h"; }
+            if($sutraid eq "T0220" && $juan eq "578") { $sutraid = "T0220i"; }
+            if($sutraid eq "T0220" && $juan eq "579") { $sutraid = "T0220j"; }
+            if($sutraid eq "T0220" && $juan eq "584") { $sutraid = "T0220k"; }
+            if($sutraid eq "T0220" && $juan eq "589") { $sutraid = "T0220l"; }
+            if($sutraid eq "T0220" && $juan eq "590") { $sutraid = "T0220m"; }
+            if($sutraid eq "T0220" && $juan eq "591") { $sutraid = "T0220n"; }
+            if($sutraid eq "T0220" && $juan eq "593") { $sutraid = "T0220o"; }
+
+            my $index = $sutralist->index_by_id->{$sutraid}; 
+            my $link = "";
+            my $name = $bulei_data->[$i];
+            if(defined $index)
+            {
+                $link = $sutralist->link->[$index];
+                $link = "XML/" . $link;
+            }
+            # 卷數換成指定卷數
+            $link =~ s/\d\d\d\.xml/${juan}.xml/;
+            $link =~ s/(T0[567]n0220)[a-z]/$1/;     # 特例
+            $xhtml .= "<cblink href=\"" . $link . "\">" . $name . "</cblink>";
         }
         else
         {
