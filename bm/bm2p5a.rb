@@ -2012,12 +2012,18 @@ def read_source_line(line, laiyuan)
 end
 
 def read_all_gaijis
-  base = $config['default']['gaiji']
-  if base == nil
-    base = File.join($config['default']['cbwork'], 'cbeta_gaiji')
-  end
-  fn = File.join(base, 'cbeta_gaiji.json')
-  $all_gaijis = JSON.load_file(fn)
+  # 以前的寫法，使用 d:/cbwork/gaiji/cbeta_gaiji.json
+  # base = $config['default']['gaiji']
+  # if base == nil
+  #   base = File.join($config['default']['cbwork'], 'cbeta_gaiji')
+  # end
+  # fn = File.join(base, 'cbeta_gaiji.json')
+  # $all_gaijis = JSON.load_file(fn)
+
+  # 現在的寫法，使用 d:\Dropbox\CBETA\heaven\cbeta_gaiji.json
+  gaiji_file = $config['default']['gaiji-m.mdb_file']
+  gaiji_file.sub!('gaiji-m.mdb', 'cbeta_gaiji.json')  
+  $all_gaijis = JSON.load_file(gaiji_file)
 
   # $unicode2cb = {}
   $all_gaijis.each do |cb, v|

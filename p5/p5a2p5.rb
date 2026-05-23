@@ -241,17 +241,25 @@ def read_config
   jing        = $config['default']['jing.jar_file']
   $in_p5a     = $config['default']['xml_p5a'] # 不一定有，沒有就用預設
   $in_p5      = $config['default']['xml_p5'] # 不一定有，沒有就用預設
-  $gaiji_base = $config['default']['gaiji'] # 不一定有，沒有就用預設
+  # 以前的寫法，使用 d:/cbwork/gaiji/cbeta_gaiji.json
+  # $gaiji_base = $config['default']['gaiji'] # 不一定有，沒有就用預設
+  # 現在的寫法，使用 d:\Dropbox\CBETA\heaven\cbeta_gaiji.json
+  $gaiji_base = $config['default']['gaiji-m.mdb_file']
+  $gaiji_base.sub!('gaiji-m.mdb', '')
+
   #gaiji_mdb   = $config['default']['gaiji-m.mdb_file'] # 不用了
+
   if $in_p5a == nil
     $in_p5a = File.join($config['default']['cbwork'], 'xml-p5a')
   end
   if $in_p5 == nil
     $in_p5 = File.join($config['default']['cbwork'], 'xml-p5')
   end
-  if $gaiji_base == nil
-    $gaiji_base = File.join($config['default']['cbwork'], 'cbeta_gaiji')
-  end
+
+  # 以前的寫法，使用 d:/cbwork/gaiji/cbeta_gaiji.json
+  # if $gaiji_base == nil
+  #   $gaiji_base = File.join($config['default']['cbwork'], 'cbeta_gaiji')
+  # end
 
   $empty_elements = %w[anchor lb milestone mulu pb space]
 
