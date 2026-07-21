@@ -118,6 +118,11 @@ sub initial
                 $links[$i] = $1;
                 $datas[$i] = $2;
                 $types[$i] = "J";   # 表示這一筆是指定卷數的 CBETA 經文
+                # 大般若經的特例
+                # T0220_001..400 T0220 (卷1-400) 大般若波羅蜜多經第1會
+                if ($links[$i] =~ /T0220/) {
+                    $bulei_hash{"T0220"} = $bulei_id;
+                }
             }
             # xxx.html , xxx.htm
             elsif($datas[$i] =~ /^(\S+\.html?)[ \t]+(.*)$/i) { # [ \t]+ 不能用 \s+ 因為可能有全型空格

@@ -94,8 +94,8 @@ sub create_body
             $name =~ s/\(第.*?卷\)$//;  # 去除卷數
             $name =~ s/（上）$// if($name !~ /((編輯說明)|(紀念集))（上）/); # ZY47 , Ba014 特例
             $name =~ s/（一）$// if($name !~ /華雨集（一）/); # 特例
-            #$sutraid =~ s/^T0220a$/T0220/; # 部類的版本不取消 a
-            $link =~ s/(T0[567]n0220)[a-z]/$1/; # 特例
+            # $sutraid =~ s/^T0220a$/T0220/; # 部類的版本不取消 a
+            # $link =~ s/(T0[567]n0220)[a-z]/$1/; # 特例
             $xhtml .= "<cblink href=\"" . $link . "\">" . $sutraid . " " . $name . "</cblink>";
         } elsif($bulei_type->[$i] eq "J") {
             # 指定卷數的 CBETA 經文
@@ -105,23 +105,29 @@ sub create_body
             my $juan = $2;
 
             # 處理大般若經的特例
-            if($sutraid eq "T0220" && $juan eq "001") { $sutraid = "T0220a"; }
-            if($sutraid eq "T0220" && $juan eq "201") { $sutraid = "T0220b"; }
-            if($sutraid eq "T0220" && $juan eq "401") { $sutraid = "T0220c"; }
-            if($sutraid eq "T0220" && $juan eq "538") { $sutraid = "T0220d"; }
-            if($sutraid eq "T0220" && $juan eq "566") { $sutraid = "T0220e"; }
-            if($sutraid eq "T0220" && $juan eq "574") { $sutraid = "T0220f"; }
-            if($sutraid eq "T0220" && $juan eq "576") { $sutraid = "T0220g"; }
-            if($sutraid eq "T0220" && $juan eq "577") { $sutraid = "T0220h"; }
-            if($sutraid eq "T0220" && $juan eq "578") { $sutraid = "T0220i"; }
-            if($sutraid eq "T0220" && $juan eq "579") { $sutraid = "T0220j"; }
-            if($sutraid eq "T0220" && $juan eq "584") { $sutraid = "T0220k"; }
-            if($sutraid eq "T0220" && $juan eq "589") { $sutraid = "T0220l"; }
-            if($sutraid eq "T0220" && $juan eq "590") { $sutraid = "T0220m"; }
-            if($sutraid eq "T0220" && $juan eq "591") { $sutraid = "T0220n"; }
-            if($sutraid eq "T0220" && $juan eq "593") { $sutraid = "T0220o"; }
+            # if($sutraid eq "T0220" && $juan eq "001") { $sutraid = "T0220a"; }
+            # if($sutraid eq "T0220" && $juan eq "201") { $sutraid = "T0220b"; }
+            # if($sutraid eq "T0220" && $juan eq "401") { $sutraid = "T0220c"; }
+            # if($sutraid eq "T0220" && $juan eq "538") { $sutraid = "T0220d"; }
+            # if($sutraid eq "T0220" && $juan eq "566") { $sutraid = "T0220e"; }
+            # if($sutraid eq "T0220" && $juan eq "574") { $sutraid = "T0220f"; }
+            # if($sutraid eq "T0220" && $juan eq "576") { $sutraid = "T0220g"; }
+            # if($sutraid eq "T0220" && $juan eq "577") { $sutraid = "T0220h"; }
+            # if($sutraid eq "T0220" && $juan eq "578") { $sutraid = "T0220i"; }
+            # if($sutraid eq "T0220" && $juan eq "579") { $sutraid = "T0220j"; }
+            # if($sutraid eq "T0220" && $juan eq "584") { $sutraid = "T0220k"; }
+            # if($sutraid eq "T0220" && $juan eq "589") { $sutraid = "T0220l"; }
+            # if($sutraid eq "T0220" && $juan eq "590") { $sutraid = "T0220m"; }
+            # if($sutraid eq "T0220" && $juan eq "591") { $sutraid = "T0220n"; }
+            # if($sutraid eq "T0220" && $juan eq "593") { $sutraid = "T0220o"; }
 
             my $index = $sutralist->index_by_id->{$sutraid}; 
+            # 處理跨冊經文的特例
+            # 處理大般若經的特例
+            if($sutraid eq "T0220" && $juan > 200) { $index += 1; }
+            if($sutraid eq "T0220" && $juan > 400) { $index += 1; }
+            if($sutraid eq "JB277" && $juan > 11) { $index += 1; }
+
             my $link = "";
             my $name = $bulei_data->[$i];
             if(defined $index)
@@ -131,7 +137,7 @@ sub create_body
             }
             # 卷數換成指定卷數
             $link =~ s/\d\d\d\.xml/${juan}.xml/;
-            $link =~ s/(T0[567]n0220)[a-z]/$1/;     # 特例
+            # $link =~ s/(T0[567]n0220)[a-z]/$1/;     # 特例
             $xhtml .= "<cblink href=\"" . $link . "\">" . $name . "</cblink>";
         }
         else

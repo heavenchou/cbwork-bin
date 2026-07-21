@@ -101,15 +101,25 @@ def phase3(src, dest)
   s.gsub!(/\n+(<anchor )/, '\1')
   s.gsub!(/(<anchor [^>]*>)\n+/, '\1')
   
-  # lb, pb 之前要換行
+  # teiHeader, lb, pb, milestone,text </body> </teiHeader> 之前要換行
   s.gsub!(/>(<lb[^>]*?ed="#{$canon})/, ">\n\\1")
-  s.gsub!(/([^\n])<pb /, "\\1\n<pb ")
+  s.gsub!(/([^\n])<((pb)|(milestone)|(teiHeader)|(text)[ >])/, "\\1\n<\\2")
+  s.gsub!(/([^\n])<\/((body)|(teiHeader))>/, "\\1\n</\\2>")
   
   # type="old" 的 lb 和 pb 不換行 (印順導師全集才有的)
   s.gsub!(/\n(<[lp]b[^>]*type="old")/, '\1')
   
   # 如果 sourceDesc 下有 <p> 的話, listWit 要放在 p 裡面.
   s.gsub!(/(<\/p>)\s*(<listWit>.*?<\/listWit>)/m, "\n\\2\\1")
+
+  # 將 teiHeader 範圍內的行首縮排成對的雙空格轉回 Tab
+  # if s.match(/(.*?<\/teiHeader>)(.*)/m)
+  #   header_part = $1
+  #   body_part = $2
+  #   while header_part.gsub!(/\n(\t*)  /, "\n\\1\t")
+  #   end
+  #   s = header_part + body_part
+  # end
 
   fn = File.join(dest, File.basename(src))
   puts "write #{fn}"

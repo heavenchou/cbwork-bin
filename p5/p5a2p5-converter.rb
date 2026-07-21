@@ -7,6 +7,12 @@ class P5aToP5Converter
     p5b_format: false
   }
 
+  # 只有在這些標籤下的「純空白文字」才應該被自動刪除
+  # body 不要處理，因為像 <milestone> 會換行，若移除會影響縮排格式
+  IGNORABLE_PARENTS = %w[
+    body app div list row table def entry event dialog sp cit lg tt
+  ].freeze
+
   attr_reader :root
 
   def initialize(args={})
@@ -22,6 +28,7 @@ class P5aToP5Converter
     @xml_file = xml_file
     @file_id = File.basename(xml_file, '.*')  #  file_id = N10n0003
     @wit = wit
+    @in_body_tag = false
 
     doc = File.open(xml_file) { |f| Nokogiri::XML(f) }
     doc.remove_namespaces!
@@ -64,6 +71,10 @@ class P5aToP5Converter
     text += '</TEI>'
 
     char_decl = prepare_char_decl(@gaijis)
+    
+    # tab 換成二個半型空白
+    char_decl.gsub!(/\t/, '  ')
+
     text.sub!('<charDecl></charDecl>', char_decl)
     text
   end
@@ -398,7 +409,10 @@ class P5aToP5Converter
     end
 
     @resp_id.each do |k, v|
-      r += %(\n\t\t\t<respStmt xml:id="#{v}"><resp>corrections</resp><name>#{k}</name></respStmt>)
+      # 原本
+      # r += %(\n\t\t\t<respStmt xml:id="#{v}"><resp>corrections</resp><name>#{k}</name></respStmt>)
+      # tab 換成二個半型空白
+      r += %(\n      <respStmt xml:id="#{v}"><resp>corrections</resp><name>#{k}</name></respStmt>)
     end
 
     r
@@ -406,7 +420,9 @@ class P5aToP5Converter
 
   def e_encoding_desc(e, mode)
     convert_e(e, mode) do |e2|
-      e2.content += "<charDecl></charDecl>\t"
+      # tab 換成二個半型空白
+      #e2.content += "<charDecl></charDecl>\t"
+      e2.content += "<charDecl></charDecl>  "
     end
   end
 
@@ -541,10 +557,14 @@ class P5aToP5Converter
     unless @wit_id.empty?
       wits = @wit_id.sort_by { |_k, v| v }
       wits.each do |k, v|
-        r += %(\t\t\t\t\t\t<witness xml:id="#{v}">#{k}</witness>\n)
+        # 原本
+        #r += %(\t\t\t\t\t\t<witness xml:id="#{v}">#{k}</witness>\n)
+        # tab 換成二個半型空白
+        r += %(            <witness xml:id="#{v}">#{k}</witness>\n)
       end
     end
-    r += "\t" * 5
+    # r += "\t" * 5
+    r += "  " * 5
     r += node.end_tag
     r
   end
@@ -700,7 +720,9 @@ class P5aToP5Converter
 
     convert_e(e, mode) do |e2|
       # 加上日期 <data>....</date>
-      e2.content += "\t<date>#{git_date}</date>\n\t\t"
+      # tab 換成二個半型空白
+      #e2.content += "\t<date>#{git_date}</date>\n\t\t"
+      e2.content += "  <date>#{git_date}</date>\n    "
     end
   end
 
@@ -776,7 +798,9 @@ class P5aToP5Converter
     end
 
     r = ''
+    # tab 換成二個半型空白
     r += "\t" if tt_type == 'app'
+    # r += "  " if tt_type == 'app'
     r += convert_e(e, mode) + "\n"
     r
   end
@@ -796,6 +820,7 @@ class P5aToP5Converter
   end
 
   def e_text(e, mode)
+    @in_body_tag = true
     convert_e(e, mode) do |e2|
       # p5b 不用處理 back
       e2.content += handle_back unless @p5b_format
@@ -999,7 +1024,39 @@ class P5aToP5Converter
   def handle_text(e, mode)
     return '' if e.nil?
 
+    # 空白字元的處理法：
+    # 規則一：
+    # 在白名單內的標記底下，如果內容是空白字元，就不保留，因為這些標記的空白字元都是格式化用的，不是實際要呈現的。
+    # 白名單在此: IGNORABLE_PARENTS
+
+    # 規則二：
+    # 若是 \n 開頭的空白，則不管是不是白名單，都不保留，除非後面是 <lb> <pb> 這類允許換行的標記，才保留 \n
+
+    # 規則一：攔截並過濾白名單容器底下的格式化空白
+    parent_name = e.parent ? e.parent.name : ''
+    return '' if IGNORABLE_PARENTS.include?(parent_name) && e.content.strip.empty?
+
     text = e.content
+    # XML P5a 的 text 可能在 </p><p> 之間會有換行符號, 
+    # 或 </l><l> 之間，或 </lem><rdg> 之間... 等等，這類標記可能不少，是允許換行的，
+    # 所以除了後面是 <lb> 這類允許換行的標記，其它要先接起來
+    if @in_body_tag
+      if text =~ /\A\n\s*\Z/
+        # 檢查下一個兄弟節點是否是 <lb> 或 <pb>
+        next_sibling = e.next_sibling
+        if next_sibling && %w[lb pb teiHeader text milestone].include?(next_sibling.name)
+          # 這種情況下，保留換行符號，但若在 back 區就不保留
+          if mode.include?(:back)
+            return ""
+          else
+            # puts "保留換行符號，因為下一個兄弟節點是 <#{next_sibling.to_s}>"
+            return "\n"
+          end
+        else
+          return ''
+        end
+      end
+    end
 
     text.gsub!("\n", '') if mode.include?(:back)
     text.gsub!('&', '&amp;')
