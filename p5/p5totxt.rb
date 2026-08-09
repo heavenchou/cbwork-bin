@@ -202,7 +202,7 @@ def e_lg(e)
   r = traverse(e)
 
   type = e['subtype']
-  return "(#{r})" if type=='note2' or type=='note1'
+  return "(#{r})" if type=='note2' or type=='note1' or e['rend'] == "inlinenote"
 
   r
 end

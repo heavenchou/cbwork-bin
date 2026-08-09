@@ -82,11 +82,32 @@ sub create_body
         }
         elsif($book_nav->type->[$i] eq "L")
         {
+            # 指定卷數 T0220_576 或 T0310_017..018 (數卷時只指向開頭卷)
+            # 描述文字直接用後面的字, 不查 sutralist
+            if($book_nav->data->[$i] =~ /^([A-Z]+a?\d+[A-Za-z]?)_(\d\d\d)(?:\.\.\d\d\d)? +(.+)$/) {
+                my $sutraid = $1;
+                my $juan = $2;
+                my $name = $3;
+                my $index = $sutralist->index_by_id->{$sutraid};
+
+                # 處理跨冊經文的特例 (同 create_bulei_nav.pl)
+                if($sutraid eq "T0220" && $juan > 200) { $index += 1; }
+                if($sutraid eq "T0220" && $juan > 400) { $index += 1; }
+                if($sutraid eq "JB277" && $juan > 11)  { $index += 1; }
+
+                my $link = "";
+                if(defined $index) {
+                    $link = "XML/" . $sutralist->link->[$index];
+                }
+                # 卷數換成指定卷數
+                $link =~ s/\d\d\d\.xml/${juan}.xml/;
+                $xhtml .= "<cblink href=\"" . $link . "\">" . $name . "</cblink>";
+            }
             # 網頁連結
             # XXX.htm 說明檔
             # 不可有連續 .. 否則 T0001..T0005 XXX 會被誤判成 T0001..T0005 的連結
             # 空格不可以用 \s , 因為有全型空格會在文字中
-            if($book_nav->data->[$i] =~ /^(.+[^\.]\.[0-9A-Za-z]+) +(.+)$/i) {
+            elsif($book_nav->data->[$i] =~ /^(.+[^\.]\.[0-9A-Za-z]+) +(.+)$/i) {
                 my $link = $1;
                 my $name = $2;
                 $xhtml .= "<a href=\"" . $link . "\">" . $name . "</a>";

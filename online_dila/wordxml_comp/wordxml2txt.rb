@@ -43,7 +43,7 @@ end
 # 把 body 轉成我們要的純文字格式
 def body_to_txt(xml, basename)
   body = xml.at_css('body')
-  return '' unless body
+  return [] unless body
 
   raw_xml = body.inner_html
 
@@ -56,6 +56,13 @@ def body_to_txt(xml, basename)
     ""
   end
 
+  
+  # lb 之前的左括號，移到下一行
+  # (<!-- lb: X18n0332_p0067b20 --> => <!-- lb: X18n0332_p0067b20 -->(
+  raw_xml.gsub!(/\((<!\-\- lb[^>]*>)/,'\1(')
+  # raw_xml.gsub!(/<p rend="lg_note[12]">(<!\-\- lb[^>]*>)/,'<p>\1(')
+  
+
   # 根據 <!-- lb: xxx --> 分割
   # (允許一行有多個。前一個片段如果沒 lb 標記，補個首段)
   # <!-- lb: T02n0131_p0854b04 -->
@@ -66,7 +73,6 @@ def body_to_txt(xml, basename)
   i = 1
   while i < lines.size
     lb = lines[i].strip # T02n0131_p0854b04
-    $lb = lb
     content = lines[i+1].to_s
     # 有些空白要先移除
     #  <item><p>天帝釋問品</p></item>
@@ -128,11 +134,21 @@ def body_to_txt(xml, basename)
     # 組合處理
     #line_label = "#{basename}p#{lb}"
     line_label = "#{lb}"
-    result << "#{line_label}║#{text}"
+
+    # 取出這一行所屬的冊號(如 X39、T02)，用來判斷跨冊時該寫到哪個目錄
+    # 如果 lb 格式有問題、抓不到冊號，仍然寫入檔案(方便比對時發現問題)，
+    # 只是歸類到 UNKNOWN 這個冊號目錄下
+    vol = lb[/^([A-Za-z]+\d+)n/, 1]
+    if vol.nil?
+      puts "Warning: 無法從 lb 取得冊號: #{lb.inspect} (basename=#{basename})，歸類到 UNKNOWN"
+      vol = 'UNKNOWN'
+    end
+
+    result << [vol, "#{line_label}║#{text}"]
 
     i += 2
   end
-  result.join("\n")
+  result
 end
 
 # 取得傳入的參數
@@ -165,7 +181,8 @@ Find.find(SRC_ROOT) do |path|
   end
 
   unless m
-    puts "Skip not-matched: #{path}"
+    # 印出不符合條件的檔案
+    # puts "Skip not-matched: #{path}"
     next
   end
 
@@ -195,24 +212,20 @@ Find.find(SRC_ROOT) do |path|
 
   # 讀取、處理、寫出
   xml = Nokogiri::XML(File.read(path))
-  content = body_to_txt(xml, basename_txt)
+  lines = body_to_txt(xml, basename_txt) # [[vol, "lb║text"], ...]
 
+  # 依冊號分組(同一卷可能跨冊，例如前半在 X39、後半在 X40)
+  # 每個冊號各自組成內容，寫到各自的目錄
+  lines.group_by { |vol, _line| vol }.each do |serdir, group|
+    content = group.map { |_vol, line| line }.join("\n")
 
-  #serdir = $Sutra2Vol[sernum]
-  #
-  serdir = ""
-  if $lb =~ /([A-Z]+\d+)n/
-    serdir = $1 # T01
+    # 輸出路徑：d:/Temp/wordxml_out_txt/T/T01
+    outdir = File.join(OUT_ROOT, subdir, serdir)
+    FileUtils.mkdir_p(outdir)
+
+    File.write(File.join(outdir, outname), content)
+    puts "Output: #{File.join(outdir, outname)}"
   end
-  p $lb
-  p serdir
-  # 輸出路徑：d:/Temp/wordxml_out_txt/T/T01
-  outdir = File.join(OUT_ROOT, subdir, serdir)
-  FileUtils.mkdir_p(outdir)
-
-
-  File.write(File.join(outdir, outname), content)
-  puts "Output: #{File.join(outdir, outname)}"
 end
 
 puts "All done!"

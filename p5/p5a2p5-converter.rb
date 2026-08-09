@@ -70,7 +70,7 @@ class P5aToP5Converter
     text += traverse(@root, Set.new([:body]))
     text += '</TEI>'
 
-    char_decl = prepare_char_decl(@gaijis)
+    char_decl = prepare_char_decl(@gaijis)  # "\t<charDecl>\n#{r}\t\t</charDecl>\n\t"
     
     # tab 換成二個半型空白
     char_decl.gsub!(/\t/, '  ')
@@ -422,7 +422,7 @@ class P5aToP5Converter
     convert_e(e, mode) do |e2|
       # tab 換成二個半型空白
       #e2.content += "<charDecl></charDecl>\t"
-      e2.content += "<charDecl></charDecl>  "
+      e2.content += "<charDecl></charDecl>"
     end
   end
 
@@ -1121,7 +1121,7 @@ class P5aToP5Converter
 
     return '' if r.empty?
 
-    "\t<charDecl>\n#{r}\t\t</charDecl>\n"
+    "\t<charDecl>\n#{r}\t\t</charDecl>\n\t"
   end
 
   def prepare_char_decl_char(cb)
