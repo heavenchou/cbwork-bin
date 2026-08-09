@@ -846,7 +846,20 @@ sub get_word2
 		{
 			$tagbuff .= "\n";
 			$index2 ++;
+			# 換行後若有行首空白，一律視為標記
+			if($lines2[$index2] =~ /^[ \t]+/) {
+				$lines2[$index2] =~ s/^([ \t]*)//;
+				$tagbuff .= $1;
+			}
 			next;
+		}
+
+		# 把 <note \n ....> 接成一行
+		if($lines2[$index2] =~ /^<note$/) {
+			$lines2[$index2 + 1] = $lines2[$index2] . $lines2[$index2 + 1];
+			$lines2[$index2] = "";
+			$index2 += 1;
+			print $lines2[$index2];
 		}
 
 		if($lines2[$index2] =~ /^(<lb.*?>)/)
@@ -1532,9 +1545,9 @@ sub get_all_note
 
 	while($_)
 	{
-		if(/^<note [^>]*>/)
+		if(/^<note\s?[^>]*>/)
 		{
-			s/^(<note [^>]*>)//;
+			s/^(<note\s?[^>]*>)//;
 			$note .= $1;
 			$notecount++;
 		}
@@ -1545,7 +1558,7 @@ sub get_all_note
 			$notecount--;
 			last if($notecount == 0);
 		}
-		elsif(/^<.*?>/)
+		elsif(/^<[^>]*?>/)
 		{
 			s/^(<[^>]*>)//;
 			$note .= $1;
