@@ -855,11 +855,10 @@ sub get_word2
 		}
 
 		# 把 <note \n ....> 接成一行
-		if($lines2[$index2] =~ /^<note$/) {
+		if($lines2[$index2] =~ /^<note\s*$/) {
 			$lines2[$index2 + 1] = $lines2[$index2] . $lines2[$index2 + 1];
 			$lines2[$index2] = "";
 			$index2 += 1;
-			print $lines2[$index2];
 		}
 
 		if($lines2[$index2] =~ /^(<lb.*?>)/)
