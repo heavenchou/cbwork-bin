@@ -9,6 +9,7 @@
 # pushsign.pl 簡單標記版.txt 舊的xml.xml 結果檔xml.xml use_ou > 記錄檔.txt
 #
 ########################################################
+# 2026/08/26 : 支援 XML 可斷行的新格式。
 # 2025/03/10 : 加一個參數，若要處理 <o><u> 標記，就加上第四個參數 use_ou
 # 2024/07/16 : 處理卍續【科01】【標01】【解01】，並把【註】當成一個字，避免被當成新標【】。
 # 2024/01/24 : 把 BM 的 <o><u>...</u> 暫時取消，BM 若原來就有此標記，就要取消它們。
@@ -287,9 +288,9 @@ while(1)
 			
 			# 有一種情況 tagbuff 找不到 hasdot2
 			# 例如 tagbuff = "。<tag>「" , hasdot2 = "。<tag>「"
-			if($tagbuff =~ /^(.*)$hasdot2/)
+			if($tagbuff =~ /^((.|\n)*)$hasdot2/)
 			{
-				$tagbuff =~ s/^(.*)$hasdot2/$1$hasdot1/;
+				$tagbuff =~ s/^((.|\n)*)$hasdot2/$1$hasdot1/;
 				$tagbuff =~ s/((?:「)|(?:『)|(?:（)|(?:《)|(?:〈)|(?:“)|(?:【))(<.*>)/$2$1/;	# 有點暴力了...要改...
 			}
 			else
@@ -311,16 +312,16 @@ while(1)
 			# <rdg wit="【大】">阿。</rdg></app> ==> <rdg wit="【大】">阿</rdg></app>。
 			if($tagbuff =~ /^<((\/rdg)|(\/lem)|(\/t)|(note\s+resp="CBETA[^"]*">)|(app.*?))>/)
 			{
-			    if($tagbuff =~ /^.*<\/((app)|(cb:tt)|(note))>/)
+			    if($tagbuff =~ /^(.|\n)*<\/((app)|(cb:tt)|(note))>/)
 			    {
-				    $tagbuff =~ s/^(.*<\/(?:(?:app)|(?:cb:tt)|(?:note))>)/$1$hasdot1/;
+				    $tagbuff =~ s/^((.|\n)*<\/(?:(?:app)|(?:cb:tt)|(?:note))>)/$1$hasdot1/;
 				    #print OUTXml "$tagbuff";
 					printout($tagbuff);
 				}
 				else
 				{
 				    #print OUTXml "$hasdot1<<?>:<在 rdg,lem,t,note 之前的句讀應該處理掉>>$tagbuff";
-					printout("$hasdot1<<?>:<在 rdg,lem,t,note 之前的句讀應該處理掉>>$tagbuff");
+					printout("$hasdot1<<?>:<在 rdg,lem,t,note 之前的句讀應該處理掉>>$tagbuff <>");
 				}
 			}
 			# 如果標點在 <lem...> 標記之後，標點要移到前面，不管是不是上引號 (下一個 elsif)
