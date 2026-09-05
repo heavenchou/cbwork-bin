@@ -9,6 +9,7 @@
 # pushsign.pl 簡單標記版.txt 舊的xml.xml 結果檔xml.xml use_ou > 記錄檔.txt
 #
 ########################################################
+# 2026/09/06 : 支援 <P,x,y> 格式，x 和 y 可為負值
 # 2026/08/26 : 支援 XML 可斷行的新格式。
 # 2025/03/10 : 加一個參數，若要處理 <o><u> 標記，就加上第四個參數 use_ou
 # 2024/07/16 : 處理卍續【科01】【標01】【解01】，並把【註】當成一個字，避免被當成新標【】。
@@ -535,10 +536,10 @@ sub get_word1
 		# <u> =>     <cb:div type="commentary"><p>...</p></cb:div>
 		# </u> =>     </p></cb:div>
 
-		if($lines1[$index1] =~ /^((?:。)|(?:、)|(?:，)|(?:．)|(?:；)|(?:：)|(?:「)|(?:」)|(?:『)|(?:』)|(?:（)|(?:）)|(?:？)|(?:！)|(?:—)|(?:…)|(?:《)|(?:》)|(?:〈)|(?:〉)|(?:“)|(?:”)|(?:【)|(?:】)|(?:★)|(?:☆)|(?:※)|(?:●)|(?:＜)|(?:＞)|(?:(?:<\/?[ouwsaIL]\d*>)?<P(?:,\d+)?>))/)
-		{
+		if($lines1[$index1] =~ /^((?:。)|(?:、)|(?:，)|(?:．)|(?:；)|(?:：)|(?:「)|(?:」)|(?:『)|(?:』)|(?:（)|(?:）)|(?:？)|(?:！)|(?:—)|(?:…)|(?:《)|(?:》)|(?:〈)|(?:〉)|(?:“)|(?:”)|(?:【)|(?:】)|(?:★)|(?:☆)|(?:※)|(?:●)|(?:＜)|(?:＞)|(?:(?:<\/?[ouwsaIL]\d*>)?<P(?:,\-?\d+)*>))/) {
+
 			my $tmp = $1;
-			if($tmp =~ /(<\/?[ouwsaIL]\d*>)?(<P(?:,\d+)?>)/)
+			if($tmp =~ /(<\/?[ouwsaIL]\d*>)?(<P(?:,\-?\d+)*>)/)
 			{
 				my $tag1 = $1;
 				my $tag2 = $2;
@@ -546,8 +547,7 @@ sub get_word1
 				# 1. <[wsa]> => <!-- <[wsa]> --> 
 				# ex. <w> => <!-- <w> -->
 
-				if($tag1 =~ /(<[wsa]>)/)
-				{
+				if($tag1 =~ /(<[wsa]>)/) {
 					$tag1 = "<!-- $1 -->";
 				}
 
@@ -605,9 +605,7 @@ sub get_word1
 						# 錯誤的層數, 可能跳太多了 <I3> -> <I5>
 						$tag1 = "<?>item level error";
 					}
-				}
-				elsif($tag1 eq "</L>")
-				{
+				} elsif($tag1 eq "</L>") {
 
 					# 回到上一層 : ex. <I3> -> </L>
 					# <I1> => <list><item>
@@ -624,29 +622,31 @@ sub get_word1
 
 				# 3. <P> => <p>
 				#    <P,x> => <p style="margin-left:xem">
+				#    <P,x,y> => <p style="margin-left:xem;text-indent:yem">
 				#    行中 P 則加上 cb:place="inline"
 
-				if($tag2 =~ /<P>/)
-				{
-					if($firstword)
-					{
+				if($tag2 =~ /<P>/) {
+					if($firstword) {
 						$tag2 = "<p>";
-					}
-					else
-					{
+					} else {
 						$tag2 = "<p cb:place=\"inline\">";
 					}
 				}
-				if($tag2 =~ /<P,(\d+)>/)
-				{
+				if($tag2 =~ /<P,(\-?\d+)>/) {
 					my $tmpnum = $1;
-					if($firstword)
-					{
+					if($firstword) {
 						$tag2 = "<p style=\"margin-left:${tmpnum}em\">";
+					} else {
+						$tag2 = "<p style=\"margin-left:${tmpnum}em\" cb:place=\"inline\">";
 					}
-					else
-					{
-						$tag2 = "<p style=\"margin-left:${tmpnum}em;\" cb:place=\"inline\">";
+				}
+				if($tag2 =~ /<P,(\-?\d+),(\-?\d+)>/) {
+					my $tmpnum = $1;
+					my $tmpnum2 = $2;
+					if($firstword) {
+						$tag2 = "<p style=\"margin-left:${tmpnum}em;text-indent:${tmpnum2}em\">";
+					} else {
+						$tag2 = "<p style=\"margin-left:${tmpnum}em;text-indent:${tmpnum2}em\" cb:place=\"inline\">";
 					}
 				}
 
@@ -655,7 +655,7 @@ sub get_word1
 			}
 				
 			$hasdot1 .= $tmp;		
-			$lines1[$index1] =~ s/^((?:。)|(?:、)|(?:，)|(?:．)|(?:；)|(?:：)|(?:「)|(?:」)|(?:『)|(?:』)|(?:（)|(?:）)|(?:？)|(?:！)|(?:—)|(?:…)|(?:《)|(?:》)|(?:〈)|(?:〉)|(?:“)|(?:”)|(?:【)|(?:】)|(?:★)|(?:☆)|(?:※)|(?:●)|(?:＜)|(?:＞)|(?:(?:<\/?[ouwsaIL]\d*>)?<P(?:,\d+)?>))//;
+			$lines1[$index1] =~ s/^((?:。)|(?:、)|(?:，)|(?:．)|(?:；)|(?:：)|(?:「)|(?:」)|(?:『)|(?:』)|(?:（)|(?:）)|(?:？)|(?:！)|(?:—)|(?:…)|(?:《)|(?:》)|(?:〈)|(?:〉)|(?:“)|(?:”)|(?:【)|(?:】)|(?:★)|(?:☆)|(?:※)|(?:●)|(?:＜)|(?:＞)|(?:(?:<\/?[ouwsaIL]\d*>)?<P(?:,\-?\d+)*>))//;
 			next;
 		}
 		elsif($lines1[$index1] =~ /^(<\/L>)/ and $hasIP == 1)
