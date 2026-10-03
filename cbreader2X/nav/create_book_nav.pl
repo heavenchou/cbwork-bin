@@ -111,6 +111,10 @@ sub create_body
                 my $link = $1;
                 my $name = $2;
                 $xhtml .= "<a href=\"" . $link . "\">" . $name . "</a>";
+            } elsif($book_nav->data->[$i] =~ /T09n0262_p0056c02/) {
+                # 特例
+                # 普門品
+                $xhtml .= "<cblink href=\"XML/T/T09/T09n0262_007.xml#p0056c02\">T0262 (卷7) 妙法蓮華經觀世音菩薩普門品</cblink>";
             } else {
                 # 經文連結
                 # 有一種是有經名的, 要移除
