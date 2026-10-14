@@ -105,7 +105,7 @@ if ARGV[0] && ARGV[1]
 else
   puts 'CBETA XML P5a 轉出 EPUB'
   puts '用法：'
-  puts '  ruby xml2epub.rb ALL  2022.Q1 (全部)'
-  puts '  ruby xml2epub.rb T    2022.Q1 (只有大正藏 T)'
-  puts '  ruby xml2epub.rb A..D 2022.Q1 (處理範圍從 A 到 D)'
+  puts '  ruby xml2epub.rb ALL  2026.R2 (全部)'
+  puts '  ruby xml2epub.rb T    2026.R2 (只有大正藏 T)'
+  puts '  ruby xml2epub.rb A..D 2026.R2 (處理範圍從 A 到 D)'
 end

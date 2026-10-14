@@ -1,5 +1,5 @@
 class P5Node
-  CB = %w[def dialog div docNumber event fan jhead jl_byline jl_juan jl_title juan mulu sg t tt yin zi]
+  CB = %w[def dialog div docNumber event fan jhead jl_byline jl_juan jl_title juan mulu sg t tt ttr yin zi]
   EMPTY = %w[anchor caesura lb milestone mulu pb space]
 
   attr_accessor :attributes, :content, :tag
@@ -47,7 +47,11 @@ class P5Node
       v2.gsub!('<', '&lt;')
       v2 = case k  
       when 'resp', 'cb:resp'
-        handle_resp(v2)
+        if @tag == "punctuation"
+          v2
+        else
+          handle_resp(v2)
+        end
       when 'wit'
         handle_wit(v2)
       else

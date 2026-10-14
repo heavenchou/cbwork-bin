@@ -330,6 +330,9 @@ def e_t(e)
     return content 
   end
 
+  # 新版直接處理了，底下舊版都不做了
+  return content 
+
   # <cb:tt> 裏面的第一個 <cb:t> 在第一行, 第2個 <cb:t> 要顯示在下一行.
   return content if child_index(e) == 0
 

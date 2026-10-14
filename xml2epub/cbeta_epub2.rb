@@ -13,6 +13,7 @@ require 'cbeta'
 require_relative 'html-node'
 require_relative 'unicode_service'
 
+# 20260812: 處理 reg, unclear 標記
 
 # Convert CBETA XML P5a to EPUB2
 #
@@ -417,7 +418,11 @@ eos
   end
 
   def e_item(e)
-    "\n<li>%s</li>\n" % traverse(e)
+    r = ''
+    r = e['n'] if e.key?('n')
+    r += traverse(e)
+    r = "\n<li>" + r + "</li>\n"
+    r
   end
 
   def e_juan(e)
@@ -480,13 +485,23 @@ eos
   def e_lg(e)
     r = ''
     @lg_type = e['type']
+    @lg_subtype = e['subtype']
+    
+    inlinenote = false  # 判斷是否是行中小註或雙行小註
+    inlinenote = true if @lg_subtype=='note2' or @lg_subtype=='note1' or e['rend'] == "inlinenote"
 
     if @lg_type != 'regular'
       node = HtmlNode.new('span')
       node.content = traverse(e)
+      if inlinenote
+        # l 的格式為 "<span class='lg-row'>#{s}</span>\n"
+        node.content.sub!("<span class='lg-row'>", "<span class='lg-row'>(")
+        node.content.sub!(/<\/span>\Z/, ')</span>')
+      end
       node['style'] = e['style'] if e.key? 'style'
       classes = ['lg-abnormal']
       classes << e['rend'] if e.key? 'rend'
+      classes << 'note-inline' if inlinenote
       node['class'] = classes.join(' ')
       return node.to_s
     end
@@ -501,6 +516,7 @@ eos
     classes = ['lg']
     classes << e['rend'] if e.key? 'rend'
     classes << e['type'] if e.key? 'type'
+    classes << 'note-inline' if inlinenote
     node['class'] = classes.join(' ')
 
     if e.key?('style')
@@ -508,6 +524,11 @@ eos
     end
 
     node.content = traverse(e)
+    if inlinenote
+      # l 的格式為 "<span class='lg-row'>#{s}</span>\n"
+      node.content.sub!("<span class='lg-row'>", "<span class='lg-row'>(")
+      node.content.sub!(/<\/span>\Z/, ')</span>')
+    end
     "\n" + node.to_s
   end
 
@@ -660,7 +681,13 @@ eos
     r = traverse(e)
 
     # <tt type="app"> 不是 悉漢雙行對照
-    return r if @tt_type == 'app'
+    # return r if @tt_type == 'app'
+
+    # 用 C# 的程式來描述，這才要處理隔行對照
+    # if ((sPlace != "inline" && sType == "tr") || (sPlace != "inline" && sType == "")) 
+
+    return r unless @tt_place != 'inline' &&
+                (@tt_type == 'tr' || @tt_type == '')
 
     # 處理雙行對照
     i = e.xpath('../t').index(e)
@@ -676,12 +703,20 @@ eos
   end
 
   def e_tt(e)
-    @tt_type = e['type']
+    @tt_type = e['type'].to_s
+    @tt_place = e['place'].to_s
     traverse(e)
   end
 
   def e_table(e)
     "\n<table>" + traverse(e) + "</table>"
+  end
+
+  # <unclear/> 無法辨別的字, 呈現 ▆
+  def e_unclear(e)
+    r = traverse(e)
+    r = '▆' if r.empty?
+    r
   end
   
   def handle_node(e, mode)
@@ -717,12 +752,12 @@ eos
     when 'lem'       then e_lem(e)
     when 'lg'        then e_lg(e)
     when 'list'      then e_list(e)
+    when 'milestone' then e_milestone(e)
     when 'mulu'      then e_mulu(e)
     when 'note'      then e_note(e, mode)
-    when 'milestone' then e_milestone(e)
     when 'p'         then e_p(e)
     when 'rdg'       then ''
-    when 'reg'       then ''
+    #when 'reg'       then ''
     when 'row'       then e_row(e)
     when 'seg'       then e_seg(e)
     when 'sic'       then ''
@@ -730,6 +765,7 @@ eos
     when 't'         then e_t(e)
     when 'table'     then e_table(e)
     when 'tt'        then e_tt(e)
+    when 'unclear'   then e_unclear(e)
     else traverse(e)
     end
     @nor_flag.pop

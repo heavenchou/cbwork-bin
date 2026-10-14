@@ -6,6 +6,7 @@
 # 作者: 周邦信(Ray Chou) 2022-04-20
 #
 # Heaven 修改：
+# 2026-10-14 表格新規則，若在表格中，該行不是 /<c[\s,>]/ 開頭，則行首不自動加上 <row>，表示接續前一行
 # 2025-09-26 支援《演培法師全集》
 # 2025-06-12 支援 A,C,G 等藏經
 # 2025-01-30 支援新的 XML 檔頭，詳見新的 p5a-template.xml
@@ -187,9 +188,16 @@ def do_line_head(tag, text)
   end
 
   # $opens['table'] > 0 ，又沒有 <table> or <row> or <F> 則要加入 <row>
+  # 20261014 加入新規則，若該行一開始不是 /<c[\d\s,>]/ ，則不要加 <row>
+  # _f#<c>第1-1格<c>第1-2格
+  # _##第1-2格之尾<row><c>第2-1格<c>第2-2格
+  # _##第2-2格之尾
+  
   if $opens['table'] > 0
     if !text.match(/<((table)|(row)|(F[,>]))/)
-      text = '<row>' + text
+      if text.match(/^<c[\d\s,>]/)
+        text = '<row>' + text
+      end
     end
   end
   return text
