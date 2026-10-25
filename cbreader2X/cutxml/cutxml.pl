@@ -507,23 +507,33 @@ sub start_handler
 	# 處理 <lb> 標記
 	if ($el eq "lb")
 	{
-		my $att_ed = $node->getAttributeNode("ed")->getValue;	# 取得 ed 屬性
-		my $att_n = $node->getAttributeNode("n")->getValue;		# 取得 n 屬性
+		my $att_ed = $node->getAttributeNode("ed");	# 取得 ed 屬性
+		my $att_n = $node->getAttributeNode("n");		# 取得 n 屬性
 		my $att_type = $node->getAttributeNode("type");		# 取得 type 屬性 
+		my $att_ed_v = "";
+		my $att_n_v = "";
 		my $att_type_v = "";
 
+		if($att_ed)
+		{
+			$att_ed_v = $att_ed->getValue;
+		}
+		if($att_n)
+		{
+			$att_n_v = $att_n->getValue;
+		}
 		if($att_type)
 		{
 			$att_type_v = $att_type->getValue;
 		}
 		#n = 某卷第一行及 ed = 大藏經, 表示找到卷首了. (卍續藏有二個 <lb> 所以要檢查 ed 屬性)
-     	return if($att_n ne $lbn[$milestoneNum+1] || $att_ed ne $edit || $att_type_v eq "old");	
+     	return if($att_n_v ne $lbn[$milestoneNum+1] || $att_ed_v ne $edit || $att_type_v eq "old");	
      			
 		# 至此, 表示找到另一卷的開頭處, 所以要記錄上卷未結束的各種標記, 才符合 XML 的原則.
 
 		$milestoneNum++;	# 第 N 個
 		#print "mile : $milestoneNum \n";
-		#print "lb_n : $att_n \n";
+		#print "lb_n : $att_n_v \n";
 		$parentnode = $node->getParentNode();
 		while(($pnName = $parentnode->getTagName()) ne "body")
 		{

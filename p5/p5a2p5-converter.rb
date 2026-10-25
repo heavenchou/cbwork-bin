@@ -512,7 +512,7 @@ class P5aToP5Converter
     ed = e['ed']
 
     convert_e(e, mode) do |e2|
-      if ed.include?('C ')
+      if ed&.include?('C ')
         e2['type'] = 'honorific'
         e2['ed'] = ed.replace('C ', '')
       end

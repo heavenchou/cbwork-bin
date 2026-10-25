@@ -6,6 +6,7 @@
 # 作者: 周邦信(Ray Chou) 2022-04-20
 #
 # Heaven 修改：
+# 2026-10-24 新增 <lb> 標記，轉出 <lb type="forced"/>，原來的 type="honorific" 也改成 type="forced"
 # 2026-10-14 表格新規則，若在表格中，該行不是 /<c[\s,>]/ 開頭，則行首不自動加上 <row>，表示接續前一行
 # 2025-09-26 支援《演培法師全集》
 # 2025-06-12 支援 A,C,G 等藏經
@@ -277,6 +278,7 @@ def inline_tag(tag)
   when '</large>' then out('</hi>')
   when '<larger>'  then out('<hi rend="larger">')
   when '</larger>' then out('</hi>')
+  when '<lb>'     then out('<lb type="forced"/>')
   when '<ming>'    then out('<hi rend="mingti">')
   when '</ming>'   then out('</hi>')
   when /^<mj/      then start_inline_mj(tag)
@@ -1891,7 +1893,7 @@ def convert_line(s)
   end
     
   $buf << "\n<lb"
-  $buf << ' type="honorific"' if $head_tag.include?('k') # 強迫換行
+  $buf << ' type="forced"' if $head_tag.include?('k') # 強迫換行, 以前是 "honorific"，20261024 改成 "forced"
   $buf << %( ed="#{$canon}" n="#{pb}#{$line_num}"/>)
   
   text = do_line_head($head_tag, text)	

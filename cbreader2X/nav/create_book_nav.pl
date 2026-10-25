@@ -111,10 +111,17 @@ sub create_body
                 my $link = $1;
                 my $name = $2;
                 $xhtml .= "<a href=\"" . $link . "\">" . $name . "</a>";
-            } elsif($book_nav->data->[$i] =~ /T09n0262_p0056c02/) {
-                # 特例
-                # 普門品
-                $xhtml .= "<cblink href=\"XML/T/T09/T09n0262_007.xml#p0056c02\">T0262 (卷7) 妙法蓮華經觀世音菩薩普門品</cblink>";
+            } elsif($book_nav->data->[$i] =~ /^(([A-Z]+)(\d+)n[^_]{4,5})_?(p.\d\d\d.\d\d)\s+(.* \(卷(\d+)\).*)$/) {
+                # T46n1915_p0473b11 T1915 修習止觀坐禪法要 (卷1) 〈始終心要〉
+				# T46n1937_p0868a23 T1937 四明尊者教行錄 (卷2) 〈修懺要旨〉	
+                my $id = $1;    # T46n1915
+                my $ed = $2;    # T
+                my $vol = $3;   # 46
+                my $pcl = $4;   # p0473b11
+                my $name = $5;  # T1915 修習止觀坐禪法要 (卷1) 〈始終心要〉
+                my $juan = $6;  # 1
+                $juan = sprintf("%03d", $juan);
+                $xhtml .= "<cblink href=\"XML/${ed}/${ed}${vol}/${id}_${juan}.xml#${pcl}\">${name}</cblink>";
             } else {
                 # 經文連結
                 # 有一種是有經名的, 要移除
