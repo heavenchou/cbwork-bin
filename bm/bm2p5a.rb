@@ -6,6 +6,7 @@
 # 作者: 周邦信(Ray Chou) 2022-04-20
 #
 # Heaven 修改：
+# 2026-11-18 【圖】當成一個字，【圖】前後的 xml:id 才不會相同，同時海潮音不加卷目錄。
 # 2026-11-17 取消這點：2023-09-21 支援 <date> 後面不再有 <p>，改成 <date> 裡面要自動加 <p>
 # 2026-11-17 海潮音支援【圖】和【圖-廣告】，檔頭的標點預設為「AI 標點」。
 # 2026-10-24 新增 <lb> 標記，轉出 <lb type="forced"/>，原來的 type="honorific" 也改成 type="forced"
@@ -666,6 +667,7 @@ def start_img(tag)
   else tag == '<img>'
     out %(<figure><graphic url="#{url}"/></figure>)
   end
+  $char_count += 1
 end
 
 def start_J(tag)
@@ -750,7 +752,7 @@ def start_inline_mj(tag)
 
   # 原本 <cb:mulu type="卷" n="{}"/> 是在 <J> 或 Ｊ卷標記處理, 只有南傳在 <mj> 處理, 
   # 現在全部移到 <mj> 處理, 因為有卷沒有卷標記
-  unless $canon == 'TX'
+  unless $canon == 'TX' or $canon == 'HC'
     $buf << %(<cb:mulu type="卷" n="#{$juan_num}"/>)
   end
 end
