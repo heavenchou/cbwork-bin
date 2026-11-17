@@ -6,6 +6,7 @@
 # 作者: 周邦信(Ray Chou) 2022-04-20
 #
 # Heaven 修改：
+# 2026-11-17 支援【圖】和【圖-廣告】
 # 2026-10-24 新增 <lb> 標記，轉出 <lb type="forced"/>，原來的 type="honorific" 也改成 type="forced"
 # 2026-10-14 表格新規則，若在表格中，該行不是 /<c[\s,>]/ 開頭，則行首不自動加上 <row>，表示接續前一行
 # 2025-09-26 支援《演培法師全集》
@@ -47,6 +48,7 @@ $collection_zh = {
   'G'  => '佛教大藏經',
   'GA' => '中國佛寺史志彙刊',
   'GB' => '中國佛寺志叢刊',
+  'HC' => '海潮音',
   'HM' => '惠敏法師著作集',
   'LC' => '呂澂佛學著作集',
   'N' => '漢譯南傳大藏經（元亨寺版）',
@@ -71,6 +73,7 @@ $collection_en = {
   'GA' => 'Zhongguo Fosi Shizhi Huikan',
   'GB' => 'Zhongguo fosizhi congkan',
   'H'  => 'Passages concerning Buddhism from the Official Histories',
+  'HC' => 'Hai Ch\'ao Yin',
   'HM' => 'the Complete Works of Ven Huimin',
   'I'  => 'Selections of Buddhist Stone Rubbings from the Northern Dynasties',
   'J'  => 'Jiaxing Canon (Shinwenfeng Edition)',
@@ -89,7 +92,7 @@ $collection_en = {
   'W'  => 'Buddhist Texts not contained in the Tripiṭaka',
   'X'  => 'Manji Shinsan Dainihon Zokuzōkyō',
   'Y'  => 'Corpus of Venerable Yin Shun\'s Buddhist Studies',
-  'YP'  => 'The Complete Works of Venerable Yen Pei',
+  'YP' => 'The Complete Collected Works of Venerable Yen Pei',
   'Z'  => 'Manji Dainihon Zokuzōkyō',
   'ZS' => 'Passages concerning Buddhism from the Official Histories',
   'ZW' => 'Buddhist Texts not contained in the Tripiṭaka',
@@ -264,6 +267,7 @@ def inline_tag(tag)
   when /<I\d*[,>]/    then start_i(tag)
   when '<i>('       then out2('<note place="interlinear">')
   when /^\)(<\/i>)?/ then out2('</note>')
+  when /^<img/    then start_img(tag)
   when '<it>'    then out('<hi rend="italic">')
   when '</it>'   then out('</hi>')
   when '<j>'    then start_inline_j(tag)
@@ -651,6 +655,17 @@ def start_i(tag)
   out "#{s}#{style}#{rend}>"
   $opens['item'] += 1
 end  
+
+def start_img(tag)
+  $img_count_by_page += 1
+  url = %(../figures/#{$canon}/#{$vol}p#{$old_page}_%02d.gif) % $img_count_by_page
+  if tag == '<img-ad>'
+    # 此圖是廣告
+    out %(<figure type="advertisement"><graphic url="#{url}"/></figure>)
+  else tag == '<img>'
+    out %(<figure><graphic url="#{url}"/></figure>)
+  end
+end
 
 def start_J(tag)
   return if $head_tag.include?('=')
@@ -1890,6 +1905,10 @@ def convert_line(s)
   if pb != $old_pb
     $buf << %(\n<pb ed="#{$canon}" xml:id="#{vol}.#{num[1..]}.#{pb}" n="#{pb}"/>)
     $old_pb = pb
+    if $old_page != $old_pb.chop
+      $old_page = $old_pb.chop
+      $img_count_by_page = 0  # 該頁的圖檔計數歸0
+    end
   end
     
   $buf << "\n<lb"
@@ -1931,7 +1950,12 @@ def convert_line(s)
 
   # 把 Ａ<㊣Ｂ> 換成 <orig reg="Ｂ">Ａ</orig>
   text = text.gsub(/((?:\[[^\]]+\])|(?:[^\]]))<㊣(.*?)>/, '<orig reg="\2">\1</orig>')
-      
+  
+  # 把 【圖】 換成 <img>
+  # 把 【圖-廣告】 換成 <img-ad>
+  text = text.gsub('【圖】','<img>')
+  text = text.gsub('【圖-廣告】','<img-ad>')
+
   # 把這種
   # T04n0213_p0794a23D##[>法集要頌經樂品第三十]<S>　[06]忍勝則怨賊，　　自負則自鄙，
   # 把 <S> 後面的空格換成 <l></l>
@@ -2088,7 +2112,9 @@ def read_config
   $line_num = ''
   $opens = Hash.new(0)	# 記錄每一個標記的層次, 預設值為 0
   $opens['div'] = 0
-  $old_pb = ''
+  $old_pb = ''  #0001a
+  $old_page = ''  #0001 （沒有欄）
+  $img_count_by_page = 0  # 該頁的圖檔計數歸0
   $sutras = {}
   $div_type_note = 0 # 記錄是否有在 <cb:div type="note"> 之中
   $TL_count = 0

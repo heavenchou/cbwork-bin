@@ -639,7 +639,7 @@ sub print_jun_head()
 # S 宋藏遺珍(新文豐版) (Songzang yizhen(Xinwenfeng Edition)) 　 【宋遺】
 # U 洪武南藏 (Southern Hongwu Edition of the Canon) （初刻南藏） 【洪武】
 # Y 印順法師佛學著作集 (Corpus of Venerable Yin Shun's Buddhist Studies) 【印順】
-# YP 演培法師全集 (The Complete Works of Venerable Yen Pei) 【演培】
+# YP 演培法師全集 (The Complete Collected Works of Venerable Yen Pei) 【演培】
 # Z 卍大日本續藏經 (Manji Dainihon Zokuzokyo)
 # ZY 智諭老和尚全集 (the Complete Works of Ven Zhiyu) 【智諭】
 		
@@ -785,7 +785,7 @@ sub print_jun_head()
 	elsif($vol_head eq "YP")
 	{
 		$sutraver_c = "演培法師全集";
-		$sutraver_e = "The Complete Works of Venerable Yen Pei";
+		$sutraver_e = "The Complete Collected Works of Venerable Yen Pei";
 	}
 
 	$content[0] =~ /^\D+(\d+)n(.{5})/;
@@ -2308,6 +2308,11 @@ s之後的第一個Ｐ：變成二個空格。（是否是不管之前的繼承�
 			s/<\/[kf]1?>//;
 			next;
 		}
+		if($thistag =~ /<lb>/)
+		{
+			s/<lb>//;
+			next;
+		}
 		if($thistag =~ /<N>/)
 		{
 			s/<N>/$fullspace2/;
@@ -2812,7 +2817,7 @@ sub select_normal
 					$out .= $word;		# 直接呈現 $word
 					next;
 				}
-				elsif($word =~ /[ȧ⏑⏓]/)
+				elsif($word =~ /[ȧ⏑⏓㉑-㉟㊱-㊿]/)
 				{
 					# 特殊字, 直接呈現
 					$out .= $word;		# 直接呈現 $word
