@@ -42,7 +42,7 @@
       <p xml:lang="zh-Hant" cb:type="ly">%{laiyuan_c}</p>
     </projectDesc>
     <editorialDecl>
-      <punctuation resp="orig"><p>%{punctuation}</p></punctuation>
+      <punctuation resp="%{punctuation_resp}"><p>%{punctuation}</p></punctuation>
     </editorialDecl>
     <tagsDecl>
       <namespace name="http://www.tei-c.org/ns/1.0">

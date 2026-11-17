@@ -419,7 +419,10 @@ eos
 
   def e_item(e)
     r = ''
-    r = e['n'] if e.key?('n')
+    # 2026/11/08 不再使用 n 屬性的內容
+    # 原本的 <item n="（一）">...
+    # 已改成 <item n="（一）">（一）...
+    # r = e['n'] if e.key?('n')
     r += traverse(e)
     r = "\n<li>" + r + "</li>\n"
     r

@@ -6,7 +6,8 @@
 # 作者: 周邦信(Ray Chou) 2022-04-20
 #
 # Heaven 修改：
-# 2026-11-17 支援【圖】和【圖-廣告】
+# 2026-11-17 取消這點：2023-09-21 支援 <date> 後面不再有 <p>，改成 <date> 裡面要自動加 <p>
+# 2026-11-17 海潮音支援【圖】和【圖-廣告】，檔頭的標點預設為「AI 標點」。
 # 2026-10-24 新增 <lb> 標記，轉出 <lb type="forced"/>，原來的 type="honorific" 也改成 type="forced"
 # 2026-10-14 表格新規則，若在表格中，該行不是 /<c[\s,>]/ 開頭，則行首不自動加上 <row>，表示接續前一行
 # 2025-09-26 支援《演培法師全集》
@@ -36,7 +37,7 @@ require 'fileutils'
 require 'inifile'
 require 'json'
 require 'slop'
-# 要注意更新 ../common.rb 這個檔案
+# 有新的藏經要注意更新 ../common.rb 這個檔案
 require_relative '../common'
   
 $collection_zh = {
@@ -239,7 +240,7 @@ def inline_tag(tag)
     # 轉成
     # <cb:event><date>ＸＸＸ</date><p,1>ＹＹＹ</p></cb:event>
     start_inline_annals(tag)
-  when '</annals>' then close_tags('p', 'date', 'p', 'cb:event')
+  when '</annals>' then close_tags('byline', 'p', 'date', 'p', 'cb:event')
   when '<bold>'    then out('<hi rend="bold">')
   when '</bold>'   then out('</hi>')
   when '<border>'  then out('<hi rend="border">')
@@ -488,8 +489,8 @@ end
 def start_inline_date(tag)
   out('<date>')
   $opens['date'] = 1
-  # date 後面要自動加上 <p>
-  start_inline_p('<p>')
+  # date 後面要自動加上 <p>，20261117 取消
+  # start_inline_p('<p>')
 end
 
 def start_div(level, type)
@@ -1798,7 +1799,17 @@ def close_sutra(num)
   end
   punctuation = $sutras[n]['punctuation']
   if punctuation.nil?
-    punctuation = '原書標點'
+    if $canon == 'HC'
+    # 海潮音特例為 AI 標點
+      punctuation = 'AI 標點'
+    else
+      punctuation = '原書標點'
+    end
+  end
+
+  punctuation_resp = $sutras[n]['punctuation_resp']
+  if punctuation == 'AI 標點'
+    punctuation_resp = 'AI'
   end
 
   data = {
@@ -1815,6 +1826,7 @@ def close_sutra(num)
     bibl_m: $sutras[n]['title'],
     sourcedesc: sourcedesc,
     punctuation: punctuation,
+    punctuation_resp: punctuation_resp,
     laiyuan_e: $sutras[n]['laiyuan_e'],
     laiyuan_c: $sutras[n]['laiyuan_c'],
     wit: WITS[$canon],
@@ -2043,6 +2055,7 @@ def read_source_line(line, laiyuan)
 
   $sutras[n]['laiyuan_c'] = a1.join('，')
   $sutras[n]['laiyuan_e'] = a2.join(', ')
+  $sutras[n]['punctuation_resp'] = 'orig'
 end
 
 def read_all_gaijis

@@ -151,6 +151,11 @@ sub h2t()
 		s/<small[^>]*interlinear\-note[^>]*>/(/g;
 		s/<\/small>/)/g;
 
+		# 要加括號 J40nB481 <div class="lg inlinenote regular" style="margin-left:0em;;"> 
+		s/<div [^>]*inlinenote[^>]*>/(/g;
+		# 要加括號 X57n0980_p0779a14 <div class="lg note1">
+		s/<div [^>]*note[12][^>]*>/(/g;
+
 		# 悉曇
 		# <span class='siddam' roman='na' code='SD-A5A9' char=''/>
 		# <span class='ranja' roman='oṃ' code='RJ-CCBA' char=''/>

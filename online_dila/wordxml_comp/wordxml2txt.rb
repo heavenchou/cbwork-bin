@@ -43,6 +43,7 @@ end
 # 把 body 轉成我們要的純文字格式
 def body_to_txt(xml, basename)
   body = xml.at_css('body')
+  in_table_tt = false
   return [] unless body
 
   raw_xml = body.inner_html
@@ -71,9 +72,18 @@ def body_to_txt(xml, basename)
   # lines 會是: ["<p>首段內容</p>", "0001a01", "<p>有lb內容</p>", "0001a02", ...]
   result = []
   i = 1
+  nextline = '' # 梵漢對照時的下一行
+
   while i < lines.size
     lb = lines[i].strip # T02n0131_p0854b04
     content = lines[i+1].to_s
+    # 移除前面的換行及半型空白
+    #content.sub!(/\A[\n ]+/, '')
+    content.gsub!(/\n +/, "\n")
+    # 有梵漢對照就要接起來
+    content = nextline + content
+    nextline = ""
+
     # 有些空白要先移除
     #  <item><p>天帝釋問品</p></item>
     content.gsub!(/^\s+<item/, '<item')
@@ -122,6 +132,102 @@ def body_to_txt(xml, basename)
     #   #gets
     # end
 
+    #######################
+    # 2026/11/15
+    # 2026.R3 開始，梵漢對照在 XML 已經分成二行了，例如：
+
+    # <lb n="0892c01" ed="T"/><p xml:id="pT10p0892c0101" cb:type="dharani"><cb:tt>
+    # <cb:ttr>「<cb:t xml:lang="sa-Sidd"><g ref="#SD-A5A9"/></cb:t>
+    # ....
+    # <lb n="0892c02" ed="T"/><cb:ttr>
+    #   <cb:t xml:lang="zh-Hant">曩</cb:t>
+
+    # 但在 word 中，又將它們合併，用 lb 處理，讓梵字在上，漢字在下，然而其實是在同一行
+    # <!-- lb: T10n0299_p0892c01 --><table rend="table_tt">
+    # <row><cell>「<font name="sidd">巧</font><lb/>
+    # (na)<lb/>
+    # 曩</cell>
+
+    # 上面那個「曩」是要移到次行
+
+    # 先判斷是不是在 <table rend="table_tt"> 中
+    if content.include? "<table"
+      if content =~ /<table [^>]*rend=['"]table_tt['"]/
+        in_table_tt = true
+      else
+        in_table_tt = false
+      end
+    end
+
+    # table_tt 中的 row，cell 內以 <lb/> 分成 梵字 / (羅馬轉寫) / 漢字 三段，
+    # 但順序有兩種，每次都把「在後面的那一半」移到次行 (累積到 nextline)：
+    #   A. 梵(羅馬) 在前，漢 在後：漢 (最後一段) 移到次行
+    #      <cell><font name="sidd">屹</font><lb/>\n(sa)<lb/>\n三</cell>
+    #        => <cell><font name="sidd">屹</font><lb/>\n(sa)<lb/></cell>，nextline += "三"
+    #   B. 漢 在前，梵(羅馬) 在後：梵(羅馬) (後面二段) 移到次行
+    #      <cell>「唵<lb/>\n<font name="sidd">輆</font><lb/>\n(om̐)</cell>
+    #        => <cell>「唵<lb/></cell>，nextline += '<font name="sidd">輆</font><lb/>(om̐)'
+    # 是否為梵字，由 <font name="sidd"> 或 <font name="rajn"> 判斷
+    # 有些 cell 沒有對應的悉曇字，如 <cell><lb/>\n<lb/>\n金剛王</cell>，
+    # 光看這個 cell 無法判斷是 A 還是 B，要參考同一個 row 中其它 cell 的型態
+    if in_table_tt && content.include?('<cell')
+      # <lb/> 與 <lb></lb> 兩種寫法都要處理 (Nokogiri inner_html 會輸出 <lb></lb>)
+      lb_re   = /<lb\s*\/>|<lb><\/lb>/
+      sidd_re = /<font\s+name=["'](?:sidd|ranj)["']/
+      cell_re = /(<cell[^>]*>)(.*?)(<\/cell>)/m
+
+      # 判斷 cell 的型態：:A 梵(羅馬)在前、:B 漢在前、nil 無法判斷
+      classify = lambda do |cell|
+        segs = cell.split(lb_re, -1)
+        if segs.size >= 3 && segs[0] =~ sidd_re
+          :A
+        elsif segs.size >= 2 && segs[0] !~ sidd_re && segs[1..-1].any? { |s| s =~ sidd_re }
+          :B
+        end
+      end
+
+      # 先掃過整個 row，由有悉曇字的 cell 決定這個 row 的型態
+      row_type = nil
+      content.scan(cell_re) do |_open, cell, _close|
+        row_type ||= classify.call(cell)
+      end
+
+      content = content.gsub(cell_re) do
+        open_tag, cell, close_tag = $1, $2, $3
+        segs = cell.split(lb_re, -1)    # 以 lb 分成的各段文字
+        type = classify.call(cell)
+        # 沒有悉曇字的 cell (至少 3 段)，依 row 的型態處理
+        type ||= row_type if segs.size >= 3 && cell !~ sidd_re
+        # 沒有悉曇字、只有二段的 cell，如 <cell><lb/>速速速速</cell>，
+        # 不論 row 的型態，都是把最後一段 (最後一個 lb 之後) 移到次行
+        type ||= :A if segs.size == 2 && cell !~ sidd_re
+
+        moved = nil
+        if type == :A
+          # 最後一個 lb 之後是漢
+          pos = cell.enum_for(:scan, lb_re).map { Regexp.last_match }.last.end(0)
+          moved = cell[pos..-1]
+          cell  = cell[0...pos]
+        elsif type == :B
+          # 第一個 lb 之後是 梵(羅馬)
+          pos = lb_re.match(cell).end(0)
+          moved = cell[pos..-1]
+          cell  = cell[0...pos]
+        end
+        if moved
+          # 要移走的只剩 lb、沒有文字時 (空的梵/羅馬)，cell 維持原樣
+          if moved.gsub(lb_re, '').strip.empty?
+            cell = cell + moved
+          else
+            # 搬到次行的內容：只去掉換行，不能動空白 (<font name=...> 裡有空白)
+            nextline << moved.gsub(/[\r\n]+/, '').strip
+          end
+        end
+        "#{open_tag}#{cell}#{close_tag}"
+      end
+    end
+
+    ##########################################
     # 移除所有 HTML 標籤
 		text = Nokogiri::HTML.fragment(content).text
 		# 移除 footnote 佔位後，合併多餘空白與換行
@@ -144,10 +250,18 @@ def body_to_txt(xml, basename)
       vol = 'UNKNOWN'
     end
 
+    # 一個要改的特例
+    # T19n0956_p0316a10║「黽(此是梵本一字之呪)(bhrūṃ)
+    # 改成
+    # T19n0956_p0316a10║「黽(bhrūṃ)(此是梵本一字之呪)
+    
+    text.sub!('(此是梵本一字之呪)(bhrūṃ)','(bhrūṃ)(此是梵本一字之呪)')
+
     result << [vol, "#{line_label}║#{text}"]
 
     i += 2
   end
+  
   result
 end
 
@@ -156,6 +270,15 @@ $argv = ""
 
 if ARGV.size > 0
   $argv = ARGV[0]
+end
+
+# 參數是冊 (如 T01) 時，才需要載入 經_卷 與冊的對照表
+if $argv =~ /\A[A-Z]{1,2}\d{2,3}\Z/i
+  sutra2vol()
+  if $Sutra2Vol.empty?
+    puts "找不到 sutra_list.txt 或內容是空的，無法依冊處理: #{$argv}"
+    exit 1
+  end
 end
 
 Find.find(SRC_ROOT) do |path|
@@ -171,13 +294,24 @@ Find.find(SRC_ROOT) do |path|
   m = path.match(%r{wordxml_xml/([A-Z]{1,2})/([^/]+)/(.+\.xml)}i)
   if ARGV.size > 0
     # 如果有參數，則只處理該參數的資料夾
-    # 例如：ruby wordxml2txt.rb T01 
+    # 例如：ruby wordxml2txt.rb T0099
     # 會處理 wordxml_xml/T/T01/ 下的所有檔案
     # d:\Temp\wordxml_xml\T\T01\T01n0001\T01n0001_001.xml
     # m = path.match(%r{wordxml_xml/([A-Z]{1,2})/(#{Regexp.escape($argv)})/([^/]+)/(.+\.xml)}i)
     # d:\Temp\wordxml_xml\T\T0001\T0001_001.xml
     # m = path.match(%r{wordxml_xml/([A-Z]{1,2})/(#{Regexp.escape($argv)})/(.+\.xml)}i)
-    m = path.match(%r{wordxml_xml/([A-Z]{1,2})/(#{$argv})/(.+\.xml)}i)
+    if $argv =~ /\A[A-Z]{1,2}\Z/i  # 藏經，如 T
+      m = path.match(%r{wordxml_xml/(#{$argv})/([^/]+)/(.+\.xml)}i)
+    elsif $argv =~ /\A[A-Z]{1,2}\d{2,3}\Z/i  # 冊，如 T01
+      # 來源目錄沒有冊的層次，要靠 sutra_list.txt 查出該 經_卷 屬於哪一冊
+      m = path.match(%r{wordxml_xml/([A-Z]{1,2})/([^/]+)/(.+\.xml)}i)
+      if m
+        vol_of_file = $Sutra2Vol[File.basename(m[3], '.xml')]   # T0001_001 => T01
+        m = nil unless vol_of_file && vol_of_file.upcase == $argv.upcase
+      end
+    else  # 單經，如 T0914
+      m = path.match(%r{wordxml_xml/([A-Z]{1,2})/(#{$argv})/(.+\.xml)}i)
+    end
   end
 
   unless m

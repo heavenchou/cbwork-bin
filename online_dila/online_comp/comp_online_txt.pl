@@ -12,6 +12,12 @@ use lib "/cbwork/bin";
 use CBETA;
 my $gaiji = new Gaiji();
 $gaiji->load_access_db();
+use Config::IniFiles;
+use JSON::PP;
+
+# 悉曇字 SD 碼 => 羅馬轉寫
+my %sanskrit_roman;
+get_sanskrit();
 
 # 來源目錄, 也就是 cbreader 產生的 html 檔目錄
 my $cbr_path = "d:/temp/online_out_txt/";
@@ -44,6 +50,28 @@ print OUT $output;
 close OUT;
 
 ##########################
+
+# 載入悉曇字資料 (cbeta_sanskrit.json), 建立 SD 碼 => 羅馬轉寫 的對照表
+# 檔案位置由 cbwork_bin.ini 的 gaiji-m.mdb_file 推得
+sub get_sanskrit
+{
+	my $cfg = Config::IniFiles->new( -file => "/cbwork/bin/cbwork_bin.ini" );
+	my $sanskrit_file = $cfg->val('default', 'gaiji-m.mdb_file', '');
+	$sanskrit_file =~ s/gaiji\-m\.mdb/cbeta_sanskrit.json/;
+
+	open my $fh, "<:raw", $sanskrit_file or die "無法開啟悉曇字資料 $sanskrit_file : $!";
+	local $/;
+	my $json = <$fh>;
+	close $fh;
+
+	my $data = JSON::PP->new->utf8->decode($json);
+	foreach my $id (keys %$data)
+	{
+		my $roman = $data->{$id}{romanized};
+		next if(!defined($roman) || $roman eq "");	# 沒有轉寫字的不處理
+		$sanskrit_roman{$id} = $roman;
+	}
+}
 
 sub findfile
 {
@@ -259,6 +287,9 @@ sub getfile
 		}
 
 		#next if(/\D+.*?║$/);
+
+		# 其餘的悉曇字 &SD-xxxx; 換成羅馬轉寫字 (找不到的維持原樣)
+		s/&((?:SD|RJ)\-[0-9A-Fa-f]+);/exists $sanskrit_roman{uc $1} ? $sanskrit_roman{uc $1} : "&$1;"/ge;
 
 		push(@$lines, $_);
 	}
