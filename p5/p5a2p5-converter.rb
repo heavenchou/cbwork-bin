@@ -895,6 +895,8 @@ class P5aToP5Converter
       r[k] = info['char']
 
       r['pua'] = info['pua']
+      r['unicode'] = info['unicode'] if info.key?('unicode')
+      r['composed'] = info['uni_composed'] if info.key?('uni_composed')
       return r
     end
 
@@ -1068,7 +1070,7 @@ class P5aToP5Converter
     text.each_codepoint do |code|
       c = text[i]
       if @unihan.ver(code) > 2.0
-        if code == 0x227 || code == 0x23D1 || code == 0x23D3 || code == 0x3251  # unicode 特例 ȧ⏑⏓㉑
+        if code == 0x227 || code == 0x23D1 || code == 0x23D3 || (code >= 0x3251 && code <= 0x325F) || (code >= 0x32B1 && code <= 0x32BF)  # unicode 特例 ȧ⏑⏓㉑-㉟ ㊱-㊿
           r += c
         else
           hex = '%X' % code
@@ -1129,7 +1131,7 @@ class P5aToP5Converter
     r += %(\t\t\t\t<charName>CBETA CHARACTER #{cb}</charName>\n)
     h = get_gaiji_info(cb)
     h.sort.each do |k, v|
-      next if %w[uni_char unicode moe_variant_id nor_unicode norm_uni_char norm_unicode pua].include?(k)
+      next if %w[uni_char unicode composed moe_variant_id nor_unicode norm_uni_char norm_unicode pua].include?(k)
       r += "\t\t\t\t<charProp>\n"
       r += "\t\t\t\t\t<localName>"
       r += case k
@@ -1155,6 +1157,10 @@ class P5aToP5Converter
 
     if h.key?('unicode')
       r += %(\t\t\t\t<mapping type="unicode">U+#{h['unicode']}</mapping>\n)
+    end
+
+    if h.key?('composed')
+      r += %(\t\t\t\t<mapping type="composed">#{h['composed']}</mapping>\n)
     end
 
     if h.key?('norm_unicode')

@@ -163,7 +163,8 @@ end
 def e_item(e)
   r = ''
   r += "\n" if $opts[:para_format]
-  r += e['n'] if e.key?('n')
+  # n 屬性的內容已經直接變成文字了 2026/11/09
+  # r += e['n'] if e.key?('n')
   r + traverse(e)
 end
 
@@ -182,6 +183,7 @@ end
 def e_lb(e)
   $lb = e['n']
 
+  return '' if !e.key?('ed')  # <lb type="forced"/>
   return '' if e.key?('ed') and e['ed'].start_with?('R')
   return '' if e['type'] == "old"
 
